@@ -1,0 +1,1 @@
+export const FOREXEDGE_VERSION = '1.0.0';
