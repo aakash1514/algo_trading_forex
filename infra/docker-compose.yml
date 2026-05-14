@@ -3,21 +3,23 @@ services:
 
   # ─── DATABASE ───────────────────────────────
   timescaledb:
-    image: timescale/timescaledb:latest-pg16
-    container_name: forexedge_tsdb
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "5432:5432"
-    volumes:
-      - tsdb_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      image: timescale/timescaledb:latest-pg16
+      container_name: forexedge_tsdb
+      environment:
+        POSTGRES_USER: ${DB_USER}
+        POSTGRES_PASSWORD: ${DB_PASS}
+        POSTGRES_DB: ${DB_NAME}
+        POSTGRES_HOST_AUTH_METHOD: md5
+        POSTGRES_INITDB_ARGS: "--auth-host=md5 --auth-local=trust"
+      ports:
+        - "15432:5432"
+      volumes:
+        - tsdb_data:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
   # ─── CACHE + PUB/SUB ────────────────────────
   redis:
@@ -60,7 +62,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      
+
   # ─── OBJECT STORAGE ──────────────────────────
   minio:
     image: minio/minio:latest
