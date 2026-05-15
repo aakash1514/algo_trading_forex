@@ -5,6 +5,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { config } from 'process';
 import * as path from 'path';
+import { AuthModule } from '../auth/auth.module';
+import { RedisModule } from '../redis/redis.module';
+import { UserEntity, InstrumentEntity } from '@forexedge/database';
+
 
 @Module({
   imports: [
@@ -23,12 +27,14 @@ import * as path from 'path';
         username: config.get<string>('DB_USER'),
         password: config.get<string>('DB_PASS'),
         database: config.get<string>('DB_NAME'),
-        entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        entities: [UserEntity, InstrumentEntity],
         migrations: [__dirname + '/../migrations/*{.ts,.js}'],
         synchronize: false,  
         logging: config.get<string>('NODE_ENV') === 'development',
       })
-    })
+    }),
+    RedisModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

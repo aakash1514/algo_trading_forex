@@ -22,23 +22,23 @@ export enum InstrumentType {
 @Entity('instruments')
 export class InstrumentEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true, length: 7 })
-  pair: string;              
+  pair!: string;              
 
   @Column({ name: 'base_currency', length: 3 })
-  baseCurrency: string;      
+  baseCurrency!: string;      
 
   @Column({ name: 'quote_currency', length: 3 })
-  quoteCurrency: string;     
+  quoteCurrency!: string;     
 
   @Column({
     type: 'enum',
     enum: InstrumentType,
     default: InstrumentType.MAJOR,
   })
-  type: InstrumentType;
+  type!: InstrumentType;
 
   @Column({
     name: 'pip_size',
@@ -46,14 +46,14 @@ export class InstrumentEntity {
     precision: 10,
     scale: 6,
   })
-  pipSize: number;            // 0.0001 for most pairs, 0.01 for JPY pairs
+  pipSize!: number;            // 0.0001 for most pairs, 0.01 for JPY pairs
 
   @Column({
     name: 'lot_size',
     type: 'integer',
     default: 100000,
   })
-  lotSize: number;            // standard lot = 100,000 units
+  lotSize!: number;            // standard lot = 100,000 units
 
   @Column({
     name: 'min_lot',
@@ -62,7 +62,7 @@ export class InstrumentEntity {
     scale: 2,
     default: 0.01,
   })
-  minLot: number;
+  minLot!: number;
 
   @Column({
     name: 'max_lot',
@@ -71,7 +71,7 @@ export class InstrumentEntity {
     scale: 2,
     default: 100,
   })
-  maxLot: number;
+  maxLot!: number;
 
   @Column({
     name: 'avg_spread',
@@ -80,7 +80,7 @@ export class InstrumentEntity {
     scale: 5,
     nullable: true,
   })
-  avgSpread: number;
+  avgSpread!: number;
 
   // Which sessions this pair is most active in
   @Column({
@@ -88,14 +88,14 @@ export class InstrumentEntity {
     type: 'simple-array',
     nullable: true,
   })
-  activeSessions: ForexSession[];
+  activeSessions!: ForexSession[];
 
   @Column({ name: 'is_active', default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

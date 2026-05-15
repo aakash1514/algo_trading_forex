@@ -22,46 +22,46 @@ export enum UserStatus {
 @Entity('users')
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column({ unique: true })
-  username: string;
+  username!: string;
 
   @Column({ name: 'password_hash' })
-  passwordHash: string;
+  passwordHash!: string;
 
   @Column({
     type: 'enum',
     enum: UserRole,
     default: UserRole.TRADER,
   })
-  role: UserRole;
+  role!: UserRole;
 
   @Column({
     type: 'enum',
     enum: UserStatus,
     default: UserStatus.ACTIVE,
   })
-  status: UserStatus;
+  status!: UserStatus;
 
   @Column({ name: 'first_name', nullable: true })
-  firstName: string;
+  firstName!: string;
 
   @Column({ name: 'last_name', nullable: true })
-  lastName: string;
+  lastName!: string;
 
   @Column({ name: 'is_email_verified', default: false })
-  isEmailVerified: boolean;
+  isEmailVerified!: boolean;
 
   @Column({ name: 'last_login_at', nullable: true })
-  lastLoginAt: Date;
+  lastLoginAt!: Date;
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  updatedAt!: Date;
 }

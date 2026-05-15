@@ -22,4 +22,13 @@ module.exports = {
       sourceMap: true,
     }),
   ],
+
+  optimization: {
+    minimize: false,
+  },
+  node: {
+    __dirname: false,
+    __filename: false,
+  },
+
 };
