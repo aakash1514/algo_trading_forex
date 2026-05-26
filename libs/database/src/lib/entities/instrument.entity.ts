@@ -49,6 +49,13 @@ export class InstrumentEntity {
   pipSize!: number;            // 0.0001 for most pairs, 0.01 for JPY pairs
 
   @Column({
+  name: 'pip_decimal_places',
+  type: 'integer',
+  default: 4,
+  })
+  pipDecimalPlaces!: number;
+
+  @Column({
     name: 'lot_size',
     type: 'integer',
     default: 100000,
@@ -98,4 +105,6 @@ export class InstrumentEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  
 }

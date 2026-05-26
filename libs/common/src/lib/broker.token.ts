@@ -1,0 +1,1 @@
+export const BROKER_ADAPTER = 'BROKER_ADAPTER';
