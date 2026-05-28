@@ -57,7 +57,11 @@
         "apps/auth-service-e2e/**/*",
         "apps/market-service-e2e/**/*",
         "apps/domain-service-e2e/**/*",
-        "apps/order-service-e2e/**/*"
+        "apps/order-service-e2e/**/*",
+        "apps-e2e/**/*",
+        "ws-gateway-e2e/**/*",
+        "apps-e2e/**/*",
+        "apps/ws-gateway-e2e/**/*"
       ]
     }
   ],
