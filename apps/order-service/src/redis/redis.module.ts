@@ -11,10 +11,12 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       provide: REDIS_CLIENT,
       useFactory: (config: ConfigService) => {
         return new Redis({
-          host: config.get<string>('REDIS_HOST', 'localhost'),
-          port: config.get<number>('REDIS_PORT', 6379),
-          password: config.get<string>('REDIS_PASS'),
-        });
+        host: config.get<string>('REDIS_HOST', 'localhost'),
+        port: config.get<number>('REDIS_PORT', 6379),
+        password: config.get<string>('REDIS_PASS'),
+        tls: config.get<string>('REDIS_TLS') === 'true' ? {} : undefined,
+        username: config.get<string>('REDIS_USERNAME') ?? 'default',
+      });
       },
       inject: [ConfigService],
     },

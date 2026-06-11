@@ -48,7 +48,7 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
     this.minioClient = new MinioClient({
       endPoint: process.env.MINIO_ENDPOINT ?? 'localhost',
       port: Number(process.env.MINIO_PORT ?? 9000),
-      useSSL: false,
+      useSSL: process.env.MINIO_USE_SSL === 'true', // was hardcoded false
       accessKey: process.env.MINIO_USER ?? 'minio_admin',
       secretKey: process.env.MINIO_PASS ?? 'minio_secret123',
     });
@@ -72,6 +72,8 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
           host: process.env.REDIS_HOST ?? 'localhost',
           port: Number(process.env.REDIS_PORT ?? 6379),
           password: process.env.REDIS_PASS ?? undefined,
+          tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
+          username: process.env.REDIS_USERNAME ?? 'default',
         },
         concurrency: 1, // conservative for dev — increase to 2 in production
       },

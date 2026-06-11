@@ -17,16 +17,18 @@ import { TickProcessorModule } from '../tick-processor/tick-processor.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 15432),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASS'),
-        database: config.get<string>('DB_NAME'),
-        entities: [InstrumentEntity],
-        synchronize: false,   // NEVER true — we use migrations
-        ssl: false,
-      }),
+      type: 'postgres',
+      host: config.get<string>('DB_HOST', 'localhost'),
+      port: config.get<number>('DB_PORT', 15432),
+      username: config.get<string>('DB_USER'),
+      password: config.get<string>('DB_PASS'),
+      database: config.get<string>('DB_NAME'),
+      entities: [InstrumentEntity],
+      synchronize: false,
+      ssl: config.get<string>('DB_SSL') === 'true'
+        ? { rejectUnauthorized: false }
+        : false,
+    }),
       inject: [ConfigService],
     }),
 

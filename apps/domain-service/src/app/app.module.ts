@@ -26,16 +26,19 @@ import { AppService } from './app.service';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host:     config.get<string>('DB_HOST', 'localhost'),
-        port:     config.get<number>('DB_PORT', 15432),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASS'),
-        database: config.get<string>('DB_NAME'),
-        entities: [InstrumentEntity, SwapRateEntity, EconomicEventEntity],
-        synchronize: false,
-      }),
+     useFactory: (config: ConfigService) => ({
+      type: 'postgres',
+      host: config.get<string>('DB_HOST', 'localhost'),
+      port: config.get<number>('DB_PORT', 15432),
+      username: config.get<string>('DB_USER'),
+      password: config.get<string>('DB_PASS'),
+      database: config.get<string>('DB_NAME'),
+      entities: [InstrumentEntity, SwapRateEntity, EconomicEventEntity],
+      synchronize: false,
+      ssl: config.get<string>('DB_SSL') === 'true'
+        ? { rejectUnauthorized: false }
+        : false,
+    }),
     }),
     KafkaModule,
     RedisModule,

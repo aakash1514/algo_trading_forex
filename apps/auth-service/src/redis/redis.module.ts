@@ -12,19 +12,22 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const redis = new Redis({
-          host: config.get<string>('REDIS_HOST'),
-          port: config.get<number>('REDIS_PORT'),
-          password: config.get<string>('REDIS_PASS'),
-          lazyConnect: false,
-          retryStrategy: (times) => {
-            if (times > 3) {
-              console.error('Redis connection failed after 3 retries');
-              return null; // stop retrying
-            }
-            return Math.min(times * 500, 2000);
-          },
-          reconnectOnError: () => true,
-        });
+            host: config.get<string>('REDIS_HOST'),
+            port: config.get<number>('REDIS_PORT'),
+            password: config.get<string>('REDIS_PASS'),
+            // ADD THIS:
+            tls: config.get<string>('REDIS_TLS') === 'true' ? {} : undefined,
+            username: config.get<string>('REDIS_USERNAME') ?? 'default',
+            lazyConnect: false,
+            retryStrategy: (times) => {
+              if (times > 3) {
+                console.error('Redis connection failed after 3 retries');
+                return null;
+              }
+              return Math.min(times * 500, 2000);
+            },
+            reconnectOnError: () => true,
+          });
 
         redis.on('connect', () => {
           console.log('✅ Redis connected');

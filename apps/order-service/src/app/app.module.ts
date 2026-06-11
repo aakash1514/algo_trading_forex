@@ -39,14 +39,13 @@ import { AppService } from './app.service';
         password: config.get<string>('DB_PASS'),
         database: config.get<string>('DB_NAME', 'forexedge_db'),
         entities: [
-          UserEntity,
-          OrderEntity,
-          PositionEntity,
-          AccountSummaryEntity,
-          InstrumentEntity,
-          EconomicEventEntity,
+          UserEntity, OrderEntity, PositionEntity,
+          AccountSummaryEntity, InstrumentEntity, EconomicEventEntity,
         ],
         synchronize: false,
+        ssl: config.get<string>('DB_SSL') === 'true'
+          ? { rejectUnauthorized: false }
+          : false,
       }),
       inject: [ConfigService],
     }),

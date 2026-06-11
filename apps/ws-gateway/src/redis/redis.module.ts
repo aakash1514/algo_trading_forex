@@ -14,6 +14,8 @@ const logger = new Logger('RedisModule');
           host: process.env.REDIS_HOST ?? 'localhost',
           port: Number(process.env.REDIS_PORT ?? 6379),
           password: process.env.REDIS_PASS ?? undefined,
+          tls: process.env.REDIS_TLS === 'true' ? {} : undefined,
+          username: process.env.REDIS_USERNAME ?? 'default',
           lazyConnect: false,
         });
 

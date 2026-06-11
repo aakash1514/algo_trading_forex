@@ -31,7 +31,11 @@ import { UserEntity, InstrumentEntity } from '@forexedge/database';
         migrations: [__dirname + '/../migrations/*{.ts,.js}'],
         synchronize: false,  
         logging: config.get<string>('NODE_ENV') === 'development',
-      })
+        // ADD THIS:
+        ssl: config.get<string>('DB_SSL') === 'true' 
+          ? { rejectUnauthorized: false } 
+          : false,
+})
     }),
     RedisModule,
     AuthModule

@@ -22,8 +22,11 @@ import { UserEntity } from '@forexedge/database';
       username: process.env.DB_USER ?? 'forexedge',
       password: process.env.DB_PASS ?? 'forexedge',
       database: process.env.DB_NAME ?? 'forexedge_db',
-      entities: [BacktestRunEntity,UserEntity],  // ← explicit, no glob
+      entities: [BacktestRunEntity, UserEntity],
       synchronize: false,
+      ssl: process.env.DB_SSL === 'true'
+        ? { rejectUnauthorized: false }
+        : false,
     }),
     AuthModule,
     RedisModule,
