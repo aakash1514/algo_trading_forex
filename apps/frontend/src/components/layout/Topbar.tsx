@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { useGetCurrentSessionQuery } from '../../store/api/domain.api';
+import { useLogoutMutation } from '../../store/api/auth.api';
 import { clearCredentials } from '../../store/slices/auth.slice';
 import { useRouter } from 'next/navigation';
 import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
@@ -12,13 +13,21 @@ import { getPriceDecimals } from '../../lib/pip';
 export function Topbar() {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const [logout] = useLogoutMutation();
   const user = useAppSelector((s) => s.auth.user);
   const prices = useAppSelector((s) => s.market.prices);
   const { data: session } = useGetCurrentSessionQuery(undefined, {
     pollingInterval: 30_000,
   });
 
-  function handleLogout() {
+  async function handleLogout() {
+    // Revoke the refresh token server-side first; otherwise the next page load
+    // would silently restore the session from the cookie.
+    try {
+      await logout().unwrap();
+    } catch {
+      // Already expired/revoked: clearing local state is still correct.
+    }
     dispatch(clearCredentials());
     router.replace('/login');
   }

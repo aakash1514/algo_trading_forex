@@ -2,8 +2,9 @@ import type { AuthUser, AccountSummary, Position, Order, SignalUpdateEvent } fro
 
 export interface AuthState {
   user: AuthUser | null;
-  accessToken: string | null;
+  accessToken: string | null; // in memory only
   isAuthenticated: boolean;
+  sessionRestored: boolean;   // false until the app-load refresh attempt resolves
 }
 
 export interface MarketState {

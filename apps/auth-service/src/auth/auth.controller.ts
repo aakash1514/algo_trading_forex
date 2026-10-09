@@ -63,7 +63,8 @@ export class AuthController {
   async logout(@Req() req: Request, @Res() res: Response) {
     const user = req.user as any;
     await this.authService.logout(user.id);
-    res.clearCookie('refresh_token');
+    // Must match the path the cookie was set with, or the browser keeps it.
+    res.clearCookie('refresh_token', { path: '/api/auth' });
     return res.json({ message: 'Logged out successfully' });
   }
 

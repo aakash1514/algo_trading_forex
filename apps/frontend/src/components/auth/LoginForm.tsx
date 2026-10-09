@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
 import { useLoginMutation } from '../../store/api/auth.api';
-import { useAppDispatch } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
 import { setCredentials } from '../../store/slices/auth.slice';
 import { cn } from '../../lib/cn';
 
@@ -23,6 +23,12 @@ export function LoginForm() {
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
   const [serverError, setServerError] = useState<string | null>(null);
+  const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated);
+
+  // A session restored from the refresh cookie skips the login form.
+  useEffect(() => {
+    if (isAuthenticated) router.replace('/dashboard');
+  }, [isAuthenticated, router]);
 
   const {
     register,

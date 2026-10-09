@@ -1,43 +1,43 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import {
+  createApi,
+  fetchBaseQuery,
+  type BaseQueryFn,
+  type FetchArgs,
+  type FetchBaseQueryError,
+} from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../index';
+import { setCredentials, clearCredentials } from '../slices/auth.slice';
+import { refreshSession } from '../../lib/session';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: '/',
   prepareHeaders(headers, { getState }) {
-    const token = (getState() as RootState).auth.accessToken
-      ?? (typeof window !== 'undefined' ? localStorage.getItem('fx_access_token') : null);
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
+    const token = (getState() as RootState).auth.accessToken;
+    if (token) headers.set('Authorization', `Bearer ${token}`);
     return headers;
   },
   credentials: 'include',
 });
 
-const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
+// A 401 from these means bad credentials or an expired session, not a stale access token.
+const AUTH_ENDPOINTS = /\/auth\/(login|register|refresh|logout)$/;
+
+export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
+  args, api, extraOptions,
+) => {
   let result = await baseQuery(args, api, extraOptions);
+  const url = typeof args === 'string' ? args : args.url;
 
-  if (result.error?.status === 401) {
-    // Try refresh
-    const refreshResult = await baseQuery(
-      { url: 'http://localhost:3000/api/auth/refresh', method: 'POST' },
-      api,
-      extraOptions
-    );
-
-    if (refreshResult.data) {
-      const data = refreshResult.data as { accessToken: string };
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('fx_access_token', data.accessToken);
-      }
-      // Retry original request
+  if (result.error?.status === 401 && !AUTH_ENDPOINTS.test(url)) {
+    // Shared single-flight refresh: concurrent 401s wait on the same call.
+    const session = await refreshSession();
+    if (session) {
+      // Store the new token first; prepareHeaders reads it for the retry.
+      api.dispatch(setCredentials(session));
       result = await baseQuery(args, api, extraOptions);
     } else {
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('fx_access_token');
-        localStorage.removeItem('fx_user');
-        window.location.href = '/login';
-      }
+      // AuthGuard redirects to /login once isAuthenticated is false.
+      api.dispatch(clearCredentials());
     }
   }
 

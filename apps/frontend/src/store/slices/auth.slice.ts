@@ -2,10 +2,13 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { AuthState } from '../../types/store.types';
 import type { AuthUser } from '../../types/api.types';
 
+// The access token lives in memory only (never localStorage, so XSS can't read
+// it). After a reload the session is restored from the httpOnly refresh cookie.
 const initialState: AuthState = {
   user: null,
   accessToken: null,
   isAuthenticated: false,
+  sessionRestored: false,
 };
 
 export const authSlice = createSlice({
@@ -16,28 +19,16 @@ export const authSlice = createSlice({
       state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('fx_access_token', action.payload.accessToken);
-        localStorage.setItem('fx_user', JSON.stringify(action.payload.user));
-      }
-    },
-    setAccessToken(state, action: PayloadAction<string>) {
-      state.accessToken = action.payload;
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('fx_access_token', action.payload);
-      }
+      state.sessionRestored = true;
     },
     clearCredentials(state) {
       state.user = null;
       state.accessToken = null;
       state.isAuthenticated = false;
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('fx_access_token');
-        localStorage.removeItem('fx_user');
-      }
+      state.sessionRestored = true;
     },
   },
 });
 
-export const { setCredentials, setAccessToken, clearCredentials } = authSlice.actions;
+export const { setCredentials, clearCredentials } = authSlice.actions;
 export default authSlice.reducer;
