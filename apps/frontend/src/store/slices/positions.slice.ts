@@ -17,10 +17,12 @@ export const positionsSlice = createSlice({
       });
     },
     positionUpdated(state, action: PayloadAction<PositionUpdateEvent>) {
-      const { positionId, pipPnl, unrealizedPnl } = action.payload;
-      if (state.items[positionId]) {
-        state.items[positionId].pipPnl = pipPnl;
-        state.items[positionId].unrealizedPnl = unrealizedPnl;
+      const { positionId, currentPrice, pipPnl, unrealizedPnl } = action.payload;
+      const position = state.items[positionId];
+      if (position) {
+        position.currentPrice = currentPrice;
+        position.pipPnl = pipPnl;
+        position.unrealizedPnl = unrealizedPnl;
       }
     },
     removePosition(state, action: PayloadAction<string>) {

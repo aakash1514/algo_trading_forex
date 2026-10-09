@@ -74,12 +74,14 @@ describe('AccountService', () => {
       expect(result.marginLevel).toBeNull();
     });
 
-    it('returns cached value without hitting DB on second call', async () => {
-      accountRepo.findOne.mockResolvedValue(makeAccountRow());
+    it('reads fresh values on every call (fills and closes write the DB directly)', async () => {
+      accountRepo.findOne
+        .mockResolvedValueOnce(makeAccountRow({ marginUsed: 1000 }))
+        .mockResolvedValueOnce(makeAccountRow({ marginUsed: 2500 }));
       await service.getAccountSummary('user-1');
-      await service.getAccountSummary('user-1');
-      // DB should only be hit once — second call uses cache
-      expect(accountRepo.findOne).toHaveBeenCalledTimes(1);
+      const second = await service.getAccountSummary('user-1');
+      expect(accountRepo.findOne).toHaveBeenCalledTimes(2);
+      expect(second.marginUsed).toBe(2500);
     });
 
     it('equity is correct with negative unrealizedPnl', async () => {

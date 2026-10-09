@@ -15,14 +15,10 @@ import { AuthModule } from '../auth/auth.module';
 import { KafkaConsumerModule } from '../kafka/kafka.module';
 import { PaperBrokerAdapter } from '../broker/paper-broker.adapter';
 import { OrderService } from '../order/order.service';
-import { OrderValidationService } from '../order/order-validation.service';
 import { OrderController } from '../order/order.controller';
 import { MarginEngineService } from '../order/margin-engine.service';
-import { PositionService } from '../position/position.service';
 import { PositionController } from '../position/position.controller';
-import { AccountService } from '../account/account.service';
 import { AccountController } from '../account/account.controller';
-import { SessionConsumer } from '../kafka/session.consumer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -75,11 +71,10 @@ import { AppService } from './app.service';
       useClass: PaperBrokerAdapter,
     },
     OrderService,
-    OrderValidationService,
     MarginEngineService,
-    PositionService,
-    AccountService,
-    SessionConsumer,
+    // PositionService, AccountService, OrderValidationService, SessionConsumer and
+    // RealtimePublisher come from KafkaConsumerModule. Declaring them here too would
+    // create second instances with separate state (spread cache, sessions).
   ],
 })
 export class AppModule {}

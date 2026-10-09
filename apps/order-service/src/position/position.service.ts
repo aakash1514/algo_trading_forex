@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
 import { CloseReason } from '@forexedge/database';
+import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 
 export interface NormalizedTick {
   pair: string;
@@ -24,6 +25,7 @@ export class PositionService {
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
     private readonly dataSource: DataSource,
+    private readonly realtime: RealtimePublisher,
   ) {}
 
   // ─── Called by Kafka tick consumer ─────────────────────────────────────────
@@ -78,6 +80,8 @@ export class PositionService {
         })
         .where('user_id = :userId', { userId: position.userId })
         .execute();
+
+      this.realtime.positionPnl(position, currentPrice, pipPnl, unrealizedPnl);
     }
   }
 
@@ -117,7 +121,7 @@ export class PositionService {
     reason: CloseReason,
     closingPrice: number,
   ): Promise<PositionEntity> {
-    return this.dataSource.transaction(async manager => {
+    const closed = await this.dataSource.transaction(async manager => {
       const position = await manager.findOne(PositionEntity, {
         where: { id: positionId },
       });
@@ -165,6 +169,10 @@ export class PositionService {
 
       return manager.findOne(PositionEntity, { where: { id: positionId } }) as Promise<PositionEntity>;
     });
+
+    // Publish only after the transaction committed.
+    void this.realtime.positionsChanged(closed.userId, closed.id);
+    return closed;
   }
 
   // ─── Pure math ─────────────────────────────────────────────────────────────

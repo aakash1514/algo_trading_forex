@@ -11,6 +11,7 @@ import { BROKER_ADAPTER } from '@forexedge/common';
 import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
 import { instrumentToPair } from '../common/instrument';
+import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { MarginEngineService } from './margin-engine.service';
 import { Kafka, Producer } from 'kafkajs';
 import { SessionConsumer } from '../kafka/session.consumer';
@@ -42,6 +43,7 @@ export class OrderService {
     private readonly validationService: OrderValidationService,
     private readonly marginEngine: MarginEngineService,
     private readonly sessionConsumer: SessionConsumer,
+    private readonly realtime: RealtimePublisher,
   ) {
     // Kafka producer — wired up in Step 10
     // Declared here so OrderService doesn't need to change in Step 10
@@ -185,6 +187,7 @@ export class OrderService {
       this.publishLifecycleEvent(order).catch(err =>
         this.logger.warn(`Kafka publish failed: ${this.getErrorMessage(err)}`)
       );
+      void this.realtime.positionsChanged(userId);
 
       return order;
     } catch (err) {

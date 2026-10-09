@@ -8,6 +8,15 @@ export const API_BASE = {
 
 export const WS_URL = 'http://localhost:3005';
 
+// Per-user Socket.IO events from ws-gateway. Mirrors SOCKET_EVENTS in
+// libs/kafka/src/lib/interfaces/realtime.interface.ts; keep the two in sync.
+export const SOCKET_EVENTS = {
+  ORDER_UPDATE: 'order:update',
+  POSITION_UPDATE: 'position:update',
+  POSITIONS_SNAPSHOT: 'positions:snapshot',
+  ACCOUNT_UPDATE: 'account:update',
+} as const;
+
 export const MAJOR_PAIRS = [
   'EUR_USD', 'GBP_USD', 'USD_JPY', 'USD_CHF',
   'AUD_USD', 'USD_CAD', 'NZD_USD', 'EUR_GBP',

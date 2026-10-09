@@ -14,6 +14,7 @@ import { SessionConsumer } from './session.consumer';
 import { PositionService } from '../position/position.service';
 import { AccountService } from '../account/account.service';
 import { OrderValidationService } from '../order/order-validation.service';
+import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { OrderValidationService } from '../order/order-validation.service';
     PositionService,
     AccountService,
     OrderValidationService,
+    RealtimePublisher,
     {
       provide: 'KAFKA_CONFIG',
       useFactory: (config: ConfigService) => ({
@@ -41,6 +43,7 @@ import { OrderValidationService } from '../order/order-validation.service';
       inject: [ConfigService],
     },
   ],
-  exports: [SpreadConsumer, SessionConsumer],
+  // Single instances shared with AppModule (controllers, OrderService).
+  exports: [SessionConsumer, PositionService, AccountService, OrderValidationService, RealtimePublisher],
 })
 export class KafkaConsumerModule {}

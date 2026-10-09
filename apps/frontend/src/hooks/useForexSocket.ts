@@ -5,16 +5,16 @@ import { io, type Socket } from 'socket.io-client';
 import { useAppDispatch, useAppSelector } from '../store';
 import { tickReceived } from '../store/slices/market.slice';
 import { positionUpdated, setPositions } from '../store/slices/positions.slice';
-import { accountUpdated, setAccountSummary } from '../store/slices/account.slice';
+import { setAccountSummary } from '../store/slices/account.slice';
 import { signalReceived } from '../store/slices/signals.slice';
-import { WS_URL, MAJOR_PAIRS } from '../lib/constants';
+import { baseApi } from '../store/api/base.api';
+import { WS_URL, MAJOR_PAIRS, SOCKET_EVENTS } from '../lib/constants';
 import type {
   TickEvent,
   PositionUpdateEvent,
+  PositionsSnapshotEvent,
   AccountUpdateEvent,
   SignalUpdateEvent,
-  AccountSummary,
-  Position,
 } from '../types/api.types';
 
 export function useForexSocket() {
@@ -48,14 +48,24 @@ export function useForexSocket() {
       });
     });
 
-    // Position P&L updates → positions slice
-    socket.on('position:update', (data: PositionUpdateEvent) => {
+    // Tick-driven P&L for one position (~1/s per position)
+    socket.on(SOCKET_EVENTS.POSITION_UPDATE, (data: PositionUpdateEvent) => {
       dispatch(positionUpdated(data));
     });
 
-    // Account equity/margin updates → account slice
-    socket.on('account:update', (data: AccountUpdateEvent) => {
-      dispatch(accountUpdated(data));
+    // Full open-position list after an order fills or a position closes
+    socket.on(SOCKET_EVENTS.POSITIONS_SNAPSHOT, (positions: PositionsSnapshotEvent) => {
+      dispatch(setPositions(positions));
+    });
+
+    // Full account summary after order/position changes (~1/s while P&L moves)
+    socket.on(SOCKET_EVENTS.ACCOUNT_UPDATE, (summary: AccountUpdateEvent) => {
+      dispatch(setAccountSummary(summary));
+    });
+
+    // Order lifecycle changes: refetch any cached order lists
+    socket.on(SOCKET_EVENTS.ORDER_UPDATE, () => {
+      dispatch(baseApi.util.invalidateTags(['Orders']));
     });
 
     // ML signals → signals slice
@@ -63,13 +73,13 @@ export function useForexSocket() {
       dispatch(signalReceived(data));
     });
 
-   return () => {
-  MAJOR_PAIRS.forEach((pair) => {
-    socket.emit('unsubscribe:ticker', pair);  // plain string here too
-  });
-  socket.disconnect();
-  socketRef.current = null;
-};
+    return () => {
+      MAJOR_PAIRS.forEach((pair) => {
+        socket.emit('unsubscribe:ticker', pair);
+      });
+      socket.disconnect();
+      socketRef.current = null;
+    };
   }, [accessToken, dispatch]);
 
   return socketRef;

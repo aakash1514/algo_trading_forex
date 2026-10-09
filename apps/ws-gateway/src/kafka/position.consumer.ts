@@ -1,5 +1,10 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { KafkaConsumerService } from '@forexedge/kafka';
+import {
+  KafkaConsumerService,
+  REALTIME_TOPICS,
+  SOCKET_EVENTS,
+  type PositionsUpdatedMessage,
+} from '@forexedge/kafka';
 import { AppGateway } from '../gateway/app.gateway';
 
 @Injectable()
@@ -14,13 +19,23 @@ export class PositionConsumer implements OnModuleInit {
   async onModuleInit() {
     await this.kafkaConsumer.subscribe(
       'ws-gateway-position-consumer',
-      ['positions.updated'],
+      [REALTIME_TOPICS.POSITIONS_UPDATED],
       async (_topic, _partition, message) => {
         try {
-          const payload = JSON.parse(message) as { userId?: string };
-          const userId = payload.userId as string | undefined;
-          if (!userId) return;
-          this.gateway.emitToUser(userId, 'position:update', payload);
+          const payload = JSON.parse(message) as PositionsUpdatedMessage;
+          if (!payload.userId) return;
+
+          if (payload.type === 'SNAPSHOT') {
+            this.gateway.emitToUser(payload.userId, SOCKET_EVENTS.POSITIONS_SNAPSHOT, payload.positions);
+          } else if (payload.type === 'PNL') {
+            const { positionId, currentPrice, pipPnl, unrealizedPnl } = payload;
+            this.gateway.emitToUser(payload.userId, SOCKET_EVENTS.POSITION_UPDATE, {
+              positionId,
+              currentPrice,
+              pipPnl,
+              unrealizedPnl,
+            });
+          }
         } catch (err) {
           this.logger.error('Failed to process positions.updated message', err);
         }

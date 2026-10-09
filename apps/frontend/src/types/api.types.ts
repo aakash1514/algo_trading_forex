@@ -104,7 +104,7 @@ export interface AccountSummary {
   equity: number;
   marginUsed: number;
   freeMargin: number;
-  marginLevel: number;
+  marginLevel: number | null; // null when no margin is in use
   unrealizedPnl: number;
 }
 
@@ -169,18 +169,17 @@ export interface TickEvent {
   timestamp: string;
 }
 
+// Socket payloads (see SOCKET_EVENTS in lib/constants.ts)
 export interface PositionUpdateEvent {
   positionId: string;
+  currentPrice: number;
   pipPnl: number;
   unrealizedPnl: number;
-  marginLevel: number;
 }
 
-export interface AccountUpdateEvent {
-  equity: number;
-  freeMargin: number;
-  marginLevel: number;
-}
+export type PositionsSnapshotEvent = Position[];
+
+export type AccountUpdateEvent = AccountSummary;
 
 export interface SignalUpdateEvent {
   instrument: string;

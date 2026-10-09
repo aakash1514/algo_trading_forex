@@ -21,16 +21,6 @@ export interface AccountSummaryDto {
 export class AccountService {
   private readonly logger = new Logger(AccountService.name);
 
-  // In-memory cache per userId for tick-frequency updates
-  // Structure: userId → AccountSummaryEntity
-  private cache = new Map<string, AccountSummaryEntity>();
-
-  // Track last DB write time per userId
-  private lastWriteAt = new Map<string, number>();
-
-  // Write-through interval: 5 seconds
-  private readonly WRITE_INTERVAL_MS = 5_000;
-
   constructor(
     @InjectRepository(AccountSummaryEntity)
     private readonly accountRepo: Repository<AccountSummaryEntity>,
@@ -39,17 +29,12 @@ export class AccountService {
   ) {}
 
   // ─── Get account summary with computed fields ──────────────────────────────
+  // Always reads the row: positions, fills and closes write account_summary
+  // directly, so an in-process cache would serve stale margin/P&L (including
+  // to the margin-call check).
   async getAccountSummary(userId: string): Promise<AccountSummaryDto> {
-    // Check cache first
-    let row = this.cache.get(userId);
-
-    if (!row) {
-      const dbRow = await this.accountRepo.findOne({ where: { userId } });
-      if (!dbRow) throw new Error(`Account not found for user ${userId}`);
-      row = dbRow;
-      this.cache.set(userId, row);
-    }
-
+    const row = await this.accountRepo.findOne({ where: { userId } });
+    if (!row) throw new Error(`Account not found for user ${userId}`);
     return this.computeSummary(row);
   }
 
@@ -71,51 +56,9 @@ export class AccountService {
     });
 
     const saved = await this.accountRepo.save(account);
-    this.cache.set(userId, saved);
 
     this.logger.log(`Paper account initialized for user ${userId} — $10,000 balance`);
     return this.computeSummary(saved);
-  }
-
-  // ─── Update unrealized P&L from tick (in-memory, write-through every 5s) ──
-  async updateUnrealizedPnl(userId: string, unrealizedPnl: number): Promise<void> {
-    let row = this.cache.get(userId);
-
-    if (!row) {
-      const dbRow = await this.accountRepo.findOne({ where: { userId } });
-      if (!dbRow) return;
-      row = dbRow;
-    }
-
-    // Update cache
-    row.unrealizedPnl = unrealizedPnl;
-    this.cache.set(userId, row);
-
-    // Write-through: flush to DB if 5 seconds have passed
-    const now = Date.now();
-    const lastWrite = this.lastWriteAt.get(userId) ?? 0;
-
-    if (now - lastWrite >= this.WRITE_INTERVAL_MS) {
-      await this.flushToDb(userId, row);
-    }
-  }
-
-  // ─── Force flush to DB (called on position close) ─────────────────────────
-  async flushToDb(userId: string, row?: AccountSummaryEntity): Promise<void> {
-    const account = row ?? this.cache.get(userId);
-    if (!account) return;
-
-    await this.accountRepo.update(
-      { userId },
-      {
-        unrealizedPnl: account.unrealizedPnl,
-        marginUsed: account.marginUsed,
-        balance: account.balance,
-      },
-    );
-
-    this.lastWriteAt.set(userId, Date.now());
-    this.logger.debug(`Account flushed to DB for user ${userId}`);
   }
 
   // ─── Margin call check ─────────────────────────────────────────────────────
@@ -144,12 +87,6 @@ export class AccountService {
         `MARGIN WARNING — user ${userId} margin level ${summary.marginLevel.toFixed(2)}%`,
       );
     }
-  }
-
-  // ─── Invalidate cache entry (call after position close) ───────────────────
-  invalidateCache(userId: string): void {
-    this.cache.delete(userId);
-    this.lastWriteAt.delete(userId);
   }
 
   // ─── Private helpers ───────────────────────────────────────────────────────

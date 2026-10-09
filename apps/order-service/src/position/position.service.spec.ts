@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
 import { PositionService } from './position.service';
+import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 
 const mockPositionRepo = () => ({
   find: jest.fn(),
@@ -29,8 +30,8 @@ const makePosition = (overrides: Partial<PositionEntity> = {}): PositionEntity =
   id: 'pos-1',
   orderId: 'ord-1',
   userId: 'user-1',
-  instrument: 'EURUSD',
-  pair: 'EURUSD',
+  instrument: 'EUR_USD',
+  pair: 'EUR/USD',
   direction: 'LONG',
   lots: 1,
   openPrice: 1.08000,
@@ -54,6 +55,11 @@ const makePosition = (overrides: Partial<PositionEntity> = {}): PositionEntity =
 
 describe('PositionService — P&L calculation', () => {
   let service: PositionService;
+  let positionRepo: ReturnType<typeof mockPositionRepo>;
+  let accountRepo: ReturnType<typeof mockAccountRepo>;
+  let dataSource: ReturnType<typeof mockDataSource>;
+  const realtime = { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) };
+  afterEach(() => jest.clearAllMocks());
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -63,10 +69,52 @@ describe('PositionService — P&L calculation', () => {
         { provide: getRepositoryToken(AccountSummaryEntity), useFactory: mockAccountRepo },
         { provide: getRepositoryToken(OrderEntity), useFactory: mockOrderRepo },
         { provide: DataSource, useFactory: mockDataSource },
+        { provide: RealtimePublisher, useValue: realtime },
       ],
     }).compile();
 
     service = module.get(PositionService);
+    positionRepo = module.get(getRepositoryToken(PositionEntity));
+    accountRepo = module.get(getRepositoryToken(AccountSummaryEntity));
+    dataSource = module.get(DataSource);
+  });
+
+  describe('realtime publishing', () => {
+    const tick = { pair: 'EUR/USD', bid: 1.0809, ask: 1.0811, mid: 1.081, timestamp: '2026-10-09T14:00:00Z' };
+
+    it('publishes throttled P&L after a tick updates an open position', async () => {
+      const position = makePosition();
+      positionRepo.find.mockResolvedValue([position]);
+      const qb = { update: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(), execute: jest.fn() };
+      accountRepo.createQueryBuilder.mockReturnValue(qb);
+
+      await service.recalculatePositions(tick);
+
+      // LONG from 1.08000 to mid 1.08100 = +10 pips at $10/pip
+      expect(realtime.positionPnl).toHaveBeenCalledWith(position, 1.081, 10, 100);
+    });
+
+    it('publishes a snapshot only after the close transaction committed', async () => {
+      const closed = makePosition({ isOpen: false });
+      let committed = false;
+      dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => {
+        const result = await cb({
+          findOne: jest.fn()
+            .mockResolvedValueOnce(makePosition())
+            .mockResolvedValueOnce({ id: 'acct-1', balance: 10000, marginUsed: 1080, unrealizedPnl: 0 })
+            .mockResolvedValueOnce(closed),
+          update: jest.fn(),
+        });
+        expect(realtime.positionsChanged).not.toHaveBeenCalled();
+        committed = true;
+        return result;
+      });
+
+      await service.closePosition('pos-1', 'MANUAL', 1.081);
+
+      expect(committed).toBe(true);
+      expect(realtime.positionsChanged).toHaveBeenCalledWith('user-1', 'pos-1');
+    });
   });
 
   afterEach(() => jest.clearAllMocks());

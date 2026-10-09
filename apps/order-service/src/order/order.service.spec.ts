@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { OrderEntity, AccountSummaryEntity, PositionEntity, OrderStatus } from '@forexedge/database';
 import { BROKER_ADAPTER } from '@forexedge/common';
 import { OrderService } from './order.service';
+import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { OrderValidationService } from './order-validation.service';
 import { MarginEngineService } from './margin-engine.service';
 import { BadRequestException } from '@nestjs/common';
@@ -81,6 +82,7 @@ describe('OrderService — FSM transitions', () => {
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
         { provide: SessionConsumer, useFactory: mockSessionConsumer },
+        { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
       ],
     }).compile();
 
