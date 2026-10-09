@@ -66,7 +66,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 ### Per-service conventions
 - Every service has its own small `redis/` module (with an injection decorator) instead of a shared lib.
 - order-service and ws-gateway don't issue tokens. They validate JWTs from auth-service with their own `auth/jwt.strategy.ts` and `jwt-auth.guard.ts`, so the `JWT_ACCESS_SECRET` values must match.
-- Config comes from `@nestjs/config` with `ConfigModule.forRoot({ isGlobal: true })`, which reads `.env` from the cwd (the repo root under Nx). ws-gateway is the exception: it points at `../../infra/.env`. Postgres and Redis support TLS through env flags (e.g. `DB_SSL=true`) for managed hosting (Aiven).
+- Config comes from `@nestjs/config` with `ConfigModule.forRoot({ isGlobal: true })`, which reads `.env` from the cwd, so every service (and `npm run migration:*`) runs from the repo root, which has the only `.env`. Docker Compose needs `--env-file .env` because the compose file lives in `infra/`. Postgres and Redis support TLS through env flags (e.g. `DB_SSL=true`) for managed hosting (Aiven).
 
 ### Frontend (`apps/frontend`)
 - Next.js App Router with route groups `(auth)` and `(dashboard)`, Tailwind, Radix UI, and `lightweight-charts`.
@@ -121,18 +121,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Phases 1–6 (5 services + frontend: trading terminal, backtesting, economic calendar) were built by ~June 2026 and **haven't been run since**, so verify before assuming anything works.
 - Never deployed. Earlier attempts hit many issues.
 - Health check (2026-10-09): infra is healthy. From a clean `dist/`, all 9 projects pass build,
-  typecheck and tests; all 6 apps pass lint with 0 errors (the 3 libs fail `@nx/dependency-checks`,
-  see below). All 5 compiled services boot (ws-gateway only from `apps/ws-gateway/`).
+  typecheck, lint (0 errors) and tests, and all 5 compiled services boot from the repo root.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
 - `minio/minio` is no longer anonymously pullable (see step 7). The pinned release only runs where the
   image is cached; a `docker save` backup lives outside the repo.
 - XAU/USD and order-service's hardcoded JPY pip rule are scheduled in step 2.
-- The libs fail `nx lint` (`@nx/dependency-checks`): their `package.json` files list only `tslib`,
-  not the packages they import (e.g. `typeorm` in `database`).
-- ws-gateway's `envFilePath: '../../infra/.env'` resolves against the cwd, so it finds no env when
-  started from the repo root (`nx serve` or `node dist/...`). It boots only from `apps/ws-gateway/`.
 - Lint warnings remain (mostly `no-explicit-any` and unused vars): 16 in the frontend, more in the services.
 - ws-gateway has no tests (`passWithNoTests`); backtest tests come in step 3. Redis still holds stale
   BullMQ `bull:backtest:*` jobs from earlier runs.

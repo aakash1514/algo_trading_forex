@@ -5,12 +5,10 @@ export default [
   {
     files: ['**/*.json'],
     rules: {
-      '@nx/dependency-checks': [
-        'error',
-        {
-          ignoredFiles: ['{projectRoot}/eslint.config.{js,cjs,mjs,ts,cts,mts}'],
-        },
-      ],
+      // Internal lib: consumed only via tsconfig path aliases and bundled into the
+      // apps, never published, so its package.json doesn't need to list the deps
+      // it imports. They are declared once in the root package.json.
+      '@nx/dependency-checks': 'off',
     },
     languageOptions: {
       parser: await import('jsonc-eslint-parser'),
