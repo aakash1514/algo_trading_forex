@@ -9,6 +9,7 @@ export default [
   {
     // `**/` prefix: the Nx lint executor runs ESLint from the workspace root with
     // this file as overrideConfigFile, so ignore patterns resolve against the root.
-    ignores: ['**/.next/**'],
+    // next-env.d.ts is generated; after `next build` it imports from dist/.
+    ignores: ['**/.next/**', '**/next-env.d.ts'],
   },
 ];
