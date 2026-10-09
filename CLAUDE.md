@@ -45,16 +45,16 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | market-service | 3002 | Tick stream ingestion (`StreamModule` picks `MockStreamProvider` or `OandaStreamProvider` based on `USE_MOCK_DATA`, default `true`). Publishes `forex.ticks`. Consumes its own ticks to write them to TimescaleDB and Redis. Serves candle and instrument queries. |
 | domain-service | 3003 | Forex domain logic: pip calc, margin, swaps, session clock, spread monitor, economic calendar. Scheduled jobs publish `forex.sessions`, `forex.spread-alerts`, `forex.calendar-events`. |
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
-| ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues`. |
+| ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues`. |
 
-Nothing produces `positions.updated` yet. ws-gateway subscribes to it, but order-service doesn't publish it.
+order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Topic names, socket event names and payload types live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
 
 ### Kafka flow
 ```
 market-service ─forex.ticks─▶ market-service (DB/cache writers), domain-service (spread monitor), order-service, ws-gateway
 domain-service ─forex.sessions / forex.spread-alerts─▶ order-service
 domain-service ─forex.calendar-events─▶ (no consumer yet)
-order-service  ─orders.lifecycle─▶ ws-gateway ─socket.io─▶ frontend
+order-service  ─orders.lifecycle / positions.updated / accounts.updated─▶ ws-gateway ─socket.io─▶ frontend
 ```
 Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumerService.subscribe(groupId, topics, handler)` hands the handler the message value as a string, and `KafkaProducerService.publish(topic, key, value)` JSON-serializes. order-service's consumers in `apps/order-service/src/kafka/` use raw kafkajs consumers instead. `createKafkaClient` is a process-wide singleton.
 
@@ -70,7 +70,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 ### Frontend (`apps/frontend`)
 - Next.js App Router with route groups `(auth)` and `(dashboard)`, Tailwind, Radix UI, and `lightweight-charts`.
-- State uses Redux Toolkit. RTK Query APIs in `src/store/api/*.api.ts` all extend `baseApi`, which attaches the bearer token from the store or `localStorage` (`fx_access_token`). On a 401 it calls `auth/refresh` and retries.
+- State uses Redux Toolkit. RTK Query APIs in `src/store/api/*.api.ts` all extend `baseApi`, which attaches the bearer token from the store. The access token is **in memory only** (never localStorage); on app load `SessionRestorer` restores the session from the httpOnly refresh cookie, and `AuthGuard` waits for it. On a 401, `baseApi` awaits `refreshSession()` (`src/lib/session.ts`), stores the new token, then retries.
 - Backend URLs are hardcoded in `src/lib/constants.ts` (`API_BASE`, `WS_URL`). Live data comes through `hooks/useForexSocket.ts`.
 - Instrument symbols use OANDA format (`EUR_USD`).
 
@@ -101,6 +101,15 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Backtest results come back as **flat fields** on the run object (no nested `metrics` key).
 - Pip size: the source of truth is `instruments.pip_size` (0.01 for JPY-quoted pairs, else 0.0001).
   The frontend uses `apps/frontend/src/lib/pip.ts`, never a hardcoded `* 10000`. Candles are built from **mid**.
+- Money math lives in `libs/common/src/lib/money.ts` (shared by order- and domain-service):
+  margin = units × base→USD ÷ leverage, pip value = units × pip_size × quote→USD, with
+  base→USD = price × quote→USD. Contract specs come from `instruments` (order-service `PricingService`);
+  crosses convert via the live QUOTE/USD (or inverse USD/QUOTE) price. Never hardcode lot or pip sizes.
+- Clients send `instrument` (`EUR_USD`) only; order-service derives `pair` with `instrumentToPair()`.
+- Refresh tokens rotate on every use: never fire two refreshes concurrently (use `refreshSession()`).
+- order-service: PositionService, AccountService, OrderValidationService, SessionConsumer, RealtimePublisher
+  and PricingService are provided once, by `KafkaConsumerModule`. Don't also list them in AppModule
+  (duplicate instances have separate state).
 
 ### Tooling gotchas
 - **Never put `NODE_ENV` in `.env`.** Nx loads the root `.env` into every task, and
@@ -116,42 +125,54 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   The service webpack configs set `typeCheckOptions: false`: the in-build checker can't resolve lib
   project references until their `.d.ts` exist, so it broke clean builds (TS6305).
 - `next-env.d.ts` and `*.tsbuildinfo` are generated and gitignored; don't commit them.
+- **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
+  trading: specs used `EURUSD` while the DB holds `EUR/USD` and Redis `price:EUR_USD`, and DTOs were
+  built with fields the UI never sent. Assert the exact query/where clause and validate request bodies
+  through the real `ValidationPipe` options.
 
 ## Current status
 - Phases 1–6 (5 services + frontend: trading terminal, backtesting, economic calendar) were built by ~June 2026 and **haven't been run since**, so verify before assuming anything works.
 - Never deployed. Earlier attempts hit many issues.
-- Health check (2026-10-09): infra is healthy. From a clean `dist/`, all 9 projects pass build,
-  typecheck, lint (0 errors) and tests, and all 5 compiled services boot from the repo root.
+- **Roadmap step 1 (health check) is done** (2026-10-09): infra healthy, all 9 projects pass build,
+  lint (0 errors), typecheck and tests from a clean `dist/`, all 5 services start from the repo root,
+  and paper trading works end to end in the browser (orders, live positions/account, session restore).
+  Write-up: `docs/phase-summaries/step-1-health-check.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
 - `minio/minio` is no longer anonymously pullable (see step 7). The pinned release only runs where the
   image is cached; a `docker save` backup lives outside the repo.
-- XAU/USD and order-service's hardcoded JPY pip rule are scheduled in step 2.
-- Lint warnings remain (mostly `no-explicit-any` and unused vars): 16 in the frontend, more in the services.
-- ws-gateway has no tests (`passWithNoTests`); backtest tests come in step 3. Redis still holds stale
-  BullMQ `bull:backtest:*` jobs from earlier runs.
+- Lint warnings remain (mostly `no-explicit-any` and unused vars), 0 errors.
 
 ## Roadmap (in order)
-1. Health check: infra up, all projects build and serve, fix breakages.
+1. ✅ **Done (2026-10-09).** Health check: infra up, all projects build and serve, fix breakages.
 2. Historical data seed: M1 OHLC candles, 2010–2022, imported from Dukascopy via the dukascopy-node package (UTC timestamps) for
    8 pairs: EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, NZD/USD, XAU/USD.
    M1 goes into its own hypertable with compression. M5/M15/H1/H4/D1 are continuous
    aggregates on it. The import script must be idempotent (safe to re-run). The market-service
    candle queries and the ws-gateway backtester read from it. Production deploys only H1 and above.
+   First purge the June 2026 mock data still materialized in the candle continuous aggregates (the raw
+   ticks are gone, the candles_* views are not), so charts and backtests never mix mock and real candles.
    XAU/USD integration: add it to the instruments seed with the correct contract specs (100 oz lot, pip 0.01).
-   Replace order-service's 3 hardcoded pip-size calculations with instruments.pip_size from the DB.
-   Add XAU_USD to MAJOR_PAIRS, PAIR_DISPLAY and BacktestClient's pair list, and remove EUR_GBP there.
-   Verify pip value, margin and P&L for gold with tests.
+   Margin, pip value, P&L and paper fills already read lot_size/pip_size from the DB (step 1), so gold
+   needs only its row plus a price feed. Add XAU_USD to MAJOR_PAIRS, PAIR_DISPLAY and BacktestClient's
+   pair list, and remove EUR_GBP there. Verify pip value, margin and P&L for gold against the real row.
 3. Backtest verification: re-run strategies on the historical data. The all-zero
    metrics were caused by mock random-walk data. Confirm they're fixed and fix anything remaining.
+   ws-gateway has no tests yet (`passWithNoTests`): add backtest engine tests. Clear the stale BullMQ
+   `bull:backtest:*` jobs left in Redis from earlier runs.
 4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
 7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
    Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
    MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
-8. Known gaps: nothing publishes `positions.updated`, and `forex.calendar-events` has no consumer.
+   Restart resilience: order-service's SessionConsumer only learns sessions from OPEN/CLOSE events
+   (`fromBeginning: false`), so after a restart orders are stamped OFF_HOURS until the next session
+   boundary; seed the current state on startup (e.g. from domain-service's /sessions/current).
+   Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
+   add a health check to every service for the host's probes.
+8. Known gaps: `forex.calendar-events` has no consumer.
 
 ## How to work with me
 - This is a portfolio and client project. Keep it production quality, with no shortcuts or simplified "demo" code.
