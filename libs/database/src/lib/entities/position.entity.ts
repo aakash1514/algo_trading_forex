@@ -3,6 +3,7 @@ import {
 } from 'typeorm';
 import { OrderEntity } from './order.entity';
 import { UserEntity } from './user.entity';
+import { decimalTransformer } from '../transformers/decimal.transformer';
 
 export type CloseReason = 'MANUAL' | 'STOP_LOSS' | 'TAKE_PROFIT' | 'MARGIN_CALL';
 
@@ -34,37 +35,37 @@ export class PositionEntity {
   @Column({ type: 'varchar' })
   direction!: 'LONG' | 'SHORT';
 
-  @Column({ type: 'decimal', precision: 8, scale: 2 })
+  @Column({ type: 'decimal', transformer: decimalTransformer, precision: 8, scale: 2 })
   lots!: number;
 
-  @Column({ name: 'open_price', type: 'decimal', precision: 18, scale: 6 })
+  @Column({ name: 'open_price', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6 })
   openPrice!: number;
 
-  @Column({ name: 'current_price', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'current_price', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   currentPrice!: number | null;
 
-  @Column({ name: 'pip_pnl', type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({ name: 'pip_pnl', type: 'decimal', transformer: decimalTransformer, precision: 10, scale: 2, default: 0 })
   pipPnl!: number;
 
-  @Column({ name: 'unrealized_pnl', type: 'decimal', precision: 12, scale: 2, default: 0 })
+  @Column({ name: 'unrealized_pnl', type: 'decimal', transformer: decimalTransformer, precision: 12, scale: 2, default: 0 })
   unrealizedPnl!: number;
 
-  @Column({ name: 'realized_pnl', type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({ name: 'realized_pnl', type: 'decimal', transformer: decimalTransformer, precision: 12, scale: 2, nullable: true })
   realizedPnl!: number | null;
 
-  @Column({ name: 'swap_accrued', type: 'decimal', precision: 10, scale: 4, default: 0 })
+  @Column({ name: 'swap_accrued', type: 'decimal', transformer: decimalTransformer, precision: 10, scale: 4, default: 0 })
   swapAccrued!: number;
 
-  @Column({ name: 'pip_value', type: 'decimal', precision: 10, scale: 4 })
+  @Column({ name: 'pip_value', type: 'decimal', transformer: decimalTransformer, precision: 10, scale: 4 })
   pipValue!: number;
 
-  @Column({ name: 'margin_used', type: 'decimal', precision: 12, scale: 2 })
+  @Column({ name: 'margin_used', type: 'decimal', transformer: decimalTransformer, precision: 12, scale: 2 })
   marginUsed!: number;
 
-  @Column({ name: 'stop_loss', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'stop_loss', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   stopLoss!: number | null;
 
-  @Column({ name: 'take_profit', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'take_profit', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   takeProfit!: number | null;
 
   @Column({ name: 'is_open', default: true })

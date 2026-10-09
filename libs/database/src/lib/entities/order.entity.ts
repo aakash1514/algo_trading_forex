@@ -3,6 +3,7 @@ import {
   CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { decimalTransformer } from '../transformers/decimal.transformer';
 
 export type OrderStatus =
   | 'DRAFT' | 'PENDING' | 'SUBMITTED' | 'OPEN'
@@ -38,19 +39,19 @@ export class OrderEntity {
   @Column({ name: 'order_type', type: 'varchar' })
   orderType!: OrderType;
 
-  @Column({ type: 'decimal', precision: 8, scale: 2 })
+  @Column({ type: 'decimal', transformer: decimalTransformer, precision: 8, scale: 2 })
   lots!: number;
 
-  @Column({ name: 'requested_price', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'requested_price', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   requestedPrice!: number | null;
 
-  @Column({ name: 'executed_price', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'executed_price', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   executedPrice!: number | null;
 
-  @Column({ name: 'stop_loss', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'stop_loss', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   stopLoss!: number | null;
 
-  @Column({ name: 'take_profit', type: 'decimal', precision: 18, scale: 6, nullable: true })
+  @Column({ name: 'take_profit', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
   takeProfit!: number | null;
 
   @Column({ type: 'varchar', default: 'DRAFT' })
@@ -59,10 +60,10 @@ export class OrderEntity {
   @Column({ name: 'session_opened',type: 'varchar', nullable: true })
   sessionOpened!: string | null;
 
-  @Column({ name: 'pip_value', type: 'decimal', precision: 10, scale: 4, nullable: true })
+  @Column({ name: 'pip_value', type: 'decimal', transformer: decimalTransformer, precision: 10, scale: 4, nullable: true })
   pipValue!: number | null;
 
-  @Column({ name: 'margin_used', type: 'decimal', precision: 12, scale: 2, nullable: true })
+  @Column({ name: 'margin_used', type: 'decimal', transformer: decimalTransformer, precision: 12, scale: 2, nullable: true })
   marginUsed!: number | null;
 
   @Column({ name: 'rejection_reason', type: 'text', nullable: true })
