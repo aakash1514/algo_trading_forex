@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { FOREXEDGE_VERSION } from '@forexedge/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -13,9 +14,12 @@ describe('AppController', () => {
   });
 
   describe('getData', () => {
-    it('should return "Hello API"', () => {
+    it('returns the service info from AppService', () => {
       const appController = app.get<AppController>(AppController);
-      expect(appController.getData()).toEqual({ message: 'Hello API' });
+      expect(appController.getData()).toEqual({
+        message: 'ForexEdge Auth Service',
+        version: FOREXEDGE_VERSION,
+      });
     });
   });
 });

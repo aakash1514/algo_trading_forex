@@ -6,5 +6,8 @@ module.exports = {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/ws-gateway'
+  coverageDirectory: '../../coverage/apps/ws-gateway',
+  // No specs yet; backtest engine tests arrive in roadmap step 3.
+  passWithNoTests: true,
 };
+
