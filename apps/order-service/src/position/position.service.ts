@@ -1,9 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
 import { CloseReason } from '@forexedge/database';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
+import { pipValueUsd, pipsBetween } from '@forexedge/common';
+import { PricingService } from '../pricing/pricing.service';
 
 export interface NormalizedTick {
   pair: string;
@@ -26,7 +28,18 @@ export class PositionService {
     private readonly orderRepo: Repository<OrderEntity>,
     private readonly dataSource: DataSource,
     private readonly realtime: RealtimePublisher,
+    private readonly pricing: PricingService,
   ) {}
+
+  // P&L of a position at `price`, converted to USD at the current quote->USD
+  // rate (exact for USD-base and cross pairs, not just USD-quote ones).
+  async valueAt(position: PositionEntity, price: number): Promise<{ pipPnl: number; pipValue: number; pnl: number }> {
+    const spec = await this.pricing.getSpec(position.pair);
+    const quoteToUsd = await this.pricing.quoteToUsd(position.pair, price);
+    const pipPnl = pipsBetween(position.direction, Number(position.openPrice), price, spec);
+    const pipValue = pipValueUsd(Number(position.lots), spec, quoteToUsd);
+    return { pipPnl, pipValue, pnl: this.calculateUnrealizedPnl(pipPnl, pipValue) };
+  }
 
   // ─── Called by Kafka tick consumer ─────────────────────────────────────────
   async recalculatePositions(tick: NormalizedTick): Promise<void> {
@@ -38,8 +51,7 @@ export class PositionService {
 
     for (const position of positions) {
       const currentPrice = tick.mid;
-      const pipPnl = this.calculatePipPnl(position, currentPrice);
-      const unrealizedPnl = this.calculateUnrealizedPnl(pipPnl, Number(position.pipValue));
+      const { pipPnl, pipValue, pnl: unrealizedPnl } = await this.valueAt(position, currentPrice);
 
       // Check stop-loss and take-profit before saving
       const slHit =
@@ -66,6 +78,7 @@ export class PositionService {
       await this.positionRepo.update(position.id, {
         currentPrice,
         pipPnl,
+        pipValue,
         unrealizedPnl,
       });
 
@@ -129,8 +142,7 @@ export class PositionService {
       if (!position) throw new Error(`Position ${positionId} not found`);
       if (!position.isOpen) throw new Error(`Position ${positionId} is already closed`);
 
-      const pipPnl = this.calculatePipPnl(position, closingPrice);
-      const realizedPnl = this.calculateUnrealizedPnl(pipPnl, Number(position.pipValue));
+      const { pipPnl, pnl: realizedPnl } = await this.valueAt(position, closingPrice);
 
       // Close the position
       await manager.update(PositionEntity, positionId, {
@@ -143,11 +155,11 @@ export class PositionService {
         unrealizedPnl: 0,
       });
 
-      // Update order status to CLOSED
+      // Update order status to CLOSED. executed_price stays the entry fill;
+      // the exit price lives on the position (current_price at close).
       await manager.update(OrderEntity, position.orderId, {
         status: 'CLOSED',
         closedAt: new Date(),
-        executedPrice: closingPrice,
       });
 
       // Update account: release margin, realize P&L, zero out this position's unrealized
@@ -177,17 +189,6 @@ export class PositionService {
 
   // ─── Pure math ─────────────────────────────────────────────────────────────
 
-  // Returns pip P&L (number of pips won or lost)
-  calculatePipPnl(position: PositionEntity, currentPrice: number): number {
-    const isJpy = position.pair.includes('JPY');
-    const pipSize = isJpy ? 0.01 : 0.0001;
-    const priceDiff = position.direction === 'LONG'
-      ? currentPrice - Number(position.openPrice)
-      : Number(position.openPrice) - currentPrice;
-
-    return Math.round((priceDiff / pipSize) * 100) / 100;
-  }
-
   // Returns unrealized P&L in account currency (USD)
   calculateUnrealizedPnl(pipPnl: number, pipValue: number): number {
     return Math.round(pipPnl * pipValue * 100) / 100;
@@ -205,7 +206,15 @@ export class PositionService {
     const position = await this.positionRepo.findOne({
       where: { id: positionId, userId },
     });
-    if (!position) throw new Error(`Position ${positionId} not found`);
+    if (!position) throw new NotFoundException(`Position ${positionId} not found`);
     return position;
+  }
+
+  // Manual close at the live market: a LONG sells at the bid, a SHORT buys at the ask.
+  async closeAtMarket(userId: string, positionId: string): Promise<PositionEntity> {
+    const position = await this.getPosition(userId, positionId);
+    const quote = await this.pricing.getQuote(position.pair);
+    const closingPrice = position.direction === 'LONG' ? quote.bid : quote.ask;
+    return this.closePosition(positionId, 'MANUAL', closingPrice);
   }
 }

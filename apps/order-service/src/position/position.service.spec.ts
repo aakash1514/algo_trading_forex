@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
 import { PositionService } from './position.service';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
+import { PricingService } from '../pricing/pricing.service';
 
 const mockPositionRepo = () => ({
   find: jest.fn(),
@@ -59,6 +60,12 @@ describe('PositionService — P&L calculation', () => {
   let accountRepo: ReturnType<typeof mockAccountRepo>;
   let dataSource: ReturnType<typeof mockDataSource>;
   const realtime = { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) };
+  const pricing = { getSpec: jest.fn(), quoteToUsd: jest.fn(), getQuote: jest.fn() };
+  beforeEach(() => {
+    pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.0001 });
+    pricing.quoteToUsd.mockResolvedValue(1);
+    pricing.getQuote.mockResolvedValue({ bid: 1.0809, ask: 1.0811, mid: 1.081 });
+  });
   afterEach(() => jest.clearAllMocks());
 
   beforeEach(async () => {
@@ -70,6 +77,7 @@ describe('PositionService — P&L calculation', () => {
         { provide: getRepositoryToken(OrderEntity), useFactory: mockOrderRepo },
         { provide: DataSource, useFactory: mockDataSource },
         { provide: RealtimePublisher, useValue: realtime },
+        { provide: PricingService, useValue: pricing },
       ],
     }).compile();
 
@@ -115,45 +123,76 @@ describe('PositionService — P&L calculation', () => {
       expect(committed).toBe(true);
       expect(realtime.positionsChanged).toHaveBeenCalledWith('user-1', 'pos-1');
     });
+
+    it('does not overwrite the order entry price when closing', async () => {
+      const update = jest.fn();
+      dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => cb({
+        findOne: jest.fn()
+          .mockResolvedValueOnce(makePosition())
+          .mockResolvedValueOnce({ id: 'acct-1', balance: 10000, marginUsed: 1080, unrealizedPnl: 0 })
+          .mockResolvedValueOnce(makePosition({ isOpen: false })),
+        update,
+      }));
+
+      await service.closePosition('pos-1', 'MANUAL', 1.081);
+
+      const orderUpdate = update.mock.calls.find(([entity]: [unknown]) => entity === OrderEntity);
+      expect(orderUpdate[2]).toEqual(expect.objectContaining({ status: 'CLOSED' }));
+      expect(orderUpdate[2]).not.toHaveProperty('executedPrice');
+    });
+  });
+
+  describe('closeAtMarket', () => {
+    const closeSpy = () => jest.spyOn(service, 'closePosition').mockResolvedValue(makePosition({ isOpen: false }));
+
+    it('closes a LONG at the live bid, scoped to the requesting user', async () => {
+      positionRepo.findOne.mockResolvedValue(makePosition({ direction: 'LONG' }));
+      const spy = closeSpy();
+      await service.closeAtMarket('user-1', 'pos-1');
+      expect(positionRepo.findOne).toHaveBeenCalledWith({ where: { id: 'pos-1', userId: 'user-1' } });
+      expect(spy).toHaveBeenCalledWith('pos-1', 'MANUAL', 1.0809);
+    });
+
+    it('closes a SHORT at the live ask', async () => {
+      positionRepo.findOne.mockResolvedValue(makePosition({ direction: 'SHORT' }));
+      const spy = closeSpy();
+      await service.closeAtMarket('user-1', 'pos-1');
+      expect(spy).toHaveBeenCalledWith('pos-1', 'MANUAL', 1.0811);
+    });
+
+    it("404s for another user's position", async () => {
+      positionRepo.findOne.mockResolvedValue(null);
+      await expect(service.closeAtMarket('user-2', 'pos-1')).rejects.toThrow('Position pos-1 not found');
+    });
   });
 
   afterEach(() => jest.clearAllMocks());
 
-  // ── calculatePipPnl ─────────────────────────────────────────────────────────
-  describe('calculatePipPnl', () => {
-    it('LONG position profit: price moves up 10 pips', () => {
-      const position = makePosition({ direction: 'LONG', openPrice: 1.08000 });
-      const result = service.calculatePipPnl(position, 1.08100);
-      expect(result).toBe(10);
+  // ── valueAt (DB pip size, current quote->USD rate) ─────────────────────────
+  describe('valueAt', () => {
+    it('LONG EUR/USD +10 pips at 1 lot = +$100', async () => {
+      const position = makePosition({ direction: 'LONG', openPrice: 1.08 });
+      await expect(service.valueAt(position, 1.081)).resolves.toEqual({ pipPnl: 10, pipValue: 10, pnl: 100 });
     });
 
-    it('LONG position loss: price moves down 10 pips', () => {
-      const position = makePosition({ direction: 'LONG', openPrice: 1.08000 });
-      const result = service.calculatePipPnl(position, 1.07900);
-      expect(result).toBe(-10);
+    it('SHORT EUR/USD -10 pips at 1 lot = -$100', async () => {
+      const position = makePosition({ direction: 'SHORT', openPrice: 1.08 });
+      await expect(service.valueAt(position, 1.081)).resolves.toEqual({ pipPnl: -10, pipValue: 10, pnl: -100 });
     });
 
-    it('SHORT position profit: price moves down 10 pips', () => {
-      const position = makePosition({ direction: 'SHORT', openPrice: 1.08000 });
-      const result = service.calculatePipPnl(position, 1.07900);
-      expect(result).toBe(10);
+    it('USD/JPY uses the DB pip size 0.01 and converts at the current price', async () => {
+      pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.01 });
+      pricing.quoteToUsd.mockResolvedValue(1 / 150.5);
+      const position = makePosition({ pair: 'USD/JPY', instrument: 'USD_JPY', direction: 'LONG', openPrice: 150 });
+      // +50 pips; pip value 100,000 x 0.01 / 150.5 = 6.6445; P&L 50 x 6.6445 = 332.23
+      await expect(service.valueAt(position, 150.5)).resolves.toEqual({ pipPnl: 50, pipValue: 6.6445, pnl: 332.23 });
+      expect(pricing.getSpec).toHaveBeenCalledWith('USD/JPY');
     });
 
-    it('SHORT position loss: price moves up 10 pips', () => {
-      const position = makePosition({ direction: 'SHORT', openPrice: 1.08000 });
-      const result = service.calculatePipPnl(position, 1.08100);
-      expect(result).toBe(-10);
-    });
-
-    it('JPY pair — uses pip size 0.01', () => {
-      const position = makePosition({
-        pair: 'USDJPY',
-        direction: 'LONG',
-        openPrice: 150.00,
-      });
-      // 50 pip move up
-      const result = service.calculatePipPnl(position, 150.50);
-      expect(result).toBe(50);
+    it('XAU/USD (100 oz, pip 0.01): +$3.50 at 0.5 lot = 350 pips x $0.50 = +$175', async () => {
+      pricing.getSpec.mockResolvedValue({ lotSize: 100, pipSize: 0.01 });
+      const position = makePosition({ pair: 'XAU/USD', instrument: 'XAU_USD', lots: 0.5, openPrice: 2400 });
+      await expect(service.valueAt(position, 2403.5)).resolves.toEqual({ pipPnl: 350, pipValue: 0.5, pnl: 175 });
     });
   });
 

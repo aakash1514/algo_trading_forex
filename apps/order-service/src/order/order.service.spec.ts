@@ -9,6 +9,7 @@ import { OrderValidationService } from './order-validation.service';
 import { MarginEngineService } from './margin-engine.service';
 import { BadRequestException } from '@nestjs/common';
 import { SessionConsumer } from '../kafka/session.consumer';
+import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
 
 jest.mock('kafkajs', () => ({
   Kafka: jest.fn().mockImplementation(() => ({
@@ -50,8 +51,11 @@ const mockValidation = () => ({
 
 const mockMarginEngine = () => ({
   canOpenPosition: jest.fn().mockResolvedValue({ valid: true }),
-  calculatePipValue: jest.fn().mockReturnValue(10),
-  calculateMarginRequired: jest.fn().mockReturnValue(1085),
+  valuePosition: jest.fn().mockResolvedValue({ units: 100_000, marginRequired: 1085, pipValue: 10, quoteToUsd: 1 }),
+});
+
+const mockPricing = () => ({
+  getQuote: jest.fn().mockResolvedValue({ bid: 1.0849, ask: 1.0851, mid: 1.085 }),
 });
 
 const mockSessionConsumer = () => ({
@@ -83,6 +87,7 @@ describe('OrderService — FSM transitions', () => {
         { provide: MarginEngineService, useFactory: mockMarginEngine },
         { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
+        { provide: PricingService, useFactory: mockPricing },
       ],
     }).compile();
 
@@ -199,5 +204,101 @@ describe('OrderService — FSM transitions', () => {
       expect.objectContaining({ instrument: 'EUR_USD', pair: 'EUR/USD' }),
     );
     expect(result).toBeDefined();
+  });
+});
+
+describe('OrderService — pricing and margin', () => {
+  let service: OrderService;
+  let orderRepo: ReturnType<typeof mockOrderRepo>;
+  let validation: ReturnType<typeof mockValidation>;
+  let marginEngine: ReturnType<typeof mockMarginEngine>;
+  let pricing: ReturnType<typeof mockPricing>;
+  let dataSource: ReturnType<typeof mockDataSource>;
+
+  const draft = { id: 'o9', status: 'DRAFT', pair: 'EUR/USD', direction: 'LONG', lots: 1 } as OrderEntity;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        OrderService,
+        { provide: getRepositoryToken(OrderEntity), useFactory: mockOrderRepo },
+        { provide: getRepositoryToken(AccountSummaryEntity), useFactory: mockAccountRepo },
+        { provide: getRepositoryToken(PositionEntity), useFactory: () => ({}) },
+        { provide: DataSource, useFactory: mockDataSource },
+        { provide: BROKER_ADAPTER, useFactory: mockBroker },
+        { provide: OrderValidationService, useFactory: mockValidation },
+        { provide: MarginEngineService, useFactory: mockMarginEngine },
+        { provide: SessionConsumer, useFactory: mockSessionConsumer },
+        { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
+        { provide: PricingService, useFactory: mockPricing },
+      ],
+    }).compile();
+
+    service = module.get(OrderService);
+    orderRepo = module.get(getRepositoryToken(OrderEntity));
+    validation = module.get(OrderValidationService);
+    marginEngine = module.get(MarginEngineService);
+    pricing = module.get(PricingService);
+    dataSource = module.get(DataSource);
+
+    orderRepo.findOne.mockResolvedValue(null);
+    orderRepo.create.mockReturnValue(draft);
+    orderRepo.save.mockResolvedValue(draft);
+    // Run the injected margin gate like the real validation service does
+    validation.validate.mockImplementation(async (_u: string, _d: unknown, marginCheck: () => Promise<unknown>) => marginCheck());
+  });
+
+  afterEach(() => jest.clearAllMocks());
+
+  const submit = (direction: 'LONG' | 'SHORT') =>
+    service.submitOrder('user-1', { instrument: 'EUR_USD', direction, orderType: 'MARKET', lots: 1 }, `k-${direction}`);
+
+  it('checks margin at the live ask for a LONG', async () => {
+    await submit('LONG');
+    expect(marginEngine.canOpenPosition).toHaveBeenCalledWith('user-1', 'EUR/USD', 1, 1.0851);
+  });
+
+  it('checks margin at the live bid for a SHORT', async () => {
+    await submit('SHORT');
+    expect(marginEngine.canOpenPosition).toHaveBeenCalledWith('user-1', 'EUR/USD', 1, 1.0849);
+  });
+
+  it('rejects a market order when free margin is insufficient', async () => {
+    marginEngine.canOpenPosition.mockResolvedValue({ valid: false, reason: 'Insufficient margin: need $1085.10, free margin $50.00' });
+    const rejected = { ...draft, status: 'REJECTED', rejectionReason: 'Insufficient margin: need $1085.10, free margin $50.00' };
+    dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) =>
+      cb({ update: jest.fn(), findOne: jest.fn().mockResolvedValue(rejected) }));
+
+    const result = await submit('LONG');
+    expect(result.status).toBe('REJECTED');
+    expect(result.rejectionReason).toContain('Insufficient margin');
+  });
+
+  it('rejects instead of validating at price 0 when no live price exists', async () => {
+    pricing.getQuote.mockRejectedValue(new PriceUnavailableError('No live price for EUR/USD. Is market-service running?'));
+    const rejected = { ...draft, status: 'REJECTED', rejectionReason: 'No live price for EUR/USD. Is market-service running?' };
+    dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) =>
+      cb({ update: jest.fn(), findOne: jest.fn().mockResolvedValue(rejected) }));
+
+    const result = await submit('LONG');
+    expect(result.status).toBe('REJECTED');
+    expect(marginEngine.canOpenPosition).not.toHaveBeenCalled();
+  });
+
+  it('publishes the lifecycle event only after the transition transaction resolves', async () => {
+    const send = jest.fn().mockResolvedValue(undefined);
+    (service as unknown as { producer: { send: jest.Mock } }).producer.send = send;
+    let committed = false;
+    dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => {
+      const result = await cb({ update: jest.fn(), findOne: jest.fn().mockResolvedValue({ ...draft, status: 'PENDING' }) });
+      expect(send).not.toHaveBeenCalled();
+      committed = true;
+      return result;
+    });
+
+    await (service as unknown as { transitionState: (o: OrderEntity, s: OrderStatus) => Promise<OrderEntity> })
+      .transitionState(draft, 'PENDING');
+    expect(committed).toBe(true);
+    expect(send).toHaveBeenCalledWith(expect.objectContaining({ topic: 'orders.lifecycle' }));
   });
 });

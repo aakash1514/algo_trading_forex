@@ -74,12 +74,12 @@ describe('AppController', () => {
   });
 
   describe('calculateMargin', () => {
-    it('forwards the body fields to the margin engine', () => {
-      marginEngine.calculateMarginRequired.mockReturnValue({ marginRequired: 1085 });
+    it('forwards the body fields to the margin engine, normalizing the pair', async () => {
+      marginEngine.calculateMarginRequired.mockResolvedValue({ marginRequired: 1085 });
 
-      expect(
-        controller.calculateMargin({ pair: 'EUR/USD', lots: 1, leverage: 100, currentPrice: 1.085 }),
-      ).toEqual({ marginRequired: 1085 });
+      await expect(
+        controller.calculateMargin({ pair: 'EUR_USD', lots: 1, leverage: 100, currentPrice: 1.085 }),
+      ).resolves.toEqual({ marginRequired: 1085 });
       expect(marginEngine.calculateMarginRequired).toHaveBeenCalledWith('EUR/USD', 1, 100, 1.085);
     });
   });

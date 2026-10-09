@@ -15,6 +15,7 @@ import { PositionService } from '../position/position.service';
 import { AccountService } from '../account/account.service';
 import { OrderValidationService } from '../order/order-validation.service';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
+import { PricingService } from '../pricing/pricing.service';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
     AccountService,
     OrderValidationService,
     RealtimePublisher,
+    PricingService,
     {
       provide: 'KAFKA_CONFIG',
       useFactory: (config: ConfigService) => ({
@@ -44,6 +46,6 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
     },
   ],
   // Single instances shared with AppModule (controllers, OrderService).
-  exports: [SessionConsumer, PositionService, AccountService, OrderValidationService, RealtimePublisher],
+  exports: [SessionConsumer, PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService],
 })
 export class KafkaConsumerModule {}

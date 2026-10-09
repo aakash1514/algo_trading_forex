@@ -12,24 +12,18 @@ export class PositionController {
   // GET /api/positions
   @Get()
   async getOpenPositions(@Request() req: any) {
-    return this.positionService.getOpenPositions(req.user.userId);
+    return this.positionService.getOpenPositions(req.user.id);
   }
 
   // GET /api/positions/:id
   @Get(':id')
   async getPosition(@Request() req: any, @Param('id') id: string) {
-    return this.positionService.getPosition(req.user.userId, id);
+    return this.positionService.getPosition(req.user.id, id);
   }
 
   // DELETE /api/positions/:id — manual close
   @Delete(':id')
   async closePosition(@Request() req: any, @Param('id') id: string) {
-    // Fetch current price from position record as closing price
-    const position = await this.positionService.getPosition(req.user.userId, id);
-    return this.positionService.closePosition(
-      id,
-      'MANUAL',
-      Number(position.currentPrice ?? position.openPrice),
-    );
+    return this.positionService.closeAtMarket(req.user.id, id);
   }
 }

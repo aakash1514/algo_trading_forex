@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { InstrumentEntity, EconomicEventEntity, OrderEntity } from '@forexedge/database';
+import { InstrumentEntity, EconomicEventEntity, OrderEntity, PositionEntity } from '@forexedge/database';
 import { pairCurrencies } from '../common/instrument';
 import type { OrderRequest } from './dto/submit-order.dto';
 
@@ -32,6 +32,8 @@ export class OrderValidationService {
     private readonly economicEventRepo: Repository<EconomicEventEntity>,
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
+    @InjectRepository(PositionEntity)
+    private readonly positionRepo: Repository<PositionEntity>,
   ) {}
 
   // Called by Kafka consumer in Step 10
@@ -117,17 +119,27 @@ export class OrderValidationService {
     pair: string,
     lots: number,
   ): Promise<ValidationResult> {
-    // Rule 1: lots per pair must not exceed 10
-    if (lots > this.MAX_LOTS_PER_PAIR) {
+    // Rule 1: open exposure on the pair (gross LONG + SHORT lots) plus this
+    // order must not exceed 10 lots
+    const exposure = await this.positionRepo
+      .createQueryBuilder('p')
+      .select('COALESCE(SUM(p.lots), 0)', 'openLots')
+      .where('p.user_id = :userId', { userId })
+      .andWhere('p.pair = :pair', { pair })
+      .andWhere('p.is_open = true')
+      .getRawOne<{ openLots: string }>();
+    const openLots = Number(exposure?.openLots ?? 0);
+    if (openLots + lots > this.MAX_LOTS_PER_PAIR) {
       return {
         valid: false,
-        reason: `Lot size ${lots} exceeds maximum ${this.MAX_LOTS_PER_PAIR} lots per pair`,
+        reason: `Exposure limit: ${openLots} lots open on ${pair} + ${lots} would exceed ${this.MAX_LOTS_PER_PAIR} lots per pair`,
       };
     }
 
     // Rule 2: daily realized loss must not exceed $500
+    // "Today" is the UTC trading day, independent of the server's timezone
     const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    todayStart.setUTCHours(0, 0, 0, 0);
 
     // Sum all closed orders today where the position lost money
     const result = await this.orderRepo

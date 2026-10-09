@@ -83,9 +83,10 @@ export class AppController {
 
   // POST /api/domain/margin/calculate
   @Post('margin/calculate')
-  calculateMargin(@Body() body: MarginCalculateDto) {
+  async calculateMargin(@Body() body: MarginCalculateDto) {
+    // Accept both EUR_USD and EUR/USD formats
     return this.marginEngine.calculateMarginRequired(
-      body.pair,
+      body.pair.replace('_', '/'),
       body.lots,
       body.leverage,
       body.currentPrice,

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PipCalculatorService } from '../pip-calculator/pip-calculator.service';
+import { marginRequiredUsd } from '@forexedge/common';
 
 export enum MarginCallStatus {
   SAFE        = 'SAFE',         // margin level > 150%
@@ -43,17 +44,17 @@ export class MarginEngineService {
 
   constructor(private readonly pipCalculator: PipCalculatorService) {}
 
-  // Called by OMS before opening a new position
-  calculateMarginRequired(
+  // margin (USD) = units x base->USD / leverage, with the lot size from the DB.
+  // Same shared formula as order-service (libs/common money.ts).
+  async calculateMarginRequired(
     pair: string,
     lots: number,
     leverage: number,
     currentPrice: number,
-    lotSize = 100000,
-  ): MarginRequiredResult {
-    // margin = (lots × lotSize × currentPrice) / leverage
-    const notionalValue  = lots * lotSize * currentPrice;
-    const marginRequired = Math.round((notionalValue / leverage) * 100) / 100;
+  ): Promise<MarginRequiredResult> {
+    const spec = await this.pipCalculator.getContractSpec(pair);
+    const quoteToUsd = await this.pipCalculator.getQuoteToUsd(pair, currentPrice);
+    const marginRequired = marginRequiredUsd(lots, spec, currentPrice, quoteToUsd, leverage);
 
     return {
       pair,
@@ -66,22 +67,16 @@ export class MarginEngineService {
   }
 
   // Called by OMS to check account health across all open positions
-  calculateMarginLevel(
+  async calculateMarginLevel(
     accountBalance: number,
     unrealisedPnL: number,
     positions: Position[],
-  ): MarginLevelResult {
+  ): Promise<MarginLevelResult> {
     const equity = accountBalance + unrealisedPnL;
 
-    const totalMarginUsed = positions.reduce((sum, pos) => {
-      const { marginRequired } = this.calculateMarginRequired(
-        pos.pair,
-        pos.lots,
-        pos.leverage,
-        pos.currentPrice,
-      );
-      return sum + marginRequired;
-    }, 0);
+    const margins = await Promise.all(positions.map((pos) =>
+      this.calculateMarginRequired(pos.pair, pos.lots, pos.leverage, pos.currentPrice)));
+    const totalMarginUsed = margins.reduce((sum, m) => sum + m.marginRequired, 0);
 
     const freeMargin  = Math.round((equity - totalMarginUsed) * 100) / 100;
     const marginLevel = totalMarginUsed === 0
@@ -108,19 +103,19 @@ export class MarginEngineService {
   }
 
   // Called by OMS to check if user can afford to open a new position
-  canOpenPosition(
+  async canOpenPosition(
     accountBalance: number,
     unrealisedPnL: number,
     existingPositions: Position[],
     newPosition: Position,
-  ): { allowed: boolean; reason?: string; freeMargin: number; marginRequired: number } {
-    const { freeMargin } = this.calculateMarginLevel(
+  ): Promise<{ allowed: boolean; reason?: string; freeMargin: number; marginRequired: number }> {
+    const { freeMargin } = await this.calculateMarginLevel(
       accountBalance,
       unrealisedPnL,
       existingPositions,
     );
 
-    const { marginRequired } = this.calculateMarginRequired(
+    const { marginRequired } = await this.calculateMarginRequired(
       newPosition.pair,
       newPosition.lots,
       newPosition.leverage,

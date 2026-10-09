@@ -1,12 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { InstrumentEntity, EconomicEventEntity, OrderEntity } from '@forexedge/database';
+import { InstrumentEntity, EconomicEventEntity, OrderEntity, PositionEntity } from '@forexedge/database';
 import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest } from './dto/submit-order.dto';
 
 const mockInstrumentRepo = () => ({ findOne: jest.fn() });
 const mockEconomicEventRepo = () => ({ createQueryBuilder: jest.fn() });
 const mockOrderRepo = () => ({ createQueryBuilder: jest.fn() });
+const mockPositionRepo = () => ({ createQueryBuilder: jest.fn() });
+
+const exposureQb = (openLots: string) => ({
+  select: jest.fn().mockReturnThis(),
+  where: jest.fn().mockReturnThis(),
+  andWhere: jest.fn().mockReturnThis(),
+  getRawOne: jest.fn().mockResolvedValue({ openLots }),
+});
 
 const baseDto: OrderRequest = {
   instrument: 'EUR_USD',
@@ -23,6 +31,8 @@ describe('OrderValidationService', () => {
   let service: OrderValidationService;
   let instrumentRepo: ReturnType<typeof mockInstrumentRepo>;
   let orderRepo: ReturnType<typeof mockOrderRepo>;
+  let positionRepo: ReturnType<typeof mockPositionRepo>;
+  let orderQb: { select: jest.Mock; innerJoin: jest.Mock; where: jest.Mock; andWhere: jest.Mock; getRawOne: jest.Mock };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,12 +41,17 @@ describe('OrderValidationService', () => {
         { provide: getRepositoryToken(InstrumentEntity), useFactory: mockInstrumentRepo },
         { provide: getRepositoryToken(EconomicEventEntity), useFactory: mockEconomicEventRepo },
         { provide: getRepositoryToken(OrderEntity), useFactory: mockOrderRepo },
+        { provide: getRepositoryToken(PositionEntity), useFactory: mockPositionRepo },
       ],
     }).compile();
 
     service = module.get(OrderValidationService);
     instrumentRepo = module.get(getRepositoryToken(InstrumentEntity));
     orderRepo = module.get(getRepositoryToken(OrderEntity));
+    positionRepo = module.get(getRepositoryToken(PositionEntity));
+
+    // Gate 4 exposure query — no open lots by default
+    positionRepo.createQueryBuilder.mockReturnValue(exposureQb('0'));
 
     // Mock Gate 5 (economic calendar) — returns no events by default
     const qb = {
@@ -48,7 +63,7 @@ describe('OrderValidationService', () => {
       .createQueryBuilder.mockReturnValue(qb);
 
     // Mock Gate 4 daily loss query — returns no loss by default
-    const orderQb = {
+    orderQb = {
       select: jest.fn().mockReturnThis(),
       innerJoin: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
@@ -139,14 +154,45 @@ describe('OrderValidationService', () => {
       service.updateSpreadCache('EUR/USD', 2);
     });
 
-    it('rejects when lots exceed maximum', async () => {
+    it('rejects when a single order exceeds the per-pair maximum', async () => {
       const result = await service.validate(
         'user-1',
         { ...baseDto, lots: 11 },
         marginOk,
       );
       expect(result.valid).toBe(false);
-      expect(result.reason).toContain('exceeds maximum');
+      expect(result.reason).toContain('would exceed 10 lots');
+    });
+
+    it('counts existing open exposure on the pair', async () => {
+      positionRepo.createQueryBuilder.mockReturnValue(exposureQb('9.5'));
+      const result = await service.validate('user-1', { ...baseDto, lots: 1 }, marginOk);
+      expect(result.valid).toBe(false);
+      expect(result.reason).toContain('9.5 lots open on EUR/USD');
+    });
+
+    it('allows an order that stays within the exposure limit', async () => {
+      positionRepo.createQueryBuilder.mockReturnValue(exposureQb('9'));
+      const result = await service.validate('user-1', { ...baseDto, lots: 1 }, marginOk);
+      expect(result.valid).toBe(true);
+    });
+
+    it('scopes the exposure query to the user, the slash-format pair and open positions', async () => {
+      const qb = exposureQb('0');
+      positionRepo.createQueryBuilder.mockReturnValue(qb);
+      await service.validate('user-1', baseDto, marginOk);
+      expect(qb.where).toHaveBeenCalledWith('p.user_id = :userId', { userId: 'user-1' });
+      expect(qb.andWhere).toHaveBeenCalledWith('p.pair = :pair', { pair: 'EUR/USD' });
+      expect(qb.andWhere).toHaveBeenCalledWith('p.is_open = true');
+    });
+
+    it('starts the daily-loss window at UTC midnight', async () => {
+      await service.validate('user-1', baseDto, marginOk);
+      const call = orderQb.andWhere.mock.calls.find(([sql]: [string]) => sql.includes('todayStart'));
+      const todayStart: Date = call[1].todayStart;
+      expect(todayStart.getUTCHours()).toBe(0);
+      expect(todayStart.getUTCMinutes()).toBe(0);
+      expect(todayStart.toISOString().slice(0, 10)).toBe(new Date().toISOString().slice(0, 10));
     });
 
     it('rejects when daily loss limit is reached', async () => {

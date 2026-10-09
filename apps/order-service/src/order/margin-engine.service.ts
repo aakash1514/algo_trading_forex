@@ -1,55 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AccountSummaryEntity, PositionEntity } from '@forexedge/database';
+import { AccountSummaryEntity } from '@forexedge/database';
 import { ValidationResult } from './order-validation.service';
+import { PricingService, PositionValuation } from '../pricing/pricing.service';
 
+const DEFAULT_LEVERAGE = 100;
+
+// Margin and pip value come from the shared money math (libs/common) using the
+// instrument's contract spec from the DB; domain-service uses the same functions.
 @Injectable()
 export class MarginEngineService {
   constructor(
     @InjectRepository(AccountSummaryEntity)
     private readonly accountRepo: Repository<AccountSummaryEntity>,
-    @InjectRepository(PositionEntity)
-    private readonly positionRepo: Repository<PositionEntity>,
+    private readonly pricing: PricingService,
   ) {}
 
-  // ─── Pure math (mirrors domain-service MarginEngineService) ────────────────
-  // These three methods are stateless arithmetic — safe to duplicate.
-  // domain-service owns the canonical copy; if the formula changes, update both.
-
-  calculateMarginRequired(
-    lots: number,
-    currentPrice: number,
-    leverage: number,
-  ): number {
-    const notionalValue = lots * 100_000 * currentPrice;
-    return Math.round((notionalValue / leverage) * 100) / 100;
+  valuePosition(pair: string, lots: number, price: number, leverage = DEFAULT_LEVERAGE): Promise<PositionValuation> {
+    return this.pricing.valuePosition(pair, lots, price, leverage);
   }
 
-  calculatePipValue(pair: string, lots: number, currentPrice: number): number {
-    // Synchronous approximation for stamping pipValue on order record at fill time.
-    // Full async version with Redis cross-rate lookup lives in PipCalculatorService.
-    const isJpy = pair.includes('JPY');
-    const pipSize = isJpy ? 0.01 : 0.0001;
-    const units = lots * 100_000;
-
-    if (pair.endsWith('USD')) {
-      // Direct pair — pip value already in USD
-      return Math.round(units * pipSize * 100) / 100;
-    }
-    // Indirect/cross — divide by current price to approximate USD value
-    return Math.round(((units * pipSize) / currentPrice) * 100) / 100;
-  }
-
-  // ─── DB-aware check ────────────────────────────────────────────────────────
+  // `entryPrice` must be the live price the order would fill at (ask for LONG, bid for SHORT).
   async canOpenPosition(
     userId: string,
-    lots: number,
-    currentPrice: number,
     pair: string,
+    lots: number,
+    entryPrice: number,
   ): Promise<ValidationResult> {
     const account = await this.accountRepo.findOne({ where: { userId } });
-
     if (!account) {
       return {
         valid: false,
@@ -57,12 +36,7 @@ export class MarginEngineService {
       };
     }
 
-    const marginRequired = this.calculateMarginRequired(
-      lots,
-      currentPrice,
-      account.leverage,
-    );
-
+    const { marginRequired } = await this.valuePosition(pair, lots, entryPrice, account.leverage);
     const equity = Number(account.balance) + Number(account.unrealizedPnl);
     const freeMargin = equity - Number(account.marginUsed);
 
@@ -72,7 +46,6 @@ export class MarginEngineService {
         reason: `Insufficient margin: need $${marginRequired.toFixed(2)}, free margin $${freeMargin.toFixed(2)}`,
       };
     }
-
     return { valid: true };
   }
 }

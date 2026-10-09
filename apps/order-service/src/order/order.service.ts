@@ -12,6 +12,7 @@ import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
 import { instrumentToPair } from '../common/instrument';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
+import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
 import { MarginEngineService } from './margin-engine.service';
 import { Kafka, Producer } from 'kafkajs';
 import { SessionConsumer } from '../kafka/session.consumer';
@@ -44,6 +45,7 @@ export class OrderService {
     private readonly marginEngine: MarginEngineService,
     private readonly sessionConsumer: SessionConsumer,
     private readonly realtime: RealtimePublisher,
+    private readonly pricing: PricingService,
   ) {
     // Kafka producer — wired up in Step 10
     // Declared here so OrderService doesn't need to change in Step 10
@@ -98,12 +100,19 @@ export class OrderService {
 
     // Wrap post-DRAFT flow so errors never leave an order stuck in DRAFT
     try {
-      // Step 3: Run validation gates
-      const currentPrice = dto.requestedPrice ?? 0;
+      // Step 3: Run validation gates, checking margin at the live entry price
+      let entryPrice: number;
+      try {
+        const quote = await this.pricing.getQuote(dto.pair);
+        entryPrice = dto.direction === 'LONG' ? quote.ask : quote.bid;
+      } catch (err) {
+        if (!(err instanceof PriceUnavailableError)) throw err;
+        return await this.transitionState(order, 'REJECTED', err.message);
+      }
       const validation = await this.validationService.validate(
         userId,
         dto,
-        () => this.marginEngine.canOpenPosition(userId, dto.lots, currentPrice, dto.pair),
+        () => this.marginEngine.canOpenPosition(userId, dto.pair, dto.lots, entryPrice),
       );
 
       if (!validation.valid) {
@@ -134,15 +143,12 @@ export class OrderService {
         order.openedAt = fill.executedAt;
         order.submittedAt = fill.executedAt;
 
-        // Calculate pip value and margin now that we have executed price
-        const pipValue = this.marginEngine.calculatePipValue(
-          order.pair, order.lots, fill.executedPrice
-        );
+        // Pip value and margin at the executed price
         const account = await manager.findOne(AccountSummaryEntity, {
           where: { userId }
         });
-        const marginUsed = this.marginEngine.calculateMarginRequired(
-          order.lots, fill.executedPrice, account?.leverage ?? 100
+        const { pipValue, marginRequired: marginUsed } = await this.marginEngine.valuePosition(
+          order.pair, Number(order.lots), fill.executedPrice, account?.leverage,
         );
 
         order.pipValue = pipValue;
@@ -222,7 +228,7 @@ export class OrderService {
       );
     }
 
-    return this.dataSource.transaction(async manager => {
+    const updated = await this.dataSource.transaction(async manager => {
       const updates: Partial<OrderEntity> = { status: newState };
 
       if (reason) updates.rejectionReason = reason;
@@ -231,16 +237,16 @@ export class OrderService {
 
       await manager.update(OrderEntity, order.id, updates);
 
-      const updated = await manager.findOne(OrderEntity, { where: { id: order.id } });
-      if (!updated) throw new Error(`Order ${order.id} not found after transition`);
-
-      // Fire and forget — Kafka publish after DB commit
-      this.publishLifecycleEvent(updated).catch(err =>
-        this.logger.warn(`Kafka lifecycle publish failed: ${this.getErrorMessage(err)}`)
-      );
-
-      return updated;
+      const reloaded = await manager.findOne(OrderEntity, { where: { id: order.id } });
+      if (!reloaded) throw new Error(`Order ${order.id} not found after transition`);
+      return reloaded;
     });
+
+    // Fire and forget, only after the transaction committed
+    this.publishLifecycleEvent(updated).catch(err =>
+      this.logger.warn(`Kafka lifecycle publish failed: ${this.getErrorMessage(err)}`)
+    );
+    return updated;
   }
 
   // ─── Cancel Order ──────────────────────────────────────────────────────────
