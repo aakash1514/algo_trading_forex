@@ -7,6 +7,7 @@ import { clearCredentials } from '../../store/slices/auth.slice';
 import { useRouter } from 'next/navigation';
 import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
 import { cn } from '../../lib/cn';
+import { getPriceDecimals } from '../../lib/pip';
 
 export function Topbar() {
   const dispatch = useAppDispatch();
@@ -62,7 +63,7 @@ export function Topbar() {
             >
               <span className="text-terminal-muted">{PAIR_DISPLAY[pair]}</span>
               <span className="tabular-nums text-[#e2e4e9] font-medium">
-                {price ? price.bid.toFixed(5) : '—'}
+                {price ? price.bid.toFixed(getPriceDecimals(pair)) : '—'}
               </span>
             </div>
           );

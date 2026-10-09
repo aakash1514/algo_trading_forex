@@ -8,6 +8,7 @@ import { removePosition } from '../../store/slices/positions.slice';
 import { useAppDispatch } from '../../store';
 import { PAIR_DISPLAY } from '../../lib/constants';
 import { cn } from '../../lib/cn';
+import { getPriceDecimals } from '../../lib/pip';
 
 
 export function PositionsTable() {
@@ -71,8 +72,8 @@ const positions = useAppSelector(selectPositions);
                     </span>
                   </td>
                   <td className="px-3 py-2 tabular-nums text-[#e2e4e9]">{pos.lots.toFixed(2)}</td>
-                  <td className="px-3 py-2 tabular-nums text-terminal-muted">{pos.openPrice.toFixed(5)}</td>
-                  <td className="px-3 py-2 tabular-nums text-[#e2e4e9]">{pos.currentPrice.toFixed(5)}</td>
+                  <td className="px-3 py-2 tabular-nums text-terminal-muted">{pos.openPrice.toFixed(getPriceDecimals(pos.instrument))}</td>
+                  <td className="px-3 py-2 tabular-nums text-[#e2e4e9]">{pos.currentPrice.toFixed(getPriceDecimals(pos.instrument))}</td>
                   <td className={cn('px-3 py-2 tabular-nums font-medium',
                     pos.pipPnl >= 0 ? 'text-accent-green' : 'text-accent-red'
                   )}>
