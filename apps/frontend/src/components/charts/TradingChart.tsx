@@ -6,10 +6,42 @@ import type { CandlestickData, IChartApi, ISeriesApi, UTCTimestamp } from 'light
 import { useAppSelector } from '../../store';
 import { useGetCandlesQuery } from '../../store/api/market.api';
 import { PAIR_DISPLAY, TIMEFRAMES, type Timeframe } from '../../lib/constants';
+import type { Candle } from '../../types/api.types';
 import { cn } from '../../lib/cn';
 
 interface TradingChartProps {
   pair: string;
+}
+
+// Postgres NUMERIC columns arrive as strings, so prices may be string or number.
+// Returns NaN for empty/invalid input so callers can filter the row out.
+function toPrice(value: number | string): number {
+  if (typeof value === 'number') return value;
+  return value.trim() === '' ? NaN : Number(value);
+}
+
+// UTCTimestamp is a branded number (seconds since epoch), so the cast is required.
+function toUtcTimestamp(value: string | number | undefined): UTCTimestamp {
+  const ms = value === undefined ? NaN : new Date(value).getTime();
+  return Math.floor(ms / 1000) as UTCTimestamp;
+}
+
+function toCandlestick(c: Candle): CandlestickData<UTCTimestamp> {
+  return {
+    time: toUtcTimestamp(c.bucket ?? c.time),
+    open: toPrice(c.open),
+    high: toPrice(c.high),
+    low: toPrice(c.low),
+    close: toPrice(c.close),
+  };
+}
+
+function isValidCandle(c: CandlestickData<UTCTimestamp>): boolean {
+  return (
+    Number.isFinite(c.time) &&
+    c.time > 0 &&
+    [c.open, c.high, c.low, c.close].every(Number.isFinite)
+  );
 }
 
 export function TradingChart({ pair }: TradingChartProps) {
@@ -49,9 +81,9 @@ export function TradingChart({ pair }: TradingChartProps) {
         borderColor: '#2a2d35',
         textColor: '#6b7280',
       },
+      // Time-scale labels inherit layout.textColor (v5 has no timeScale.textColor).
       timeScale: {
         borderColor: '#2a2d35',
-        textColor: '#6b7280',
         timeVisible: true,
         secondsVisible: false,
       },
@@ -93,14 +125,8 @@ export function TradingChart({ pair }: TradingChartProps) {
   useEffect(() => {
     if (!seriesRef.current || !candles?.length) return;
     const formatted = candles
-      .map((c): CandlestickData => ({
-        time: Math.floor(new Date(c.bucket ?? c.time).getTime() / 1000) as UTCTimestamp,
-        open: parseFloat(c.open),
-        high: parseFloat(c.high),
-        low: parseFloat(c.low),
-        close: parseFloat(c.close),
-      }))
-      .filter((c) => !isNaN(c.time) && c.time > 0 && !isNaN(c.open))
+      .map(toCandlestick)
+      .filter(isValidCandle)
       .sort((a, b) => a.time - b.time);
 
     if (formatted.length === 0) return;
@@ -113,7 +139,7 @@ export function TradingChart({ pair }: TradingChartProps) {
   useEffect(() => {
     if (!seriesRef.current || !currentPrice) return;
     seriesRef.current.update({
-      time: Math.floor(Date.now() / 1000) as UTCTimestamp,
+      time: toUtcTimestamp(Date.now()),
       open: currentPrice.bid,
       high: currentPrice.bid,
       low: currentPrice.bid,
@@ -121,10 +147,10 @@ export function TradingChart({ pair }: TradingChartProps) {
     });
   }, [currentPrice]);
 
-        const lastCandle = candles?.[candles.length - 1];
-        const pipChange = currentPrice && lastCandle
-        ? ((currentPrice.bid - parseFloat(String(lastCandle.open))) * 10000).toFixed(1)
-        : null;
+  const lastCandle = candles?.[candles.length - 1];
+  const pipChange = currentPrice && lastCandle
+    ? ((currentPrice.bid - toPrice(lastCandle.open)) * 10000).toFixed(1)
+    : null;
   const isPositive = pipChange ? parseFloat(pipChange) >= 0 : true;
 
   return (
