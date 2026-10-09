@@ -51,3 +51,9 @@ dist/
 # Next.js
 .next
 out
+
+# TypeScript incremental build state
+*.tsbuildinfo
+
+# Next.js regenerates this on every build/dev run
+next-env.d.ts

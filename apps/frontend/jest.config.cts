@@ -1,7 +1,9 @@
 const nextJest = require('next/jest.js');
 
+// next/jest resolves `dir` against process.cwd(), which is the workspace root
+// under the Nx jest executor, so anchor it to this project explicitly.
 const createJestConfig = nextJest({
-  dir: './',
+  dir: __dirname,
 });
 
 const config = {

@@ -1,10 +1,13 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import Page from '../src/app/page';
+import { redirect } from 'next/navigation';
+import RootPage from '../src/app/page';
 
-describe('Page', () => {
-  it('should render successfully', () => {
-    const { baseElement } = render(<Page />);
-    expect(baseElement).toBeTruthy();
+jest.mock('next/navigation', () => ({
+  redirect: jest.fn(),
+}));
+
+describe('RootPage', () => {
+  it('redirects to /login', () => {
+    RootPage();
+    expect(redirect).toHaveBeenCalledWith('/login');
   });
 });

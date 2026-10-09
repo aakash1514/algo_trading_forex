@@ -7,6 +7,8 @@ export default [
   ...nx.configs['flat/react-typescript'],
   ...baseConfig,
   {
-    ignores: ['.next/**/*'],
+    // `**/` prefix: the Nx lint executor runs ESLint from the workspace root with
+    // this file as overrideConfigFile, so ignore patterns resolve against the root.
+    ignores: ['**/.next/**'],
   },
 ];
