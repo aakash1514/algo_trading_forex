@@ -14,6 +14,9 @@ module.exports = {
       compiler: 'tsc',
       main: './src/main.ts',
       tsConfig: './tsconfig.app.json',
+      // Transpile only: type safety lives in `nx typecheck` (tsc --build over
+      // project references). The in-build checker can't see unbuilt lib .d.ts files.
+      typeCheckOptions: false,
       assets: ['./src/assets'],
       optimization: false,
       outputHashing: 'none',
