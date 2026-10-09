@@ -161,7 +161,7 @@ describe('OrderService — FSM transitions', () => {
 
   // ── Idempotency ─────────────────────────────────────────────────────────────
   it('returns existing order when idempotency key already exists', async () => {
-    const existing = { id: 'o1', status: 'OPEN', idempotencyKey: 'key-123' } as OrderEntity;
+    const existing = { id: 'o1', userId: 'user-1', status: 'OPEN', idempotencyKey: 'key-123' } as OrderEntity;
     orderRepo.findOne.mockResolvedValue(existing);
 
     const result = await service.submitOrder('user-1', {
@@ -300,5 +300,75 @@ describe('OrderService — pricing and margin', () => {
       .transitionState(draft, 'PENDING');
     expect(committed).toBe(true);
     expect(send).toHaveBeenCalledWith(expect.objectContaining({ topic: 'orders.lifecycle' }));
+  });
+});
+
+describe('OrderService cross-user access', () => {
+  const USER_A = 'aaaaaaaa-0000-4000-8000-000000000001';
+  const USER_B = 'bbbbbbbb-0000-4000-8000-000000000002';
+  const orderOfA = { id: 'ord-a', userId: USER_A, status: 'OPEN', idempotencyKey: 'key-a' } as OrderEntity;
+
+  let service: OrderService;
+  let orderRepo: ReturnType<typeof mockOrderRepo>;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        OrderService,
+        { provide: getRepositoryToken(OrderEntity), useFactory: mockOrderRepo },
+        { provide: getRepositoryToken(AccountSummaryEntity), useFactory: mockAccountRepo },
+        { provide: getRepositoryToken(PositionEntity), useFactory: () => ({}) },
+        { provide: DataSource, useFactory: mockDataSource },
+        { provide: BROKER_ADAPTER, useFactory: mockBroker },
+        { provide: OrderValidationService, useFactory: mockValidation },
+        { provide: MarginEngineService, useFactory: mockMarginEngine },
+        { provide: SessionConsumer, useFactory: mockSessionConsumer },
+        { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn() } },
+        { provide: PricingService, useFactory: mockPricing },
+      ],
+    }).compile();
+    service = module.get(OrderService);
+    orderRepo = module.get(getRepositoryToken(OrderEntity));
+    // Behaves like Postgres: a row is returned only when every condition matches.
+    orderRepo.findOne.mockImplementation(async ({ where }: { where: Partial<OrderEntity> }) =>
+      Object.entries(where).every(([k, v]) => (orderOfA as unknown as Record<string, unknown>)[k] === v) ? orderOfA : null);
+  });
+
+  afterEach(() => jest.clearAllMocks());
+
+  it("user B gets 404 on user A's order", async () => {
+    await expect(service.getOrder(USER_B, 'ord-a')).rejects.toHaveProperty('status', 404);
+    expect(orderRepo.findOne).toHaveBeenCalledWith({ where: { id: 'ord-a', userId: USER_B } });
+  });
+
+  it("user B gets 404 cancelling user A's order", async () => {
+    await expect(service.cancelOrder(USER_B, 'ord-a')).rejects.toHaveProperty('status', 404);
+  });
+
+  it('owner can read their order', async () => {
+    await expect(service.getOrder(USER_A, 'ord-a')).resolves.toBe(orderOfA);
+  });
+
+  it("reusing user A's idempotency key as user B is a 409 and never returns A's order", async () => {
+    await expect(
+      service.submitOrder(USER_B, { instrument: 'EUR_USD', direction: 'LONG', orderType: 'MARKET', lots: 1 }, 'key-a'),
+    ).rejects.toHaveProperty('status', 409);
+    await expect(service.idempotencyKeyExists(USER_B, 'key-a')).rejects.toHaveProperty('status', 409);
+    expect(orderRepo.create).not.toHaveBeenCalled();
+  });
+
+  it('same user reusing their key gets their existing order back', async () => {
+    await expect(
+      service.submitOrder(USER_A, { instrument: 'EUR_USD', direction: 'LONG', orderType: 'MARKET', lots: 1 }, 'key-a'),
+    ).resolves.toBe(orderOfA);
+  });
+
+  it.each([
+    ['getOrders', () => service.getOrders(undefined as unknown as string, {})],
+    ['getOrder', () => service.getOrder(undefined as unknown as string, 'ord-a')],
+    ['cancelOrder', () => service.cancelOrder(undefined as unknown as string, 'ord-a')],
+  ])('%s with a missing user id fails closed (401)', async (_name, call) => {
+    await expect(call()).rejects.toHaveProperty('status', 401);
+    expect(orderRepo.findOne).not.toHaveBeenCalled();
   });
 });

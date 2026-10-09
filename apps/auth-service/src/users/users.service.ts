@@ -2,6 +2,7 @@ import { Injectable, ConflictException, NotFoundException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '@forexedge/database';
+import { assertUserId } from '@forexedge/common';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +16,8 @@ export class UsersService {
   }
 
   async findById(id: string): Promise<UserEntity | null> {
+    // findOne({ where: { id: undefined } }) would return the first user.
+    assertUserId(id);
     return this.userRepo.findOne({ where: { id } });
   }
 

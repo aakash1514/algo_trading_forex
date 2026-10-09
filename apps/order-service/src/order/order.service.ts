@@ -1,5 +1,5 @@
 import {
-  Injectable, Logger, Inject, BadRequestException, ConflictException
+  Injectable, Logger, Inject, BadRequestException, ConflictException, NotFoundException
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
@@ -7,7 +7,7 @@ import {
   OrderEntity, OrderStatus, PositionEntity, AccountSummaryEntity
 } from '@forexedge/database';
 import { IForexBroker } from '@forexedge/common';
-import { BROKER_ADAPTER } from '@forexedge/common';
+import { BROKER_ADAPTER, assertUserId } from '@forexedge/common';
 import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
 import { instrumentToPair } from '../common/instrument';
@@ -57,12 +57,20 @@ export class OrderService {
   }
 
   // ─── Submit Order ──────────────────────────────────────────────────────────
-  async idempotencyKeyExists(idempotencyKey: string): Promise<boolean> {
-    const existing = await this.orderRepo.findOne({
-      where: { idempotencyKey },
-      select: ['id'],
-    });
-    return !!existing;
+  // Idempotency keys are globally unique in the DB. A key reused by the same
+  // user returns that user's order; another user's key is a conflict and must
+  // never return (or reveal) the other user's order.
+  private async findIdempotent(userId: string, idempotencyKey: string): Promise<OrderEntity | null> {
+    const existing = await this.orderRepo.findOne({ where: { idempotencyKey } });
+    if (existing && existing.userId !== userId) {
+      throw new ConflictException('Idempotency key already used');
+    }
+    return existing;
+  }
+
+  async idempotencyKeyExists(userId: string, idempotencyKey: string): Promise<boolean> {
+    assertUserId(userId);
+    return !!(await this.findIdempotent(userId, idempotencyKey));
   }
 
   async submitOrder(
@@ -70,12 +78,11 @@ export class OrderService {
     body: SubmitOrderDto,
     idempotencyKey: string,
   ): Promise<OrderEntity> {
+    assertUserId(userId);
     const dto: OrderRequest = { ...body, pair: instrumentToPair(body.instrument) };
 
-    // Step 1: Idempotency check
-    const existing = await this.orderRepo.findOne({
-      where: { idempotencyKey },
-    });
+    // Step 1: Idempotency check (scoped to the user)
+    const existing = await this.findIdempotent(userId, idempotencyKey);
     if (existing) {
       this.logger.log(`Idempotency hit — returning existing order ${existing.id}`);
       return existing;
@@ -251,12 +258,13 @@ export class OrderService {
 
   // ─── Cancel Order ──────────────────────────────────────────────────────────
   async cancelOrder(userId: string, orderId: string): Promise<OrderEntity> {
+    assertUserId(userId);
     const order = await this.orderRepo.findOne({
       where: { id: orderId, userId },
     });
 
     if (!order) {
-      throw new BadRequestException(`Order ${orderId} not found`);
+      throw new NotFoundException(`Order ${orderId} not found`);
     }
 
     if (!['PENDING', 'SUBMITTED'].includes(order.status)) {
@@ -270,10 +278,11 @@ export class OrderService {
 
   // ─── Queries ───────────────────────────────────────────────────────────────
   async getOrder(userId: string, orderId: string): Promise<OrderEntity> {
+    assertUserId(userId);
     const order = await this.orderRepo.findOne({
       where: { id: orderId, userId },
     });
-    if (!order) throw new BadRequestException(`Order ${orderId} not found`);
+    if (!order) throw new NotFoundException(`Order ${orderId} not found`);
     return order;
   }
 
@@ -287,6 +296,7 @@ export class OrderService {
       limit?: number;
     },
   ): Promise<OrderEntity[]> {
+    assertUserId(userId);
     const qb = this.orderRepo
       .createQueryBuilder('o')
       .where('o.user_id = :userId', { userId })

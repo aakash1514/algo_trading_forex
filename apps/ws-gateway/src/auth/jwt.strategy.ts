@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { assertUserId } from '@forexedge/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
@@ -23,6 +24,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   validate(payload: JwtPayload) {
+    // A token without a subject would make every user-scoped query unfiltered.
+    assertUserId(payload.sub);
     return { id: payload.sub, email: payload.email, role: payload.role };
   }
 }

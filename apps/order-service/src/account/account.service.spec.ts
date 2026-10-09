@@ -116,3 +116,29 @@ describe('AccountService', () => {
     });
   });
 });
+describe('AccountService cross-user access', () => {
+  const USER_A = 'aaaaaaaa-0000-4000-8000-000000000001';
+  const USER_B = 'bbbbbbbb-0000-4000-8000-000000000002';
+  const rowOfA = { id: 'acct-a', userId: USER_A, balance: 10000, marginUsed: 0, unrealizedPnl: 0, leverage: 100 };
+  // Behaves like Postgres: only the row whose user_id matches is returned.
+  const repo = { findOne: jest.fn(async ({ where }: { where: { userId?: string } }) => (where.userId === USER_A ? rowOfA : null)) };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const service = new AccountService(repo as any, {} as any);
+
+  afterEach(() => jest.clearAllMocks());
+
+  it('user B without an account gets 404, never user A\'s account', async () => {
+    await expect(service.getAccountSummary(USER_B)).rejects.toThrow('Account not found');
+    await expect(service.getAccountSummary(USER_B)).rejects.toHaveProperty('status', 404);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { userId: USER_B } });
+  });
+
+  it('owner reads their own account', async () => {
+    await expect(service.getAccountSummary(USER_A)).resolves.toMatchObject({ userId: USER_A, balance: 10000 });
+  });
+
+  it('a missing user id fails closed (401) instead of matching the first account', async () => {
+    await expect(service.getAccountSummary(undefined as unknown as string)).rejects.toHaveProperty('status', 401);
+    expect(repo.findOne).not.toHaveBeenCalled();
+  });
+});

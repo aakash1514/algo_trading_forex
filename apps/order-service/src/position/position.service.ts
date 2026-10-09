@@ -4,7 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
 import { CloseReason } from '@forexedge/database';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
-import { pipValueUsd, pipsBetween } from '@forexedge/common';
+import { assertUserId, pipValueUsd, pipsBetween } from '@forexedge/common';
 import { PricingService } from '../pricing/pricing.service';
 
 export interface NormalizedTick {
@@ -196,6 +196,7 @@ export class PositionService {
 
   // ─── Queries ───────────────────────────────────────────────────────────────
   async getOpenPositions(userId: string): Promise<PositionEntity[]> {
+    assertUserId(userId);
     return this.positionRepo.find({
       where: { userId, isOpen: true },
       order: { openedAt: 'DESC' },
@@ -203,6 +204,7 @@ export class PositionService {
   }
 
   async getPosition(userId: string, positionId: string): Promise<PositionEntity> {
+    assertUserId(userId);
     const position = await this.positionRepo.findOne({
       where: { id: positionId, userId },
     });

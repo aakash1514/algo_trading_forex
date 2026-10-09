@@ -28,7 +28,7 @@ export class OrderController {
       throw new BadRequestException('X-Idempotency-Key header is required');
     }
 
-    const isExisting = await this.orderService.idempotencyKeyExists(idempotencyKey);
+    const isExisting = await this.orderService.idempotencyKeyExists(req.user.id, idempotencyKey);
 
     const order = await this.orderService.submitOrder(
       req.user.id,

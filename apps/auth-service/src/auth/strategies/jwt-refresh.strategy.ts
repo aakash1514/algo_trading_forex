@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
+import { assertUserId } from '@forexedge/common';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -25,6 +26,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not found');
     }
+    assertUserId(payload?.sub);
     return { ...payload, refreshToken };
   }
 }

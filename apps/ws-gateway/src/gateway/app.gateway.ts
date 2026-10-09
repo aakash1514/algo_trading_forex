@@ -46,6 +46,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
         token,
         { secret: process.env.JWT_ACCESS_SECRET },
       );
+      // Without a subject every such socket would share the room "user:undefined".
+      if (typeof payload.sub !== 'string' || payload.sub.trim() === '') {
+        throw new Error('Token has no subject');
+      }
       socket.data.userId = payload.sub;
       socket.join(`user:${payload.sub}`);
       this.logger.log(`Socket ${socket.id} connected — user:${payload.sub}`);
@@ -92,6 +96,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // ── Methods called by Kafka consumers ──
 
   emitToUser(userId: string, event: string, payload: unknown) {
+    if (typeof userId !== 'string' || userId.trim() === '') {
+      this.logger.warn(`Dropped ${event}: no target user id`);
+      return;
+    }
     this.server.to(`user:${userId}`).emit(event, payload);
   }
 

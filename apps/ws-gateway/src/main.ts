@@ -9,6 +9,7 @@ import { Queue } from 'bullmq';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { BACKTEST_QUEUE } from './backtest/backtest-queue.module';
+import { basicAuth, bullBoardCredentials } from './admin/bull-board-auth';
 
 
 const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
@@ -36,14 +37,19 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Idempotency-Key'],
   });
 
-  const backtestQueue = app.get<Queue>(BACKTEST_QUEUE);
-  const serverAdapter = new ExpressAdapter();
-  serverAdapter.setBasePath('/admin/queues');
-  createBullBoard({
-    queues: [new BullMQAdapter(backtestQueue)],
-    serverAdapter,
-  });
-  app.use('/admin/queues', serverAdapter.getRouter());
+  // Bull Board exposes every user's jobs: operator-only, behind Basic auth,
+  // and not mounted at all unless BULL_BOARD_USER/BULL_BOARD_PASS are set.
+  const bullBoardAuth = bullBoardCredentials(process.env);
+  if (bullBoardAuth) {
+    const backtestQueue = app.get<Queue>(BACKTEST_QUEUE);
+    const serverAdapter = new ExpressAdapter();
+    serverAdapter.setBasePath('/admin/queues');
+    createBullBoard({
+      queues: [new BullMQAdapter(backtestQueue)],
+      serverAdapter,
+    });
+    app.use('/admin/queues', basicAuth(bullBoardAuth), serverAdapter.getRouter());
+  }
 
   app.use(cookieParser());
   app.useGlobalPipes(
@@ -58,7 +64,9 @@ async function bootstrap() {
 
   await app.listen(3005);
   console.log('ws-gateway        → http://localhost:3005');
-  console.log('Bull Board admin  → http://localhost:3005/admin/queues');
+  console.log(bullBoardAuth
+    ? 'Bull Board admin  → http://localhost:3005/admin/queues (basic auth)'
+    : 'Bull Board admin  → disabled (set BULL_BOARD_USER and BULL_BOARD_PASS)');
 }
 
 bootstrap();

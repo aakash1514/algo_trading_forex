@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { assertUserId } from '@forexedge/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AccountSummaryEntity, PositionEntity } from '@forexedge/database';
@@ -33,13 +34,15 @@ export class AccountService {
   // directly, so an in-process cache would serve stale margin/P&L (including
   // to the margin-call check).
   async getAccountSummary(userId: string): Promise<AccountSummaryDto> {
+    assertUserId(userId);
     const row = await this.accountRepo.findOne({ where: { userId } });
-    if (!row) throw new Error(`Account not found for user ${userId}`);
+    if (!row) throw new NotFoundException('Account not found — call POST /api/account/initialize first');
     return this.computeSummary(row);
   }
 
   // ─── Initialize paper account ──────────────────────────────────────────────
   async initializeAccount(userId: string): Promise<AccountSummaryDto> {
+    assertUserId(userId);
     // INSERT ... ON CONFLICT DO NOTHING — idempotent
     const existing = await this.accountRepo.findOne({ where: { userId } });
     if (existing) {

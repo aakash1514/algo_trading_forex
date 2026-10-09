@@ -13,6 +13,9 @@
       "path": "../../libs/kafka/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/common/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/database/tsconfig.lib.json"
     }
   ]

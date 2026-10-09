@@ -45,7 +45,7 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | market-service | 3002 | Tick stream ingestion (`StreamModule` picks `MockStreamProvider` or `OandaStreamProvider` based on `USE_MOCK_DATA`, default `true`). Publishes `forex.ticks`. Consumes its own ticks to write them to TimescaleDB and Redis. Serves candle and instrument queries. |
 | domain-service | 3003 | Forex domain logic: pip calc, margin, swaps, session clock, spread monitor, economic calendar. Scheduled jobs publish `forex.sessions`, `forex.spread-alerts`, `forex.calendar-events`. |
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
-| ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues`. |
+| ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
 order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Topic names, socket event names and payload types live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
 
@@ -89,7 +89,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 ## Critical gotchas (learned the hard way, don't regress these)
 - **Pair format:** DB and REST APIs use `EUR/USD` (slash). Redis keys use `price:EUR_USD` (underscore). The frontend and socket events use `EUR_USD`. Check which format a layer expects before touching it.
 - Redis price value: `{ pair, instrument, bid, ask, mid, spread, timestamp, source }`.
-- In order-service, `req.user.id` (NOT `userId`). JwtStrategy returns `{ id: payload.sub, email, role }`.
+- In order-service and ws-gateway, `req.user.id` (NOT `userId`). JwtStrategy returns `{ id: payload.sub, email, role }` and rejects tokens without `sub`.
+- **Authorization:** TypeORM drops `undefined` from a `where` object, so a query scoped by a missing user id matches every row (this leaked all users' positions once). Every user-scoped service method calls `assertUserId(userId)` (`@forexedge/common`) first, and reads are scoped by owner in the query itself (`where: { id, userId }`), so another user's resource is a 404, never a 403. Idempotency keys are globally unique: another user's key is a 409.
 - TypeORM: entities are direct class references (no globs) and use `!` definite assignment. Nullable union columns need explicit `type: 'varchar'`. Webpack must keep `optimization.minimize: false`, or entity class names break.
 - Never store derived columns. `account_summary` stores only balance, margin_used and unrealized_pnl. Equity, free margin and margin level are computed on read.
 - Tick/time-series tables use raw SQL migrations, never ORM sync on hypertables.

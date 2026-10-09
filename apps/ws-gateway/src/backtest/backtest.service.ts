@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
   BadRequestException,
   ConflictException,
   Inject,
@@ -10,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Queue, Job } from 'bullmq';
 import { Client as MinioClient } from 'minio';
+import { assertUserId } from '@forexedge/common';
 import { BacktestRunEntity } from '@forexedge/database';
 import { BACKTEST_QUEUE } from './backtest-queue.module';
 import { BacktestJobData } from './backtest.worker';
@@ -36,6 +36,7 @@ export class BacktestService {
 
   // ── Submit backtest job ──
   async submit(userId: string, dto: SubmitBacktestDto): Promise<{ runId: string }> {
+    assertUserId(userId);
     // Validate date range
     const from = new Date(dto.fromDate);
     const to = new Date(dto.toDate);
@@ -76,6 +77,7 @@ export class BacktestService {
 
   // ── List user's backtest runs ──
   async list(userId: string): Promise<BacktestRunEntity[]> {
+    assertUserId(userId);
     return this.repo.find({
       where: { userId },
       order: { createdAt: 'DESC' },
@@ -84,10 +86,12 @@ export class BacktestService {
   }
 
   // ── Get single run status + summary ──
+  // Scoped by owner in the query: another user's run is indistinguishable from
+  // a missing one (404, not 403, so run ids can't be probed).
   async findOne(runId: string, userId: string): Promise<BacktestRunEntity> {
-    const run = await this.repo.findOne({ where: { id: runId } });
+    assertUserId(userId);
+    const run = await this.repo.findOne({ where: { id: runId, userId } });
     if (!run) throw new NotFoundException('Backtest run not found');
-    if (run.userId !== userId) throw new ForbiddenException();
     return run;
   }
 
