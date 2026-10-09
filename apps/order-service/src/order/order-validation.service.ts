@@ -2,21 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstrumentEntity, EconomicEventEntity, OrderEntity } from '@forexedge/database';
+import { pairCurrencies } from '../common/instrument';
+import type { OrderRequest } from './dto/submit-order.dto';
 
 export interface ValidationResult {
   valid: boolean;
   reason?: string;
-}
-
-export interface SubmitOrderDto {
-  instrument: string;
-  pair: string;
-  direction: 'LONG' | 'SHORT';
-  orderType: 'MARKET' | 'LIMIT' | 'STOP' | 'TRAILING_STOP' | 'OCO';
-  lots: number;
-  requestedPrice?: number;
-  stopLoss?: number;
-  takeProfit?: number;
 }
 
 @Injectable()
@@ -50,11 +41,11 @@ export class OrderValidationService {
 
   async validate(
     userId: string,
-    dto: SubmitOrderDto,
+    dto: OrderRequest,
     marginCheck: () => Promise<ValidationResult>,
   ): Promise<ValidationResult> {
-    // Gate 1: Instrument active
-    const gate1 = await this.checkInstrumentActive(dto.instrument);
+    // Gate 1: Instrument active (instruments are keyed by slash-format pair)
+    const gate1 = await this.checkInstrumentActive(dto.pair);
     if (!gate1.valid) return gate1;
 
     // Gate 2: Spread check
@@ -77,18 +68,18 @@ export class OrderValidationService {
 
   // ─── Gate 1 ────────────────────────────────────────────────────────────────
   private async checkInstrumentActive(
-    instrument: string,
+    pair: string,
   ): Promise<ValidationResult> {
     const record = await this.instrumentRepo.findOne({
-      where: { pair: instrument },
+      where: { pair },
     });
 
     if (!record) {
-      return { valid: false, reason: `Instrument ${instrument} not found` };
+      return { valid: false, reason: `Instrument ${pair} not found` };
     }
 
     if (!record.isActive) {
-      return { valid: false, reason: `Instrument ${instrument} is not active` };
+      return { valid: false, reason: `Instrument ${pair} is not active` };
     }
 
     return { valid: true };
@@ -163,8 +154,7 @@ export class OrderValidationService {
 
   // ─── Gate 5 ────────────────────────────────────────────────────────────────
   private async checkEconomicCalendar(pair: string): Promise<void> {
-    // Extract the two currencies from the pair e.g. EURUSD → ['EUR', 'USD']
-    const currencies = [pair.slice(0, 3), pair.slice(3, 6)];
+    const currencies = pairCurrencies(pair);
 
     const now = new Date();
     const windowMinutes = 30;

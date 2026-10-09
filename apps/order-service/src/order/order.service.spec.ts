@@ -158,7 +158,7 @@ describe('OrderService — FSM transitions', () => {
     orderRepo.findOne.mockResolvedValue(existing);
 
     const result = await service.submitOrder('user-1', {
-      instrument: 'EURUSD', pair: 'EURUSD', direction: 'LONG',
+      instrument: 'EUR_USD', direction: 'LONG',
       orderType: 'MARKET', lots: 1,
     }, 'key-123');
 
@@ -168,7 +168,7 @@ describe('OrderService — FSM transitions', () => {
 
   it('creates new order when idempotency key is fresh', async () => {
     orderRepo.findOne.mockResolvedValueOnce(null); // idempotency check
-    const draft = { id: 'o2', status: 'DRAFT', pair: 'EURUSD', direction: 'LONG',
+    const draft = { id: 'o2', status: 'DRAFT', pair: 'EUR/USD', direction: 'LONG',
                     lots: 1, idempotencyKey: 'key-456' } as OrderEntity;
     orderRepo.create.mockReturnValue(draft);
     orderRepo.save.mockResolvedValue(draft);
@@ -189,11 +189,13 @@ describe('OrderService — FSM transitions', () => {
     });
 
     const result = await service.submitOrder('user-1', {
-      instrument: 'EURUSD', pair: 'EURUSD', direction: 'LONG',
+      instrument: 'EUR_USD', direction: 'LONG',
       orderType: 'MARKET', lots: 1,
     }, 'key-456');
 
-    expect(orderRepo.create).toHaveBeenCalled();
+    expect(orderRepo.create).toHaveBeenCalledWith(
+      expect.objectContaining({ instrument: 'EUR_USD', pair: 'EUR/USD' }),
+    );
     expect(result).toBeDefined();
   });
 });

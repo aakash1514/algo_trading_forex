@@ -8,7 +8,9 @@ import {
 } from '@forexedge/database';
 import { IForexBroker } from '@forexedge/common';
 import { BROKER_ADAPTER } from '@forexedge/common';
-import { OrderValidationService, SubmitOrderDto } from './order-validation.service';
+import { OrderValidationService } from './order-validation.service';
+import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
+import { instrumentToPair } from '../common/instrument';
 import { MarginEngineService } from './margin-engine.service';
 import { Kafka, Producer } from 'kafkajs';
 import { SessionConsumer } from '../kafka/session.consumer';
@@ -61,9 +63,10 @@ export class OrderService {
 
   async submitOrder(
     userId: string,
-    dto: SubmitOrderDto,
+    body: SubmitOrderDto,
     idempotencyKey: string,
   ): Promise<OrderEntity> {
+    const dto: OrderRequest = { ...body, pair: instrumentToPair(body.instrument) };
 
     // Step 1: Idempotency check
     const existing = await this.orderRepo.findOne({

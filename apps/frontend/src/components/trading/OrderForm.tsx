@@ -8,18 +8,23 @@ import { useAppSelector } from '../../store';
 import { useCreateOrderMutation } from '../../store/api/order.api';
 import { useGetPipValueQuery } from '../../store/api/domain.api';
 import { PAIR_DISPLAY } from '../../lib/constants';
+import type { OrderDirection } from '../../types/api.types';
 import { cn } from '../../lib/cn';
 
 const orderSchema = z.object({
   lots: z.number().min(0.01).max(100),
-  stopLoss: z.number().optional(),
-  takeProfit: z.number().optional(),
+  stopLoss: z.number().positive().optional(),
+  takeProfit: z.number().positive().optional(),
 });
+
+// Empty SL/TP inputs mean "not set"; valueAsNumber would turn them into NaN,
+// which fails the schema and silently blocks the submit.
+const optionalNumber = (value: string) => (value === '' ? undefined : Number(value));
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
 export function OrderForm() {
-  const [direction, setDirection] = useState<'BUY' | 'SELL'>('BUY');
+  const [direction, setDirection] = useState<OrderDirection>('LONG');
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -54,7 +59,8 @@ export function OrderForm() {
       reset({ lots: 0.1 });
       setTimeout(() => setSubmitSuccess(false), 2000);
     } catch (err: any) {
-      setSubmitError(err?.data?.message ?? 'Order failed');
+      const message = err?.data?.message;
+      setSubmitError(Array.isArray(message) ? message.join(', ') : message ?? 'Order failed');
     }
   }
 
@@ -67,10 +73,10 @@ export function OrderForm() {
       {/* Buy / Sell toggle */}
       <div className="grid grid-cols-2 gap-1.5 mb-3">
         <button
-          onClick={() => setDirection('BUY')}
+          onClick={() => setDirection('LONG')}
           className={cn(
             'py-2 rounded text-[12px] font-medium transition-all',
-            direction === 'BUY'
+            direction === 'LONG'
               ? 'bg-accent-green text-[#0a1a0f] border border-accent-green'
               : 'bg-accent-green/5 text-accent-green border border-accent-green/20 hover:bg-accent-green/10'
           )}
@@ -78,10 +84,10 @@ export function OrderForm() {
           Buy
         </button>
         <button
-          onClick={() => setDirection('SELL')}
+          onClick={() => setDirection('SHORT')}
           className={cn(
             'py-2 rounded text-[12px] font-medium transition-all',
-            direction === 'SELL'
+            direction === 'SHORT'
               ? 'bg-accent-red text-white border border-accent-red'
               : 'bg-accent-red/5 text-accent-red border border-accent-red/20 hover:bg-accent-red/10'
           )}
@@ -111,21 +117,27 @@ export function OrderForm() {
           <div>
             <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Stop loss</label>
             <input
-              {...register('stopLoss', { valueAsNumber: true })}
+              {...register('stopLoss', { setValueAs: optionalNumber })}
               type="number"
               step="0.00001"
               placeholder="—"
-              className="w-full bg-terminal-elevated border border-terminal-border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors"
+              className={cn(
+                'w-full bg-terminal-elevated border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors',
+                errors.stopLoss ? 'border-accent-red' : 'border-terminal-border'
+              )}
             />
           </div>
           <div>
             <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Take profit</label>
             <input
-              {...register('takeProfit', { valueAsNumber: true })}
+              {...register('takeProfit', { setValueAs: optionalNumber })}
               type="number"
               step="0.00001"
               placeholder="—"
-              className="w-full bg-terminal-elevated border border-terminal-border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors"
+              className={cn(
+                'w-full bg-terminal-elevated border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors',
+                errors.takeProfit ? 'border-accent-red' : 'border-terminal-border'
+              )}
             />
           </div>
         </div>
@@ -153,13 +165,13 @@ export function OrderForm() {
             'w-full py-2 rounded text-[12px] font-medium transition-all',
             submitSuccess
               ? 'bg-accent-green/20 text-accent-green border border-accent-green/30'
-              : direction === 'BUY'
+              : direction === 'LONG'
               ? 'bg-accent-blue/10 text-accent-blue border border-accent-blue/30 hover:bg-accent-blue/20'
               : 'bg-accent-red/10 text-accent-red border border-accent-red/30 hover:bg-accent-red/20',
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
-          {submitSuccess ? '✓ Order placed' : isLoading ? 'Placing...' : `Place ${direction.toLowerCase()} order`}
+          {submitSuccess ? '✓ Order placed' : isLoading ? 'Placing...' : `Place ${direction === 'LONG' ? 'buy' : 'sell'} order`}
         </button>
       </form>
     </div>

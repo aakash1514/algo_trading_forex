@@ -63,7 +63,7 @@ const positions = useAppSelector(selectPositions);
                   <td className="px-3 py-2">
                     <span className={cn(
                       'text-[10px] font-medium px-1.5 py-0.5 rounded',
-                      pos.direction === 'BUY'
+                      pos.direction === 'LONG'
                         ? 'bg-accent-green/10 text-accent-green'
                         : 'bg-accent-red/10 text-accent-red'
                     )}>

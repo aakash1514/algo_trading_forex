@@ -50,7 +50,7 @@ export interface Candle {
 }
 
 // Orders
-export type OrderDirection = 'BUY' | 'SELL';
+export type OrderDirection = 'LONG' | 'SHORT';
 export type OrderType = 'MARKET' | 'LIMIT' | 'STOP';
 export type OrderStatus =
   | 'PENDING'

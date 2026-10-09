@@ -1,15 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { InstrumentEntity, EconomicEventEntity, OrderEntity } from '@forexedge/database';
-import { OrderValidationService, SubmitOrderDto } from './order-validation.service';
+import { OrderValidationService } from './order-validation.service';
+import type { OrderRequest } from './dto/submit-order.dto';
 
 const mockInstrumentRepo = () => ({ findOne: jest.fn() });
 const mockEconomicEventRepo = () => ({ createQueryBuilder: jest.fn() });
 const mockOrderRepo = () => ({ createQueryBuilder: jest.fn() });
 
-const baseDto: SubmitOrderDto = {
-  instrument: 'EURUSD',
-  pair: 'EURUSD',
+const baseDto: OrderRequest = {
+  instrument: 'EUR_USD',
+  pair: 'EUR/USD',
   direction: 'LONG',
   orderType: 'MARKET',
   lots: 1,
@@ -67,14 +68,20 @@ describe('OrderValidationService', () => {
     });
 
     it('rejects when instrument is inactive', async () => {
-      instrumentRepo.findOne.mockResolvedValue({ pair: 'EURUSD', isActive: false });
+      instrumentRepo.findOne.mockResolvedValue({ pair: 'EUR/USD', isActive: false });
       const result = await service.validate('user-1', baseDto, marginOk);
       expect(result.valid).toBe(false);
       expect(result.reason).toContain('not active');
     });
 
+    it('looks the instrument up by its slash-format pair', async () => {
+      instrumentRepo.findOne.mockResolvedValue(null);
+      await service.validate('user-1', baseDto, marginOk);
+      expect(instrumentRepo.findOne).toHaveBeenCalledWith({ where: { pair: 'EUR/USD' } });
+    });
+
     it('passes when instrument is active', async () => {
-      instrumentRepo.findOne.mockResolvedValue({ pair: 'EURUSD', isActive: true });
+      instrumentRepo.findOne.mockResolvedValue({ pair: 'EUR/USD', isActive: true });
       const result = await service.validate('user-1', baseDto, marginOk);
       expect(result.valid).toBe(true);
     });
@@ -83,18 +90,18 @@ describe('OrderValidationService', () => {
   // ── Gate 2 ─────────────────────────────────────────────────────────────────
   describe('Gate 2 — spread check', () => {
     beforeEach(() => {
-      instrumentRepo.findOne.mockResolvedValue({pair: 'EURUSD', isActive: true });
+      instrumentRepo.findOne.mockResolvedValue({pair: 'EUR/USD', isActive: true });
     });
 
     it('rejects when spread exceeds maximum', async () => {
-      service.updateSpreadCache('EURUSD', 6);
+      service.updateSpreadCache('EUR/USD', 6);
       const result = await service.validate('user-1', baseDto, marginOk);
       expect(result.valid).toBe(false);
       expect(result.reason).toContain('Spread too wide');
     });
 
     it('passes when spread is within limit', async () => {
-      service.updateSpreadCache('EURUSD', 2);
+      service.updateSpreadCache('EUR/USD', 2);
       const result = await service.validate('user-1', baseDto, marginOk);
       expect(result.valid).toBe(true);
     });
@@ -109,8 +116,8 @@ describe('OrderValidationService', () => {
   // ── Gate 3 ─────────────────────────────────────────────────────────────────
   describe('Gate 3 — margin check', () => {
     beforeEach(() => {
-      instrumentRepo.findOne.mockResolvedValue({ pair: 'EURUSD', isActive: true });
-      service.updateSpreadCache('EURUSD', 2);
+      instrumentRepo.findOne.mockResolvedValue({ pair: 'EUR/USD', isActive: true });
+      service.updateSpreadCache('EUR/USD', 2);
     });
 
     it('rejects when margin is insufficient', async () => {
@@ -128,8 +135,8 @@ describe('OrderValidationService', () => {
   // ── Gate 4 ─────────────────────────────────────────────────────────────────
   describe('Gate 4 — risk limits', () => {
     beforeEach(() => {
-      instrumentRepo.findOne.mockResolvedValue({ pair: 'EURUSD', isActive: true });
-      service.updateSpreadCache('EURUSD', 2);
+      instrumentRepo.findOne.mockResolvedValue({ pair: 'EUR/USD', isActive: true });
+      service.updateSpreadCache('EUR/USD', 2);
     });
 
     it('rejects when lots exceed maximum', async () => {

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { OrderService } from './order.service';
-import { SubmitOrderDto } from './order-validation.service';
+import { SubmitOrderDto } from './dto/submit-order.dto';
 import { OrderStatus } from '@forexedge/database';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
