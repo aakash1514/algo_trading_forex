@@ -6,6 +6,8 @@ import type { CandlestickData, IChartApi, ISeriesApi, UTCTimestamp } from 'light
 import { useAppSelector } from '../../store';
 import { useGetCandlesQuery } from '../../store/api/market.api';
 import { PAIR_DISPLAY, TIMEFRAMES, type Timeframe } from '../../lib/constants';
+import { getPriceDecimals, priceToPips } from '../../lib/pip';
+import { alignToBarStart } from '../../lib/timeframe';
 import type { Candle } from '../../types/api.types';
 import { cn } from '../../lib/cn';
 
@@ -48,12 +50,18 @@ export function TradingChart({ pair }: TradingChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
+  // Bar that live ticks extend; only valid once history for the current
+  // pair/timeframe has been loaded into the series.
+  const lastBarRef = useRef<CandlestickData<UTCTimestamp> | null>(null);
+  const historyLoadedRef = useRef(false);
   const [timeframe, setTimeframe] = useState<Timeframe>('1h');
 
   const prices = useAppSelector((s) => s.market.prices);
   const currentPrice = prices[pair];
 
-  const { data: candles } = useGetCandlesQuery(
+  // currentData (not data): data keeps the previous pair/timeframe's candles
+  // while refetching, which would mix bar sizes in the series.
+  const { currentData: candles } = useGetCandlesQuery(
     { pair, timeframe, limit: 200 },
     { skip: !pair }
   );
@@ -123,33 +131,63 @@ export function TradingChart({ pair }: TradingChartProps) {
 
   // Load historical candles
   useEffect(() => {
-    if (!seriesRef.current || !candles?.length) return;
+    const series = seriesRef.current;
+    if (!series) return;
+    if (!candles) {
+      // History for a new pair/timeframe is loading; hold live ticks until it lands.
+      historyLoadedRef.current = false;
+      lastBarRef.current = null;
+      return;
+    }
+
     const formatted = candles
       .map(toCandlestick)
       .filter(isValidCandle)
       .sort((a, b) => a.time - b.time);
 
-    if (formatted.length === 0) return;
-
-    seriesRef.current.setData(formatted);
-    chartRef.current?.timeScale().fitContent();
+    // setData also clears bars left over from the previous pair/timeframe.
+    series.setData(formatted);
+    lastBarRef.current = formatted.at(-1) ?? null;
+    historyLoadedRef.current = true;
+    if (formatted.length > 0) chartRef.current?.timeScale().fitContent();
   }, [candles]);
 
-  // Live tick update
+  // Live tick update: extend the bar the tick falls in, or open the next one.
   useEffect(() => {
-    if (!seriesRef.current || !currentPrice) return;
-    seriesRef.current.update({
-      time: toUtcTimestamp(Date.now()),
-      open: currentPrice.bid,
-      high: currentPrice.bid,
-      low: currentPrice.bid,
-      close: currentPrice.bid,
-    });
-  }, [currentPrice]);
+    const series = seriesRef.current;
+    if (!series || !currentPrice || !historyLoadedRef.current) return;
+
+    const tickMs = Date.parse(currentPrice.timestamp);
+    const tickSeconds = (Number.isFinite(tickMs) ? tickMs : Date.now()) / 1000;
+    // UTCTimestamp is a branded number, so the cast is required.
+    const time = alignToBarStart(tickSeconds, timeframe) as UTCTimestamp;
+    // Candles are aggregated from mid prices, so live bars use mid too.
+    const price = (currentPrice.bid + currentPrice.ask) / 2;
+    const last = lastBarRef.current;
+
+    // Out-of-order tick for an earlier bar; series.update() rejects older times.
+    if (last && time < last.time) return;
+
+    const bar: CandlestickData<UTCTimestamp> =
+      last && time === last.time
+        ? {
+            ...last,
+            high: Math.max(last.high, price),
+            low: Math.min(last.low, price),
+            close: price,
+          }
+        : { time, open: price, high: price, low: price, close: price };
+
+    series.update(bar);
+    lastBarRef.current = bar;
+  }, [currentPrice, timeframe]);
 
   const lastCandle = candles?.[candles.length - 1];
   const pipChange = currentPrice && lastCandle
-    ? ((currentPrice.bid - toPrice(lastCandle.open)) * 10000).toFixed(1)
+    ? priceToPips(
+        (currentPrice.bid + currentPrice.ask) / 2 - toPrice(lastCandle.open),
+        pair,
+      ).toFixed(1)
     : null;
   const isPositive = pipChange ? parseFloat(pipChange) >= 0 : true;
 
@@ -162,7 +200,7 @@ export function TradingChart({ pair }: TradingChartProps) {
         {currentPrice && (
           <>
             <span className="tabular-nums text-xl font-medium text-[#e2e4e9]">
-              {currentPrice.bid.toFixed(pair.includes('JPY') ? 3 : 5)}
+              {currentPrice.bid.toFixed(getPriceDecimals(pair))}
             </span>
             {pipChange && (
               <span className={cn(
@@ -173,7 +211,7 @@ export function TradingChart({ pair }: TradingChartProps) {
               </span>
             )}
             <span className="text-[11px] text-terminal-muted tabular-nums">
-              Spread: {(currentPrice.spread * 10000).toFixed(1)}
+              Spread: {priceToPips(currentPrice.spread, pair).toFixed(1)}
             </span>
           </>
         )}

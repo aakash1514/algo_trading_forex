@@ -3,6 +3,7 @@
 import { useAppDispatch, useAppSelector } from '../../store';
 import { setActivePair } from '../../store/slices/market.slice';
 import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
+import { getPriceDecimals } from '../../lib/pip';
 import { cn } from '../../lib/cn';
 
 
@@ -31,7 +32,7 @@ export function PairTabs() {
             <span className="font-medium">{PAIR_DISPLAY[pair]}</span>
             {price && (
               <span className="tabular-nums text-[#e2e4e9]">
-                {price.bid.toFixed(pair.includes('JPY') ? 3 : 5)}
+                {price.bid.toFixed(getPriceDecimals(pair))}
               </span>
             )}
           </button>
