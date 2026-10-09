@@ -30,7 +30,7 @@ import { UserEntity, InstrumentEntity } from '@forexedge/database';
         entities: [UserEntity, InstrumentEntity],
         migrations: [__dirname + '/../migrations/*{.ts,.js}'],
         synchronize: false,  
-        logging: config.get<string>('NODE_ENV') === 'development',
+        logging: config.get<string>('DB_LOGGING') === 'true',
         // ADD THIS:
         ssl: config.get<string>('DB_SSL') === 'true' 
           ? { rejectUnauthorized: false } 
