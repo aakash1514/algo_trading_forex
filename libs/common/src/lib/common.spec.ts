@@ -1,7 +1,7 @@
-import { common } from './common';
+import { FOREXEDGE_VERSION } from './common';
 
-describe('common', () => {
-  it('should work', () => {
-    expect(common()).toEqual('common');
+describe('FOREXEDGE_VERSION', () => {
+  it('is a semver string', () => {
+    expect(FOREXEDGE_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
 });

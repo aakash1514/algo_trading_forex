@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/out-tsc",
+    "outDir": "../../dist/out-tsc/apps/order-service/app",
     "module": "commonjs",
     "types": ["node"],
     "experimentalDecorators": true,
@@ -15,5 +15,13 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "jest.config.cts"]
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "jest.config.cts"],
+  "references": [
+    {
+      "path": "../../libs/common/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/database/tsconfig.lib.json"
+    }
+  ]
 }
