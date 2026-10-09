@@ -76,8 +76,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 
 ## Environment
-- Windows + Docker Desktop (no WSL2). Shells: Git Bash and PowerShell. Node v24+, Nx v22.
-- Use Windows-compatible commands. In Git Bash, wrap Docker commands that use paths in `bash -c "..."`.
+- Windows + Docker Desktop (no WSL2). Node v24+, Nx v22.
+- **Use Git Bash only.** PowerShell 5.1 crashes at startup in this environment
+  (`InitialSessionState` type initializer exception), so don't use it.
+- Docker Desktop doesn't auto-start; launch it before `docker compose up`.
+- Use Windows-compatible commands. In Git Bash, wrap Docker commands that use paths in `bash -c "..."`,
+  and set `MSYS_NO_PATHCONV=1` for `docker exec` with container paths (e.g. `/opt/kafka/bin/...`).
 - Local Postgres 13/15 occupy 5432/5433, so TimescaleDB is on host port **15432**. Don't change it.
 - The laptop is low on resources. For running several services, prefer compiled mode
   (`npx nx build <svc>` then `node dist/apps/<svc>/main.js`) over multiple `nx serve` watchers.
@@ -95,24 +99,63 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - ws-gateway bootstrap order: register Bull Board middleware BEFORE the Socket.io adapter. Socket.io CORS lives in the custom `SocketIoAdapter`, not `enableCors()`.
 - Frontend: Tailwind **v3** (not v4). lightweight-charts v5 uses `addSeries(CandlestickSeries, opts)`. Use `createSelector` for derived Redux arrays.
 - Backtest results come back as **flat fields** on the run object (no nested `metrics` key).
+- Pip size: the source of truth is `instruments.pip_size` (0.01 for JPY-quoted pairs, else 0.0001).
+  The frontend uses `apps/frontend/src/lib/pip.ts`, never a hardcoded `* 10000`. Candles are built from **mid**.
+
+### Tooling gotchas
+- **Never put `NODE_ENV` in `.env`.** Nx loads the root `.env` into every task, and
+  `NODE_ENV=development` makes `next build` fail while prerendering (`Cannot read properties of null
+  (reading 'useMemo')`). Use dedicated flags instead (e.g. `DB_LOGGING=true` for TypeORM SQL logging).
+- **Nx lint runs ESLint from the repo root** with the project's config as `overrideConfigFile`, so
+  ignore patterns resolve against the root. Prefix them with `**/` (e.g. `'**/.next/**'`).
+- **`next/jest` needs `dir: __dirname`.** It resolves `dir` against `process.cwd()`, which is the
+  repo root under the Nx jest executor.
+- `typecheck` runs `tsc --build` over TS project references: libs are `composite`, apps reference
+  `libs/<lib>/tsconfig.lib.json`. After adding a lib import to a project, run `npx nx sync`.
+- **Builds are transpile-only; always run `nx typecheck` (or `nx run-many -t typecheck`) before committing.**
+  The service webpack configs set `typeCheckOptions: false`: the in-build checker can't resolve lib
+  project references until their `.d.ts` exist, so it broke clean builds (TS6305).
+- `next-env.d.ts` and `*.tsbuildinfo` are generated and gitignored; don't commit them.
 
 ## Current status
 - Phases 1–6 (5 services + frontend: trading terminal, backtesting, economic calendar) were built by ~June 2026 and **haven't been run since**, so verify before assuming anything works.
 - Never deployed. Earlier attempts hit many issues.
+- Health check (2026-10-09): infra is healthy. From a clean `dist/`, all 9 projects pass build,
+  typecheck and tests; all 6 apps pass lint with 0 errors (the 3 libs fail `@nx/dependency-checks`,
+  see below). All 5 compiled services boot (ws-gateway only from `apps/ws-gateway/`).
+
+### Deferred from the health check
+- `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
+- `minio/minio` is no longer anonymously pullable (see step 7). The pinned release only runs where the
+  image is cached; a `docker save` backup lives outside the repo.
+- XAU/USD and order-service's hardcoded JPY pip rule are scheduled in step 2.
+- The libs fail `nx lint` (`@nx/dependency-checks`): their `package.json` files list only `tslib`,
+  not the packages they import (e.g. `typeorm` in `database`).
+- ws-gateway's `envFilePath: '../../infra/.env'` resolves against the cwd, so it finds no env when
+  started from the repo root (`nx serve` or `node dist/...`). It boots only from `apps/ws-gateway/`.
+- Lint warnings remain (mostly `no-explicit-any` and unused vars): 16 in the frontend, more in the services.
+- ws-gateway has no tests (`passWithNoTests`); backtest tests come in step 3. Redis still holds stale
+  BullMQ `bull:backtest:*` jobs from earlier runs.
 
 ## Roadmap (in order)
 1. Health check: infra up, all projects build and serve, fix breakages.
-2. Historical data seed: M1 OHLC candles, 2010–2022, imported from CSV (HistData.com) for
+2. Historical data seed: M1 OHLC candles, 2010–2022, imported from Dukascopy via the dukascopy-node package (UTC timestamps) for
    8 pairs: EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, NZD/USD, XAU/USD.
    M1 goes into its own hypertable with compression. M5/M15/H1/H4/D1 are continuous
    aggregates on it. The import script must be idempotent (safe to re-run). The market-service
    candle queries and the ws-gateway backtester read from it. Production deploys only H1 and above.
+   XAU/USD integration: add it to the instruments seed with the correct contract specs (100 oz lot, pip 0.01).
+   Replace order-service's 3 hardcoded pip-size calculations with instruments.pip_size from the DB.
+   Add XAU_USD to MAJOR_PAIRS, PAIR_DISPLAY and BacktestClient's pair list, and remove EUR_GBP there.
+   Verify pip value, margin and P&L for gold with tests.
 3. Backtest verification: re-run strategies on the historical data. The all-zero
    metrics were caused by mock random-walk data. Confirm they're fixed and fix anything remaining.
 4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
 7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
+   Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
+   MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
 8. Known gaps: nothing publishes `positions.updated`, and `forex.calendar-events` has no consumer.
 
 ## How to work with me
