@@ -91,7 +91,7 @@ export class SpreadMonitorService implements OnModuleInit {
     this.spreadCache.set(instrument, result);
 
     if (!previous || previous.status !== status) {
-      await this.publishAlert(result, timestamp.toISOString());
+      await this.publishAlert(result, new Date(timestamp).toISOString());
     }
   }
 

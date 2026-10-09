@@ -47,3 +47,7 @@ Thumbs.db
 .env
 .env.*
 dist/
+
+# Next.js
+.next
+out

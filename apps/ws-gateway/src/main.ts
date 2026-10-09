@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { ServerOptions } from 'socket.io';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { ExpressAdapter } from '@bull-board/express';
@@ -9,10 +10,32 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { BACKTEST_QUEUE } from './backtest/backtest-queue.module';
 
+
+const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
+
+class SocketIoAdapter extends IoAdapter {
+  createIOServer(port: number, options?: ServerOptions) {
+    return super.createIOServer(port, {
+      ...options,
+      cors: {
+        origin: CORS_ORIGIN,
+        credentials: true,
+        methods: ['GET', 'POST'],
+      },
+    });
+  }
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // ── 1. Bull Board — get queue from DI (not `new Queue()`) ──
+  app.enableCors({
+    origin: CORS_ORIGIN,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Idempotency-Key'],
+  });
+
   const backtestQueue = app.get<Queue>(BACKTEST_QUEUE);
   const serverAdapter = new ExpressAdapter();
   serverAdapter.setBasePath('/admin/queues');
@@ -22,19 +45,16 @@ async function bootstrap() {
   });
   app.use('/admin/queues', serverAdapter.getRouter());
 
-  // ── 2. Standard middleware + pipes ──
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
 
-  // ── 3. Socket.io adapter — after HTTP middleware ──
-  app.useWebSocketAdapter(new IoAdapter(app));
+  app.useWebSocketAdapter(new SocketIoAdapter(app));
 
-  // ── 4. Global prefix — excludes Bull Board ──
   app.setGlobalPrefix('api', {
-  exclude: ['/admin/queues', '/admin/queues/*path'],  // ← named parameter syntax
-});
+    exclude: ['/admin/queues', '/admin/queues/*path'],
+  });
 
   await app.listen(3005);
   console.log('ws-gateway        → http://localhost:3005');
