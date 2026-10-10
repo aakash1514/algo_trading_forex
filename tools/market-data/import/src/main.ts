@@ -7,13 +7,13 @@
 // Year-major: all pairs of a year, then the year's finished chunks are
 // compressed (the chunk straddling into the next year waits for it). After the
 // last year: remaining chunks compressed, aggregates refreshed (see
-// aggregates.ts), 5m/15m compressed, checks run. Safe to re-run: pair-years
+// aggregates.ts), 5m/15m compressed, M1 and aggregates vacuumed, checks run. Safe to re-run: pair-years
 // already in the import log with the same file hash are skipped.
 import { existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { Client } from 'pg';
 import { forceKey, parseArgs, USAGE, UsageError, type ImportArgs } from './args';
-import { refreshAggregates } from './aggregates';
+import { refreshAggregates, vacuumAnalyze } from './aggregates';
 import { runChecks } from './checks';
 import { compressChunks, ImportError, importPairRange, type ImportResult } from './importer';
 import { PAIRS, yearRange, type TimeRange } from './pairs';
@@ -118,6 +118,7 @@ async function main(): Promise<void> {
         log('refreshing aggregates: 5m -> 15m -> 1h per year (UTC), then 4h -> 1d over the whole span +- 7 days');
         await refreshAggregates(client, touched, (s) => log(`  ${s.view} ${s.window.start.toISOString().slice(0, 10)}` +
           ` .. ${s.window.end.toISOString().slice(0, 10)}: ${fmt(s.seconds)}`));
+        log(`vacuum (analyze) of M1 and the aggregates: ${fmt(await vacuumAnalyze(client))}`);
       } else {
         log(args.dryRun ? 'dry run: nothing written' : 'nothing to import');
       }

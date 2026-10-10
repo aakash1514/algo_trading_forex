@@ -100,3 +100,20 @@ export async function refreshAggregates(
   }
   return steps;
 }
+
+// After a bulk load: reclaims the dead tuples left by forced re-imports and
+// aggregate rewrites, and gives the planner statistics for the new rows.
+// VACUUM on a hypertable recurses into its chunks; it can't run in a transaction.
+export async function vacuumAnalyze(client: Client): Promise<number> {
+  const started = Date.now();
+  const targets = ['historical_candles'];
+  for (const view of [...UTC_VIEWS, ...NY_VIEWS]) {
+    const { rows } = await client.query(
+      `SELECT format('%I.%I', materialization_hypertable_schema, materialization_hypertable_name) AS name
+       FROM timescaledb_information.continuous_aggregates WHERE view_name = $1`, [view]);
+    targets.push(rows[0].name);
+  }
+  // Names come from the catalog, not from user input
+  await client.query(`VACUUM (ANALYZE) ${targets.join(', ')}`);
+  return (Date.now() - started) / 1000;
+}
