@@ -7,10 +7,15 @@
 // |                       |                                           | order-service tick processor, ws-gateway tick relay              |
 // | forex.sessions        | domain-service session clock              | none (order-service computes sessions from the shared clock)     |
 // | forex.spread-alerts   | domain-service spread monitor             | none yet (UI relay planned)                                      |
-// | forex.calendar-events | domain-service economic calendar          | none yet (roadmap step 8)                                        |
+// | forex.calendar-events | domain-service economic calendar (*)      | NOT BUILT: no consumer (roadmap step 8)                          |
 // | orders.lifecycle      | order-service OrderService                | ws-gateway order relay                                           |
 // | positions.updated     | order-service RealtimePublisher           | ws-gateway position relay                                        |
 // | accounts.updated      | order-service RealtimePublisher           | ws-gateway account relay                                         |
+// (*) The producer only publishes when a stored event is about to start. The
+//     calendar page doesn't use Kafka: it calls domain-service's REST endpoint
+//     GET /api/domain/calendar, which reads the economic_events table (filled
+//     from ForexFactory every 6 h). No event has ever been close enough, so the
+//     topic has never been created; the message type below is the producer's.
 import { checkRules, parseContract } from './contract';
 import type { AccountUpdatedMessage, PositionsUpdatedMessage } from '../interfaces/realtime.interface';
 
@@ -75,7 +80,7 @@ export const parseSpreadAlertMessage = (raw: string) => parseContract<SpreadAler
   currentSpread: 'number', avgSpread: 'number', ratio: 'number', timestamp: 'iso-date',
 });
 
-// ─── forex.calendar-events ──────────────────────────────────────────────────
+// ─── forex.calendar-events (NOT BUILT: producer only, no consumer) ──────────
 export const CALENDAR_EVENTS_TOPIC = 'forex.calendar-events';
 const CALENDAR_EVENT_TYPES = ['CALENDAR_EVENT_APPROACHING', 'CALENDAR_EVENT_ACTIVE', 'CALENDAR_EVENT_PASSED'] as const;
 

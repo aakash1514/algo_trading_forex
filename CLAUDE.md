@@ -47,13 +47,15 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
-order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Topic names, socket event names and payload types live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
+order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
+
+Every Kafka topic has one message type and a validating `parse*` function in `libs/kafka/src/lib/contracts/topics.ts` (with the producer/consumer map in its header). Producers type their payloads with it; consumers parse with it, never `JSON.parse(...) as T` (two consumers once read fields no producer sent). Contract tests parse real captured messages (`contracts/fixtures/`).
 
 ### Kafka flow
 ```
 market-service ─forex.ticks─▶ market-service (DB/cache writers), domain-service (spread monitor), order-service, ws-gateway
-domain-service ─forex.sessions / forex.spread-alerts─▶ order-service
-domain-service ─forex.calendar-events─▶ (no consumer yet)
+domain-service ─forex.sessions / forex.spread-alerts─▶ (no consumer; order-service computes sessions from the shared clock)
+domain-service ─forex.calendar-events─▶ NOT BUILT: no consumer, and the producer has never fired (the calendar page uses REST)
 order-service  ─orders.lifecycle / positions.updated / accounts.updated─▶ ws-gateway ─socket.io─▶ frontend
 ```
 Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumerService.subscribe(groupId, topics, handler)` hands the handler the message value as a string, and `KafkaProducerService.publish(topic, key, value)` JSON-serializes. order-service's consumers in `apps/order-service/src/kafka/` use raw kafkajs consumers instead. `createKafkaClient` is a process-wide singleton.
@@ -92,7 +94,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - In order-service and ws-gateway, `req.user.id` (NOT `userId`). JwtStrategy returns `{ id: payload.sub, email, role }` and rejects tokens without `sub`.
 - **Authorization:** TypeORM drops `undefined` from a `where` object, so a query scoped by a missing user id matches every row (this leaked all users' positions once). Every user-scoped service method calls `assertUserId(userId)` (`@forexedge/common`) first, and reads are scoped by owner in the query itself (`where: { id, userId }`), so another user's resource is a 404, never a 403. Idempotency keys are globally unique: another user's key is a 409.
 - TypeORM: entities are direct class references (no globs) and use `!` definite assignment. Nullable union columns need explicit `type: 'varchar'`. Webpack must keep `optimization.minimize: false`, or entity class names break.
-- Never store derived columns. `account_summary` stores only balance, margin_used and unrealized_pnl. Equity, free margin and margin level are computed on read.
+- Never store derived columns. `account_summary` stores only balance and margin_used. Open (unrealized) P&L is the sum of the open positions, and equity, free margin and margin level are computed on read (`AccountService`).
+- `account_summary` writes are relative SQL updates only (`balance + :pnl`, `margin_used + :m`). Writing back a row read earlier loses concurrent updates (reproduced; covered by `account-consistency.db.spec.ts`, run with `RUN_DB_TESTS=true`). `AccountInvariantMonitor` logs any drift once a minute.
 - Tick/time-series tables use raw SQL migrations, never ORM sync on hypertables.
 - After a DB reset, refresh the TimescaleDB continuous aggregates bottom-up (1m → 5m → … ) with `CALL refresh_continuous_aggregate(...)`.
 - Order FSM transitions are synchronous DB transactions. Kafka publish happens only after commit.
@@ -108,9 +111,22 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   crosses convert via the live QUOTE/USD (or inverse USD/QUOTE) price. Never hardcode lot or pip sizes.
 - Clients send `instrument` (`EUR_USD`) only; order-service derives `pair` with `instrumentToPair()`.
 - Refresh tokens rotate on every use: never fire two refreshes concurrently (use `refreshSession()`).
-- order-service: PositionService, AccountService, OrderValidationService, SessionConsumer, RealtimePublisher
-  and PricingService are provided once, by `KafkaConsumerModule`. Don't also list them in AppModule
-  (duplicate instances have separate state).
+- order-service: PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService,
+  OpenPairsIndex, MarketHoursPolicy, StopOutService and AccountInvariantMonitor are provided once, by
+  `KafkaConsumerModule`. Don't also list them in AppModule (duplicate instances have separate state).
+- Market hours come from the shared clock `libs/common/src/lib/market-hours.ts` (FX Sun 17:00 to Fri 17:00 New York;
+  metals open Sun 18:00 and pause 17:00-18:00 Mon-Thu). Orders and manual closes are rejected while closed; SL/TP
+  changes and cancels are allowed. order-service's tick consumer ignores ticks stamped while closed. Dev-only flags,
+  both strictly `true`/`false`: `MARKET_HOURS_GATE=false` (order-service) and `MOCK_STREAM_WHEN_CLOSED=true`
+  (market-service), used together to trade on weekends. Sessions on orders come from the same clock.
+- Redis `price:<INSTRUMENT>` expires 2 s after the last tick, so nothing fills on a stale price.
+  `price:last:<INSTRUMENT>` has no expiry and is only a reference (validating SL/TP while the market is closed).
+- A triggered stop-loss/take-profit is committed on the position (`pending_exit_*`) before it is booked and is retried
+  from the DB, so a restart can't lose it. It books at the triggering tick's price, never the SL/TP level.
+- Stop-out (margin level < 50%) closes the biggest loser first until the level is back above 50%; close_reason
+  `STOP_OUT`. `MARGIN_CALL` is a log warning only and is never written to open positions.
+- Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
+  right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
 
 ### Tooling gotchas
 - **Never put `NODE_ENV` in `.env`.** Nx loads the root `.env` into every task, and
@@ -166,9 +182,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    DB (step 1). The frontend's MAJOR_PAIRS, PAIR_DISPLAY, PairTabs and BacktestClient list only the 4 pairs
    (EUR_GBP removed there); the other instrument rows stay in the DB untouched. Verify pip value, margin and
    P&L for gold with an end-to-end order.
-   Restart resilience: order-service's SessionConsumer only learns sessions from OPEN/CLOSE events
-   (`fromBeginning: false`), so after a restart orders are stamped OFF_HOURS until the next session
-   boundary. Fix: compute sessions from a shared pure session clock instead of rebuilding them from events.
+   Restart resilience (done in 2.7b): sessions are computed from the shared market clock.
+   For 2.5: the backtester treats the historical data as the truth and never applies the live market-hours
+   clock (gold traded through its 17:00-18:00 New York break in 2010-2012).
 3. Backtest verification: re-run strategies on the historical data. The all-zero
    metrics were caused by mock random-walk data. Confirm they're fixed and fix anything remaining.
    ws-gateway has no tests yet (`passWithNoTests`): add backtest engine tests. Clear the stale BullMQ
@@ -184,7 +200,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    Re-check Dukascopy's terms of use before a public deployment serves its historical data.
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
-8. Known gaps: `forex.calendar-events` has no consumer.
+8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar
+   is scraped every 6 h only at 00/06/12/18 UTC, so it is stale whenever the services weren't running then.
 
 ## How to work with me
 - This is a portfolio and client project. Keep it production quality, with no shortcuts or simplified "demo" code.

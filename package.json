@@ -94,7 +94,6 @@
     "class-validator": "^0.15.1",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.7",
-    "date-fns-tz": "^3.2.0",
     "ioredis": "^5.10.1",
     "kafkajs": "^2.2.4",
     "lightweight-charts": "^5.2.0",
