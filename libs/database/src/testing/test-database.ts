@@ -3,15 +3,23 @@
 // scratch on every run, and nothing connects unless the name ends in "_test".
 // (A test that shared the development database once marked and stopped out
 // real positions.)
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { DataSource, type DataSourceOptions } from 'typeorm';
 import {
   AccountSummaryEntity, BacktestRunEntity, EconomicEventEntity, InstrumentEntity, OrderEntity, PositionEntity,
   SwapRateEntity, UserEntity,
-} from '@forexedge/database';
+} from '../index';
 
-const REPO_ROOT = join(__dirname, '../../../..');
+// The repo root holds nx.json, the only .env and the migrations.
+function findRepoRoot(from: string): string {
+  for (let dir = from; ; dir = dirname(dir)) {
+    if (existsSync(join(dir, 'nx.json'))) return dir;
+    if (dirname(dir) === dir) throw new Error(`No nx.json above ${from}`);
+  }
+}
+
+export const REPO_ROOT = findRepoRoot(__dirname);
 
 export function rootEnv(): Record<string, string> {
   const text = readFileSync(join(REPO_ROOT, '.env'), 'utf8');
@@ -25,9 +33,19 @@ export function assertTestDatabaseName(name: string): void {
   }
 }
 
+export interface TestDatabaseConnection {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+}
+
 export interface TestDatabase {
   dataSource: DataSource;
   name: string;
+  // For clients other than TypeORM (e.g. pg, used by the historical importer)
+  connection: TestDatabaseConnection;
   drop(): Promise<void>;
 }
 
@@ -37,12 +55,19 @@ export async function createTestDatabase(): Promise<TestDatabase> {
   const name = env['TEST_DB_NAME'] || `${env['DB_NAME']}_test`;
   assertTestDatabaseName(name);
 
-  const server: DataSourceOptions = {
-    type: 'postgres',
+  const connection: TestDatabaseConnection = {
     host: env['DB_HOST'] || 'localhost',
     port: Number(env['DB_PORT']),
-    username: env['DB_USER'],
+    user: env['DB_USER'],
     password: env['DB_PASS'],
+    database: name,
+  };
+  const server: DataSourceOptions = {
+    type: 'postgres',
+    host: connection.host,
+    port: connection.port,
+    username: connection.user,
+    password: connection.password,
   };
 
   // CREATE/DROP DATABASE run from the server's maintenance database
@@ -68,6 +93,7 @@ export async function createTestDatabase(): Promise<TestDatabase> {
   return {
     dataSource,
     name,
+    connection,
     async drop() {
       if (dataSource.isInitialized) await dataSource.destroy();
       const cleanup = new DataSource({ ...server, database: 'postgres' });

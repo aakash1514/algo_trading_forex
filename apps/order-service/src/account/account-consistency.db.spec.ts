@@ -7,7 +7,7 @@
 //   open P&L    = sum of the open positions (derived on read)
 //
 // Runs in its own database (<DB_NAME>_test, dropped, created and migrated per
-// run; see testing/test-database.ts), never the development one. Skipped unless
+// run; see libs/database/src/testing/test-database.ts), never the development one. Skipped unless
 // RUN_DB_TESTS=true:
 //   RUN_DB_TESTS=true npx nx test order-service --testFile=account-consistency.db.spec.ts
 import { DataSource } from 'typeorm';
@@ -16,7 +16,7 @@ import { OrderService } from '../order/order.service';
 import { PositionService } from '../position/position.service';
 import { AccountService, PAPER_STARTING_BALANCE } from './account.service';
 import { AccountInvariantMonitor } from './account-invariant.monitor';
-import { createTestDatabase, type TestDatabase } from '../testing/test-database';
+import { createTestDatabase, type TestDatabase } from '@forexedge/database/testing';
 
 jest.mock('kafkajs', () => ({
   Kafka: jest.fn(() => ({ producer: () => ({ connect: jest.fn().mockResolvedValue(undefined), send: jest.fn().mockResolvedValue(undefined) }) })),

@@ -1,0 +1,8 @@
+{
+  "name": "market-data-import",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/market-data/import/src",
+  "projectType": "application",
+  "targets": {},
+  "tags": []
+}

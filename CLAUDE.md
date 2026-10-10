@@ -32,6 +32,13 @@ npm run migration:generate -- apps/auth-service/src/migrations/<Name>
 npm run migration:run
 npm run migration:revert
 npm run seed:instruments
+
+# Historical M1 import (Dukascopy exports in data/raw/jforex/, idempotent; see tools/market-data/import)
+npm run data:import -- --years 2022 [--pairs EURUSD,XAUUSD] [--force EURUSD:2022] [--dry-run]
+npm run data:import -- --check-only
+
+# DB integration tests run in <DB_NAME>_test, created and migrated per run
+RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
 ```
 
 ## Architecture
@@ -78,7 +85,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 
 ## Environment
-- Windows + Docker Desktop (no WSL2). Node v24+, Nx v22.
+- Windows + Docker Desktop on the WSL2 backend (its disk is `docker_data.vhdx`, which never shrinks by itself). Node v24+, Nx v22.
 - **Use Git Bash only.** PowerShell 5.1 crashes at startup in this environment
   (`InitialSessionState` type initializer exception), so don't use it.
 - Docker Desktop doesn't auto-start; launch it before `docker compose up`.
@@ -97,6 +104,14 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Never store derived columns. `account_summary` stores only balance and margin_used. Open (unrealized) P&L is the sum of the open positions, and equity, free margin and margin level are computed on read (`AccountService`).
 - `account_summary` writes are relative SQL updates only (`balance + :pnl`, `margin_used + :m`). Writing back a row read earlier loses concurrent updates (reproduced; covered by `account-consistency.db.spec.ts`, run with `RUN_DB_TESTS=true`). `AccountInvariantMonitor` logs any drift once a minute.
 - Tick/time-series tables use raw SQL migrations, never ORM sync on hypertables.
+- `historical_candles` stores integer points: price = value × 10^price_decimals, volume = value × 10^6, with the
+  scale fixed per pair in `historical_price_scale` (EUR/USD and GBP/USD 5, USD/JPY and XAU/USD 3). Convert with
+  that table, never with `instruments.pip_size`. Float8 compressed 2.9×, integers 7.7× (decimal floats have noisy low bits).
+- `refresh_continuous_aggregate` only materializes buckets entirely inside the window. The New York-aligned
+  historical H4/D1 bars start at 21:00/22:00 UTC, so never refresh them in yearly windows (the Dec 31 evening bar
+  crosses the UTC year and is lost); the importer refreshes them in one window padded a week each side.
+- Integration tests that touch the DB use `createTestDatabase()` (`@forexedge/database/testing`): it drops, creates
+  and migrates `<DB_NAME>_test` and refuses any name not ending in `_test`. Never point a test at the dev DB.
 - After a DB reset, refresh the TimescaleDB continuous aggregates bottom-up (1m → 5m → … ) with `CALL refresh_continuous_aggregate(...)`.
 - Order FSM transitions are synchronous DB transactions. Kafka publish happens only after commit.
 - KafkaJS needs `Partitioners.LegacyPartitioner` and `KAFKAJS_NO_PARTITIONER_WARNING=1`. Topics are ensured before the producer connects (KRaft cold start).
@@ -163,7 +178,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 ## Roadmap (in order)
 1. ✅ **Done (2026-10-09).** Health check: infra up, all projects build and serve, fix breakages.
-2. Historical data seed: M1 bid and ask OHLC candles (float8), 2010–2022, for **4 pairs: EUR/USD, GBP/USD,
+2. Historical data seed: M1 bid and ask OHLC candles (integer points: int4 prices, int8 volumes), 2010–2022, for **4 pairs: EUR/USD, GBP/USD,
    USD/JPY, XAU/USD**. Source: Dukascopy, exported with the official JForex strategy API by
    `tools/market-data/jforex/ForexEdgeM1Export.java` (see its README; a free JForex 4 demo login is enough).
    Dukascopy's HTTP endpoints sit behind bot protection and its S3 export needs AWS, so dukascopy-node and
