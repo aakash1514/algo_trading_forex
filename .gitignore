@@ -60,3 +60,7 @@ next-env.d.ts
 
 # Historical market data (exports and import scratch; never committed)
 /data/
+
+# JForex writes the compiled strategy and saved parameter presets next to the source
+tools/market-data/jforex/*.jfx
+tools/market-data/jforex/*.xml
