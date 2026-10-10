@@ -10,6 +10,10 @@ import { MarginEngineService } from './margin-engine.service';
 import { BadRequestException } from '@nestjs/common';
 import { SessionConsumer } from '../kafka/session.consumer';
 import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
+import { OpenPairsIndex } from '../position/open-pairs.index';
+
+// Open-pairs index (tick consumer): the fill path must record the new position's pair
+const openPairs = { opened: jest.fn(), closed: jest.fn(), has: jest.fn().mockReturnValue(true) };
 
 jest.mock('kafkajs', () => ({
   Kafka: jest.fn().mockImplementation(() => ({
@@ -88,6 +92,7 @@ describe('OrderService — FSM transitions', () => {
         { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
         { provide: PricingService, useFactory: mockPricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
       ],
     }).compile();
 
@@ -204,6 +209,8 @@ describe('OrderService — FSM transitions', () => {
       expect.objectContaining({ instrument: 'EUR_USD', pair: 'EUR/USD' }),
     );
     expect(result).toBeDefined();
+    // The fill opened a position: the tick consumer's index learns its pair
+    expect(openPairs.opened).toHaveBeenCalledWith('EUR/USD');
   });
 });
 
@@ -231,6 +238,7 @@ describe('OrderService — pricing and margin', () => {
         { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
         { provide: PricingService, useFactory: mockPricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
       ],
     }).compile();
 
@@ -281,6 +289,7 @@ describe('OrderService — pricing and margin', () => {
     const result = await submit('LONG');
     expect(result.status).toBe('REJECTED');
     expect(result.rejectionReason).toContain('Insufficient margin');
+    expect(openPairs.opened).not.toHaveBeenCalled(); // no position, no index entry
   });
 
   it('rejects instead of validating at price 0 when no live price exists', async () => {
@@ -334,6 +343,7 @@ describe('OrderService cross-user access', () => {
         { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn() } },
         { provide: PricingService, useFactory: mockPricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
       ],
     }).compile();
     service = module.get(OrderService);

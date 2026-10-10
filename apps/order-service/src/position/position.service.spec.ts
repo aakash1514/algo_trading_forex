@@ -5,6 +5,7 @@ import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/da
 import { PositionAlreadyClosedError, PositionService } from './position.service';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService } from '../pricing/pricing.service';
+import { OpenPairsIndex } from './open-pairs.index';
 
 const mockPositionRepo = () => ({
   find: jest.fn(),
@@ -57,14 +58,16 @@ const makePosition = (overrides: Partial<PositionEntity> = {}): PositionEntity =
 describe('PositionService — P&L calculation', () => {
   let service: PositionService;
   let positionRepo: ReturnType<typeof mockPositionRepo>;
-  let accountRepo: ReturnType<typeof mockAccountRepo>;
   let dataSource: ReturnType<typeof mockDataSource>;
   const realtime = { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) };
   const pricing = { getSpec: jest.fn(), quoteToUsd: jest.fn(), getQuote: jest.fn() };
+  // Every pair has open positions unless a test says otherwise
+  const openPairs = { has: jest.fn(), opened: jest.fn(), closed: jest.fn() };
   beforeEach(() => {
     pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.0001, maxLeverage: null });
     pricing.quoteToUsd.mockResolvedValue(1);
     pricing.getQuote.mockResolvedValue({ bid: 1.0809, ask: 1.0811, mid: 1.081 });
+    openPairs.has.mockReturnValue(true);
   });
   afterEach(() => jest.clearAllMocks());
 
@@ -78,12 +81,12 @@ describe('PositionService — P&L calculation', () => {
         { provide: DataSource, useFactory: mockDataSource },
         { provide: RealtimePublisher, useValue: realtime },
         { provide: PricingService, useValue: pricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
       ],
     }).compile();
 
     service = module.get(PositionService);
     positionRepo = module.get(getRepositoryToken(PositionEntity));
-    accountRepo = module.get(getRepositoryToken(AccountSummaryEntity));
     dataSource = module.get(DataSource);
   });
 
@@ -106,7 +109,7 @@ describe('PositionService — P&L calculation', () => {
       positionRepo.find.mockResolvedValue([position]);
       tickManager(position);
 
-      await service.recalculatePositions(tick);
+      await service.processTicks([tick]);
 
       // LONG from 1.08000 to mid 1.08100 = +10 pips at $10/pip
       expect(realtime.positionPnl).toHaveBeenCalledWith(position, 1.081, 10, 100);
@@ -117,7 +120,7 @@ describe('PositionService — P&L calculation', () => {
       positionRepo.find.mockResolvedValue([makePosition({ unrealizedPnl: 40 })]);
       const { manager, qb } = tickManager(makePosition({ unrealizedPnl: 60 }));
 
-      await service.recalculatePositions(tick);
+      await service.processTicks([tick]);
 
       expect(manager.findOne).toHaveBeenCalledWith(PositionEntity, {
         where: { id: 'pos-1', isOpen: true }, lock: { mode: 'pessimistic_write' },
@@ -133,7 +136,7 @@ describe('PositionService — P&L calculation', () => {
       positionRepo.find.mockResolvedValue([makePosition()]);
       const { manager } = tickManager(null); // closed by a manual close in between
 
-      await service.recalculatePositions(tick);
+      await service.processTicks([tick]);
 
       expect(manager.update).not.toHaveBeenCalled();
       expect(manager.createQueryBuilder).not.toHaveBeenCalled();
@@ -147,9 +150,104 @@ describe('PositionService — P&L calculation', () => {
       tickManager(other);
       jest.spyOn(service, 'closePosition').mockRejectedValueOnce(new PositionAlreadyClosedError('pos-sl'));
 
-      await service.recalculatePositions(tick);
+      await service.processTicks([tick]);
 
       expect(realtime.positionPnl).toHaveBeenCalledWith(other, 1.081, 10, 100);
+    });
+
+    describe('batches', () => {
+      const at = (mid: number, pair = 'EUR/USD') => ({ pair, bid: mid - 0.0001, ask: mid + 0.0001, mid, timestamp: '2026-10-09T14:00:00Z' });
+
+      it('skips pairs without open positions without touching the DB', async () => {
+        openPairs.has.mockImplementation((pair: string) => pair === 'EUR/USD');
+        positionRepo.find.mockResolvedValue([]);
+
+        await service.processTicks([at(150.1, 'USD/JPY'), at(1823.5, 'XAU/USD'), at(1.0810)]);
+
+        expect(positionRepo.find).toHaveBeenCalledTimes(1);
+        expect(positionRepo.find).toHaveBeenCalledWith({ where: { pair: 'EUR/USD', isOpen: true } });
+      });
+
+      it('loads each pair once and marks P&L once, from the latest tick', async () => {
+        const position = makePosition();
+        positionRepo.find.mockResolvedValue([position]);
+        const { manager } = tickManager(position);
+
+        const users = await service.processTicks([at(1.0805), at(1.0812), at(1.0810)]);
+
+        expect(positionRepo.find).toHaveBeenCalledTimes(1);
+        expect(manager.update).toHaveBeenCalledTimes(1);
+        // 1.08000 -> latest mid 1.08100 = +10 pips at $10/pip
+        expect(manager.update).toHaveBeenCalledWith(PositionEntity, 'pos-1',
+          { currentPrice: 1.081, pipPnl: 10, pipValue: 10, unrealizedPnl: 100 });
+        expect(users).toEqual(new Set(['user-1']));
+      });
+
+      it('checks the stop-loss on every tick: a stop touched mid-batch fills at that tick even if price recovers', async () => {
+        const position = makePosition({ stopLoss: 1.0795 }); // LONG from 1.08000
+        positionRepo.find.mockResolvedValue([position]);
+        const close = jest.spyOn(service, 'closePosition').mockResolvedValue(makePosition({ isOpen: false }));
+        const { manager } = tickManager(position);
+
+        await service.processTicks([at(1.0802), at(1.0791), at(1.0810)]);
+
+        // Gapped through 1.0795 to 1.0791: filled at that tick's price, not the level
+        expect(close).toHaveBeenCalledTimes(1);
+        expect(close).toHaveBeenCalledWith('pos-1', 'STOP_LOSS', 1.0791);
+        expect(manager.update).not.toHaveBeenCalled(); // no P&L mark for a closed position
+      });
+
+      it('take-profit and stop-loss work for SHORT positions', async () => {
+        const tp = makePosition({ id: 'tp', direction: 'SHORT', takeProfit: 1.0790 });
+        const sl = makePosition({ id: 'sl', direction: 'SHORT', stopLoss: 1.0815 });
+        positionRepo.find.mockResolvedValue([tp, sl]);
+        const close = jest.spyOn(service, 'closePosition').mockResolvedValue(makePosition({ isOpen: false }));
+        tickManager(null);
+
+        await service.processTicks([at(1.0789), at(1.0816)]);
+
+        expect(close).toHaveBeenCalledWith('tp', 'TAKE_PROFIT', 1.0789);
+        expect(close).toHaveBeenCalledWith('sl', 'STOP_LOSS', 1.0816);
+      });
+
+      it('one pair failing (e.g. no cross rate yet) does not skip the other pairs in the batch', async () => {
+        const eurGbp = makePosition({ id: 'cross', pair: 'EUR/GBP', instrument: 'EUR_GBP' });
+        const eurUsd = makePosition();
+        positionRepo.find.mockImplementation(async ({ where }: { where: { pair: string } }) =>
+          (where.pair === 'EUR/GBP' ? [eurGbp] : [eurUsd]));
+        pricing.quoteToUsd.mockImplementation(async (pair: string) => {
+          if (pair === 'EUR/GBP') throw new Error('No live price for USD/GBP. Is market-service running?');
+          return 1;
+        });
+        tickManager(eurUsd);
+
+        const users = await service.processTicks([at(0.8571, 'EUR/GBP'), at(1.0810)]);
+
+        expect(realtime.positionPnl).toHaveBeenCalledTimes(1);
+        expect(realtime.positionPnl).toHaveBeenCalledWith(eurUsd, 1.081, 10, 100);
+        expect(users).toEqual(new Set(['user-1']));
+      });
+
+      it('closing a position removes its pair from the index after the commit', async () => {
+        const order: string[] = [];
+        dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => {
+          const result = await cb({
+            findOne: jest.fn()
+              .mockResolvedValueOnce(makePosition())
+              .mockResolvedValueOnce({ id: 'acct-1', balance: 10000, marginUsed: 1080, unrealizedPnl: 0 })
+              .mockResolvedValueOnce(makePosition({ isOpen: false })),
+            update: jest.fn(),
+          });
+          order.push('commit');
+          return result;
+        });
+        openPairs.closed.mockImplementation(() => order.push('index'));
+
+        await service.closePosition('pos-1', 'MANUAL', 1.081);
+
+        expect(openPairs.closed).toHaveBeenCalledWith('EUR/USD');
+        expect(order).toEqual(['commit', 'index']);
+      });
     });
 
     it('locks the row when closing, and a second close is a 409', async () => {

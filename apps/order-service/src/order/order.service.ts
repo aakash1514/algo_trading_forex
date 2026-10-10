@@ -14,6 +14,7 @@ import { instrumentToPair } from '../common/instrument';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
 import { MarginEngineService } from './margin-engine.service';
+import { OpenPairsIndex } from '../position/open-pairs.index';
 import { Kafka, Producer } from 'kafkajs';
 import { SessionConsumer } from '../kafka/session.consumer';
 
@@ -46,6 +47,7 @@ export class OrderService {
     private readonly sessionConsumer: SessionConsumer,
     private readonly realtime: RealtimePublisher,
     private readonly pricing: PricingService,
+    private readonly openPairs: OpenPairsIndex,
   ) {
     // Kafka producer — wired up in Step 10
     // Declared here so OrderService doesn't need to change in Step 10
@@ -197,7 +199,9 @@ export class OrderService {
         return updated;
       });
 
-      // Step 9: Publish to Kafka (fire and forget — after all DB writes succeed)
+      // Step 9: after the commit — the tick consumer's open-pairs index, then
+      // Kafka (fire and forget)
+      this.openPairs.opened(order.pair);
       this.publishLifecycleEvent(order).catch(err =>
         this.logger.warn(`Kafka publish failed: ${this.getErrorMessage(err)}`)
       );
