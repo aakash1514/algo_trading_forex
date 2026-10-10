@@ -1,4 +1,15 @@
-import { getPipSize, getPriceDecimals, priceToPips } from './pip';
+import { getPipSize, getPriceDecimals, getPriceFormat, getPriceStep, priceToPips } from './pip';
+
+describe('getPriceStep / getPriceFormat', () => {
+  it.each([
+    ['EUR_USD', 5, 0.00001],
+    ['USD_JPY', 3, 0.001],
+    ['XAU_USD', 3, 0.001],
+  ])('%s: precision %i, minMove %d', (pair, precision, step) => {
+    expect(getPriceStep(pair)).toBe(step);
+    expect(getPriceFormat(pair)).toEqual({ type: 'price', precision, minMove: step });
+  });
+});
 
 describe('getPipSize', () => {
   it.each([

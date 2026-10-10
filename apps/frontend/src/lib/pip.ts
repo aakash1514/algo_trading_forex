@@ -28,3 +28,14 @@ export function priceToPips(priceDelta: number, pair: string): number {
 export function getPriceDecimals(pair: string): number {
   return Math.round(-Math.log10(getPipSize(pair))) + 1;
 }
+
+// Smallest quoted price increment (one point): 0.00001 for EUR/USD, 0.001 for
+// USD/JPY and XAU/USD. Used as the step of price inputs.
+export function getPriceStep(pair: string): number {
+  return Number((10 ** -getPriceDecimals(pair)).toFixed(getPriceDecimals(pair)));
+}
+
+// lightweight-charts price format for a pair (without it every pair shows 2 dp).
+export function getPriceFormat(pair: string): { type: 'price'; precision: number; minMove: number } {
+  return { type: 'price', precision: getPriceDecimals(pair), minMove: getPriceStep(pair) };
+}

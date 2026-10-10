@@ -8,6 +8,7 @@ import { useAppSelector } from '../../store';
 import { useCreateOrderMutation } from '../../store/api/order.api';
 import { useGetPipValueQuery } from '../../store/api/domain.api';
 import { PAIR_DISPLAY } from '../../lib/constants';
+import { getPriceStep } from '../../lib/pip';
 import type { OrderDirection } from '../../types/api.types';
 import { cn } from '../../lib/cn';
 
@@ -119,7 +120,7 @@ export function OrderForm() {
             <input
               {...register('stopLoss', { setValueAs: optionalNumber })}
               type="number"
-              step="0.00001"
+              step={getPriceStep(activePair)}
               placeholder="—"
               className={cn(
                 'w-full bg-terminal-elevated border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors',
@@ -132,7 +133,7 @@ export function OrderForm() {
             <input
               {...register('takeProfit', { setValueAs: optionalNumber })}
               type="number"
-              step="0.00001"
+              step={getPriceStep(activePair)}
               placeholder="—"
               className={cn(
                 'w-full bg-terminal-elevated border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors',

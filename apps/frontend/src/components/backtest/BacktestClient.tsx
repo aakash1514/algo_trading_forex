@@ -11,6 +11,7 @@ import {
   useDeleteBacktestMutation,
 } from '../../store/api/backtest.api';
 import { cn } from '../../lib/cn';
+import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
 import React from 'react';
 
 const schema = z.object({
@@ -106,8 +107,8 @@ export function BacktestClient() {
             <div>
               <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Instrument</label>
               <select {...register('instrument')} className={inputClass}>
-                {['EUR_USD','GBP_USD','USD_JPY','USD_CHF','AUD_USD','USD_CAD','NZD_USD','EUR_GBP'].map((p) => (
-                  <option key={p} value={p}>{p.replace('_', '/')}</option>
+                {MAJOR_PAIRS.map((p) => (
+                  <option key={p} value={p}>{PAIR_DISPLAY[p]}</option>
                 ))}
               </select>
             </div>
