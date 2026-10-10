@@ -13,9 +13,10 @@
 //
 // All arithmetic is exact: fixings go text -> numeric -> points in SQL, and a
 // deviation in pips is points / 10 at every pair's scale (1 pip = 10 points).
-// Every check fails on empty input.
+// Every check fails on empty input. Investigated failures are named in exceptions.ts.
 import { readFileSync } from 'node:fs';
 import type { Client } from 'pg';
+import { applyExceptions, EXCEPTIONS, type ExceptionOutcome, type Exceptions, type MedianException } from './exceptions';
 
 export interface FxSeries {
   id: string;
@@ -83,7 +84,9 @@ export interface PairYearResult {
   maxPips: number | null;
   maxDate: string | null;
   flagged: number;
-  failing: FailingDay[];
+  failing: FailingDay[];       // every day above the per-day limit
+  exceptedDays: ExceptionOutcome['exceptedDays']; // those of them that are named exceptions
+  medianExcepted: MedianException | null;
   medianByOffset: Record<number, number | null>;
   problems: string[];
   ok: boolean;
@@ -126,7 +129,8 @@ const COMPARISON_CTE = `
     ) m ON true
   )`;
 
-export async function compareSeries(client: Client, series: FxSeries, fixings: Fixing[]): Promise<PairYearResult[]> {
+export async function compareSeries(client: Client, series: FxSeries, fixings: Fixing[],
+  exceptions: Exceptions = EXCEPTIONS): Promise<PairYearResult[]> {
   const byYear = new Map<number, number>();
   for (const f of fixings) byYear.set(Number(f.date.slice(0, 4)), (byYear.get(Number(f.date.slice(0, 4))) ?? 0) + 1);
   if (fixings.length === 0) {
@@ -171,14 +175,19 @@ export async function compareSeries(client: Client, series: FxSeries, fixings: F
       maxPips: num(zero?.max_abs), maxDate: zero?.max_date ?? null,
       flagged: zero?.flagged ?? 0,
       failing: failing.filter((f) => f.year === year).map(({ date, fixing, mid, pips }) => ({ date, fixing, mid, pips })),
+      exceptedDays: [],
+      medianExcepted: null,
       medianByOffset,
       problems: [],
       ok: false,
     };
     const p = result.problems;
     if (result.compared === 0) p.push('no day compared');
-    if (result.failing.length > 0) p.push(`${result.failing.length} day(s) above ${series.failPips} pips`);
-    if (result.medianPips !== null && result.medianPips > series.maxMedian) p.push(`median above ${series.maxMedian} pips`);
+    // Days above the per-day limit and the median limit: only the named exceptions may fail
+    const outcome = applyExceptions(series.pair, year, result.failing, result.medianPips, series.maxMedian, exceptions);
+    p.push(...outcome.problems);
+    result.exceptedDays = outcome.exceptedDays;
+    result.medianExcepted = outcome.medianExcepted;
     if (result.p95Pips !== null && result.p95Pips > series.maxP95) p.push(`p95 above ${series.maxP95} pips`);
     const m0 = medianByOffset[0];
     for (const o of OFFSETS.filter((x) => x !== 0)) {
@@ -194,7 +203,8 @@ export async function compareSeries(client: Client, series: FxSeries, fixings: F
 export function emptyResult(pair: string, year: number, problem: string): PairYearResult {
   return {
     pair, year, fixings: 0, compared: 0, noData: 0, medianPips: null, p95Pips: null, meanSignedPips: null,
-    maxPips: null, maxDate: null, flagged: 0, failing: [], medianByOffset: {}, problems: [problem], ok: false,
+    maxPips: null, maxDate: null, flagged: 0, failing: [], exceptedDays: [], medianExcepted: null, medianByOffset: {},
+    problems: [problem], ok: false,
   };
 }
 

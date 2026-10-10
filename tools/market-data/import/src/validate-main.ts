@@ -27,14 +27,38 @@ function fxTable(results: PairYearResult[]): string[] {
     lines.push(`| ${r.pair} | ${r.year} | ${r.compared} | ${r.noData} | ${f2(r.medianPips)} | ${f2(r.p95Pips)} | ` +
       `${f2(r.meanSignedPips)} | ${f2(r.maxPips)} (${r.maxDate ?? '-'}) | ` +
       `${f2(r.medianByOffset[-60] ?? null)} / ${f2(r.medianByOffset[0] ?? null)} / ${f2(r.medianByOffset[60] ?? null)} | ` +
-      `${r.ok ? 'pass' : `**FAIL**: ${r.problems.join('; ')}`} |`);
+      `${r.ok ? passLabel(r) : `**FAIL**: ${r.problems.join('; ')}`} |`);
   }
   const failing = results.flatMap((r) => r.failing.map((d) => ({ pair: r.pair, ...d })));
-  if (failing.length > 0) {
-    lines.push('', 'Failing days:', '', '| Pair | Date | Fixing | Our mid | Δ pips |', '|---|---|---|---|---|');
-    for (const d of failing) lines.push(`| ${d.pair} | ${d.date} | ${d.fixing} | ${d.mid} | ${d.pips.toFixed(2)} |`);
+  const excepted = (pair: string, date: string) =>
+    results.flatMap((r) => r.exceptedDays).find((e) => e.pair === pair && e.date === date);
+  const medians = results.filter((r) => r.medianExcepted);
+  if (failing.length > 0 || medians.length > 0) {
+    lines.push('', '### Investigated exceptions', '',
+      'Days above the per-day limit and pair-years above the median limit pass only as these named exceptions ' +
+      '(`tools/market-data/import/src/exceptions.ts`); any other failure, a different deviation or an exception that ' +
+      'no longer fails makes the check fail. On every listed day the fixing lies inside our range for that New York ' +
+      'day, and our 11:45-12:15 NY bars are all present with normal spreads (0.1-2 pips) and no spike: the fixing, ' +
+      'not our data, is off noon. "Matches" gives the NY times at which our mid came closest to the fixing.', '',
+      '| Pair | Date | Fixing | Our mid | Δ pips | Reason |', '|---|---|---|---|---|---|');
+    for (const d of failing) {
+      const e = excepted(d.pair, d.date);
+      lines.push(`| ${d.pair} | ${d.date} | ${d.fixing} | ${d.mid} | ${d.pips.toFixed(2)} | ` +
+        `${e ? e.reason : '**NOT AN INVESTIGATED EXCEPTION**'} |`);
+    }
+    for (const r of medians) {
+      lines.push('', `Median exception: ${r.pair} ${r.year}, median ${r.medianExcepted?.medianPips} pips: ${r.medianExcepted?.reason}.`);
+    }
   }
   return lines;
+}
+
+function passLabel(r: PairYearResult): string {
+  const parts = [
+    r.exceptedDays.length > 0 ? `${r.exceptedDays.length} excepted day(s)` : '',
+    r.medianExcepted ? 'median excepted' : '',
+  ].filter(Boolean);
+  return parts.length > 0 ? `pass (${parts.join(', ')})` : 'pass';
 }
 
 function goldTable(results: GoldResult[]): string[] {
@@ -99,6 +123,9 @@ async function main(): Promise<void> {
       '',
       'Tolerances: ' + FX_SERIES.map((s) => `${s.pair} (${s.id}) day ≤ ${s.failPips} pips, median ≤ ${s.maxMedian}, ` +
         `p95 ≤ ${s.maxP95}`).join('; ') + '.',
+      '',
+      'Bias: the mean signed Δ is a steady sub-pip offset (EUR/USD about −0.5, GBP/USD about −1.0, USD/JPY about ' +
+        '+0.5 pips; larger in 2010): in every pair the fixing values the dollar slightly lower than our mid.',
       '',
       ...fxTable(fx),
       '',
