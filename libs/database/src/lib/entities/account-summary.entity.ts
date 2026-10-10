@@ -25,8 +25,8 @@ export class AccountSummaryEntity {
   @Column({ name: 'margin_used', type: 'decimal', transformer: decimalTransformer, precision: 15, scale: 2, default: 0 })
   marginUsed!: number;
 
-  @Column({ name: 'unrealized_pnl', type: 'decimal', transformer: decimalTransformer, precision: 12, scale: 2, default: 0 })
-  unrealizedPnl!: number;
+  // Open (unrealized) P&L is not stored: it is the sum of the user's open
+  // positions' unrealized_pnl, computed on read (AccountService), so it can't drift.
 
   @Column({ type: 'integer', default: 100 })
   leverage!: number;

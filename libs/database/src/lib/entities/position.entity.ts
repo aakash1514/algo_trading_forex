@@ -5,7 +5,9 @@ import { OrderEntity } from './order.entity';
 import { UserEntity } from './user.entity';
 import { decimalTransformer } from '../transformers/decimal.transformer';
 
-export type CloseReason = 'MANUAL' | 'STOP_LOSS' | 'TAKE_PROFIT' | 'MARGIN_CALL';
+// MARGIN_CALL is legacy (history only); stop-outs close with STOP_OUT.
+export type CloseReason = 'MANUAL' | 'STOP_LOSS' | 'TAKE_PROFIT' | 'MARGIN_CALL' | 'STOP_OUT';
+export type ExitTrigger = 'STOP_LOSS' | 'TAKE_PROFIT';
 
 @Entity('positions')
 export class PositionEntity {
@@ -79,4 +81,17 @@ export class PositionEntity {
 
   @Column({ name: 'close_reason', type: 'varchar', nullable: true })
   closeReason!: CloseReason | null;
+
+  // A triggered stop-loss/take-profit not booked yet (e.g. no USD conversion
+  // rate for a cross pair). Committed when the trigger is detected and retried
+  // from here, so a restart can't lose it. Books at pending_exit_price, the
+  // triggering tick's price (not the SL/TP level).
+  @Column({ name: 'pending_exit_price', type: 'decimal', transformer: decimalTransformer, precision: 18, scale: 6, nullable: true })
+  pendingExitPrice!: number | null;
+
+  @Column({ name: 'pending_exit_reason', type: 'varchar', nullable: true })
+  pendingExitReason!: ExitTrigger | null;
+
+  @Column({ name: 'exit_triggered_at', type: 'timestamptz', nullable: true })
+  exitTriggeredAt!: Date | null;
 }
