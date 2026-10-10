@@ -1,4 +1,5 @@
--- Verifies the historical_candles schema (migration HistoricalCandles1791626574903).
+-- Verifies the historical_candles schema (migrations HistoricalCandles1791626574903 and
+-- HistoricalCandlesIntegerPoints1791720000000).
 -- Every check raises an exception on failure, so a clean run ends with "ALL OK".
 --
 --   docker exec -i forexedge_tsdb psql -U "$DB_USER" -d "$DB_NAME" -v ON_ERROR_STOP=1 \
@@ -112,6 +113,37 @@ BEGIN
       RAISE EXCEPTION 'minute %: H4 % (expected %), D1 % (expected %)', r.minute, h4, r.h4_start, d1, r.d1_start;
     END IF;
   END LOOP;
+END $$;
+
+-- 3b. Integer points: int4 prices, int8 volumes, in M1 and in every aggregate.
+DO $$
+DECLARE wrong text;
+BEGIN
+  SELECT string_agg(format('%s.%s is %s', c.table_name, c.column_name, c.data_type), '; ') INTO wrong
+  FROM information_schema.columns c
+  WHERE c.table_schema = 'public'
+    AND (c.table_name = 'historical_candles' OR c.table_name LIKE 'historical\_candles\_%')
+    AND c.column_name NOT IN ('time', 'bucket', 'pair', 'minutes')
+    AND c.data_type <> CASE WHEN c.column_name LIKE '%volume' THEN 'bigint' ELSE 'integer' END;
+  IF wrong IS NOT NULL THEN
+    RAISE EXCEPTION 'non-integer historical columns: %', wrong;
+  END IF;
+END $$;
+
+-- 3c. One fixed scale per pair: historical_price_scale rows for the 4 pairs, and
+--     every import-log row tied to its pair's scale by a composite FK.
+DO $$
+DECLARE scales text;
+BEGIN
+  SELECT string_agg(format('%s:%s/%s', pair, price_decimals, volume_decimals), ',' ORDER BY pair) INTO scales
+  FROM historical_price_scale;
+  IF scales IS DISTINCT FROM 'EUR/USD:5/6,GBP/USD:5/6,USD/JPY:3/6,XAU/USD:3/6' THEN
+    RAISE EXCEPTION 'historical_price_scale is %, expected EUR/USD:5/6,GBP/USD:5/6,USD/JPY:3/6,XAU/USD:3/6', scales;
+  END IF;
+  IF pg_get_constraintdef((SELECT oid FROM pg_constraint WHERE conname = 'historical_import_log_scale_fkey'))
+     IS DISTINCT FROM 'FOREIGN KEY (pair, price_decimals, volume_decimals) REFERENCES historical_price_scale(pair, price_decimals, volume_decimals)' THEN
+    RAISE EXCEPTION 'historical_import_log_scale_fkey is missing or different';
+  END IF;
 END $$;
 
 -- 6. Import log and coverage view exist.
