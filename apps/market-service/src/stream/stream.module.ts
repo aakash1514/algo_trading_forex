@@ -5,6 +5,7 @@ import { MockStreamProvider } from './providers/mock-stream.provider';
 import { OandaStreamProvider } from './providers/oanda-stream.provider';
 import { STREAM_PROVIDER } from './interfaces/stream-provider.interface';
 import { MarketModule } from '../market/market.module';
+import { InstrumentRepository } from '../market/instrument.repository';
 
 @Module({
   imports: [MarketModule],
@@ -14,14 +15,15 @@ import { MarketModule } from '../market/market.module';
     // StreamService never knows which one it gets — it only sees IForexStreamProvider.
     {
       provide: STREAM_PROVIDER,
-      useFactory: (config: ConfigService) => {
+      useFactory: (config: ConfigService, instruments: InstrumentRepository) => {
         const useMock = config.get<string>('USE_MOCK_DATA', 'true') === 'true';
         if (useMock) {
-          return new MockStreamProvider();
+          // Precision and typical spread per instrument come from the DB
+          return new MockStreamProvider(() => instruments.findQuoteSpecs());
         }
         return new OandaStreamProvider(config);
       },
-      inject: [ConfigService],
+      inject: [ConfigService, InstrumentRepository],
     },
     StreamService,
   ],

@@ -18,4 +18,21 @@ export class InstrumentRepository {
     // Convert DB format EUR/USD → OANDA format EUR_USD
     return result.map((r) => r.pair.replace('/', '_'));
   }
+
+  // Quote specs for active instruments, keyed by OANDA format (EUR_USD):
+  // pip_size (price precision) and avg_spread (typical ask - bid, price units).
+  async findQuoteSpecs(): Promise<Map<string, InstrumentQuoteSpec>> {
+    const rows = await this.dataSource.query<{ pair: string; pip_size: string; avg_spread: string | null }[]>(
+      `SELECT pair, pip_size, avg_spread FROM instruments WHERE is_active = true`,
+    );
+    return new Map(rows.map((r) => [
+      r.pair.replace('/', '_'),
+      { pipSize: Number(r.pip_size), avgSpread: r.avg_spread === null ? null : Number(r.avg_spread) },
+    ]));
+  }
+}
+
+export interface InstrumentQuoteSpec {
+  pipSize: number;
+  avgSpread: number | null;
 }
