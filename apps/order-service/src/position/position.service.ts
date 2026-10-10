@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
@@ -15,6 +15,14 @@ export interface NormalizedTick {
   timestamp: string;
 }
 
+// Closing a position that is no longer open: 409 over HTTP; the tick path,
+// which can race with a manual close, catches it and moves on.
+export class PositionAlreadyClosedError extends ConflictException {
+  constructor(positionId: string) {
+    super(`Position ${positionId} is already closed`);
+  }
+}
+
 @Injectable()
 export class PositionService {
   private readonly logger = new Logger(PositionService.name);
@@ -22,8 +30,6 @@ export class PositionService {
   constructor(
     @InjectRepository(PositionEntity)
     private readonly positionRepo: Repository<PositionEntity>,
-    @InjectRepository(AccountSummaryEntity)
-    private readonly accountRepo: Repository<AccountSummaryEntity>,
     @InjectRepository(OrderEntity)
     private readonly orderRepo: Repository<OrderEntity>,
     private readonly dataSource: DataSource,
@@ -64,35 +70,46 @@ export class PositionService {
         ((position.direction === 'LONG' && currentPrice >= Number(position.takeProfit)) ||
           (position.direction === 'SHORT' && currentPrice <= Number(position.takeProfit)));
 
-      if (slHit) {
-        await this.closePosition(position.id, 'STOP_LOSS', currentPrice);
+      if (slHit || tpHit) {
+        try {
+          await this.closePosition(position.id, slHit ? 'STOP_LOSS' : 'TAKE_PROFIT', currentPrice);
+        } catch (err) {
+          // Closed by another path (manual close) since it was loaded: nothing to do
+          if (!(err instanceof PositionAlreadyClosedError)) throw err;
+        }
         continue;
       }
 
-      if (tpHit) {
-        await this.closePosition(position.id, 'TAKE_PROFIT', currentPrice);
-        continue;
-      }
+      // The position was loaded before the awaits above, so it may have been
+      // closed meanwhile. Re-read it under a row lock (closePosition takes the
+      // same lock) and skip it if it's no longer open; otherwise this write would
+      // overwrite the exit price and P&L of a closed position and add its P&L
+      // back into the account. The account delta uses the locked row's value.
+      const updated = await this.dataSource.transaction(async manager => {
+        const locked = await manager.findOne(PositionEntity, {
+          where: { id: position.id, isOpen: true },
+          lock: { mode: 'pessimistic_write' },
+        });
+        if (!locked) return false;
 
-      // Update position with latest P&L
-      await this.positionRepo.update(position.id, {
-        currentPrice,
-        pipPnl,
-        pipValue,
-        unrealizedPnl,
+        await manager.update(PositionEntity, locked.id, {
+          currentPrice,
+          pipPnl,
+          pipValue,
+          unrealizedPnl,
+        });
+
+        // Direct update so tick-frequency changes reach account_summary
+        await manager
+          .createQueryBuilder()
+          .update(AccountSummaryEntity)
+          .set({ unrealizedPnl: () => 'unrealized_pnl - :previousPnl + :nextPnl' })
+          .where('user_id = :userId', { userId: locked.userId })
+          .setParameters({ previousPnl: Number(locked.unrealizedPnl), nextPnl: unrealizedPnl })
+          .execute();
+        return true;
       });
-
-      // Update account unrealized_pnl — write-through handled by AccountService
-      // Here we do a direct update so tick-frequency changes are captured
-      await this.accountRepo
-        .createQueryBuilder()
-        .update(AccountSummaryEntity)
-        .set({
-          unrealizedPnl: () =>
-            `unrealized_pnl - ${Number(position.unrealizedPnl)} + ${unrealizedPnl}`,
-        })
-        .where('user_id = :userId', { userId: position.userId })
-        .execute();
+      if (!updated) continue;
 
       this.realtime.positionPnl(position, currentPrice, pipPnl, unrealizedPnl);
     }
@@ -135,12 +152,14 @@ export class PositionService {
     closingPrice: number,
   ): Promise<PositionEntity> {
     const closed = await this.dataSource.transaction(async manager => {
+      // Row lock: serializes with the tick-driven P&L update for this position
       const position = await manager.findOne(PositionEntity, {
         where: { id: positionId },
+        lock: { mode: 'pessimistic_write' },
       });
 
       if (!position) throw new Error(`Position ${positionId} not found`);
-      if (!position.isOpen) throw new Error(`Position ${positionId} is already closed`);
+      if (!position.isOpen) throw new PositionAlreadyClosedError(positionId);
 
       const { pipPnl, pnl: realizedPnl } = await this.valueAt(position, closingPrice);
 

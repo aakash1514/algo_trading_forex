@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
-import { PositionService } from './position.service';
+import { PositionAlreadyClosedError, PositionService } from './position.service';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService } from '../pricing/pricing.service';
 
@@ -90,16 +90,74 @@ describe('PositionService — P&L calculation', () => {
   describe('realtime publishing', () => {
     const tick = { pair: 'EUR/USD', bid: 1.0809, ask: 1.0811, mid: 1.081, timestamp: '2026-10-09T14:00:00Z' };
 
+    // A transaction manager whose locked re-read returns `lockedRow` (null = closed meanwhile)
+    const tickManager = (lockedRow: PositionEntity | null) => {
+      const qb = {
+        update: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(),
+        setParameters: jest.fn().mockReturnThis(), execute: jest.fn(),
+      };
+      const manager = { findOne: jest.fn().mockResolvedValue(lockedRow), update: jest.fn(), createQueryBuilder: jest.fn(() => qb) };
+      dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => cb(manager));
+      return { manager, qb };
+    };
+
     it('publishes throttled P&L after a tick updates an open position', async () => {
       const position = makePosition();
       positionRepo.find.mockResolvedValue([position]);
-      const qb = { update: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(), execute: jest.fn() };
-      accountRepo.createQueryBuilder.mockReturnValue(qb);
+      tickManager(position);
 
       await service.recalculatePositions(tick);
 
       // LONG from 1.08000 to mid 1.08100 = +10 pips at $10/pip
       expect(realtime.positionPnl).toHaveBeenCalledWith(position, 1.081, 10, 100);
+    });
+
+    it('re-reads the position under a row lock and moves the account by the locked value', async () => {
+      // Loaded with +40 unrealized, but the locked row already holds +60
+      positionRepo.find.mockResolvedValue([makePosition({ unrealizedPnl: 40 })]);
+      const { manager, qb } = tickManager(makePosition({ unrealizedPnl: 60 }));
+
+      await service.recalculatePositions(tick);
+
+      expect(manager.findOne).toHaveBeenCalledWith(PositionEntity, {
+        where: { id: 'pos-1', isOpen: true }, lock: { mode: 'pessimistic_write' },
+      });
+      expect(manager.update).toHaveBeenCalledWith(PositionEntity, 'pos-1',
+        { currentPrice: 1.081, pipPnl: 10, pipValue: 10, unrealizedPnl: 100 });
+      expect(qb.set.mock.calls[0][0].unrealizedPnl()).toBe('unrealized_pnl - :previousPnl + :nextPnl');
+      expect(qb.setParameters).toHaveBeenCalledWith({ previousPnl: 60, nextPnl: 100 });
+      expect(qb.where).toHaveBeenCalledWith('user_id = :userId', { userId: 'user-1' });
+    });
+
+    it('leaves a position closed after it was loaded untouched (exit price, P&L and account)', async () => {
+      positionRepo.find.mockResolvedValue([makePosition()]);
+      const { manager } = tickManager(null); // closed by a manual close in between
+
+      await service.recalculatePositions(tick);
+
+      expect(manager.update).not.toHaveBeenCalled();
+      expect(manager.createQueryBuilder).not.toHaveBeenCalled();
+      expect(realtime.positionPnl).not.toHaveBeenCalled();
+    });
+
+    it('skips a stop-loss close for a position closed meanwhile and carries on with the others', async () => {
+      const hitStop = makePosition({ id: 'pos-sl', stopLoss: 1.0815 }); // LONG, mid 1.081 <= stop
+      const other = makePosition({ id: 'pos-2' });
+      positionRepo.find.mockResolvedValue([hitStop, other]);
+      tickManager(other);
+      jest.spyOn(service, 'closePosition').mockRejectedValueOnce(new PositionAlreadyClosedError('pos-sl'));
+
+      await service.recalculatePositions(tick);
+
+      expect(realtime.positionPnl).toHaveBeenCalledWith(other, 1.081, 10, 100);
+    });
+
+    it('locks the row when closing, and a second close is a 409', async () => {
+      const findOne = jest.fn().mockResolvedValue(makePosition({ isOpen: false }));
+      dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => cb({ findOne, update: jest.fn() }));
+
+      await expect(service.closePosition('pos-1', 'MANUAL', 1.081)).rejects.toMatchObject({ status: 409 });
+      expect(findOne).toHaveBeenCalledWith(PositionEntity, { where: { id: 'pos-1' }, lock: { mode: 'pessimistic_write' } });
     });
 
     it('publishes a snapshot only after the close transaction committed', async () => {
