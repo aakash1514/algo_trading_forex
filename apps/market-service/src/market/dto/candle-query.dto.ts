@@ -14,7 +14,16 @@ export const TIMEFRAME_VIEW_MAP: Record<Timeframe, string> = {
   '1d':  'candles_1d',
 };
 
+// live: candles_* built from the tick stream; historical: the imported Dukascopy
+// history (historical_candles*). Never mixed.
+export const CANDLE_SOURCES = ['live', 'historical'] as const;
+export type CandleSource = (typeof CANDLE_SOURCES)[number];
+
 export class CandleQueryDto {
+  @IsOptional()
+  @IsIn(CANDLE_SOURCES)
+  source?: CandleSource = 'live';
+
   @IsOptional()
   @IsISO8601()
   from?: string;
