@@ -9,7 +9,6 @@ import {
   EconomicEventEntity,
 } from '@forexedge/database';
 import { TickConsumer } from './tick.consumer';
-import { SpreadConsumer } from './spread.consumer';
 import { SessionConsumer } from './session.consumer';
 import { PositionService } from '../position/position.service';
 import { AccountService } from '../account/account.service';
@@ -29,7 +28,6 @@ import { PricingService } from '../pricing/pricing.service';
   ],
   providers: [
     TickConsumer,
-    SpreadConsumer,
     SessionConsumer,
     PositionService,
     AccountService,

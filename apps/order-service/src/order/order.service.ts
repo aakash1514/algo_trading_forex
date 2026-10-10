@@ -108,17 +108,18 @@ export class OrderService {
     // Wrap post-DRAFT flow so errors never leave an order stuck in DRAFT
     try {
       // Step 3: Run validation gates, checking margin at the live entry price
-      let entryPrice: number;
+      let quote: { bid: number; ask: number };
       try {
-        const quote = await this.pricing.getQuote(dto.pair);
-        entryPrice = dto.direction === 'LONG' ? quote.ask : quote.bid;
+        quote = await this.pricing.getQuote(dto.pair);
       } catch (err) {
         if (!(err instanceof PriceUnavailableError)) throw err;
         return await this.transitionState(order, 'REJECTED', err.message);
       }
+      const entryPrice = dto.direction === 'LONG' ? quote.ask : quote.bid;
       const validation = await this.validationService.validate(
         userId,
         dto,
+        quote,
         () => this.marginEngine.canOpenPosition(userId, dto.pair, dto.lots, entryPrice),
       );
 

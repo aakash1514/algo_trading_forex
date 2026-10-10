@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstrumentEntity, EconomicEventEntity, OrderEntity, PositionEntity } from '@forexedge/database';
+import { SPREAD_WIDE_RATIO, isSpreadWide, priceDecimals, spreadRatio } from '@forexedge/common';
 import { pairCurrencies } from '../common/instrument';
 import type { OrderRequest } from './dto/submit-order.dto';
 
@@ -10,16 +11,17 @@ export interface ValidationResult {
   reason?: string;
 }
 
+// The live quote the order is priced at (the same one the margin check uses).
+export interface OrderQuote {
+  bid: number;
+  ask: number;
+}
+
+type InstrumentCheck = ValidationResult & { instrument?: InstrumentEntity };
+
 @Injectable()
 export class OrderValidationService {
   private readonly logger = new Logger(OrderValidationService.name);
-
-  // Populated by Kafka consumer order-service-spread-monitor
-  // key: pair (e.g. 'EURUSD'), value: current spread in pips
-  private spreadCache = new Map<string, number>();
-
-  // Maximum allowed spread per pair in pips before orders are blocked
-  private readonly MAX_SPREAD_PIPS = 5;
 
   // Risk limits per spec
   private readonly MAX_LOTS_PER_PAIR = 10;
@@ -36,22 +38,18 @@ export class OrderValidationService {
     private readonly positionRepo: Repository<PositionEntity>,
   ) {}
 
-  // Called by Kafka consumer in Step 10
-  updateSpreadCache(pair: string, spreadPips: number): void {
-    this.spreadCache.set(pair, spreadPips);
-  }
-
   async validate(
     userId: string,
     dto: OrderRequest,
+    quote: OrderQuote,
     marginCheck: () => Promise<ValidationResult>,
   ): Promise<ValidationResult> {
     // Gate 1: Instrument active (instruments are keyed by slash-format pair)
     const gate1 = await this.checkInstrumentActive(dto.pair);
-    if (!gate1.valid) return gate1;
+    if (!gate1.valid || !gate1.instrument) return gate1;
 
-    // Gate 2: Spread check
-    const gate2 = this.checkSpread(dto.pair);
+    // Gate 2: Spread of the quote being traded, relative to the instrument's norm
+    const gate2 = this.checkSpread(gate1.instrument, quote);
     if (!gate2.valid) return gate2;
 
     // Gate 3: Margin check — injected as a callback to avoid HTTP calls
@@ -71,7 +69,7 @@ export class OrderValidationService {
   // ─── Gate 1 ────────────────────────────────────────────────────────────────
   private async checkInstrumentActive(
     pair: string,
-  ): Promise<ValidationResult> {
+  ): Promise<InstrumentCheck> {
     const record = await this.instrumentRepo.findOne({
       where: { pair },
     });
@@ -84,24 +82,28 @@ export class OrderValidationService {
       return { valid: false, reason: `Instrument ${pair} is not active` };
     }
 
-    return { valid: true };
+    return { valid: true, instrument: record };
   }
 
   // ─── Gate 2 ────────────────────────────────────────────────────────────────
-  private checkSpread(pair: string): ValidationResult {
-    const spread = this.spreadCache.get(pair);
-
-    if (spread === undefined) {
-      // No spread data yet — allow through with a warning log
-      // Prevents blocking all orders on service startup before first Kafka message
-      this.logger.warn(`No spread data cached for ${pair} — allowing order through`);
-      return { valid: true };
+  // Judged on the quote the order is priced at, so there is no cached status to
+  // go stale. WIDE means strictly more than SPREAD_WIDE_RATIO x avg_spread (the
+  // same rule domain-service uses for its alerts). Fails closed if the
+  // instrument has no average spread: the gate must never silently pass.
+  private checkSpread(instrument: InstrumentEntity, quote: OrderQuote): ValidationResult {
+    const avgSpread = Number(instrument.avgSpread);
+    if (!(avgSpread > 0)) {
+      this.logger.error(`No average spread configured for ${instrument.pair}`);
+      return { valid: false, reason: `Spread check unavailable for ${instrument.pair}: no average spread configured` };
     }
 
-    if (spread > this.MAX_SPREAD_PIPS) {
+    const ratio = spreadRatio(quote.bid, quote.ask, avgSpread);
+    if (isSpreadWide(ratio)) {
+      const dp = priceDecimals({ pipSize: Number(instrument.pipSize) });
       return {
         valid: false,
-        reason: `Spread too wide for ${pair}: ${spread} pips (max ${this.MAX_SPREAD_PIPS})`,
+        reason: `Spread too wide for ${instrument.pair}: ${(quote.ask - quote.bid).toFixed(dp)} is ${ratio}x `
+          + `the average ${avgSpread} (limit ${SPREAD_WIDE_RATIO}x)`,
       };
     }
 

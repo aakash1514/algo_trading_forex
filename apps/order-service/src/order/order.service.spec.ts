@@ -245,13 +245,22 @@ describe('OrderService — pricing and margin', () => {
     orderRepo.create.mockReturnValue(draft);
     orderRepo.save.mockResolvedValue(draft);
     // Run the injected margin gate like the real validation service does
-    validation.validate.mockImplementation(async (_u: string, _d: unknown, marginCheck: () => Promise<unknown>) => marginCheck());
+    validation.validate.mockImplementation(
+      async (_u: string, _d: unknown, _quote: unknown, marginCheck: () => Promise<unknown>) => marginCheck());
   });
 
   afterEach(() => jest.clearAllMocks());
 
   const submit = (direction: 'LONG' | 'SHORT') =>
     service.submitOrder('user-1', { instrument: 'EUR_USD', direction, orderType: 'MARKET', lots: 1 }, `k-${direction}`);
+
+  it('validates the spread on the same live quote the order is priced at', async () => {
+    await submit('LONG');
+    expect(pricing.getQuote).toHaveBeenCalledWith('EUR/USD');
+    expect(validation.validate).toHaveBeenCalledWith(
+      'user-1', expect.objectContaining({ pair: 'EUR/USD' }),
+      { bid: 1.0849, ask: 1.0851, mid: 1.085 }, expect.any(Function));
+  });
 
   it('checks margin at the live ask for a LONG', async () => {
     await submit('LONG');
