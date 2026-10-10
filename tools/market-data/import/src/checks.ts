@@ -1,6 +1,7 @@
 // Real-data checks after an import. Each one recomputes from M1 or compares
 // against the import log, independently of the aggregate definitions in the
-// migration (a wrong definition must not be able to confirm itself).
+// migration (a wrong definition must not be able to confirm itself). Every check
+// fails on empty input: nothing compared confirms nothing.
 //
 //   1. Rows and first/last minute per pair-year equal the import log.
 //   2. Every import-log row uses its pair's fixed scale.
@@ -108,7 +109,7 @@ async function checkScale(client: Client): Promise<CheckResult> {
   `);
   return {
     name: 'One fixed scale per pair',
-    ok: rows.every((r) => r.off_scale === 0 && r.price_decimals !== null),
+    ok: rows.length > 0 && rows.every((r) => r.off_scale === 0 && r.price_decimals !== null),
     lines: rows.map((r) => `${r.pair}: prices ${r.price_decimals} dp, volumes ${r.volume_decimals} dp, ` +
       `${r.years} pair-years, ${r.off_scale} off scale`),
   };
@@ -126,7 +127,7 @@ async function checkMinuteTotals(client: Client): Promise<CheckResult> {
     lines.push(`${view}: ${off.length === 0 && rows.length === m1.length ? 'equal' : 'DIFFERENT'} ` +
       `(${m1.map((r) => `${r.pair} ${byPair.get(r.pair) ?? 0}/${r.n}`).join(', ')})`);
   }
-  return { name: 'sum(minutes) of every aggregate = M1 rows per pair', ok, lines };
+  return { name: 'sum(minutes) of every aggregate = M1 rows per pair', ok: ok && m1.length > 0, lines };
 }
 
 async function checkRebuilt(client: Client): Promise<CheckResult> {
@@ -211,6 +212,8 @@ async function storage(client: Client): Promise<CheckResult> {
            hypertable_size('historical_candles')::text AS size
     FROM hypertable_columnstore_stats('historical_candles')
   `);
+  // No row at all when the hypertable has no compressed chunk
+  if (!m1) return { name: 'Storage', ok: false, lines: ['historical_candles has no compressed chunks'] };
   const ratio = Number(m1.after) > 0 ? Number(m1.before) / Number(m1.after) : 0;
   const lines = [
     `historical_candles: ${mb(m1.size)} on disk, ${m1.number_compressed_chunks}/${m1.total_chunks} chunks compressed, ` +
@@ -226,7 +229,7 @@ async function storage(client: Client): Promise<CheckResult> {
   }
   const { rows: [db] } = await client.query('SELECT pg_database_size(current_database())::text AS size');
   lines.push(`database total: ${mb(db.size)}`);
-  return { name: 'Storage', ok: true, lines };
+  return { name: 'Storage', ok: Number(m1.total_chunks) > 0, lines };
 }
 
 export async function runChecks(client: Client, log: (r: CheckResult, seconds: number) => void = () => undefined):

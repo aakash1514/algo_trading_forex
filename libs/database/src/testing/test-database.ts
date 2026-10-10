@@ -1,5 +1,6 @@
 // Integration tests run against their own database, never the development one:
-// <DB_NAME>_test (e.g. forexedge_test) is dropped, created and migrated from
+// <DB_NAME>_test (e.g. forexedge_test; forexedge_w2_test for a second Jest
+// worker) is dropped, created and migrated from
 // scratch on every run, and nothing connects unless the name ends in "_test".
 // (A test that shared the development database once marked and stopped out
 // real positions.)
@@ -52,7 +53,10 @@ export interface TestDatabase {
 // Drops, creates and migrates the test database, and returns a connection to it.
 export async function createTestDatabase(): Promise<TestDatabase> {
   const env = rootEnv();
-  const name = env['TEST_DB_NAME'] || `${env['DB_NAME']}_test`;
+  // One database per Jest worker: suites run in parallel and each drops and
+  // recreates its database (forexedge_test, forexedge_w2_test, ...).
+  const worker = Number(process.env['JEST_WORKER_ID'] ?? '1');
+  const name = env['TEST_DB_NAME'] || `${env['DB_NAME']}${worker > 1 ? `_w${worker}` : ''}_test`;
   assertTestDatabaseName(name);
 
   const connection: TestDatabaseConnection = {

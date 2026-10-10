@@ -36,6 +36,7 @@ npm run seed:instruments
 # Historical M1 import (Dukascopy exports in data/raw/jforex/, idempotent; see tools/market-data/import)
 npm run data:import -- --years 2022 [--pairs EURUSD,XAUUSD] [--force EURUSD:2022] [--dry-run]
 npm run data:import -- --check-only
+npm run data:validate        # FRED noon fixings + gold extremes -> docs/validation/historical-spot-checks.md
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
@@ -164,6 +165,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **The Nx daemon can serve stale cache for a project directory created after it started** (seen on Windows: edits to
   a new spec replayed an old result with fewer tests). After adding a project, run `npx nx daemon --stop`, and confirm
   a new test file actually runs.
+- **Every check fails on empty input.** A data check, validation or test assertion that compared zero rows must
+  fail, never pass (an empty comparison once read as "equal"). Assert the count compared is > 0.
 - **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
   trading: specs used `EURUSD` while the DB holds `EUR/USD` and Redis `price:EUR_USD`, and DTOs were
   built with fields the UI never sent. Assert the exact query/where clause and validate request bodies
