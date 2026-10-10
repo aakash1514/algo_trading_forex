@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { MarginEngineService } from './margin-engine.service';
 import { PricingService } from '../pricing/pricing.service';
 
@@ -6,7 +7,14 @@ const account = (overrides: Partial<{ balance: number; unrealizedPnl: number; ma
 });
 
 function makeEngine(row: ReturnType<typeof account> | null) {
-  const accountRepo = { findOne: jest.fn().mockResolvedValue(row) };
+  // AccountService derives equity and free margin (open P&L summed from positions)
+  const accounts = {
+    getAccountSummary: jest.fn(async () => {
+      if (!row) throw new NotFoundException('Account not found — call POST /api/account/initialize first');
+      const equity = row.balance + row.unrealizedPnl;
+      return { ...row, equity, freeMargin: equity - row.marginUsed };
+    }),
+  };
   const redis = { get: jest.fn().mockResolvedValue(null) };
   const instrumentRepo = {
     findOne: jest.fn(async ({ where }: { where: { pair: string } }) => ({
@@ -17,7 +25,7 @@ function makeEngine(row: ReturnType<typeof account> | null) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pricing = new PricingService(redis as any, instrumentRepo as any);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new MarginEngineService(accountRepo as any, pricing);
+  return new MarginEngineService(accounts as any, pricing);
 }
 
 describe('MarginEngineService.canOpenPosition', () => {

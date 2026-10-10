@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Kafka, Consumer, EachBatchPayload } from 'kafkajs';
 import { FOREX_TICKS_TOPIC, parseTickMessage } from '@forexedge/kafka';
 import { PositionService, NormalizedTick } from '../position/position.service';
-import { AccountService } from '../account/account.service';
+import { StopOutService } from '../account/stop-out.service';
 
 // Consumes forex.ticks in batches. Per batch: stop-loss/take-profit see every
 // tick, P&L is marked once per pair from the latest tick, and each affected
@@ -24,7 +24,7 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
   constructor(
     private readonly config: ConfigService,
     private readonly positionService: PositionService,
-    private readonly accountService: AccountService,
+    private readonly stopOut: StopOutService,
   ) {
     const kafka = new Kafka({
       clientId: 'order-service-tick-processor',
@@ -77,7 +77,7 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
     try {
       const users = await this.positionService.processTicks(ticks);
       for (const userId of users) {
-        await this.accountService.checkMarginCall(userId);
+        await this.stopOut.check(userId);
       }
     } catch (err) {
       this.logger.error(`Error processing ${ticks.length} ticks: ${this.getErrorMessage(err)}`);

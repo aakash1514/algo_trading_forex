@@ -7,7 +7,7 @@ import {
   OrderEntity, OrderStatus, PositionEntity, AccountSummaryEntity
 } from '@forexedge/database';
 import { IForexBroker } from '@forexedge/common';
-import { BROKER_ADAPTER, assertUserId, sessionLabel } from '@forexedge/common';
+import { BROKER_ADAPTER, assertUserId, sessionLabel, type InstrumentKind } from '@forexedge/common';
 import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
 import { instrumentToPair } from '../common/instrument';
@@ -15,14 +15,15 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
 import { MarginEngineService } from './margin-engine.service';
 import { OpenPairsIndex } from '../position/open-pairs.index';
+import { MarketHoursPolicy, marketClosedReason } from '../market/market-hours.policy';
 import { Kafka, Producer } from 'kafkajs';
 import { ORDERS_LIFECYCLE_TOPIC, type OrderLifecycleMessage } from '@forexedge/kafka';
 
 // Valid FSM transitions — key: current state, value: allowed next states
 const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   DRAFT:     ['PENDING', 'REJECTED'],
-  PENDING:   ['OPEN', 'REJECTED'],
-  SUBMITTED: ['OPEN', 'REJECTED'],
+  PENDING:   ['OPEN', 'REJECTED', 'CANCELLED'],
+  SUBMITTED: ['OPEN', 'REJECTED', 'CANCELLED'],
   OPEN:      ['CLOSED', 'CANCELLED'],
   CLOSED:    [],
   REJECTED:  [],
@@ -47,6 +48,7 @@ export class OrderService {
     private readonly realtime: RealtimePublisher,
     private readonly pricing: PricingService,
     private readonly openPairs: OpenPairsIndex,
+    private readonly marketHours: MarketHoursPolicy,
   ) {
     // Kafka producer — wired up in Step 10
     // Declared here so OrderService doesn't need to change in Step 10
@@ -110,6 +112,12 @@ export class OrderService {
 
     // Wrap post-DRAFT flow so errors never leave an order stuck in DRAFT
     try {
+      // Step 2b: market hours first. While a market is closed the feed is silent
+      // and there is no live quote, so this must come before fetching one or the
+      // trader would be told "no live price" instead of "market closed".
+      const closed = await this.marketClosedReason(dto.pair);
+      if (closed) return await this.transitionState(order, 'REJECTED', closed);
+
       // Step 3: Run validation gates, checking margin at the live entry price
       let quote: { bid: number; ask: number };
       try {
@@ -137,7 +145,7 @@ export class OrderService {
       // Step 5: Call broker adapter
       let fill;
       try {
-        fill = await this.broker.fillOrder(order);
+        fill = await this.broker.fillOrder(order, quote);
       } catch (err) {
         this.logger.error(`Broker fill failed: ${this.getErrorMessage(err)}`);
         order = await this.transitionState(
@@ -318,6 +326,19 @@ export class OrderService {
     if (filters.to)     qb.andWhere('o.created_at <= :to', { to: filters.to });
 
     return qb.getMany();
+  }
+
+  // The rejection reason if the pair's market is closed now, else null. An
+  // unknown pair is left to the instrument gate.
+  private async marketClosedReason(pair: string): Promise<string | null> {
+    let kind: InstrumentKind;
+    try {
+      kind = await this.pricing.getInstrumentKind(pair);
+    } catch {
+      return null;
+    }
+    const status = this.marketHours.status(kind);
+    return status.open ? null : marketClosedReason(pair, status);
   }
 
   // ─── Kafka ─────────────────────────────────────────────────────────────────

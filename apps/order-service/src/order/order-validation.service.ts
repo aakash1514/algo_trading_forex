@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { InstrumentEntity, EconomicEventEntity, OrderEntity, PositionEntity } from '@forexedge/database';
 import { SPREAD_WIDE_RATIO, isSpreadWide, priceDecimals, spreadRatio } from '@forexedge/common';
 import { pairCurrencies } from '../common/instrument';
+import { MarketHoursPolicy, marketClosedReason } from '../market/market-hours.policy';
+import { exitLevelProblem } from './exit-levels';
+import type { InstrumentKind } from '@forexedge/common';
 import type { OrderRequest } from './dto/submit-order.dto';
 
 export interface ValidationResult {
@@ -36,6 +39,7 @@ export class OrderValidationService {
     private readonly orderRepo: Repository<OrderEntity>,
     @InjectRepository(PositionEntity)
     private readonly positionRepo: Repository<PositionEntity>,
+    private readonly marketHours: MarketHoursPolicy,
   ) {}
 
   async validate(
@@ -44,13 +48,30 @@ export class OrderValidationService {
     quote: OrderQuote,
     marginCheck: () => Promise<ValidationResult>,
   ): Promise<ValidationResult> {
+    // Gate 0: only market orders are executed. LIMIT/STOP/... are accepted by the
+    // DTO but there is no pending-order engine yet; filling them at market (what
+    // used to happen) would ignore their price.
+    if (dto.orderType !== 'MARKET') {
+      return { valid: false, reason: `${dto.orderType} orders are not supported yet; only MARKET orders are executed` };
+    }
+
     // Gate 1: Instrument active (instruments are keyed by slash-format pair)
     const gate1 = await this.checkInstrumentActive(dto.pair);
     if (!gate1.valid || !gate1.instrument) return gate1;
 
+    // Gate 1b: the instrument's market is open (FX weekends, gold's daily break)
+    const market = this.marketHours.status(gate1.instrument.type as InstrumentKind);
+    if (!market.open) return { valid: false, reason: marketClosedReason(dto.pair, market) };
+
     // Gate 2: Spread of the quote being traded, relative to the instrument's norm
     const gate2 = this.checkSpread(gate1.instrument, quote);
     if (!gate2.valid) return gate2;
+
+    // Gate 2b: SL/TP on the right side of the price the position would exit at
+    const levels = exitLevelProblem(dto.direction, quote, {
+      stopLoss: dto.stopLoss ?? null, takeProfit: dto.takeProfit ?? null,
+    });
+    if (levels) return { valid: false, reason: levels };
 
     // Gate 3: Margin check — injected as a callback to avoid HTTP calls
     const gate3 = await marginCheck();

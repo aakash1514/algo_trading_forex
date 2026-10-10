@@ -1,21 +1,17 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-import { PositionEntity, AccountSummaryEntity, OrderEntity } from '@forexedge/database';
-import { CloseReason } from '@forexedge/database';
+import { Repository, DataSource, IsNull, Not } from 'typeorm';
+import { PositionEntity, AccountSummaryEntity, OrderEntity, type CloseReason, type ExitTrigger } from '@forexedge/database';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { assertUserId, pipValueUsd, pipsBetween } from '@forexedge/common';
 import { PricingService } from '../pricing/pricing.service';
 import { OpenPairsIndex } from './open-pairs.index';
+import { MarketHoursPolicy, marketClosedReason } from '../market/market-hours.policy';
+import { exitLevelProblem, type ExitLevels } from '../order/exit-levels';
 import type { TickMessage } from '@forexedge/kafka';
 
 // The forex.ticks fields position processing uses (TickMessage is the contract)
 export type NormalizedTick = Pick<TickMessage, 'pair' | 'bid' | 'ask' | 'mid' | 'timestamp'>;
-
-interface PendingExit {
-  reason: 'STOP_LOSS' | 'TAKE_PROFIT';
-  price: number;
-}
 
 const errorMessage = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
@@ -31,11 +27,6 @@ export class PositionAlreadyClosedError extends ConflictException {
 export class PositionService {
   private readonly logger = new Logger(PositionService.name);
 
-  // Stop-loss/take-profit exits that triggered but couldn't be booked yet,
-  // keyed by position id, retried on every tick batch at their trigger price.
-  // In memory: lost on restart (the next tick beyond the level re-triggers).
-  private readonly pendingExits = new Map<string, PendingExit>();
-
   constructor(
     @InjectRepository(PositionEntity)
     private readonly positionRepo: Repository<PositionEntity>,
@@ -45,6 +36,7 @@ export class PositionService {
     private readonly realtime: RealtimePublisher,
     private readonly pricing: PricingService,
     private readonly openPairs: OpenPairsIndex,
+    private readonly marketHours: MarketHoursPolicy,
   ) {}
 
   // P&L of a position at `price`, converted to USD at the current quote->USD
@@ -62,16 +54,19 @@ export class PositionService {
 
   // ─── Called by the Kafka tick consumer, once per consumed batch ───────────
   // Ticks arrive in feed order. Pairs without open positions are skipped
-  // without touching the DB (OpenPairsIndex). For the rest, stop-loss and
-  // take-profit are checked against EVERY tick, so a level touched by one tick
-  // and left by the next still triggers, while the P&L mark is written once per
-  // pair from the latest tick: intermediate marks would be overwritten anyway.
-  // Returns the users whose positions were touched (for the margin-call check).
+  // without touching the DB (OpenPairsIndex), and so are ticks stamped while
+  // the instrument's market is closed (a real feed sends none; the mock feed
+  // can be told to). For the rest, stop-loss and take-profit are checked
+  // against EVERY tick, so a level touched by one tick and left by the next
+  // still triggers, while the P&L mark is written once per pair from the latest
+  // tick: intermediate marks would be overwritten anyway. Returns the users
+  // whose positions were touched (for the margin-call check).
   //
   // The batch's offsets are committed when this returns, so its ticks are never
-  // re-delivered. A triggered exit that can't be booked yet (no USD conversion
-  // rate for a cross pair) is therefore kept in pendingExits at its trigger price
-  // and retried on every batch, not dropped; only P&L marks are skipped then.
+  // re-delivered. A triggered exit is therefore committed on the position
+  // (pending_exit_*) before it is booked; if booking fails (e.g. no USD
+  // conversion rate for a cross pair) it is retried from the DB on every batch,
+  // also after a restart. Only P&L marks are ever skipped.
   async processTicks(ticks: NormalizedTick[]): Promise<Set<string>> {
     const affectedUsers = new Set<string>();
 
@@ -94,7 +89,8 @@ export class PositionService {
     // stop-loss checks and P&L marks of the other pairs in the batch.
     for (const [pair, pairTicks] of byPair) {
       try {
-        await this.processPairTicks(pair, pairTicks, affectedUsers, streamMids);
+        const tradable = await this.ticksWhileOpen(pair, pairTicks);
+        if (tradable.length) await this.processPairTicks(pair, tradable, affectedUsers, streamMids);
       } catch (err) {
         this.logger.error(
           `Dropped ${pairTicks.length} ${pair} tick(s); their offsets are committed with the batch: ${errorMessage(err)}`,
@@ -104,11 +100,20 @@ export class PositionService {
     return affectedUsers;
   }
 
+  // Ticks stamped while the pair's market is open (judged at the tick's own
+  // time, so a backlog replayed after a restart is judged correctly).
+  private async ticksWhileOpen(pair: string, ticks: NormalizedTick[]): Promise<NormalizedTick[]> {
+    if (!this.marketHours.enforced) return ticks;
+    const kind = await this.pricing.getInstrumentKind(pair);
+    return ticks.filter((t) => this.marketHours.status(kind, new Date(t.timestamp)).open);
+  }
+
   private async processPairTicks(
     pair: string, pairTicks: NormalizedTick[], affectedUsers: Set<string>, streamMids: ReadonlyMap<string, number>,
   ): Promise<void> {
+    // Positions with a held exit are booked by retryPendingExits only
     let positions = (await this.positionRepo.find({ where: { pair, isOpen: true } }))
-      .filter((p) => !this.pendingExits.has(p.id));
+      .filter((p) => p.pendingExitPrice === null);
     for (const position of positions) affectedUsers.add(position.userId);
 
     for (const tick of pairTicks) {
@@ -119,8 +124,8 @@ export class PositionService {
           stillOpen.push(position);
           continue;
         }
-        // Fills at this tick's price, even if it gapped past the level
-        await this.exitAt(position.id, { reason: trigger, price: tick.mid }, streamMids);
+        // Exits at this tick's price, even if it gapped past the level
+        await this.triggerExit(position.id, trigger, tick.mid, new Date(tick.timestamp), streamMids);
       }
       positions = stillOpen;
     }
@@ -142,36 +147,42 @@ export class PositionService {
     }
   }
 
-  // Books a triggered stop-loss/take-profit, or parks it in pendingExits when it
-  // can't be booked yet. Positions closed meanwhile by another path are ignored.
-  private async exitAt(
-    positionId: string, exit: PendingExit, streamMids: ReadonlyMap<string, number>,
+  // Commits the triggered exit on the position first (first trigger wins), then
+  // books it. If booking fails, the committed trigger is retried later.
+  private async triggerExit(
+    positionId: string, reason: ExitTrigger, price: number, at: Date, streamMids: ReadonlyMap<string, number>,
+  ): Promise<void> {
+    const held = await this.positionRepo
+      .createQueryBuilder()
+      .update(PositionEntity)
+      .set({ pendingExitPrice: price, pendingExitReason: reason, exitTriggeredAt: at })
+      .where('id = :positionId AND is_open AND pending_exit_price IS NULL', { positionId })
+      .execute();
+    if (!held.affected) return; // closed meanwhile, or already triggered
+    await this.bookExit(positionId, reason, price, streamMids);
+  }
+
+  private async bookExit(
+    positionId: string, reason: ExitTrigger, price: number, streamMids: ReadonlyMap<string, number>,
   ): Promise<void> {
     try {
-      await this.closePosition(positionId, exit.reason, exit.price, streamMids);
-      this.pendingExits.delete(positionId);
+      await this.closePosition(positionId, reason, price, streamMids);
     } catch (err) {
-      if (err instanceof PositionAlreadyClosedError) {
-        this.pendingExits.delete(positionId);
-        return;
-      }
-      if (!this.pendingExits.has(positionId)) {
-        this.logger.warn(
-          `${exit.reason} triggered for position ${positionId} at ${exit.price}; booking deferred: ${errorMessage(err)}`,
-        );
-      }
-      this.pendingExits.set(positionId, exit);
+      if (err instanceof PositionAlreadyClosedError) return;
+      this.logger.warn(`${reason} for position ${positionId} at ${price} held, booking retried: ${errorMessage(err)}`);
     }
   }
 
+  // Held exits are read from the DB, so a restart can't lose one.
   private async retryPendingExits(streamMids: ReadonlyMap<string, number>): Promise<void> {
-    for (const [positionId, exit] of [...this.pendingExits]) {
-      await this.exitAt(positionId, exit, streamMids);
+    const held = await this.positionRepo.find({ where: { isOpen: true, pendingExitPrice: Not(IsNull()) } });
+    for (const position of held) {
+      await this.bookExit(position.id, position.pendingExitReason as ExitTrigger, Number(position.pendingExitPrice), streamMids);
     }
   }
 
   // STOP_LOSS / TAKE_PROFIT when `price` reaches the position's level, else null.
-  private exitTrigger(position: PositionEntity, price: number): 'STOP_LOSS' | 'TAKE_PROFIT' | null {
+  private exitTrigger(position: PositionEntity, price: number): ExitTrigger | null {
     const long = position.direction === 'LONG';
     if (position.stopLoss !== null) {
       const sl = Number(position.stopLoss);
@@ -184,8 +195,8 @@ export class PositionService {
     return null;
   }
 
-  // Writes the position's P&L at `currentPrice` and moves the account's
-  // unrealized P&L by the difference.
+  // Writes the position's P&L at `currentPrice`. The account's open P&L is not
+  // stored; it is summed from the positions on read, so nothing else to update.
   private async markToMarket(
     position: PositionEntity, currentPrice: number, streamMids?: ReadonlyMap<string, number>,
   ): Promise<void> {
@@ -194,30 +205,14 @@ export class PositionService {
     // The position was loaded before the awaits above, so it may have been
     // closed meanwhile. Re-read it under a row lock (closePosition takes the
     // same lock) and skip it if it's no longer open; otherwise this write would
-    // overwrite the exit price and P&L of a closed position and add its P&L
-    // back into the account. The account delta uses the locked row's value.
+    // overwrite the exit price and P&L of a closed position.
     const updated = await this.dataSource.transaction(async manager => {
       const locked = await manager.findOne(PositionEntity, {
         where: { id: position.id, isOpen: true },
         lock: { mode: 'pessimistic_write' },
       });
-      if (!locked) return false;
-
-      await manager.update(PositionEntity, locked.id, {
-        currentPrice,
-        pipPnl,
-        pipValue,
-        unrealizedPnl,
-      });
-
-      // Direct update so tick-frequency changes reach account_summary
-      await manager
-        .createQueryBuilder()
-        .update(AccountSummaryEntity)
-        .set({ unrealizedPnl: () => 'unrealized_pnl - :previousPnl + :nextPnl' })
-        .where('user_id = :userId', { userId: locked.userId })
-        .setParameters({ previousPnl: Number(locked.unrealizedPnl), nextPnl: unrealizedPnl })
-        .execute();
+      if (!locked || locked.pendingExitPrice !== null) return false;
+      await manager.update(PositionEntity, locked.id, { currentPrice, pipPnl, pipValue, unrealizedPnl });
       return true;
     });
     if (!updated) return;
@@ -236,16 +231,21 @@ export class PositionService {
       const swapAmount = swapPoints * Number(position.pipValue);
 
       await this.dataSource.transaction(async manager => {
-        await manager.update(PositionEntity, position.id, {
-          swapAccrued: Number(position.swapAccrued) + swapAmount,
-        });
+        await manager
+          .createQueryBuilder()
+          .update(PositionEntity)
+          .set({ swapAccrued: () => 'swap_accrued + :swapAmount' })
+          .where('id = :id', { id: position.id })
+          .setParameters({ swapAmount })
+          .execute();
 
         // Adjust account balance by swap amount (negative swap = cost to trader)
         await manager
           .createQueryBuilder()
           .update(AccountSummaryEntity)
-          .set({ balance: () => `balance + ${swapAmount}` })
+          .set({ balance: () => 'balance + :swapAmount' })
           .where('user_id = :userId', { userId: position.userId })
+          .setParameters({ swapAmount })
           .execute();
       });
 
@@ -263,7 +263,7 @@ export class PositionService {
     streamMids?: ReadonlyMap<string, number>,
   ): Promise<PositionEntity> {
     const closed = await this.dataSource.transaction(async manager => {
-      // Row lock: serializes with the tick-driven P&L update for this position
+      // Row lock: serializes with the tick-driven P&L update and other closes
       const position = await manager.findOne(PositionEntity, {
         where: { id: positionId },
         lock: { mode: 'pessimistic_write' },
@@ -274,7 +274,8 @@ export class PositionService {
 
       const { pipPnl, pnl: realizedPnl } = await this.valueAt(position, closingPrice, streamMids);
 
-      // Close the position
+      // Close the position. exit_triggered_at stays as the record of a
+      // stop-loss/take-profit trigger; the held exit itself is done.
       await manager.update(PositionEntity, positionId, {
         isOpen: false,
         closedAt: new Date(),
@@ -283,6 +284,8 @@ export class PositionService {
         pipPnl,
         realizedPnl,
         unrealizedPnl: 0,
+        pendingExitPrice: null,
+        pendingExitReason: null,
       });
 
       // Update order status to CLOSED. executed_price stays the entry fill;
@@ -292,25 +295,17 @@ export class PositionService {
         closedAt: new Date(),
       });
 
-      // Account: realize the P&L, release the margin, remove this position's
-      // unrealized P&L. Relative updates only: other positions of the same user
-      // move unrealized_pnl concurrently, and writing back a row read earlier
-      // would discard those changes (a lost update). The position row is locked,
-      // so its unrealized_pnl here is the value last added to the account.
+      // Account: realize the P&L and release the margin. Relative updates only:
+      // writing back a row read earlier would discard concurrent changes.
       await manager
         .createQueryBuilder()
         .update(AccountSummaryEntity)
         .set({
           balance: () => 'balance + :realizedPnl',
           marginUsed: () => 'GREATEST(0, margin_used - :releasedMargin)',
-          unrealizedPnl: () => 'unrealized_pnl - :removedPnl',
         })
         .where('user_id = :userId', { userId: position.userId })
-        .setParameters({
-          realizedPnl,
-          releasedMargin: Number(position.marginUsed),
-          removedPnl: Number(position.unrealizedPnl),
-        })
+        .setParameters({ realizedPnl, releasedMargin: Number(position.marginUsed) })
         .execute();
 
       this.logger.log(
@@ -351,11 +346,54 @@ export class PositionService {
     return position;
   }
 
-  // Manual close at the live market: a LONG sells at the bid, a SHORT buys at the ask.
+  // Manual close at the live market: a LONG sells at the bid, a SHORT buys at the
+  // ask. Rejected while the instrument's market is closed (there is no price to
+  // trade at).
   async closeAtMarket(userId: string, positionId: string): Promise<PositionEntity> {
     const position = await this.getPosition(userId, positionId);
+    const status = this.marketHours.status(await this.pricing.getInstrumentKind(position.pair));
+    if (!status.open) throw new ConflictException(marketClosedReason(position.pair, status));
     const quote = await this.pricing.getQuote(position.pair);
     const closingPrice = position.direction === 'LONG' ? quote.bid : quote.ask;
     return this.closePosition(positionId, 'MANUAL', closingPrice);
+  }
+
+  // ─── Change SL/TP: PATCH /positions/:id ───────────────────────────────────
+  // Each level is set (number), cleared (null) or left as is (absent). Allowed
+  // while the market is closed: the levels are validated against the last known
+  // price with the same rule as order placement.
+  async updateExitLevels(
+    userId: string, positionId: string, changes: Partial<ExitLevels>,
+  ): Promise<PositionEntity> {
+    assertUserId(userId);
+    if (!('stopLoss' in changes) && !('takeProfit' in changes)) {
+      throw new BadRequestException('Provide stopLoss and/or takeProfit (a number to set, null to clear)');
+    }
+
+    const updated = await this.dataSource.transaction(async manager => {
+      const position = await manager.findOne(PositionEntity, {
+        where: { id: positionId, userId },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (!position) throw new NotFoundException(`Position ${positionId} not found`);
+      if (!position.isOpen) throw new PositionAlreadyClosedError(positionId);
+      if (position.pendingExitPrice !== null) {
+        throw new ConflictException(`Position ${positionId} already has a triggered ${position.pendingExitReason} exit`);
+      }
+
+      const levels: ExitLevels = {
+        stopLoss: 'stopLoss' in changes ? changes.stopLoss ?? null : position.stopLoss,
+        takeProfit: 'takeProfit' in changes ? changes.takeProfit ?? null : position.takeProfit,
+      };
+      const quote = await this.pricing.getLastQuote(position.pair);
+      const problem = exitLevelProblem(position.direction, quote, levels);
+      if (problem) throw new BadRequestException(problem);
+
+      await manager.update(PositionEntity, positionId, levels);
+      return { ...position, ...levels };
+    });
+
+    void this.realtime.positionsChanged(updated.userId, updated.id);
+    return updated;
   }
 }

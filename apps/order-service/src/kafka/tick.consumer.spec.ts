@@ -2,7 +2,7 @@ import type { ConfigService } from '@nestjs/config';
 import type { KafkaMessage } from 'kafkajs';
 import { TickConsumer } from './tick.consumer';
 import type { PositionService } from '../position/position.service';
-import type { AccountService } from '../account/account.service';
+import type { StopOutService } from '../account/stop-out.service';
 
 // A forex.ticks message exactly as market-service publishes it
 const message = (offset: number, pair: string, mid: number) => ({
@@ -15,18 +15,18 @@ const message = (offset: number, pair: string, mid: number) => ({
 
 describe('TickConsumer.handleBatch', () => {
   const processTicks = jest.fn();
-  const checkMarginCall = jest.fn();
+  const check = jest.fn();
   const config = { get: jest.fn((_k: string, d: string) => d) } as unknown as ConfigService;
   const consumer = new TickConsumer(
     config,
     { processTicks } as unknown as PositionService,
-    { checkMarginCall } as unknown as AccountService,
+    { check } as unknown as StopOutService,
   );
   const heartbeat = jest.fn();
 
   afterEach(() => jest.clearAllMocks());
 
-  it('hands the whole batch to processTicks once, in feed order, then checks margin once per affected user', async () => {
+  it('hands the whole batch to processTicks once, in feed order, then runs the stop-out check once per affected user', async () => {
     processTicks.mockResolvedValue(new Set(['user-1', 'user-2']));
     const messages = [message(10, 'EUR/USD', 1.0810), message(11, 'XAU/USD', 1823.5), message(12, 'EUR/USD', 1.0812)];
 
@@ -35,7 +35,7 @@ describe('TickConsumer.handleBatch', () => {
     expect(processTicks).toHaveBeenCalledTimes(1);
     expect(processTicks.mock.calls[0][0].map((t: { pair: string; mid: number }) => [t.pair, t.mid]))
       .toEqual([['EUR/USD', 1.0810], ['XAU/USD', 1823.5], ['EUR/USD', 1.0812]]);
-    expect(checkMarginCall.mock.calls).toEqual([['user-1'], ['user-2']]);
+    expect(check.mock.calls).toEqual([['user-1'], ['user-2']]);
     expect(heartbeat).toHaveBeenCalled();
   });
 

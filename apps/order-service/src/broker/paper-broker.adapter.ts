@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OrderEntity } from '@forexedge/database';
-import { IForexBroker, BrokerFill, priceDecimals } from '@forexedge/common';
+import { IForexBroker, BrokerFill, BrokerQuote, priceDecimals } from '@forexedge/common';
 import { PricingService } from '../pricing/pricing.service';
 
 @Injectable()
@@ -9,12 +9,10 @@ export class PaperBrokerAdapter implements IForexBroker {
 
   constructor(private readonly pricing: PricingService) {}
 
-  async fillOrder(order: OrderEntity): Promise<BrokerFill> {
-    // 1. Live price (written to Redis by market-service) and contract spec (DB)
-    const [quote, spec] = await Promise.all([
-      this.pricing.getQuote(order.pair),
-      this.pricing.getSpec(order.pair),
-    ]);
+  async fillOrder(order: OrderEntity, quote: BrokerQuote): Promise<BrokerFill> {
+    // 1. The quote the order was validated on (fetched once by OrderService, so
+    //    the spread gate, the margin check and the fill see the same price)
+    const spec = await this.pricing.getSpec(order.pair);
 
     // 2. Pick base price based on direction
     // LONG  → trader buys  → pays the ask (higher price, worse for trader)
