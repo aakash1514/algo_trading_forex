@@ -145,6 +145,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   from the DB, so a restart can't lose it. It books at the triggering tick's price, never the SL/TP level.
 - Stop-out (margin level < 50%) closes the biggest loser first until the level is back above 50%; close_reason
   `STOP_OUT`. `MARGIN_CALL` is a log warning only and is never written to open positions.
+- **Backtests read only the imported history** (shared reader `libs/database/src/lib/historical-candles.ts`,
+  coverage from `historical_coverage`), never the live `candles_*`, and never apply the live market-hours clock.
+  A signal fills at the NEXT bar's open (buy at the ask, sell at the bid); SL/TP are checked from the fill bar on
+  (long on bid, short on ask), gaps fill at the open, SL wins if both are inside one bar. P&L is in pips
+  (points / (pip_size x 10^decimals)); pip size always comes from `instruments`.
 - Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
   right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
 
@@ -162,6 +167,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   The service webpack configs set `typeCheckOptions: false`: the in-build checker can't resolve lib
   project references until their `.d.ts` exist, so it broke clean builds (TS6305).
 - `next-env.d.ts` and `*.tsbuildinfo` are generated and gitignored; don't commit them.
+- Production frontend: `npx nx build frontend && npx nx run frontend:serve:production` (port 4200).
+  `nx start frontend` fails: it runs `next start` in `apps/frontend`, but the build is in `dist/apps/frontend`.
 - **The Nx daemon can serve stale cache for a project directory created after it started** (seen on Windows: edits to
   a new spec replayed an old result with fewer tests). After adding a project, run `npx nx daemon --stop`, and confirm
   a new test file actually runs.
@@ -179,6 +186,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   lint (0 errors), typecheck and tests from a clean `dist/`, all 5 services start from the repo root,
   and paper trading works end to end in the browser (orders, live positions/account, session restore).
   Write-up: `docs/phase-summaries/step-1-health-check.md`.
+- **Roadmap step 2 (historical data) is done** (2026-10-11) on branch `step-2-historical-data` (PR into main,
+  not merged). Write-up: `docs/phase-summaries/step-2-historical-data.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -188,32 +197,19 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 ## Roadmap (in order)
 1. ✅ **Done (2026-10-09).** Health check: infra up, all projects build and serve, fix breakages.
-2. Historical data seed: M1 bid and ask OHLC candles (integer points: int4 prices, int8 volumes), 2010–2022, for **4 pairs: EUR/USD, GBP/USD,
-   USD/JPY, XAU/USD**. Source: Dukascopy, exported with the official JForex strategy API by
-   `tools/market-data/jforex/ForexEdgeM1Export.java` (see its README; a free JForex 4 demo login is enough).
-   Dukascopy's HTTP endpoints sit behind bot protection and its S3 export needs AWS, so dukascopy-node and
-   scraping are out; never work around the bot protection.
-   More pairs can be added later, one pair at a time (export, import, validate). A cross pair (e.g. EUR/GBP)
-   also needs its USD conversion pair's history (GBP/USD), because margin and pip value convert via quote→USD.
-   M1 goes into its own `historical_candles` hypertable (PK `(pair, time)`, compression). M5/M15/H1/H4/D1 are
-   continuous aggregates on it; H4 and D1 are aligned to the New York 17:00 close (5 daily bars a week).
-   The import script must be idempotent (safe to re-run). Routing is explicit: the candle API takes
-   `source=live|historical` (default live) and never mixes the two; the backtester always reads historical.
+2. ✅ **Done (2026-10-11).** Historical data: 19,187,987 real Dukascopy M1 bid/ask bars, EUR/USD, GBP/USD,
+   USD/JPY, XAU/USD, 2010–2022, as integer points in `historical_candles` (7.5x compressed), with M5/M15/H1 (UTC)
+   and H4/D1 (New York close) aggregates; validated against FRED noon fixings and gold extremes; candle API
+   `?source=historical`; the backtester runs only on it. Write-up: `docs/phase-summaries/step-2-historical-data.md`.
+   Source: the official JForex strategy API (`tools/market-data/jforex/`); Dukascopy's HTTP endpoints sit behind
+   bot protection and its S3 export needs AWS, so dukascopy-node and scraping are out; never work around it.
+   More pairs: one at a time (export, `historical_price_scale` row, import, validate). A cross pair (e.g. EUR/GBP)
+   also needs its USD conversion pair's history, because margin and pip value convert via quote→USD.
    Production deploys only H1 and above.
-   First purge the mock data still materialized in the candle continuous aggregates (2024-01/02, 2026-05/06
-   and later runtime checks; the raw ticks are gone, the candles_* views are not).
-   XAU/USD integration: instruments row (100 oz lot, pip 0.01, `max_leverage` 20 → effective leverage is
-   min(account, instrument)). Margin, pip value, P&L and paper fills already read lot_size/pip_size from the
-   DB (step 1). The frontend's MAJOR_PAIRS, PAIR_DISPLAY, PairTabs and BacktestClient list only the 4 pairs
-   (EUR_GBP removed there); the other instrument rows stay in the DB untouched. Verify pip value, margin and
-   P&L for gold with an end-to-end order.
-   Restart resilience (done in 2.7b): sessions are computed from the shared market clock.
-   For 2.5: the backtester treats the historical data as the truth and never applies the live market-hours
-   clock (gold traded through its 17:00-18:00 New York break in 2010-2012).
-3. Backtest verification: re-run strategies on the historical data. The all-zero
-   metrics were caused by mock random-walk data. Confirm they're fixed and fix anything remaining.
-   ws-gateway has no tests yet (`passWithNoTests`): add backtest engine tests. Clear the stale BullMQ
-   `bull:backtest:*` jobs left in Redis from earlier runs.
+3. Backtest verification: strategies now run on the history with real bid/ask fills and non-zero results
+   (`docs/validation/backtest-proof.md`). Remaining: the metrics (equity curve, drawdown, Sharpe) add pips to a
+   10,000 base instead of valuing trades in money, so drawdown % scales with a pair's pip count (gold 93%); see
+   `docs/OVERNIGHT-QUESTIONS.md`. Verify the metrics and add engine tests beyond the simulator.
 4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
