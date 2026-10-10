@@ -147,17 +147,28 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 ## Roadmap (in order)
 1. ✅ **Done (2026-10-09).** Health check: infra up, all projects build and serve, fix breakages.
-2. Historical data seed: M1 OHLC candles, 2010–2022, imported from Dukascopy via the dukascopy-node package (UTC timestamps) for
-   8 pairs: EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, NZD/USD, XAU/USD.
-   M1 goes into its own hypertable with compression. M5/M15/H1/H4/D1 are continuous
-   aggregates on it. The import script must be idempotent (safe to re-run). The market-service
-   candle queries and the ws-gateway backtester read from it. Production deploys only H1 and above.
-   First purge the June 2026 mock data still materialized in the candle continuous aggregates (the raw
-   ticks are gone, the candles_* views are not), so charts and backtests never mix mock and real candles.
-   XAU/USD integration: add it to the instruments seed with the correct contract specs (100 oz lot, pip 0.01).
-   Margin, pip value, P&L and paper fills already read lot_size/pip_size from the DB (step 1), so gold
-   needs only its row plus a price feed. Add XAU_USD to MAJOR_PAIRS, PAIR_DISPLAY and BacktestClient's
-   pair list, and remove EUR_GBP there. Verify pip value, margin and P&L for gold against the real row.
+2. Historical data seed: M1 bid and ask OHLC candles (float8), 2010–2022, for **4 pairs: EUR/USD, GBP/USD,
+   USD/JPY, XAU/USD**. Source: Dukascopy, exported with the official JForex strategy API by
+   `tools/market-data/jforex/ForexEdgeM1Export.java` (see its README; a free JForex 4 demo login is enough).
+   Dukascopy's HTTP endpoints sit behind bot protection and its S3 export needs AWS, so dukascopy-node and
+   scraping are out; never work around the bot protection.
+   More pairs can be added later, one pair at a time (export, import, validate). A cross pair (e.g. EUR/GBP)
+   also needs its USD conversion pair's history (GBP/USD), because margin and pip value convert via quote→USD.
+   M1 goes into its own `historical_candles` hypertable (PK `(pair, time)`, compression). M5/M15/H1/H4/D1 are
+   continuous aggregates on it; H4 and D1 are aligned to the New York 17:00 close (5 daily bars a week).
+   The import script must be idempotent (safe to re-run). Routing is explicit: the candle API takes
+   `source=live|historical` (default live) and never mixes the two; the backtester always reads historical.
+   Production deploys only H1 and above.
+   First purge the mock data still materialized in the candle continuous aggregates (2024-01/02, 2026-05/06
+   and later runtime checks; the raw ticks are gone, the candles_* views are not).
+   XAU/USD integration: instruments row (100 oz lot, pip 0.01, `max_leverage` 20 → effective leverage is
+   min(account, instrument)). Margin, pip value, P&L and paper fills already read lot_size/pip_size from the
+   DB (step 1). The frontend's MAJOR_PAIRS, PAIR_DISPLAY, PairTabs and BacktestClient list only the 4 pairs
+   (EUR_GBP removed there); the other instrument rows stay in the DB untouched. Verify pip value, margin and
+   P&L for gold with an end-to-end order.
+   Restart resilience: order-service's SessionConsumer only learns sessions from OPEN/CLOSE events
+   (`fromBeginning: false`), so after a restart orders are stamped OFF_HOURS until the next session
+   boundary. Fix: compute sessions from a shared pure session clock instead of rebuilding them from events.
 3. Backtest verification: re-run strategies on the historical data. The all-zero
    metrics were caused by mock random-walk data. Confirm they're fixed and fix anything remaining.
    ws-gateway has no tests yet (`passWithNoTests`): add backtest engine tests. Clear the stale BullMQ
@@ -165,12 +176,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
+   Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
+   realign the live views to the NY close here.
 7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
    Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
    MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
-   Restart resilience: order-service's SessionConsumer only learns sessions from OPEN/CLOSE events
-   (`fromBeginning: false`), so after a restart orders are stamped OFF_HOURS until the next session
-   boundary; seed the current state on startup (e.g. from domain-service's /sessions/current).
+   Re-check Dukascopy's terms of use before a public deployment serves its historical data.
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
 8. Known gaps: `forex.calendar-events` has no consumer.
@@ -185,3 +196,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **No synthetic data, ever.** Historical data must be real market data (Dukascopy).
   Never generate, interpolate, or fabricate prices to make a test or backtest pass.
   The mock live feed (`USE_MOCK_DATA`) stays only until Twelve Data is integrated in roadmap step 6.
+
+## Verification policy (keep it fast)
+- While working on a change: run only the affected project's tests, and a single test file
+  where possible (`npx nx test order-service --testFile=x.spec.ts`).
+- Before each commit: `npx nx affected -t lint typecheck test build --parallel=2`
+  (cache ON, daemon ON). Never use `--skip-nx-cache` or `NX_DAEMON=false` unless debugging a cache problem.
+- Full clean matrix (`nx reset`, delete dist/, run everything): only at the end of a roadmap step.
+- Start services or the browser only when the change affects runtime behavior or UI,
+  and only the services involved.
+- Run anything over ~2 minutes in the background and keep working meanwhile.
