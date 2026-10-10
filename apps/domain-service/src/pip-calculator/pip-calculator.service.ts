@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstrumentEntity } from '@forexedge/database';
 import Redis from 'ioredis';
-import { quoteToUsdRate, type ContractSpec } from '@forexedge/common';
+import { quoteToUsdRate, toContractSpec, type ContractSpec } from '@forexedge/common';
 
 export interface PipValueResult {
   pair: string;
@@ -80,11 +80,11 @@ export class PipCalculatorService {
     };
   }
 
-  // Contract spec (lot size, pip size) from the instruments table.
+  // Contract spec (lot size, pip size, leverage cap) from the instruments table.
   async getContractSpec(pair: string): Promise<ContractSpec> {
     const instrument = await this.instrumentRepo.findOne({ where: { pair } });
     if (!instrument) throw new NotFoundException(`Instrument ${pair} not found`);
-    return { lotSize: Number(instrument.lotSize), pipSize: Number(instrument.pipSize) };
+    return toContractSpec(instrument);
   }
 
   // quote->USD for valuing `pair` at `price`; crosses use the live quote/USD rate.

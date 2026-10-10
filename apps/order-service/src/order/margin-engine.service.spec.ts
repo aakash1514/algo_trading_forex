@@ -10,8 +10,8 @@ function makeEngine(row: ReturnType<typeof account> | null) {
   const redis = { get: jest.fn().mockResolvedValue(null) };
   const instrumentRepo = {
     findOne: jest.fn(async ({ where }: { where: { pair: string } }) => ({
-      'USD/JPY': { pair: 'USD/JPY', lotSize: 100_000, pipSize: 0.01 },
-      'EUR/USD': { pair: 'EUR/USD', lotSize: 100_000, pipSize: 0.0001 },
+      'USD/JPY': { pair: 'USD/JPY', lotSize: 100_000, pipSize: 0.01, maxLeverage: null },
+      'EUR/USD': { pair: 'EUR/USD', lotSize: 100_000, pipSize: 0.0001, maxLeverage: null },
     })[where.pair] ?? null),
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

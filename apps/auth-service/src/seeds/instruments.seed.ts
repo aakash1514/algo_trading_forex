@@ -5,17 +5,15 @@ import {
   ForexSession,
 } from '@forexedge/database';
 
+// Idempotent per row: each instrument is inserted only if its pair isn't there
+// yet (ON CONFLICT DO NOTHING on the unique pair). Existing rows are never
+// modified, so values changed in the DB survive a re-run, and instruments
+// added here later (e.g. XAU/USD) reach databases seeded before them.
+//
+// avg_spread is a price difference (ask - bid), not pips. max_leverage caps the
+// account's leverage for that instrument (null = no cap).
 export const seedInstruments = async (dataSource: DataSource): Promise<void> => {
-  const repo = dataSource.getRepository(InstrumentEntity);
-
-  // Check if already seeded
-  const count = await repo.count();
-  if (count > 0) {
-    console.log(`⏭  Instruments already seeded (${count} records). Skipping.`);
-    return;
-  }
-
-  const instruments = [
+  const instruments: Partial<InstrumentEntity>[] = [
     // ── MAJORS ───────────────────────────────────────────
     {
       pair: 'EUR/USD', baseCurrency: 'EUR', quoteCurrency: 'USD',
@@ -189,9 +187,33 @@ export const seedInstruments = async (dataSource: DataSource): Promise<void> => 
       avgSpread: 0.00035,
       activeSessions: [ForexSession.TOKYO],
     },
+
+    // ── METALS ───────────────────────────────────────────
+    // XAU/USD: 1 lot = 100 oz, pip 0.01 (quoted to 3 decimals). avg_spread is the
+    // median spread of Dukascopy's 2022 traded minutes (0.368; p25 0.328, p75
+    // 0.414). Leverage capped at 1:20, the ESMA retail limit for gold.
+    {
+      pair: 'XAU/USD', baseCurrency: 'XAU', quoteCurrency: 'USD',
+      type: InstrumentType.METAL, pipSize: 0.01, pipDecimalPlaces: 2,
+      lotSize: 100, minLot: 0.01, maxLot: 100,
+      avgSpread: 0.368, maxLeverage: 20,
+      activeSessions: [ForexSession.LONDON, ForexSession.NEW_YORK],
+    },
   ];
 
-  const entities = instruments.map(i => repo.create(i));
-  await repo.save(entities);
-  console.log(`✅ Seeded ${entities.length} forex instruments successfully.`);
+  const result = await dataSource
+    .createQueryBuilder()
+    .insert()
+    .into(InstrumentEntity)
+    .values(instruments)
+    .orIgnore()
+    .returning(['pair'])
+    .execute();
+
+  const inserted = (result.raw as { pair: string }[]).map(r => r.pair);
+  console.log(
+    inserted.length
+      ? `✅ Inserted ${inserted.length} instrument(s): ${inserted.join(', ')}`
+      : `⏭  All ${instruments.length} instruments already present.`,
+  );
 };

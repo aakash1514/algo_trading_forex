@@ -62,7 +62,7 @@ describe('PositionService — P&L calculation', () => {
   const realtime = { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) };
   const pricing = { getSpec: jest.fn(), quoteToUsd: jest.fn(), getQuote: jest.fn() };
   beforeEach(() => {
-    pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.0001 });
+    pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.0001, maxLeverage: null });
     pricing.quoteToUsd.mockResolvedValue(1);
     pricing.getQuote.mockResolvedValue({ bid: 1.0809, ask: 1.0811, mid: 1.081 });
   });
@@ -181,7 +181,7 @@ describe('PositionService — P&L calculation', () => {
     });
 
     it('USD/JPY uses the DB pip size 0.01 and converts at the current price', async () => {
-      pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.01 });
+      pricing.getSpec.mockResolvedValue({ lotSize: 100_000, pipSize: 0.01, maxLeverage: null });
       pricing.quoteToUsd.mockResolvedValue(1 / 150.5);
       const position = makePosition({ pair: 'USD/JPY', instrument: 'USD_JPY', direction: 'LONG', openPrice: 150 });
       // +50 pips; pip value 100,000 x 0.01 / 150.5 = 6.6445; P&L 50 x 6.6445 = 332.23
@@ -190,7 +190,7 @@ describe('PositionService — P&L calculation', () => {
     });
 
     it('XAU/USD (100 oz, pip 0.01): +$3.50 at 0.5 lot = 350 pips x $0.50 = +$175', async () => {
-      pricing.getSpec.mockResolvedValue({ lotSize: 100, pipSize: 0.01 });
+      pricing.getSpec.mockResolvedValue({ lotSize: 100, pipSize: 0.01, maxLeverage: 20 });
       const position = makePosition({ pair: 'XAU/USD', instrument: 'XAU_USD', lots: 0.5, openPrice: 2400 });
       await expect(service.valueAt(position, 2403.5)).resolves.toEqual({ pipPnl: 350, pipValue: 0.5, pnl: 175 });
     });

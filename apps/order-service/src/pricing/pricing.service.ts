@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import type { Redis } from 'ioredis';
 import { InstrumentEntity } from '@forexedge/database';
 import {
-  marginRequiredUsd, pipValueUsd, positionUnits, quoteToUsdRate, type ContractSpec,
+  marginRequiredUsd, pipValueUsd, positionUnits, quoteToUsdRate, toContractSpec, type ContractSpec,
 } from '@forexedge/common';
 import { REDIS_CLIENT } from '../redis/redis.module';
 
@@ -41,7 +41,7 @@ export class PricingService {
 
     const instrument = await this.instrumentRepo.findOne({ where: { pair } });
     if (!instrument) throw new Error(`Instrument ${pair} not found`);
-    const spec = { lotSize: Number(instrument.lotSize), pipSize: Number(instrument.pipSize) };
+    const spec = toContractSpec(instrument);
     this.specs.set(pair, spec);
     return spec;
   }

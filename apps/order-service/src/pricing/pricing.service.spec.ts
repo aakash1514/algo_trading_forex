@@ -1,12 +1,12 @@
 import { PricingService, PriceUnavailableError } from './pricing.service';
 
 // Instruments rows as stored in the DB (slash pair format, NUMERIC as numbers).
-const INSTRUMENTS: Record<string, { pair: string; lotSize: number; pipSize: number }> = {
-  'EUR/USD': { pair: 'EUR/USD', lotSize: 100_000, pipSize: 0.0001 },
-  'USD/JPY': { pair: 'USD/JPY', lotSize: 100_000, pipSize: 0.01 },
-  'EUR/GBP': { pair: 'EUR/GBP', lotSize: 100_000, pipSize: 0.0001 },
+const INSTRUMENTS: Record<string, { pair: string; lotSize: number; pipSize: number; maxLeverage: number | null }> = {
+  'EUR/USD': { pair: 'EUR/USD', lotSize: 100_000, pipSize: 0.0001, maxLeverage: null },
+  'USD/JPY': { pair: 'USD/JPY', lotSize: 100_000, pipSize: 0.01, maxLeverage: null },
+  'EUR/GBP': { pair: 'EUR/GBP', lotSize: 100_000, pipSize: 0.0001, maxLeverage: null },
   // Not seeded yet (roadmap step 2); proves metals need only a DB row.
-  'XAU/USD': { pair: 'XAU/USD', lotSize: 100, pipSize: 0.01 },
+  'XAU/USD': { pair: 'XAU/USD', lotSize: 100, pipSize: 0.01, maxLeverage: 20 },
 };
 
 // Redis price values as market-service writes them (underscore keys).
@@ -54,17 +54,17 @@ describe('PricingService.valuePosition', () => {
     // CHF quote: no CHF/USD feed, only USD/CHF @ 0.8000 -> CHF->USD = 1.25
     const prices = { ...PRICES, 'price:USD_CHF': { bid: 0.7999, ask: 0.8001, mid: 0.8 } };
     const { service } = makeService(prices);
-    INSTRUMENTS['EUR/CHF'] = { pair: 'EUR/CHF', lotSize: 100_000, pipSize: 0.0001 };
+    INSTRUMENTS['EUR/CHF'] = { pair: 'EUR/CHF', lotSize: 100_000, pipSize: 0.0001, maxLeverage: null };
     await expect(service.valuePosition('EUR/CHF', 1, 0.95, 100)).resolves.toMatchObject({
       marginRequired: 1187.5, // 100,000 x 0.95 x 1.25 / 100
       pipValue: 12.5,
     });
   });
 
-  it('XAU/USD @ 2,400 with a 100 oz contract from the DB: margin 2,400.00, pip 1.00', async () => {
+  it('XAU/USD @ 2,400, 100 oz contract capped at 1:20 by the DB row: margin 12,000.00, pip 1.00', async () => {
     const { service } = makeService();
     await expect(service.valuePosition('XAU/USD', 1, 2400, 100)).resolves.toMatchObject({
-      units: 100, marginRequired: 2400, pipValue: 1,
+      units: 100, marginRequired: 12000, pipValue: 1,
     });
   });
 
