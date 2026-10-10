@@ -194,6 +194,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
    realign the live views to the NY close here.
+   Known gap: the economic-calendar scraper has produced nothing since 2026-06-13 (it runs only at
+   00/06/12/18 UTC and not on startup, so it misses whenever the services are down then); fix it with the
+   real data feeds.
 7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
    Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
    MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
