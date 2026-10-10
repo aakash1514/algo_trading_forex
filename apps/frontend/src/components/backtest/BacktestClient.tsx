@@ -35,6 +35,13 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+// Backtest P&L is in pips (net of commission), not account currency; the win rate
+// arrives as a percentage (0-100)
+function formatPips(value: string | null | undefined): string {
+  const pips = Number.parseFloat(value ?? '0');
+  return `${pips > 0 ? '+' : ''}${pips.toFixed(1)} pips`;
+}
+
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: 'text-accent-green bg-accent-green/10',
   RUNNING:   'text-accent-blue bg-accent-blue/10',
@@ -185,7 +192,7 @@ export function BacktestClient() {
             <table className="w-full text-[11px]">
               <thead>
                 <tr className="border-b border-terminal-border">
-                  {['Strategy', 'Pair', 'Status', 'Date', 'Net profit', ''].map((h) => (
+                  {['Strategy', 'Pair', 'Status', 'Date', 'Net P&L', ''].map((h) => (
                     <th key={h} className="text-left px-4 py-2 text-[10px] text-terminal-muted uppercase tracking-wider font-medium">
                       {h}
                     </th>
@@ -220,7 +227,7 @@ export function BacktestClient() {
                       <td className={cn('px-4 py-2.5 font-medium tabular-nums',
                         (Number.parseFloat(run.totalPnl ?? '0') ?? 0) >= 0 ? 'text-accent-green' : 'text-accent-red'
                       )}>
-                        ${Number.parseFloat(run.totalPnl ?? '0').toFixed(2)}
+                        {formatPips(run.totalPnl)}
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <button
@@ -243,14 +250,14 @@ export function BacktestClient() {
                               </p>
                               <div className="grid grid-cols-6 gap-2">
                                 <MetricCard
-                                  label="Net profit"
-                                  value={`$${Number.parseFloat(run.totalPnl ?? '0').toFixed(2)}`}
+                                  label="Net P&L"
+                                  value={formatPips(run.totalPnl)}
                                   color={Number.parseFloat(run.totalPnl ?? '0') >= 0 ? 'text-accent-green' : 'text-accent-red'}
                                 />
                                 <MetricCard
                                   label="Win rate"
-                                  value={`${(Number.parseFloat(run.winRate ?? '0') * 100).toFixed(1)}%`}
-                                  color={Number.parseFloat(run.winRate ?? '0') >= 0.5 ? 'text-accent-green' : 'text-accent-red'}
+                                  value={`${Number.parseFloat(run.winRate ?? '0').toFixed(1)}%`}
+                                  color={Number.parseFloat(run.winRate ?? '0') >= 50 ? 'text-accent-green' : 'text-accent-red'}
                                 />
                                 <MetricCard label="Total trades" value={String(run.totalTrades ?? 0)} />
                                 <MetricCard
