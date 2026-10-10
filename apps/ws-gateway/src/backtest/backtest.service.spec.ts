@@ -1,5 +1,5 @@
 import { NotFoundException, UnauthorizedException } from '@nestjs/common';
-import type { Repository } from 'typeorm';
+import type { DataSource, Repository } from 'typeorm';
 import type { Queue } from 'bullmq';
 import type { BacktestRunEntity } from '@forexedge/database';
 import { BacktestService } from './backtest.service';
@@ -18,7 +18,8 @@ function makeService() {
     update: jest.fn(),
   };
   const queue = { getJob: jest.fn(), add: jest.fn() };
-  const service = new BacktestService(repo as unknown as Repository<BacktestRunEntity>, queue as unknown as Queue);
+  const service = new BacktestService(repo as unknown as Repository<BacktestRunEntity>, queue as unknown as Queue,
+    {} as DataSource);
   return { service, repo, queue };
 }
 
@@ -62,5 +63,45 @@ describe('BacktestService cross-user access', () => {
     const { service, repo } = makeService();
     await expect(service.list(undefined as unknown as string)).rejects.toBeInstanceOf(UnauthorizedException);
     expect(repo.find).not.toHaveBeenCalled();
+  });
+});
+
+describe('BacktestService submit: historical coverage', () => {
+  const coverage = { pair: 'EUR/USD', price_decimals: 5, first_time: '2010-01-01T00:00:00Z', last_time: '2022-12-30T21:59:00Z' };
+  function submitService(rows: unknown[]) {
+    const repo = { create: jest.fn((x) => ({ id: 'run-9', ...x })), save: jest.fn() };
+    const queue = { add: jest.fn() };
+    const query = jest.fn().mockResolvedValue(rows);
+    const service = new BacktestService(repo as unknown as Repository<BacktestRunEntity>, queue as unknown as Queue,
+      { query } as unknown as DataSource);
+    return { service, queue, query };
+  }
+  const dto = (over: Record<string, unknown> = {}) => ({
+    instrument: 'EUR_USD', timeframe: '1h', fromDate: '2022-01-01', toDate: '2022-12-31', strategyName: 'ma_crossover', ...over,
+  });
+
+  it('queues a run inside the covered range, checking coverage for the DB pair', async () => {
+    const { service, queue, query } = submitService([coverage]);
+    await expect(service.submit(USER_A, dto())).resolves.toEqual({ runId: 'run-9' });
+    expect(query).toHaveBeenCalledWith(expect.stringContaining('FROM historical_coverage WHERE pair = $1'), ['EUR/USD']);
+    expect(queue.add).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects a range outside the history with the covered range in the message', async () => {
+    const { service, queue } = submitService([coverage]);
+    await expect(service.submit(USER_A, dto({ fromDate: '2026-06-01', toDate: '2026-06-12' })))
+      .rejects.toThrow('2010-01-01T00:00:00.000Z to 2022-12-30T21:59:00.000Z');
+    expect(queue.add).not.toHaveBeenCalled();
+  });
+
+  it('rejects a pair without history', async () => {
+    const { service } = submitService([]);
+    await expect(service.submit(USER_A, dto({ instrument: 'EUR_GBP' }))).rejects.toThrow('No historical data for EUR/GBP');
+  });
+
+  it('caps a 1m run at 366 days', async () => {
+    const { service } = submitService([coverage]);
+    await expect(service.submit(USER_A, dto({ timeframe: '1m', fromDate: '2020-01-01', toDate: '2022-01-01' })))
+      .rejects.toThrow('at most 366 days');
   });
 });

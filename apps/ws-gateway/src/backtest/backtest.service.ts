@@ -6,14 +6,16 @@ import {
   Inject,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Queue, Job } from 'bullmq';
 import { Client as MinioClient } from 'minio';
 import { assertUserId } from '@forexedge/common';
-import { BacktestRunEntity } from '@forexedge/database';
+import { BacktestRunEntity, HistoricalDataError, requireHistoricalCoverage } from '@forexedge/database';
 import { BACKTEST_QUEUE } from './backtest-queue.module';
 import { BacktestJobData } from './backtest.worker';
 import { SubmitBacktestDto } from './dto/submit-backtest.dto';
+
+const MAX_M1_RANGE_MS = 366 * 86_400_000;
 
 @Injectable()
 export class BacktestService {
@@ -24,6 +26,7 @@ export class BacktestService {
     private readonly repo: Repository<BacktestRunEntity>,
     @Inject(BACKTEST_QUEUE)
     private readonly queue: Queue,
+    private readonly dataSource: DataSource,
   ) {
     this.minioClient = new MinioClient({
       endPoint: process.env.MINIO_ENDPOINT ?? 'localhost',
@@ -42,6 +45,17 @@ export class BacktestService {
     const to = new Date(dto.toDate);
     if (from >= to) {
       throw new BadRequestException('fromDate must be before toDate');
+    }
+    // M1 runs load every minute into memory: at most a year (~375k bars)
+    if (dto.timeframe === '1m' && to.getTime() - from.getTime() > MAX_M1_RANGE_MS) {
+      throw new BadRequestException('A 1m backtest can cover at most 366 days');
+    }
+    // Backtests always read the imported history: reject a range it doesn't cover
+    try {
+      await requireHistoricalCoverage(this.dataSource, dto.instrument.replace('_', '/'), from, to);
+    } catch (err) {
+      if (err instanceof HistoricalDataError) throw new BadRequestException(err.message);
+      throw err;
     }
 
     // Create DB record

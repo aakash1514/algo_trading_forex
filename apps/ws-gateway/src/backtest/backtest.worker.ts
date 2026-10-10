@@ -3,12 +3,14 @@ import { Worker, Job } from 'bullmq';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Client as MinioClient } from 'minio';
-import { BacktestRunEntity } from '@forexedge/database';
+import {
+  BacktestRunEntity, HISTORICAL_SOURCES, HistoricalTimeframe, pointsToPrice, readHistoricalBars, requireHistoricalCoverage,
+} from '@forexedge/database';
 import { AppGateway } from '../gateway/app.gateway';
 import { StrategyRegistry } from './strategies/strategy.registry';
 import { TradeSimulator } from './trade.simulator';
 import { MetricsCalculator } from './metrics.calculator';
-import { Candle } from './strategies/strategy.interface';
+import { Candle, StrategyContext } from './strategies/strategy.interface';
 
 export interface BacktestJobData {
   runId: string;
@@ -20,15 +22,6 @@ export interface BacktestJobData {
   strategyName: string;
   parameters: Record<string, number>;
 }
-
-const TIMEFRAME_VIEW_MAP: Record<string, string> = {
-  '1m':  'candles_1m',
-  '5m':  'candles_5m',
-  '15m': 'candles_15m',
-  '1h':  'candles_1h',
-  '4h':  'candles_4h',
-  '1d':  'candles_1d',
-};
 
 const MINIO_BUCKET = 'backtests';
 
@@ -104,17 +97,17 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
       await this.repo.update(runId, { status: 'RUNNING', startedAt: new Date(), progress: 5 });
       this.emitProgress(userId, runId, 5, 'Fetching candle data...');
 
-      // 2. Fetch candles from TimescaleDB
-      const viewName = TIMEFRAME_VIEW_MAP[timeframe];
-      const rows = await this.dataSource.query(
-        `SELECT bucket, open, high, low, close, tick_count
-         FROM ${viewName}
-         WHERE instrument = $1 AND bucket BETWEEN $2 AND $3
-         ORDER BY bucket ASC`,
-        [instrument, fromDate, toDate],
-      );
+      // 2. Load the bars: always the imported history (never the live candles), bid
+      //    and ask in integer points; contract specs from the DB. The live
+      //    market-hours clock is not applied: the history is the truth.
+      const pair = instrument.replace('_', '/');
+      const from = new Date(fromDate);
+      const to = new Date(toDate);
+      const coverage = await requireHistoricalCoverage(this.dataSource, pair, from, to);
+      const context: StrategyContext = { pipSize: await this.pipSize(pair), priceDecimals: coverage.priceDecimals };
+      const bars = await readHistoricalBars(this.dataSource, { pair, timeframe: timeframe as HistoricalTimeframe, from, to });
 
-      if (rows.length === 0) {
+      if (bars.length === 0) {
         await this.repo.update(runId, {
           status: 'FAILED',
           errorMessage: `No candle data found for ${instrument} ${timeframe} between ${fromDate} and ${toDate}`,
@@ -124,13 +117,16 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
-      const candles: Candle[] = rows.map((r: Record<string, unknown>) => ({
-        bucket: new Date(r['bucket'] as string),
-        open: parseFloat(r['open'] as string),
-        high: parseFloat(r['high'] as string),
-        low: parseFloat(r['low'] as string),
-        close: parseFloat(r['close'] as string),
-        tick_count: Number(r['tick_count']),
+      const price = (points: number) => pointsToPrice(points, coverage.priceDecimals);
+      const candles: Candle[] = bars.map((b) => ({
+        bucket: b.bucket,
+        open: price((b.bidOpen + b.askOpen) / 2),
+        high: price((b.bidHigh + b.askHigh) / 2),
+        low: price((b.bidLow + b.askLow) / 2),
+        close: price((b.bidClose + b.askClose) / 2),
+        bid: { open: b.bidOpen, high: b.bidHigh, low: b.bidLow, close: b.bidClose },
+        ask: { open: b.askOpen, high: b.askHigh, low: b.askLow, close: b.askClose },
+        minutes: b.minutes,
       }));
 
       this.logger.log(`Fetched ${candles.length} candles for ${instrument} ${timeframe}`);
@@ -139,15 +135,15 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
 
       // 3. Run strategy — no lookahead bias enforced by TradeSimulator
       const strategy = this.strategyRegistry.get(strategyName);
-      const signals = strategy.generate(candles, parameters);
+      const signals = strategy.generate(candles, parameters, context);
       this.logger.log(`Strategy generated ${signals.length} signals`);
 
       await this.repo.update(runId, { progress: 50 });
       this.emitProgress(userId, runId, 50, `${signals.length} signals generated — simulating trades...`);
 
       // 4. Simulate trades
-      const simulator = new TradeSimulator();
-      const trades = simulator.simulate(candles, signals, instrument);
+      const simulator = new TradeSimulator(context);
+      const trades = simulator.simulate(candles, signals);
       this.logger.log(`Simulated ${trades.length} trades`);
 
       await this.repo.update(runId, { progress: 70 });
@@ -207,22 +203,27 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
     this.gateway.emitToUser(userId, 'backtest:progress', { runId, progress, message });
   }
 
-  // ── Startup check — fail fast if views are missing ──
+  // instruments.pip_size is the source of truth (0.01 for JPY pairs and gold)
+  private async pipSize(pair: string): Promise<number> {
+    const rows = await this.dataSource.query('SELECT pip_size FROM instruments WHERE pair = $1', [pair]);
+    if (rows.length === 0) throw new Error(`No instruments row for ${pair}`);
+    return Number(rows[0].pip_size);
+  }
+
+  // ── Startup check — fail fast if the historical tables are missing ──
   private async verifyViews(): Promise<void> {
     const rows = await this.dataSource.query(
-      `SELECT view_name FROM timescaledb_information.continuous_aggregates
-       WHERE view_name LIKE 'candles_%'`,
+      `SELECT view_name AS name FROM timescaledb_information.continuous_aggregates WHERE view_name LIKE 'historical\\_candles\\_%'
+       UNION ALL
+       SELECT hypertable_name FROM timescaledb_information.hypertables WHERE hypertable_name = 'historical_candles'`,
     );
-    const found = rows.map((r: Record<string, string>) => r['view_name']);
-    const expected = Object.values(TIMEFRAME_VIEW_MAP);
-    for (const view of expected) {
-      if (!found.includes(view)) {
-        throw new Error(
-          `Required TimescaleDB view '${view}' not found. Run Phase 2 migrations.`,
-        );
+    const found = rows.map((r: Record<string, string>) => r['name']);
+    for (const { table } of Object.values(HISTORICAL_SOURCES)) {
+      if (!found.includes(table)) {
+        throw new Error(`Required historical table '${table}' not found. Run the migrations and npm run data:import.`);
       }
     }
-    this.logger.log('TimescaleDB candle views verified');
+    this.logger.log('Historical candle tables verified');
   }
 
   // ── Ensure MinIO bucket exists ──

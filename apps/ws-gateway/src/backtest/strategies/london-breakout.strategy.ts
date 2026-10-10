@@ -1,13 +1,13 @@
-import { IStrategy, Candle, Signal } from './strategy.interface';
+import { IStrategy, Candle, Signal, StrategyContext } from './strategy.interface';
 
 export class LondonBreakoutStrategy implements IStrategy {
   name = 'london_breakout';
 
-  generate(candles: Candle[], parameters: Record<string, number>): Signal[] {
+  generate(candles: Candle[], parameters: Record<string, number>, context: StrategyContext): Signal[] {
     const breakoutPips = parameters['breakoutPips'] ?? 20;
     const sessionStartHour = parameters['sessionStartHour'] ?? 8; // 08:00 UTC = London open
     const lots = parameters['lots'] ?? 0.1;
-    const pipSize = parameters['pipSize'] ?? 0.0001; // EUR/USD standard
+    const pipSize = context.pipSize; // from instruments.pip_size (0.01 for JPY pairs and gold)
 
     const signals: Signal[] = [];
 
@@ -53,7 +53,7 @@ export class LondonBreakoutStrategy implements IStrategy {
             lots,
             stopLoss: tokyoLow,
             takeProfit: tokyoHigh + (tokyoHigh - tokyoLow) * 2,
-            reason: `London breakout above Tokyo high (${tokyoHigh.toFixed(5)}) + ${breakoutPips} pips`,
+            reason: `London breakout above Tokyo high (${tokyoHigh.toFixed(context.priceDecimals)}) + ${breakoutPips} pips`,
           });
           tradedToday = true;
         } else if (breakoutDown) {
@@ -63,7 +63,7 @@ export class LondonBreakoutStrategy implements IStrategy {
             lots,
             stopLoss: tokyoHigh,
             takeProfit: tokyoLow - (tokyoHigh - tokyoLow) * 2,
-            reason: `London breakout below Tokyo low (${tokyoLow.toFixed(5)}) - ${breakoutPips} pips`,
+            reason: `London breakout below Tokyo low (${tokyoLow.toFixed(context.priceDecimals)}) - ${breakoutPips} pips`,
           });
           tradedToday = true;
         }
