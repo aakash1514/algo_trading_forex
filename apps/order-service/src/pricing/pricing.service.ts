@@ -54,10 +54,14 @@ export class PricingService {
     return { bid: Number(bid), ask: Number(ask), mid: Number(mid) };
   }
 
-  async quoteToUsd(pair: string, price: number): Promise<number> {
+  // `streamMids` (pair -> mid, EUR/USD format) are prices seen in the same tick
+  // batch. The tick consumer passes them so a cross pair converts at the rate of
+  // that moment in the feed (also while catching up a backlog), and so a missing
+  // Redis key right after a restart doesn't block it. Redis is the fallback.
+  async quoteToUsd(pair: string, price: number, streamMids?: ReadonlyMap<string, number>): Promise<number> {
     const [base, quote] = pair.split('/');
     if (quote === 'USD' || base === 'USD') return quoteToUsdRate(pair, price);
-    return quoteToUsdRate(pair, price, await this.crossRateToUsd(quote));
+    return quoteToUsdRate(pair, price, await this.crossRateToUsd(quote, streamMids));
   }
 
   async valuePosition(pair: string, lots: number, price: number, leverage: number): Promise<PositionValuation> {
@@ -72,7 +76,11 @@ export class PricingService {
   }
 
   // currency->USD from the live CUR/USD pair, or the inverse of USD/CUR.
-  private async crossRateToUsd(currency: string): Promise<number> {
+  private async crossRateToUsd(currency: string, streamMids?: ReadonlyMap<string, number>): Promise<number> {
+    const direct = streamMids?.get(`${currency}/USD`);
+    if (direct) return direct;
+    const inverse = streamMids?.get(`USD/${currency}`);
+    if (inverse) return 1 / inverse;
     try {
       return (await this.getQuote(`${currency}/USD`)).mid;
     } catch (err) {

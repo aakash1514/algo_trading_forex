@@ -7,14 +7,17 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { assertUserId, pipValueUsd, pipsBetween } from '@forexedge/common';
 import { PricingService } from '../pricing/pricing.service';
 import { OpenPairsIndex } from './open-pairs.index';
+import type { TickMessage } from '@forexedge/kafka';
 
-export interface NormalizedTick {
-  pair: string;
-  bid: number;
-  ask: number;
-  mid: number;
-  timestamp: string;
+// The forex.ticks fields position processing uses (TickMessage is the contract)
+export type NormalizedTick = Pick<TickMessage, 'pair' | 'bid' | 'ask' | 'mid' | 'timestamp'>;
+
+interface PendingExit {
+  reason: 'STOP_LOSS' | 'TAKE_PROFIT';
+  price: number;
 }
+
+const errorMessage = (err: unknown) => (err instanceof Error ? err.message : String(err));
 
 // Closing a position that is no longer open: 409 over HTTP; the tick path,
 // which can race with a manual close, catches it and moves on.
@@ -27,6 +30,11 @@ export class PositionAlreadyClosedError extends ConflictException {
 @Injectable()
 export class PositionService {
   private readonly logger = new Logger(PositionService.name);
+
+  // Stop-loss/take-profit exits that triggered but couldn't be booked yet,
+  // keyed by position id, retried on every tick batch at their trigger price.
+  // In memory: lost on restart (the next tick beyond the level re-triggers).
+  private readonly pendingExits = new Map<string, PendingExit>();
 
   constructor(
     @InjectRepository(PositionEntity)
@@ -41,9 +49,12 @@ export class PositionService {
 
   // P&L of a position at `price`, converted to USD at the current quote->USD
   // rate (exact for USD-base and cross pairs, not just USD-quote ones).
-  async valueAt(position: PositionEntity, price: number): Promise<{ pipPnl: number; pipValue: number; pnl: number }> {
+  // `streamMids`: prices from the same tick batch, preferred for cross rates.
+  async valueAt(
+    position: PositionEntity, price: number, streamMids?: ReadonlyMap<string, number>,
+  ): Promise<{ pipPnl: number; pipValue: number; pnl: number }> {
     const spec = await this.pricing.getSpec(position.pair);
-    const quoteToUsd = await this.pricing.quoteToUsd(position.pair, price);
+    const quoteToUsd = await this.pricing.quoteToUsd(position.pair, price, streamMids);
     const pipPnl = pipsBetween(position.direction, Number(position.openPrice), price, spec);
     const pipValue = pipValueUsd(Number(position.lots), spec, quoteToUsd);
     return { pipPnl, pipValue, pnl: this.calculateUnrealizedPnl(pipPnl, pipValue) };
@@ -56,8 +67,21 @@ export class PositionService {
   // and left by the next still triggers, while the P&L mark is written once per
   // pair from the latest tick: intermediate marks would be overwritten anyway.
   // Returns the users whose positions were touched (for the margin-call check).
+  //
+  // The batch's offsets are committed when this returns, so its ticks are never
+  // re-delivered. A triggered exit that can't be booked yet (no USD conversion
+  // rate for a cross pair) is therefore kept in pendingExits at its trigger price
+  // and retried on every batch, not dropped; only P&L marks are skipped then.
   async processTicks(ticks: NormalizedTick[]): Promise<Set<string>> {
     const affectedUsers = new Set<string>();
+
+    // Latest price of every pair in the batch, including pairs without positions:
+    // the conversion rates for cross pairs at this point in the feed.
+    const streamMids = new Map<string, number>();
+    for (const tick of ticks) streamMids.set(tick.pair, tick.mid);
+
+    await this.retryPendingExits(streamMids);
+
     const byPair = new Map<string, NormalizedTick[]>();
     for (const tick of ticks) {
       if (!this.openPairs.has(tick.pair)) continue;
@@ -66,21 +90,25 @@ export class PositionService {
       byPair.set(tick.pair, list);
     }
 
-    // Each pair is processed independently: one pair failing (e.g. a cross pair
-    // whose USD conversion rate isn't in Redis yet) must not skip the stop-loss
-    // checks and P&L marks of every other pair in the batch.
+    // Each pair is processed independently, so one pair failing never skips the
+    // stop-loss checks and P&L marks of the other pairs in the batch.
     for (const [pair, pairTicks] of byPair) {
       try {
-        await this.processPairTicks(pair, pairTicks, affectedUsers);
+        await this.processPairTicks(pair, pairTicks, affectedUsers, streamMids);
       } catch (err) {
-        this.logger.error(`Skipped ${pairTicks.length} ${pair} tick(s): ${err instanceof Error ? err.message : String(err)}`);
+        this.logger.error(
+          `Dropped ${pairTicks.length} ${pair} tick(s); their offsets are committed with the batch: ${errorMessage(err)}`,
+        );
       }
     }
     return affectedUsers;
   }
 
-  private async processPairTicks(pair: string, pairTicks: NormalizedTick[], affectedUsers: Set<string>): Promise<void> {
-    let positions = await this.positionRepo.find({ where: { pair, isOpen: true } });
+  private async processPairTicks(
+    pair: string, pairTicks: NormalizedTick[], affectedUsers: Set<string>, streamMids: ReadonlyMap<string, number>,
+  ): Promise<void> {
+    let positions = (await this.positionRepo.find({ where: { pair, isOpen: true } }))
+      .filter((p) => !this.pendingExits.has(p.id));
     for (const position of positions) affectedUsers.add(position.userId);
 
     for (const tick of pairTicks) {
@@ -91,20 +119,54 @@ export class PositionService {
           stillOpen.push(position);
           continue;
         }
-        try {
-          // Fills at this tick's price, even if it gapped past the level
-          await this.closePosition(position.id, trigger, tick.mid);
-        } catch (err) {
-          // Closed by another path (manual close) since it was loaded: nothing to do
-          if (!(err instanceof PositionAlreadyClosedError)) throw err;
-        }
+        // Fills at this tick's price, even if it gapped past the level
+        await this.exitAt(position.id, { reason: trigger, price: tick.mid }, streamMids);
       }
       positions = stillOpen;
     }
 
+    // A failed mark (e.g. no conversion rate) skips only that position's P&L
     const latest = pairTicks[pairTicks.length - 1];
+    let skipped = 0;
+    let lastError: unknown;
     for (const position of positions) {
-      await this.markToMarket(position, latest.mid);
+      try {
+        await this.markToMarket(position, latest.mid, streamMids);
+      } catch (err) {
+        skipped++;
+        lastError = err;
+      }
+    }
+    if (skipped) {
+      this.logger.warn(`Skipped the P&L mark of ${skipped} ${pair} position(s): ${errorMessage(lastError)}`);
+    }
+  }
+
+  // Books a triggered stop-loss/take-profit, or parks it in pendingExits when it
+  // can't be booked yet. Positions closed meanwhile by another path are ignored.
+  private async exitAt(
+    positionId: string, exit: PendingExit, streamMids: ReadonlyMap<string, number>,
+  ): Promise<void> {
+    try {
+      await this.closePosition(positionId, exit.reason, exit.price, streamMids);
+      this.pendingExits.delete(positionId);
+    } catch (err) {
+      if (err instanceof PositionAlreadyClosedError) {
+        this.pendingExits.delete(positionId);
+        return;
+      }
+      if (!this.pendingExits.has(positionId)) {
+        this.logger.warn(
+          `${exit.reason} triggered for position ${positionId} at ${exit.price}; booking deferred: ${errorMessage(err)}`,
+        );
+      }
+      this.pendingExits.set(positionId, exit);
+    }
+  }
+
+  private async retryPendingExits(streamMids: ReadonlyMap<string, number>): Promise<void> {
+    for (const [positionId, exit] of [...this.pendingExits]) {
+      await this.exitAt(positionId, exit, streamMids);
     }
   }
 
@@ -124,8 +186,10 @@ export class PositionService {
 
   // Writes the position's P&L at `currentPrice` and moves the account's
   // unrealized P&L by the difference.
-  private async markToMarket(position: PositionEntity, currentPrice: number): Promise<void> {
-    const { pipPnl, pipValue, pnl: unrealizedPnl } = await this.valueAt(position, currentPrice);
+  private async markToMarket(
+    position: PositionEntity, currentPrice: number, streamMids?: ReadonlyMap<string, number>,
+  ): Promise<void> {
+    const { pipPnl, pipValue, pnl: unrealizedPnl } = await this.valueAt(position, currentPrice, streamMids);
 
     // The position was loaded before the awaits above, so it may have been
     // closed meanwhile. Re-read it under a row lock (closePosition takes the
@@ -196,6 +260,7 @@ export class PositionService {
     positionId: string,
     reason: CloseReason,
     closingPrice: number,
+    streamMids?: ReadonlyMap<string, number>,
   ): Promise<PositionEntity> {
     const closed = await this.dataSource.transaction(async manager => {
       // Row lock: serializes with the tick-driven P&L update for this position
@@ -207,7 +272,7 @@ export class PositionService {
       if (!position) throw new Error(`Position ${positionId} not found`);
       if (!position.isOpen) throw new PositionAlreadyClosedError(positionId);
 
-      const { pipPnl, pnl: realizedPnl } = await this.valueAt(position, closingPrice);
+      const { pipPnl, pnl: realizedPnl } = await this.valueAt(position, closingPrice, streamMids);
 
       // Close the position
       await manager.update(PositionEntity, positionId, {
@@ -227,18 +292,26 @@ export class PositionService {
         closedAt: new Date(),
       });
 
-      // Update account: release margin, realize P&L, zero out this position's unrealized
-      const account = await manager.findOne(AccountSummaryEntity, {
-        where: { userId: position.userId },
-      });
-
-      if (account) {
-        await manager.update(AccountSummaryEntity, account.id, {
-          balance: Number(account.balance) + realizedPnl,
-          marginUsed: Math.max(0, Number(account.marginUsed) - Number(position.marginUsed)),
-          unrealizedPnl: Number(account.unrealizedPnl) - Number(position.unrealizedPnl),
-        });
-      }
+      // Account: realize the P&L, release the margin, remove this position's
+      // unrealized P&L. Relative updates only: other positions of the same user
+      // move unrealized_pnl concurrently, and writing back a row read earlier
+      // would discard those changes (a lost update). The position row is locked,
+      // so its unrealized_pnl here is the value last added to the account.
+      await manager
+        .createQueryBuilder()
+        .update(AccountSummaryEntity)
+        .set({
+          balance: () => 'balance + :realizedPnl',
+          marginUsed: () => 'GREATEST(0, margin_used - :releasedMargin)',
+          unrealizedPnl: () => 'unrealized_pnl - :removedPnl',
+        })
+        .where('user_id = :userId', { userId: position.userId })
+        .setParameters({
+          realizedPnl,
+          releasedMargin: Number(position.marginUsed),
+          removedPnl: Number(position.unrealizedPnl),
+        })
+        .execute();
 
       this.logger.log(
         `Position ${positionId} closed — reason: ${reason}, P&L: $${realizedPnl.toFixed(2)}`,

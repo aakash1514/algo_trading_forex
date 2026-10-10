@@ -9,7 +9,6 @@ import {
   EconomicEventEntity,
 } from '@forexedge/database';
 import { TickConsumer } from './tick.consumer';
-import { SessionConsumer } from './session.consumer';
 import { PositionService } from '../position/position.service';
 import { AccountService } from '../account/account.service';
 import { OrderValidationService } from '../order/order-validation.service';
@@ -29,7 +28,6 @@ import { OpenPairsIndex } from '../position/open-pairs.index';
   ],
   providers: [
     TickConsumer,
-    SessionConsumer,
     PositionService,
     AccountService,
     OrderValidationService,
@@ -46,6 +44,6 @@ import { OpenPairsIndex } from '../position/open-pairs.index';
     },
   ],
   // Single instances shared with AppModule (controllers, OrderService).
-  exports: [SessionConsumer, PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService, OpenPairsIndex],
+  exports: [PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService, OpenPairsIndex],
 })
 export class KafkaConsumerModule {}

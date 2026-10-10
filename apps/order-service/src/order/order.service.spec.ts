@@ -8,7 +8,6 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { OrderValidationService } from './order-validation.service';
 import { MarginEngineService } from './margin-engine.service';
 import { BadRequestException } from '@nestjs/common';
-import { SessionConsumer } from '../kafka/session.consumer';
 import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
 import { OpenPairsIndex } from '../position/open-pairs.index';
 
@@ -62,10 +61,6 @@ const mockPricing = () => ({
   getQuote: jest.fn().mockResolvedValue({ bid: 1.0849, ask: 1.0851, mid: 1.085 }),
 });
 
-const mockSessionConsumer = () => ({
-  getActiveSession: jest.fn().mockReturnValue('OFF_HOURS'),
-});
-
 describe('OrderService — FSM transitions', () => {
   let service: OrderService;
   let orderRepo: ReturnType<typeof mockOrderRepo>;
@@ -89,7 +84,6 @@ describe('OrderService — FSM transitions', () => {
         { provide: BROKER_ADAPTER, useFactory: mockBroker },
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
-        { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
         { provide: PricingService, useFactory: mockPricing },
         { provide: OpenPairsIndex, useValue: openPairs },
@@ -185,18 +179,24 @@ describe('OrderService — FSM transitions', () => {
     orderRepo.create.mockReturnValue(draft);
     orderRepo.save.mockResolvedValue(draft);
 
+    const accountQb = {
+      update: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(),
+      setParameters: jest.fn().mockReturnThis(), execute: jest.fn(),
+    };
     // transitionState calls dataSource.transaction which calls findOne for the updated order
     dataSource.transaction.mockImplementation(async (
       cb: (manager: {
         save: (entity: unknown, data: unknown) => Promise<unknown>;
         update: (entity: unknown, id: unknown, data: unknown) => Promise<unknown>;
         findOne: (entity: unknown, options: unknown) => Promise<unknown>;
+        createQueryBuilder: () => unknown;
       }) => Promise<unknown>
     ) => {
       return cb({
         save: jest.fn().mockResolvedValue({ ...draft, status: 'OPEN' }),
         update: jest.fn().mockResolvedValue({}),
         findOne: jest.fn().mockResolvedValue({ ...draft, status: 'PENDING' }),
+        createQueryBuilder: jest.fn(() => accountQb),
       });
     });
 
@@ -211,6 +211,30 @@ describe('OrderService — FSM transitions', () => {
     expect(result).toBeDefined();
     // The fill opened a position: the tick consumer's index learns its pair
     expect(openPairs.opened).toHaveBeenCalledWith('EUR/USD');
+    // Margin is added with a relative update, never by writing back the account row
+    expect(accountQb.set.mock.calls[0][0].marginUsed()).toBe('margin_used + :addedMargin');
+    expect(accountQb.where).toHaveBeenCalledWith('user_id = :userId', { userId: 'user-1' });
+  });
+
+  it.each([
+    ['2026-10-07T12:00:00Z', 'LONDON,NEW_YORK'], // Wednesday, London/New York overlap
+    ['2026-10-10T10:00:00Z', 'OFF_HOURS'],       // Saturday: FX closed
+  ])('stamps an order placed at %s with session %s (shared market clock, no Kafka state)', async (iso, label) => {
+    jest.useFakeTimers({
+      now: new Date(iso),
+      doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'clearImmediate', 'queueMicrotask'],
+    });
+    try {
+      orderRepo.findOne.mockResolvedValueOnce(null);
+      orderRepo.create.mockImplementation((o: OrderEntity) => o);
+      orderRepo.save.mockImplementation(async (o: OrderEntity) => ({ ...o, id: 'o3' }));
+      dataSource.transaction.mockRejectedValue(new Error('stop after DRAFT'));
+      await service.submitOrder('user-1', { instrument: 'EUR_USD', direction: 'LONG', orderType: 'MARKET', lots: 1 }, `k-${iso}`)
+        .catch(() => undefined);
+      expect(orderRepo.create).toHaveBeenCalledWith(expect.objectContaining({ sessionOpened: label }));
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 
@@ -235,7 +259,6 @@ describe('OrderService — pricing and margin', () => {
         { provide: BROKER_ADAPTER, useFactory: mockBroker },
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
-        { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
         { provide: PricingService, useFactory: mockPricing },
         { provide: OpenPairsIndex, useValue: openPairs },
@@ -340,7 +363,6 @@ describe('OrderService cross-user access', () => {
         { provide: BROKER_ADAPTER, useFactory: mockBroker },
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
-        { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn() } },
         { provide: PricingService, useFactory: mockPricing },
         { provide: OpenPairsIndex, useValue: openPairs },

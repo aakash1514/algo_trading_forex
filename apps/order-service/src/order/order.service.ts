@@ -7,7 +7,7 @@ import {
   OrderEntity, OrderStatus, PositionEntity, AccountSummaryEntity
 } from '@forexedge/database';
 import { IForexBroker } from '@forexedge/common';
-import { BROKER_ADAPTER, assertUserId } from '@forexedge/common';
+import { BROKER_ADAPTER, assertUserId, sessionLabel } from '@forexedge/common';
 import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
 import { instrumentToPair } from '../common/instrument';
@@ -16,7 +16,7 @@ import { PricingService, PriceUnavailableError } from '../pricing/pricing.servic
 import { MarginEngineService } from './margin-engine.service';
 import { OpenPairsIndex } from '../position/open-pairs.index';
 import { Kafka, Producer } from 'kafkajs';
-import { SessionConsumer } from '../kafka/session.consumer';
+import { ORDERS_LIFECYCLE_TOPIC, type OrderLifecycleMessage } from '@forexedge/kafka';
 
 // Valid FSM transitions — key: current state, value: allowed next states
 const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -44,7 +44,6 @@ export class OrderService {
     private readonly broker: IForexBroker,
     private readonly validationService: OrderValidationService,
     private readonly marginEngine: MarginEngineService,
-    private readonly sessionConsumer: SessionConsumer,
     private readonly realtime: RealtimePublisher,
     private readonly pricing: PricingService,
     private readonly openPairs: OpenPairsIndex,
@@ -102,7 +101,9 @@ export class OrderService {
       requestedPrice: dto.requestedPrice ?? null,
       stopLoss: dto.stopLoss ?? null,
       takeProfit: dto.takeProfit ?? null,
-      sessionOpened: this.sessionConsumer.getActiveSession(),
+      // From the shared market clock: correct right after a restart, and
+      // OFF_HOURS whenever the FX market is closed
+      sessionOpened: sessionLabel(),
       status: 'DRAFT',
     });
     order = await this.orderRepo.save(order);
@@ -188,13 +189,16 @@ export class OrderService {
           openedAt: fill.executedAt,
         });
 
-        // Step 8: Update account margin_used
-        if (account) {
-          await manager.save(AccountSummaryEntity, {
-            ...account,
-            marginUsed: Number(account.marginUsed) + marginUsed,
-          });
-        }
+        // Step 8: add the margin to the account. A relative update: the tick
+        // consumer moves unrealized_pnl concurrently, and writing back the row
+        // read above would undo its changes (a lost update).
+        await manager
+          .createQueryBuilder()
+          .update(AccountSummaryEntity)
+          .set({ marginUsed: () => 'margin_used + :addedMargin' })
+          .where('user_id = :userId', { userId })
+          .setParameters({ addedMargin: marginUsed })
+          .execute();
 
         return updated;
       });
@@ -318,21 +322,19 @@ export class OrderService {
 
   // ─── Kafka ─────────────────────────────────────────────────────────────────
   private async publishLifecycleEvent(order: OrderEntity): Promise<void> {
+    const message: OrderLifecycleMessage = {
+      orderId: order.id,
+      userId: order.userId,
+      status: order.status,
+      pair: order.pair,
+      direction: order.direction,
+      lots: Number(order.lots),
+      executedPrice: order.executedPrice === null ? null : Number(order.executedPrice),
+      timestamp: new Date().toISOString(),
+    };
     await this.producer.send({
-      topic: 'orders.lifecycle',
-      messages: [{
-        key: order.id,
-        value: JSON.stringify({
-          orderId: order.id,
-          userId: order.userId,
-          status: order.status,
-          pair: order.pair,
-          direction: order.direction,
-          lots: order.lots,
-          executedPrice: order.executedPrice,
-          timestamp: new Date().toISOString(),
-        }),
-      }],
+      topic: ORDERS_LIFECYCLE_TOPIC,
+      messages: [{ key: order.id, value: JSON.stringify(message) }],
     });
   }
 

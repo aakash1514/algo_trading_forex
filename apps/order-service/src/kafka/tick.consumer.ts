@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Consumer, EachBatchPayload } from 'kafkajs';
+import { FOREX_TICKS_TOPIC, parseTickMessage } from '@forexedge/kafka';
 import { PositionService, NormalizedTick } from '../position/position.service';
 import { AccountService } from '../account/account.service';
 
@@ -39,7 +40,7 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
     try {
       await this.consumer.connect();
       await this.consumer.subscribe({
-        topic: 'forex.ticks',
+        topic: FOREX_TICKS_TOPIC,
         fromBeginning: false,
       });
 
@@ -67,9 +68,9 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
       const raw = message.value?.toString();
       if (!raw) continue;
       try {
-        ticks.push(JSON.parse(raw) as NormalizedTick);
-      } catch {
-        this.logger.warn(`Skipping unparseable tick at offset ${message.offset}`);
+        ticks.push(parseTickMessage(raw));
+      } catch (err) {
+        this.logger.warn(`Skipping tick at offset ${message.offset}: ${this.getErrorMessage(err)}`);
       }
     }
 

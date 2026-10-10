@@ -55,6 +55,12 @@ const makePosition = (overrides: Partial<PositionEntity> = {}): PositionEntity =
   ...overrides,
 } as PositionEntity);
 
+// account_summary query builder, recording the relative update it builds
+const accountQb = () => ({
+  update: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(),
+  setParameters: jest.fn().mockReturnThis(), execute: jest.fn(),
+});
+
 describe('PositionService — P&L calculation', () => {
   let service: PositionService;
   let positionRepo: ReturnType<typeof mockPositionRepo>;
@@ -193,7 +199,7 @@ describe('PositionService — P&L calculation', () => {
 
         // Gapped through 1.0795 to 1.0791: filled at that tick's price, not the level
         expect(close).toHaveBeenCalledTimes(1);
-        expect(close).toHaveBeenCalledWith('pos-1', 'STOP_LOSS', 1.0791);
+        expect(close).toHaveBeenCalledWith('pos-1', 'STOP_LOSS', 1.0791, expect.any(Map));
         expect(manager.update).not.toHaveBeenCalled(); // no P&L mark for a closed position
       });
 
@@ -206,8 +212,8 @@ describe('PositionService — P&L calculation', () => {
 
         await service.processTicks([at(1.0789), at(1.0816)]);
 
-        expect(close).toHaveBeenCalledWith('tp', 'TAKE_PROFIT', 1.0789);
-        expect(close).toHaveBeenCalledWith('sl', 'STOP_LOSS', 1.0816);
+        expect(close).toHaveBeenCalledWith('tp', 'TAKE_PROFIT', 1.0789, expect.any(Map));
+        expect(close).toHaveBeenCalledWith('sl', 'STOP_LOSS', 1.0816, expect.any(Map));
       });
 
       it('one pair failing (e.g. no cross rate yet) does not skip the other pairs in the batch', async () => {
@@ -228,15 +234,55 @@ describe('PositionService — P&L calculation', () => {
         expect(users).toEqual(new Set(['user-1']));
       });
 
+      it('converts a cross pair with the rate from the same batch, not Redis', async () => {
+        const cross = makePosition({ id: 'cross', pair: 'EUR/GBP', instrument: 'EUR_GBP' });
+        positionRepo.find.mockResolvedValue([cross]);
+        tickManager(cross);
+
+        await service.processTicks([at(1.2700, 'GBP/USD'), at(0.8571, 'EUR/GBP')]);
+
+        const streamMids = pricing.quoteToUsd.mock.calls[0][2] as Map<string, number>;
+        expect(pricing.quoteToUsd).toHaveBeenCalledWith('EUR/GBP', 0.8571, expect.any(Map));
+        expect(streamMids.get('GBP/USD')).toBe(1.27);
+      });
+
+      it('a missing conversion rate defers a triggered stop (never drops it) and skips only P&L', async () => {
+        const cross = makePosition({ id: 'cross', pair: 'EUR/GBP', instrument: 'EUR_GBP', openPrice: 0.8600, stopLoss: 0.8580 });
+        const crossOk = makePosition({ id: 'cross-2', pair: 'EUR/GBP', instrument: 'EUR_GBP', openPrice: 0.8600 });
+        positionRepo.find.mockResolvedValue([cross, crossOk]);
+        const close = jest.spyOn(service, 'closePosition')
+          .mockRejectedValueOnce(new Error('No live price for USD/GBP. Is market-service running?'));
+        pricing.quoteToUsd.mockRejectedValue(new Error('No live price for USD/GBP. Is market-service running?'));
+        const { manager } = tickManager(crossOk);
+
+        // Batch 1: the stop at 0.8580 is crossed (0.8575) but can't be booked; the other position's mark is skipped
+        await expect(service.processTicks([at(0.8575, 'EUR/GBP')])).resolves.toEqual(new Set(['user-1']));
+        expect(close).toHaveBeenCalledWith('cross', 'STOP_LOSS', 0.8575, expect.any(Map));
+        expect(manager.update).not.toHaveBeenCalled();
+
+        // Batch 2: the rate is back; the deferred stop books at its TRIGGER price, even though price recovered
+        close.mockResolvedValueOnce(makePosition({ isOpen: false }));
+        pricing.quoteToUsd.mockResolvedValue(1.27);
+        openPairs.has.mockImplementation((pair: string) => pair === 'EUR/GBP'); // GBP/USD has no positions
+        positionRepo.find.mockResolvedValue([crossOk]);
+        await service.processTicks([at(1.2700, 'GBP/USD'), at(0.8610, 'EUR/GBP')]);
+        expect(close).toHaveBeenLastCalledWith('cross', 'STOP_LOSS', 0.8575, expect.any(Map));
+        expect(manager.update).toHaveBeenCalledTimes(1); // crossOk marked again
+
+        // Batch 3: nothing pending any more
+        await service.processTicks([at(0.8611, 'EUR/GBP')]);
+        expect(close).toHaveBeenCalledTimes(2);
+      });
+
       it('closing a position removes its pair from the index after the commit', async () => {
         const order: string[] = [];
         dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => {
           const result = await cb({
             findOne: jest.fn()
               .mockResolvedValueOnce(makePosition())
-              .mockResolvedValueOnce({ id: 'acct-1', balance: 10000, marginUsed: 1080, unrealizedPnl: 0 })
               .mockResolvedValueOnce(makePosition({ isOpen: false })),
             update: jest.fn(),
+            createQueryBuilder: jest.fn(() => accountQb()),
           });
           order.push('commit');
           return result;
@@ -265,9 +311,9 @@ describe('PositionService — P&L calculation', () => {
         const result = await cb({
           findOne: jest.fn()
             .mockResolvedValueOnce(makePosition())
-            .mockResolvedValueOnce({ id: 'acct-1', balance: 10000, marginUsed: 1080, unrealizedPnl: 0 })
-            .mockResolvedValueOnce(closed),
+              .mockResolvedValueOnce(closed),
           update: jest.fn(),
+          createQueryBuilder: jest.fn(() => accountQb()),
         });
         expect(realtime.positionsChanged).not.toHaveBeenCalled();
         committed = true;
@@ -280,14 +326,35 @@ describe('PositionService — P&L calculation', () => {
       expect(realtime.positionsChanged).toHaveBeenCalledWith('user-1', 'pos-1');
     });
 
+    it('books the close on the account with relative updates only (no lost update)', async () => {
+      const qb = accountQb();
+      // Position held +25 unrealized; closing LONG 1 lot from 1.08000 at 1.08100 realizes +$100
+      dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => cb({
+        findOne: jest.fn()
+          .mockResolvedValueOnce(makePosition({ unrealizedPnl: 25 }))
+          .mockResolvedValueOnce(makePosition({ isOpen: false })),
+        update: jest.fn(),
+        createQueryBuilder: jest.fn(() => qb),
+      }));
+
+      await service.closePosition('pos-1', 'MANUAL', 1.081);
+
+      const set = qb.set.mock.calls[0][0];
+      expect(set.balance()).toBe('balance + :realizedPnl');
+      expect(set.marginUsed()).toBe('GREATEST(0, margin_used - :releasedMargin)');
+      expect(set.unrealizedPnl()).toBe('unrealized_pnl - :removedPnl');
+      expect(qb.setParameters).toHaveBeenCalledWith({ realizedPnl: 100, releasedMargin: 1080, removedPnl: 25 });
+      expect(qb.where).toHaveBeenCalledWith('user_id = :userId', { userId: 'user-1' });
+    });
+
     it('does not overwrite the order entry price when closing', async () => {
       const update = jest.fn();
       dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) => cb({
         findOne: jest.fn()
           .mockResolvedValueOnce(makePosition())
-          .mockResolvedValueOnce({ id: 'acct-1', balance: 10000, marginUsed: 1080, unrealizedPnl: 0 })
           .mockResolvedValueOnce(makePosition({ isOpen: false })),
         update,
+        createQueryBuilder: jest.fn(() => accountQb()),
       }));
 
       await service.closePosition('pos-1', 'MANUAL', 1.081);
