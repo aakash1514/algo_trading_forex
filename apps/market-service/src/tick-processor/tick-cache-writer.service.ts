@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { KafkaConsumerService, KAFKA_TOPICS, NormalizedTick } from '@forexedge/kafka';
+import { KafkaConsumerService, KAFKA_TOPICS, parseTickMessage } from '@forexedge/kafka';
 import { InjectRedis } from '../redis/redis.decorator';
 import Redis from 'ioredis';
 
@@ -32,7 +32,7 @@ export class TickCacheWriterService implements OnModuleInit {
     _partition: number,
     message: string,
   ): Promise<void> {
-    const tick = JSON.parse(message) as NormalizedTick;
+    const tick = parseTickMessage(message);
 
     // Key: price:EUR_USD
     // Value: full NormalizedTick as JSON

@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { InstrumentEntity } from '@forexedge/database';
 import { isSpreadWide, spreadRatio } from '@forexedge/common';
 import {
-  KafkaProducerService, KafkaConsumerService, NormalizedTick,
+  KafkaProducerService, KafkaConsumerService, TickMessage, parseTickMessage,
   SPREAD_ALERTS_TOPIC, SpreadAlertMessage, SpreadStatus,
 } from '@forexedge/kafka';
 
@@ -45,10 +45,11 @@ export class SpreadMonitorService implements OnModuleInit {
   }
 
   private async handleTick(rawMessage: string) {
-    let tick: NormalizedTick;
+    let tick: TickMessage;
     try {
-      tick = JSON.parse(rawMessage);
-    } catch {
+      tick = parseTickMessage(rawMessage);
+    } catch (err) {
+      this.logger.warn(`Ignoring forex.ticks message: ${err instanceof Error ? err.message : String(err)}`);
       return;
     }
 

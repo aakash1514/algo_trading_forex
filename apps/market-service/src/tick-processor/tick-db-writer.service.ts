@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { KafkaConsumerService, KAFKA_TOPICS, NormalizedTick } from '@forexedge/kafka';
+import { KafkaConsumerService, KAFKA_TOPICS, parseTickMessage } from '@forexedge/kafka';
 
 @Injectable()
 export class TickDbWriterService implements OnModuleInit {
@@ -27,7 +27,7 @@ export class TickDbWriterService implements OnModuleInit {
     _partition: number,
     message: string,
   ): Promise<void> {
-    const tick = JSON.parse(message) as NormalizedTick;
+    const tick = parseTickMessage(message);
 
     // Raw SQL INSERT — no TypeORM overhead
     // $1, $2... are parameterized to prevent SQL injection

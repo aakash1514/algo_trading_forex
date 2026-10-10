@@ -3,7 +3,7 @@ import {
   KafkaConsumerService,
   REALTIME_TOPICS,
   SOCKET_EVENTS,
-  type PositionsUpdatedMessage,
+  parsePositionsUpdatedMessage,
 } from '@forexedge/kafka';
 import { AppGateway } from '../gateway/app.gateway';
 
@@ -22,8 +22,7 @@ export class PositionConsumer implements OnModuleInit {
       [REALTIME_TOPICS.POSITIONS_UPDATED],
       async (_topic, _partition, message) => {
         try {
-          const payload = JSON.parse(message) as PositionsUpdatedMessage;
-          if (!payload.userId) return;
+          const payload = parsePositionsUpdatedMessage(message);
 
           if (payload.type === 'SNAPSHOT') {
             this.gateway.emitToUser(payload.userId, SOCKET_EVENTS.POSITIONS_SNAPSHOT, payload.positions);

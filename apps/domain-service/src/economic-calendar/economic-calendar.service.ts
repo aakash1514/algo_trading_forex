@@ -4,7 +4,7 @@ import { Repository, MoreThanOrEqual } from 'typeorm';
 import { Cron } from '@nestjs/schedule';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { KafkaProducerService } from '@forexedge/kafka';
+import { CALENDAR_EVENTS_TOPIC, KafkaProducerService, type CalendarEventMessage } from '@forexedge/kafka';
 import { EconomicEventEntity } from '@forexedge/database';
 
 export enum CalendarEventType {
@@ -149,17 +149,23 @@ export class EconomicCalendarService {
     event: EconomicEventEntity,
     now: Date,
   ) {
-    const payload = {
+    // economic_events.impact is free text in the DB; the contract allows three levels
+    const impact = event.impact as CalendarEventMessage['impact'];
+    if (!['HIGH', 'MEDIUM', 'LOW'].includes(impact)) {
+      this.logger.warn(`Not publishing "${event.title}": unknown impact "${event.impact}"`);
+      return;
+    }
+    const payload: CalendarEventMessage = {
       type,
       title:       event.title,
       currency:    event.currency,
-      impact:      event.impact,
-      scheduledAt: event.scheduledAt,
+      impact,
+      scheduledAt: new Date(event.scheduledAt).toISOString(),
       timestamp:   now.toISOString(),
     };
 
     await this.kafkaProducer.publish(
-      'forex.calendar-events',
+      CALENDAR_EVENTS_TOPIC,
       event.currency,
       payload,
     ).catch((err: Error) =>
