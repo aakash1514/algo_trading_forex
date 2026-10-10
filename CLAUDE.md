@@ -86,6 +86,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 ## Environment
 - Windows + Docker Desktop on the WSL2 backend (its disk is `docker_data.vhdx`, which never shrinks by itself). Node v24+, Nx v22.
+  Every block Docker writes grows the vhdx, even short-lived ones: Postgres temp files from big sorts/aggregations
+  (at the default 4 MB `work_mem` one run of the historical checks spilled ~6 GB) and the build cache. Heavy
+  historical queries set `work_mem = '256MB'` for their own session. `docker system df` reports Kafka's volume at its
+  apparent size (preallocated sparse 10 MB index files); measure real usage with `du` inside a container.
 - **Use Git Bash only.** PowerShell 5.1 crashes at startup in this environment
   (`InitialSessionState` type initializer exception), so don't use it.
 - Docker Desktop doesn't auto-start; launch it before `docker compose up`.
@@ -157,6 +161,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   The service webpack configs set `typeCheckOptions: false`: the in-build checker can't resolve lib
   project references until their `.d.ts` exist, so it broke clean builds (TS6305).
 - `next-env.d.ts` and `*.tsbuildinfo` are generated and gitignored; don't commit them.
+- **The Nx daemon can serve stale cache for a project directory created after it started** (seen on Windows: edits to
+  a new spec replayed an old result with fewer tests). After adding a project, run `npx nx daemon --stop`, and confirm
+  a new test file actually runs.
 - **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
   trading: specs used `EURUSD` while the DB holds `EUR/USD` and Redis `price:EUR_USD`, and DTOs were
   built with fields the UI never sent. Assert the exact query/where clause and validate request bodies

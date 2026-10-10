@@ -8,10 +8,13 @@
 //   4. H1, H4 and D1 recomputed from M1 equal the stored aggregates, bar for bar.
 //   5. Around every year boundary (Jan 1 +- 7 days) no H4/D1 bar is missing or different.
 //   6. D1 weekly shape: at most 5 bars with >= 60 minutes per pair and New York
-//      week; stubs (< 60 minutes) listed, at most 20 expected.
+//      week; stubs (< 60 minutes) exactly the named ones in stubs.ts.
 //   7. Storage: compression ratio of M1, aggregate sizes.
 import type { Client } from 'pg';
 import { NY_VIEWS, UTC_VIEWS } from './aggregates';
+import { evaluateStubs, type Coverage, type Stub } from './stubs';
+
+export const CHECKS_WORK_MEM = '256MB';
 
 export interface CheckResult {
   name: string;
@@ -19,7 +22,6 @@ export interface CheckResult {
   lines: string[];
 }
 
-export const MAX_EXPECTED_STUBS = 20;
 
 const NY_BUCKET = (width: string, column: string) =>
   `time_bucket(INTERVAL '${width}', ${column}, 'America/New_York', origin => '2000-01-02 22:00:00+00')`;
@@ -173,22 +175,27 @@ async function checkWeeklyShape(client: Client): Promise<CheckResult> {
           FROM historical_candles_1d GROUP BY 1, 2) w
     GROUP BY 1, 2 ORDER BY 1, 2
   `);
-  const { rows: stubs } = await client.query(`
-    SELECT pair, to_char(bucket AT TIME ZONE 'America/New_York', 'Dy YYYY-MM-DD HH24:MI') AS ny_start, minutes
+  const { rows: stubs } = await client.query<Stub>(`
+    SELECT pair, to_char(bucket AT TIME ZONE 'America/New_York', 'YYYY-MM-DD HH24:MI') AS "nyStart", minutes
     FROM historical_candles_1d WHERE minutes < 60 ORDER BY bucket, pair
   `);
+  const { rows: coverage } = await client.query<Coverage>(`
+    SELECT pair, to_char(first_time AT TIME ZONE 'America/New_York', 'YYYY-MM-DD') AS "firstDate",
+           to_char(last_time AT TIME ZONE 'America/New_York', 'YYYY-MM-DD') AS "lastDate"
+    FROM historical_import_log
+  `);
+  const stubCheck = evaluateStubs(stubs, coverage);
   const tooMany = weeks.filter((w) => w.full_bars > 5);
   const lines = [
     'Weeks by number of full D1 bars (>= 60 minutes); weeks under 5 are holiday weeks:',
     ...[...new Set(weeks.map((w) => w.pair))].map((pair) => `  ${pair}: ` +
       weeks.filter((w) => w.pair === pair).map((w) => `${w.full_bars} bars x ${w.weeks}`).join(', ')),
-    `Stubs (< 60 minutes): ${stubs.length} (expected at most ${MAX_EXPECTED_STUBS})`,
-    ...stubs.map((s) => `  ${s.pair} D1 starting ${s.ny_start} NY: ${s.minutes} min`),
+    ...stubCheck.lines,
     ...tooMany.map((w) => `MORE THAN 5 FULL BARS: ${w.pair}, ${w.weeks} week(s) with ${w.full_bars}`),
   ];
   return {
-    name: 'D1 weekly shape: at most 5 full bars per week, stubs listed',
-    ok: weeks.length > 0 && tooMany.length === 0 && stubs.length <= MAX_EXPECTED_STUBS,
+    name: 'D1 weekly shape: at most 5 full bars per week; stubs exactly the named Sunday and holiday ones',
+    ok: weeks.length > 0 && tooMany.length === 0 && stubCheck.ok,
     lines,
   };
 }
@@ -224,13 +231,21 @@ async function storage(client: Client): Promise<CheckResult> {
 
 export async function runChecks(client: Client, log: (r: CheckResult, seconds: number) => void = () => undefined):
   Promise<CheckResult[]> {
+  // Rebuilding H1/H4/D1 from 19M M1 rows groups ~400k bars. At the default 4 MB
+  // work_mem those aggregations spilled ~6 GB of temp files per run (measured),
+  // which also grew Docker's virtual disk. Raised for this session only.
+  await client.query(`SET work_mem = '${CHECKS_WORK_MEM}'`);
   const results: CheckResult[] = [];
-  for (const check of [checkImportLog, checkScale, checkMinuteTotals, checkRebuilt, checkYearBoundaries,
-    checkWeeklyShape, storage]) {
-    const started = Date.now();
-    const result = await check(client);
-    results.push(result);
-    log(result, (Date.now() - started) / 1000);
+  try {
+    for (const check of [checkImportLog, checkScale, checkMinuteTotals, checkRebuilt, checkYearBoundaries,
+      checkWeeklyShape, storage]) {
+      const started = Date.now();
+      const result = await check(client);
+      results.push(result);
+      log(result, (Date.now() - started) / 1000);
+    }
+  } finally {
+    await client.query('RESET work_mem');
   }
   return results;
 }

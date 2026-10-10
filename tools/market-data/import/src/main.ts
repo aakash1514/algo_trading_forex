@@ -14,7 +14,7 @@ import { join, relative } from 'node:path';
 import { Client } from 'pg';
 import { forceKey, parseArgs, USAGE, UsageError, type ImportArgs } from './args';
 import { refreshAggregates, vacuumAnalyze } from './aggregates';
-import { runChecks } from './checks';
+import { CHECKS_WORK_MEM, runChecks } from './checks';
 import { compressChunks, ImportError, importPairRange, type ImportResult } from './importer';
 import { PAIRS, yearRange, type TimeRange } from './pairs';
 
@@ -104,6 +104,9 @@ async function main(): Promise<void> {
   await client.connect();
   try {
     await client.query('SET statement_timeout = 0');
+    // Aggregate refreshes over millions of rows spill to temp files at the default
+    // 4 MB (and every spill grows Docker's virtual disk); this session only.
+    await client.query(`SET work_mem = '${CHECKS_WORK_MEM}'`);
     const { rows: [lock] } = await client.query('SELECT pg_try_advisory_lock(hashtext($1)) AS ok', [ADVISORY_LOCK]);
     if (!lock.ok) throw new ImportError('Another historical import is running');
 
