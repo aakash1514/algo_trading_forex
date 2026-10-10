@@ -37,10 +37,10 @@ export class TickCacheWriterService implements OnModuleInit {
     // Key: price:EUR_USD
     // Value: full NormalizedTick as JSON
     // TTL: 2 seconds — auto-expires if stream stops
-    await this.redis.setex(
-      `price:${tick.instrument}`,
-      PRICE_CACHE_TTL_SECONDS,
-      JSON.stringify(tick),
-    );
+    const value = JSON.stringify(tick);
+    await this.redis.setex(`price:${tick.instrument}`, PRICE_CACHE_TTL_SECONDS, value);
+    // Last known price, no expiry: a reference for validating SL/TP levels
+    // while the market is closed. Never used to fill orders.
+    await this.redis.set(`price:last:${tick.instrument}`, value);
   }
 }

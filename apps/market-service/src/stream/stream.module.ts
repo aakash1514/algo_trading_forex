@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { StreamService } from './stream.service';
-import { MockStreamProvider } from './providers/mock-stream.provider';
+import { MockStreamProvider, parseMockStreamWhenClosed } from './providers/mock-stream.provider';
 import { OandaStreamProvider } from './providers/oanda-stream.provider';
 import { STREAM_PROVIDER } from './interfaces/stream-provider.interface';
 import { MarketModule } from '../market/market.module';
@@ -19,7 +19,8 @@ import { InstrumentRepository } from '../market/instrument.repository';
         const useMock = config.get<string>('USE_MOCK_DATA', 'true') === 'true';
         if (useMock) {
           // Precision and typical spread per instrument come from the DB
-          return new MockStreamProvider(() => instruments.findQuoteSpecs());
+          const streamWhenClosed = parseMockStreamWhenClosed(config.get<string>('MOCK_STREAM_WHEN_CLOSED'));
+          return new MockStreamProvider(() => instruments.findQuoteSpecs(), undefined, undefined, streamWhenClosed);
         }
         return new OandaStreamProvider(config);
       },

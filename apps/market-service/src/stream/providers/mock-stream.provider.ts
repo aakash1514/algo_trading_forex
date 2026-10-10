@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { priceDecimals } from '@forexedge/common';
+import { marketStatus, priceDecimals } from '@forexedge/common';
 import { IForexStreamProvider } from '../interfaces/stream-provider.interface';
 import { NormalizedTick as KafkaNormalizedTick } from '@forexedge/kafka';
 import type { InstrumentQuoteSpec } from '../../market/instrument.repository';
@@ -79,6 +79,17 @@ export function mockSpreadMultiplier(utcHour: number): number {
 
 export type QuoteSpecLoader = () => Promise<Map<string, InstrumentQuoteSpec>>;
 
+// MOCK_STREAM_WHEN_CLOSED: unset or "false" = no ticks for an instrument while
+// its market is closed, like a real feed; "true" = tick around the clock, for
+// development on weekends only (pair it with MARKET_HOURS_GATE=false on
+// order-service). Any other value fails startup.
+export function parseMockStreamWhenClosed(raw: string | undefined): boolean {
+  const value = (raw ?? '').trim().toLowerCase();
+  if (value === '' || value === 'false') return false;
+  if (value === 'true') return true;
+  throw new Error(`MOCK_STREAM_WHEN_CLOSED must be "true" or "false", got "${raw}"`);
+}
+
 export class MockStreamProvider implements IForexStreamProvider {
   readonly providerName = 'MOCK';
   private readonly logger = new Logger(MockStreamProvider.name);
@@ -93,6 +104,7 @@ export class MockStreamProvider implements IForexStreamProvider {
     private readonly loadSpecs: QuoteSpecLoader,
     private readonly now: () => Date = () => new Date(),
     private readonly random: () => number = Math.random,
+    private readonly streamWhenClosed = false,
   ) {}
 
   async connect(
@@ -145,6 +157,10 @@ export class MockStreamProvider implements IForexStreamProvider {
     const spec = this.specs.get(instrument);
     if (!basePrice || !spec || !spec.avgSpread) return null;
 
+    // Like a real feed: silent while the instrument's market is closed
+    const now = this.now();
+    if (!this.streamWhenClosed && !marketStatus(spec.kind, now).open) return null;
+
     // ----------------------------------------------------------------
     // Geometric Brownian Motion (GBM)
     // ----------------------------------------------------------------
@@ -169,7 +185,6 @@ export class MockStreamProvider implements IForexStreamProvider {
     // Quote at the instrument's precision (one digit past the pip). The spread is
     // rounded to whole points first and ask = bid + spread, so the quoted spread
     // is exactly avg_spread x the session multiplier (to the point).
-    const now = this.now();
     const decimals = priceDecimals({ pipSize: spec.pipSize });
     const spread = this.round(spec.avgSpread * mockSpreadMultiplier(now.getUTCHours()), decimals);
     const bid = this.round(newMid - spread / 2, decimals);

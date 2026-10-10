@@ -1,13 +1,13 @@
-import { isSpreadWide, spreadRatio } from '@forexedge/common';
+import { isSpreadWide, marketStatus, spreadRatio } from '@forexedge/common';
 import type { InstrumentQuoteSpec } from '../../market/instrument.repository';
-import { MockStreamProvider, mockSpreadMultiplier } from './mock-stream.provider';
+import { MockStreamProvider, mockSpreadMultiplier, parseMockStreamWhenClosed } from './mock-stream.provider';
 
 // pip_size and avg_spread exactly as stored in the instruments table.
 const SPECS = new Map<string, InstrumentQuoteSpec>([
-  ['EUR_USD', { pipSize: 0.0001, avgSpread: 0.0001 }],
-  ['GBP_USD', { pipSize: 0.0001, avgSpread: 0.00013 }],
-  ['USD_JPY', { pipSize: 0.01, avgSpread: 0.015 }],
-  ['XAU_USD', { pipSize: 0.01, avgSpread: 0.368 }],
+  ['EUR_USD', { pipSize: 0.0001, avgSpread: 0.0001, kind: 'MAJOR' }],
+  ['GBP_USD', { pipSize: 0.0001, avgSpread: 0.00013, kind: 'MAJOR' }],
+  ['USD_JPY', { pipSize: 0.01, avgSpread: 0.015, kind: 'MAJOR' }],
+  ['XAU_USD', { pipSize: 0.01, avgSpread: 0.368, kind: 'METAL' }],
 ]);
 
 // Lookups that fail loudly instead of non-null assertions
@@ -50,6 +50,12 @@ describe('MockStreamProvider quotes', () => {
       for (const instrument of instruments) {
         const pipSize = pipSizeOf(instrument);
         const avgSpread = avgSpreadOf(instrument);
+        // 21:30 UTC on this Wednesday is 17:30 New York: gold's daily break
+        const kind = SPECS.get(instrument)?.kind ?? 'MAJOR';
+        if (!marketStatus(kind, atUtcHour(hour)()).open) {
+          expect(p.generateTick(instrument)).toBeNull();
+          continue;
+        }
         for (let i = 0; i < 50; i++) {
           const tick = tickOf(p, instrument);
           const ratio = spreadRatio(tick.bid, tick.ask, avgSpread);
@@ -99,7 +105,7 @@ describe('MockStreamProvider quotes', () => {
 
   it('skips instruments without a base price or avg_spread instead of inventing one', async () => {
     const specs = new Map(SPECS);
-    specs.set('USD_SGD', { pipSize: 0.0001, avgSpread: null });
+    specs.set('USD_SGD', { pipSize: 0.0001, avgSpread: null, kind: 'EXOTIC' });
     const onTick = jest.fn();
     jest.useFakeTimers();
     const p = new MockStreamProvider(async () => specs, atUtcHour(14));
@@ -108,5 +114,39 @@ describe('MockStreamProvider quotes', () => {
     await p.disconnect();
     jest.useRealTimers();
     expect(onTick.mock.calls.map(([t]) => t.instrument)).toEqual(['XAU_USD']);
+  });
+
+  describe('while a market is closed', () => {
+    const at = (iso: string, streamWhenClosed = false) =>
+      new MockStreamProvider(async () => SPECS, () => new Date(iso), Math.random, streamWhenClosed);
+
+    it('sends no ticks for any instrument on the weekend', async () => {
+      const p = at('2026-10-10T12:00:00Z'); // Saturday
+      await p.connect([...SPECS.keys()], () => undefined, () => undefined);
+      await p.disconnect();
+      for (const instrument of SPECS.keys()) expect(p.generateTick(instrument)).toBeNull();
+    });
+
+    it("silences gold during its daily break while FX keeps ticking", async () => {
+      const p = at('2026-10-12T21:30:00Z'); // Monday 17:30 New York
+      await p.connect([...SPECS.keys()], () => undefined, () => undefined);
+      await p.disconnect();
+      expect(p.generateTick('XAU_USD')).toBeNull();
+      expect(p.generateTick('EUR_USD')).not.toBeNull();
+    });
+
+    it('ticks around the clock with MOCK_STREAM_WHEN_CLOSED=true (development)', async () => {
+      const p = at('2026-10-10T12:00:00Z', true);
+      await p.connect([...SPECS.keys()], () => undefined, () => undefined);
+      await p.disconnect();
+      expect(p.generateTick('EUR_USD')).not.toBeNull();
+    });
+
+    it.each([[undefined, false], ['', false], ['false', false], ['true', true], [' TRUE ', true]])(
+      'MOCK_STREAM_WHEN_CLOSED=%j -> %s', (raw, value) => expect(parseMockStreamWhenClosed(raw)).toBe(value));
+
+    it('refuses any other MOCK_STREAM_WHEN_CLOSED value', () => {
+      expect(() => parseMockStreamWhenClosed('yes')).toThrow('MOCK_STREAM_WHEN_CLOSED must be "true" or "false", got "yes"');
+    });
   });
 });
