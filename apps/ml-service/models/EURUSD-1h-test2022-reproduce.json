@@ -1,0 +1,35 @@
+{
+  "pair": "EUR/USD",
+  "fold": "test2022",
+  "config": "lstm-h32-w32",
+  "state_dict_equal": true,
+  "tensors": {
+    "lstm.weight_ih_l0": [
+      128,
+      10
+    ],
+    "lstm.weight_hh_l0": [
+      128,
+      32
+    ],
+    "lstm.bias_ih_l0": [
+      128
+    ],
+    "lstm.bias_hh_l0": [
+      128
+    ],
+    "head.weight": [
+      1,
+      32
+    ],
+    "head.bias": [
+      1
+    ]
+  },
+  "sha256_saved": "79fd0ec960b3940280979bcd175b98c6e962b9cae47fdad878b0f7b0f6867c04",
+  "sha256_rerun": "d981973bc16bd8353c71efaf98f4391f49ceb4008f5202bfc14afd7a7f23d107",
+  "bars_sha256_saved": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+  "bars_sha256_rerun": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+  "best_epoch_saved": 7,
+  "best_epoch_rerun": 7
+}

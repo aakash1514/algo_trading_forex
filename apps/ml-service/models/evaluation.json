@@ -1,0 +1,1119 @@
+{
+  "generated_at": "2026-10-11 20:06 UTC",
+  "commit": "0361864",
+  "significance": [
+    {
+      "pair": "EUR/USD",
+      "baseline": "logistic",
+      "n": 43486,
+      "lstm_correct": 22507,
+      "baseline_correct": 22110,
+      "lstm_only": 6998,
+      "baseline_only": 6601,
+      "p_raw": 0.000683743501274341,
+      "p_holm": 0.0061536915114690695,
+      "lstm_accuracy": 0.5175688727406522,
+      "baseline_accuracy": 0.508439497769397,
+      "lstm_ci95": [
+        0.5128710197349989,
+        0.5222636220283384
+      ],
+      "baseline_ci95": [
+        0.503740218951672,
+        0.5131372856650096
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "EUR/USD",
+      "baseline": "majority",
+      "n": 43486,
+      "lstm_correct": 22507,
+      "baseline_correct": 21843,
+      "lstm_only": 11516,
+      "baseline_only": 10852,
+      "p_raw": 9.278833104469173e-06,
+      "p_holm": 0.00010206716414916091,
+      "lstm_accuracy": 0.5175688727406522,
+      "baseline_accuracy": 0.5022995906728602,
+      "lstm_ci95": [
+        0.5128710197349989,
+        0.5222636220283384
+      ],
+      "baseline_ci95": [
+        0.49760023449789903,
+        0.5069985406020142
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "EUR/USD",
+      "baseline": "persistence",
+      "n": 43486,
+      "lstm_correct": 22507,
+      "baseline_correct": 21009,
+      "lstm_only": 16243,
+      "baseline_only": 14745,
+      "p_raw": 1.8055431581429636e-17,
+      "p_holm": 2.7083147372144455e-16,
+      "lstm_accuracy": 0.5175688727406522,
+      "baseline_accuracy": 0.4831210044612059,
+      "lstm_ci95": [
+        0.5128710197349989,
+        0.5222636220283384
+      ],
+      "baseline_ci95": [
+        0.4784259707724915,
+        0.48781901999414523
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "EUR/USD",
+      "baseline": "anti_persistence",
+      "n": 43486,
+      "lstm_correct": 22507,
+      "baseline_correct": 22465,
+      "lstm_only": 6278,
+      "baseline_only": 6236,
+      "p_raw": 0.7139861582488704,
+      "p_holm": 1.0,
+      "lstm_accuracy": 0.5175688727406522,
+      "baseline_accuracy": 0.5166030446580508,
+      "lstm_ci95": [
+        0.5128710197349989,
+        0.5222636220283384
+      ],
+      "baseline_ci95": [
+        0.5119049666232076,
+        0.5212981895981661
+      ],
+      "beats": false,
+      "significantly_worse": false
+    },
+    {
+      "pair": "GBP/USD",
+      "baseline": "logistic",
+      "n": 43520,
+      "lstm_correct": 22488,
+      "baseline_correct": 21984,
+      "lstm_only": 7106,
+      "baseline_only": 6602,
+      "p_raw": 1.7342132710840785e-05,
+      "p_holm": 0.00017342132710840784,
+      "lstm_accuracy": 0.5167279411764706,
+      "baseline_accuracy": 0.5051470588235294,
+      "lstm_ci95": [
+        0.5120317272021387,
+        0.5214212023003632
+      ],
+      "baseline_ci95": [
+        0.5004494864856327,
+        0.5098437225920601
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "GBP/USD",
+      "baseline": "majority",
+      "n": 43520,
+      "lstm_correct": 22488,
+      "baseline_correct": 21700,
+      "lstm_only": 10915,
+      "baseline_only": 10127,
+      "p_raw": 5.7629493627906696e-08,
+      "p_holm": 6.915539235348804e-07,
+      "lstm_accuracy": 0.5167279411764706,
+      "baseline_accuracy": 0.49862132352941174,
+      "lstm_ci95": [
+        0.5120317272021387,
+        0.5214212023003632
+      ],
+      "baseline_ci95": [
+        0.4939240961431519,
+        0.503318794282466
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "GBP/USD",
+      "baseline": "persistence",
+      "n": 43520,
+      "lstm_correct": 22488,
+      "baseline_correct": 20994,
+      "lstm_only": 17334,
+      "baseline_only": 15840,
+      "p_raw": 2.4345298745442173e-16,
+      "p_holm": 3.1648888369074825e-15,
+      "lstm_accuracy": 0.5167279411764706,
+      "baseline_accuracy": 0.48239889705882355,
+      "lstm_ci95": [
+        0.5120317272021387,
+        0.5214212023003632
+      ],
+      "baseline_ci95": [
+        0.47770599474773684,
+        0.48709490635265257
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "GBP/USD",
+      "baseline": "anti_persistence",
+      "n": 43520,
+      "lstm_correct": 22488,
+      "baseline_correct": 22524,
+      "lstm_only": 5144,
+      "baseline_only": 5180,
+      "p_raw": 0.7304990852063571,
+      "p_holm": 1.0,
+      "lstm_accuracy": 0.5167279411764706,
+      "baseline_accuracy": 0.5175551470588236,
+      "lstm_ci95": [
+        0.5120317272021387,
+        0.5214212023003632
+      ],
+      "baseline_ci95": [
+        0.5128591266345854,
+        0.5222480686125457
+      ],
+      "beats": false,
+      "significantly_worse": false
+    },
+    {
+      "pair": "USD/JPY",
+      "baseline": "logistic",
+      "n": 43496,
+      "lstm_correct": 22550,
+      "baseline_correct": 22424,
+      "lstm_only": 6459,
+      "baseline_only": 6333,
+      "p_raw": 0.2690723440803433,
+      "p_holm": 1.0,
+      "lstm_accuracy": 0.5184384771013426,
+      "baseline_accuracy": 0.5155416590031268,
+      "lstm_ci95": [
+        0.5137413819111758,
+        0.5231323156980081
+      ],
+      "baseline_ci95": [
+        0.5108438941546748,
+        0.5202366788924678
+      ],
+      "beats": false,
+      "significantly_worse": false
+    },
+    {
+      "pair": "USD/JPY",
+      "baseline": "majority",
+      "n": 43496,
+      "lstm_correct": 22550,
+      "baseline_correct": 22245,
+      "lstm_only": 7427,
+      "baseline_only": 7122,
+      "p_raw": 0.011721988624154526,
+      "p_holm": 0.08205392036908168,
+      "lstm_accuracy": 0.5184384771013426,
+      "baseline_accuracy": 0.5114263380540739,
+      "lstm_ci95": [
+        0.5137413819111758,
+        0.5231323156980081
+      ],
+      "baseline_ci95": [
+        0.5067278933987346,
+        0.5161227645959842
+      ],
+      "beats": false,
+      "significantly_worse": false
+    },
+    {
+      "pair": "USD/JPY",
+      "baseline": "persistence",
+      "n": 43496,
+      "lstm_correct": 22550,
+      "baseline_correct": 20929,
+      "lstm_only": 15797,
+      "baseline_only": 14176,
+      "p_raw": 8.008431632473044e-21,
+      "p_holm": 1.281349061195687e-19,
+      "lstm_accuracy": 0.5184384771013426,
+      "baseline_accuracy": 0.4811706823615965,
+      "lstm_ci95": [
+        0.5137413819111758,
+        0.5231323156980081
+      ],
+      "baseline_ci95": [
+        0.47647701524223834,
+        0.48586767510449275
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "USD/JPY",
+      "baseline": "anti_persistence",
+      "n": 43496,
+      "lstm_correct": 22550,
+      "baseline_correct": 22563,
+      "lstm_only": 6727,
+      "baseline_only": 6740,
+      "p_raw": 0.917641238238549,
+      "p_holm": 1.0,
+      "lstm_accuracy": 0.5184384771013426,
+      "baseline_accuracy": 0.5187373551590951,
+      "lstm_ci95": [
+        0.5137413819111758,
+        0.5231323156980081
+      ],
+      "baseline_ci95": [
+        0.5140403380521499,
+        0.523431062884864
+      ],
+      "beats": false,
+      "significantly_worse": false
+    },
+    {
+      "pair": "XAU/USD",
+      "baseline": "logistic",
+      "n": 41324,
+      "lstm_correct": 21336,
+      "baseline_correct": 21155,
+      "lstm_only": 6645,
+      "baseline_only": 6464,
+      "p_raw": 0.11591760947111998,
+      "p_holm": 0.6955056568267199,
+      "lstm_accuracy": 0.5163101345465105,
+      "baseline_accuracy": 0.5119301132513794,
+      "lstm_ci95": [
+        0.511490632102902,
+        0.5211266049077257
+      ],
+      "baseline_ci95": [
+        0.507109825022341,
+        0.5167481836516049
+      ],
+      "beats": false,
+      "significantly_worse": false
+    },
+    {
+      "pair": "XAU/USD",
+      "baseline": "majority",
+      "n": 41324,
+      "lstm_correct": 21336,
+      "baseline_correct": 20862,
+      "lstm_only": 11108,
+      "baseline_only": 10634,
+      "p_raw": 0.001336872411434272,
+      "p_holm": 0.010694979291474177,
+      "lstm_accuracy": 0.5163101345465105,
+      "baseline_accuracy": 0.5048398025360565,
+      "lstm_ci95": [
+        0.511490632102902,
+        0.5211266049077257
+      ],
+      "baseline_ci95": [
+        0.5000190269091955,
+        0.5096596784352043
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "XAU/USD",
+      "baseline": "persistence",
+      "n": 41324,
+      "lstm_correct": 21336,
+      "baseline_correct": 19858,
+      "lstm_only": 16328,
+      "baseline_only": 14850,
+      "p_raw": 5.942605133484398e-17,
+      "p_holm": 8.319647186878157e-16,
+      "lstm_accuracy": 0.5163101345465105,
+      "baseline_accuracy": 0.48054399380505275,
+      "lstm_ci95": [
+        0.511490632102902,
+        0.5211266049077257
+      ],
+      "baseline_ci95": [
+        0.4757289012296219,
+        0.4853627032858903
+      ],
+      "beats": true,
+      "significantly_worse": false
+    },
+    {
+      "pair": "XAU/USD",
+      "baseline": "anti_persistence",
+      "n": 41324,
+      "lstm_correct": 21336,
+      "baseline_correct": 21462,
+      "lstm_only": 5007,
+      "baseline_only": 5133,
+      "p_raw": 0.21447783522042896,
+      "p_holm": 1.0,
+      "lstm_accuracy": 0.5163101345465105,
+      "baseline_accuracy": 0.5193592101442261,
+      "lstm_ci95": [
+        0.511490632102902,
+        0.5211266049077257
+      ],
+      "baseline_ci95": [
+        0.5145404734135556,
+        0.524174347964044
+      ],
+      "beats": false,
+      "significantly_worse": false
+    }
+  ],
+  "controls": [
+    {
+      "pair": "EUR/USD",
+      "fold": "test2022",
+      "config": "lstm-h32-w32",
+      "shuffle_seed": 777,
+      "best_epoch": 2,
+      "test": {
+        "n": 6216,
+        "correct": 3016,
+        "accuracy": 0.4851994851994852,
+        "accuracy_ci95": [
+          0.47278815125154006,
+          0.4976291011465801
+        ],
+        "balanced_accuracy": 0.48972698185965446,
+        "log_loss": 0.6936906683809426,
+        "brier": 0.25027153613407577
+      },
+      "majority": {
+        "n": 6216,
+        "correct": 3043,
+        "accuracy": 0.48954311454311455,
+        "accuracy_ci95": [
+          0.47712637223524124,
+          0.5019727734808219
+        ],
+        "balanced_accuracy": 0.5,
+        "log_loss": null,
+        "brier": null
+      },
+      "mcnemar_vs_majority": {
+        "control_only": 867,
+        "majority_only": 894,
+        "p_value": 0.5355497449349186
+      },
+      "beats_majority": false
+    },
+    {
+      "pair": "GBP/USD",
+      "fold": "test2022",
+      "config": "lstm-h32-w32",
+      "shuffle_seed": 777,
+      "best_epoch": 7,
+      "test": {
+        "n": 6222,
+        "correct": 3129,
+        "accuracy": 0.5028929604628737,
+        "accuracy_ci95": [
+          0.49047145554306326,
+          0.515310895362933
+        ],
+        "balanced_accuracy": 0.5092845785188403,
+        "log_loss": 0.6932494704252112,
+        "brier": 0.2500508604400637
+      },
+      "majority": {
+        "n": 6222,
+        "correct": 3039,
+        "accuracy": 0.4884281581485053,
+        "accuracy_ci95": [
+          0.47601869515053424,
+          0.5008519012254813
+        ],
+        "balanced_accuracy": 0.5,
+        "log_loss": null,
+        "brier": null
+      },
+      "mcnemar_vs_majority": {
+        "control_only": 742,
+        "majority_only": 652,
+        "p_value": 0.01710668673174074
+      },
+      "beats_majority": true
+    },
+    {
+      "pair": "USD/JPY",
+      "fold": "test2022",
+      "config": "lstm-h64-w32",
+      "shuffle_seed": 777,
+      "best_epoch": 5,
+      "test": {
+        "n": 6218,
+        "correct": 3247,
+        "accuracy": 0.5221936313927308,
+        "accuracy_ci95": [
+          0.5097682467677827,
+          0.5345916106517141
+        ],
+        "balanced_accuracy": 0.49972922737920833,
+        "log_loss": 0.692345520893531,
+        "brier": 0.24959909536058003
+      },
+      "majority": {
+        "n": 6218,
+        "correct": 3261,
+        "accuracy": 0.5244451592151818,
+        "accuracy_ci95": [
+          0.512020994932676,
+          0.5368391378772045
+        ],
+        "balanced_accuracy": 0.5,
+        "log_loss": null,
+        "brier": null
+      },
+      "mcnemar_vs_majority": {
+        "control_only": 119,
+        "majority_only": 133,
+        "p_value": 0.4128820984486067
+      },
+      "beats_majority": false
+    },
+    {
+      "pair": "XAU/USD",
+      "fold": "test2022",
+      "config": "lstm-h32-w32",
+      "shuffle_seed": 777,
+      "best_epoch": 1,
+      "test": {
+        "n": 5905,
+        "correct": 2903,
+        "accuracy": 0.49161727349703643,
+        "accuracy_ci95": [
+          0.4788757838575214,
+          0.5043696627008368
+        ],
+        "balanced_accuracy": 0.4925187751948763,
+        "log_loss": 0.6936236567535351,
+        "brier": 0.25023818982752866
+      },
+      "majority": {
+        "n": 5905,
+        "correct": 2926,
+        "accuracy": 0.49551227773073664,
+        "accuracy_ci95": [
+          0.4827669783855551,
+          0.5082634121961921
+        ],
+        "balanced_accuracy": 0.5,
+        "log_loss": null,
+        "brier": null
+      },
+      "mcnemar_vs_majority": {
+        "control_only": 1168,
+        "majority_only": 1191,
+        "p_value": 0.6505875676678576
+      },
+      "beats_majority": false
+    }
+  ],
+  "reproducibility": {
+    "pair": "EUR/USD",
+    "fold": "test2022",
+    "config": "lstm-h32-w32",
+    "state_dict_equal": true,
+    "tensors": {
+      "lstm.weight_ih_l0": [
+        128,
+        10
+      ],
+      "lstm.weight_hh_l0": [
+        128,
+        32
+      ],
+      "lstm.bias_ih_l0": [
+        128
+      ],
+      "lstm.bias_hh_l0": [
+        128
+      ],
+      "head.weight": [
+        1,
+        32
+      ],
+      "head.bias": [
+        1
+      ]
+    },
+    "sha256_saved": "79fd0ec960b3940280979bcd175b98c6e962b9cae47fdad878b0f7b0f6867c04",
+    "sha256_rerun": "d981973bc16bd8353c71efaf98f4391f49ceb4008f5202bfc14afd7a7f23d107",
+    "bars_sha256_saved": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+    "bars_sha256_rerun": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+    "best_epoch_saved": 7,
+    "best_epoch_rerun": 7
+  },
+  "sql_check": [
+    {
+      "pair": "EUR/USD",
+      "test_year": 2016,
+      "python": {
+        "n": 6224,
+        "up": 3157,
+        "majority_correct": 3157,
+        "persistence_correct": 3040,
+        "anti_persistence_correct": 3177
+      },
+      "sql": {
+        "n": 6224,
+        "up": 3157,
+        "majority_correct": 3157,
+        "persistence_correct": 3040,
+        "anti_persistence_correct": 3177
+      },
+      "match": true
+    },
+    {
+      "pair": "EUR/USD",
+      "test_year": 2017,
+      "python": {
+        "n": 6201,
+        "up": 3126,
+        "majority_correct": 3126,
+        "persistence_correct": 2967,
+        "anti_persistence_correct": 3229
+      },
+      "sql": {
+        "n": 6201,
+        "up": 3126,
+        "majority_correct": 3126,
+        "persistence_correct": 2967,
+        "anti_persistence_correct": 3229
+      },
+      "match": true
+    },
+    {
+      "pair": "EUR/USD",
+      "test_year": 2018,
+      "python": {
+        "n": 6209,
+        "up": 3105,
+        "majority_correct": 3105,
+        "persistence_correct": 3013,
+        "anti_persistence_correct": 3193
+      },
+      "sql": {
+        "n": 6209,
+        "up": 3105,
+        "majority_correct": 3105,
+        "persistence_correct": 3013,
+        "anti_persistence_correct": 3193
+      },
+      "match": true
+    },
+    {
+      "pair": "EUR/USD",
+      "test_year": 2019,
+      "python": {
+        "n": 6195,
+        "up": 3105,
+        "majority_correct": 3105,
+        "persistence_correct": 2949,
+        "anti_persistence_correct": 3244
+      },
+      "sql": {
+        "n": 6195,
+        "up": 3105,
+        "majority_correct": 3105,
+        "persistence_correct": 2949,
+        "anti_persistence_correct": 3244
+      },
+      "match": true
+    },
+    {
+      "pair": "EUR/USD",
+      "test_year": 2020,
+      "python": {
+        "n": 6227,
+        "up": 3208,
+        "majority_correct": 3208,
+        "persistence_correct": 3010,
+        "anti_persistence_correct": 3223
+      },
+      "sql": {
+        "n": 6227,
+        "up": 3208,
+        "majority_correct": 3208,
+        "persistence_correct": 3010,
+        "anti_persistence_correct": 3223
+      },
+      "match": true
+    },
+    {
+      "pair": "EUR/USD",
+      "test_year": 2021,
+      "python": {
+        "n": 6214,
+        "up": 3099,
+        "majority_correct": 3099,
+        "persistence_correct": 3007,
+        "anti_persistence_correct": 3210
+      },
+      "sql": {
+        "n": 6214,
+        "up": 3099,
+        "majority_correct": 3099,
+        "persistence_correct": 3007,
+        "anti_persistence_correct": 3210
+      },
+      "match": true
+    },
+    {
+      "pair": "EUR/USD",
+      "test_year": 2022,
+      "python": {
+        "n": 6216,
+        "up": 3043,
+        "majority_correct": 3043,
+        "persistence_correct": 3023,
+        "anti_persistence_correct": 3189
+      },
+      "sql": {
+        "n": 6216,
+        "up": 3043,
+        "majority_correct": 3043,
+        "persistence_correct": 3023,
+        "anti_persistence_correct": 3189
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2016,
+      "python": {
+        "n": 6227,
+        "up": 3104,
+        "majority_correct": 3104,
+        "persistence_correct": 2992,
+        "anti_persistence_correct": 3236
+      },
+      "sql": {
+        "n": 6227,
+        "up": 3104,
+        "majority_correct": 3104,
+        "persistence_correct": 2992,
+        "anti_persistence_correct": 3236
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2017,
+      "python": {
+        "n": 6200,
+        "up": 3168,
+        "majority_correct": 3032,
+        "persistence_correct": 3037,
+        "anti_persistence_correct": 3157
+      },
+      "sql": {
+        "n": 6200,
+        "up": 3168,
+        "majority_correct": 3032,
+        "persistence_correct": 3037,
+        "anti_persistence_correct": 3157
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2018,
+      "python": {
+        "n": 6210,
+        "up": 3091,
+        "majority_correct": 3119,
+        "persistence_correct": 2977,
+        "anti_persistence_correct": 3230
+      },
+      "sql": {
+        "n": 6210,
+        "up": 3091,
+        "majority_correct": 3119,
+        "persistence_correct": 2977,
+        "anti_persistence_correct": 3230
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2019,
+      "python": {
+        "n": 6203,
+        "up": 3110,
+        "majority_correct": 3110,
+        "persistence_correct": 2944,
+        "anti_persistence_correct": 3263
+      },
+      "sql": {
+        "n": 6203,
+        "up": 3110,
+        "majority_correct": 3110,
+        "persistence_correct": 2944,
+        "anti_persistence_correct": 3263
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2020,
+      "python": {
+        "n": 6235,
+        "up": 3177,
+        "majority_correct": 3177,
+        "persistence_correct": 3007,
+        "anti_persistence_correct": 3232
+      },
+      "sql": {
+        "n": 6235,
+        "up": 3177,
+        "majority_correct": 3177,
+        "persistence_correct": 3007,
+        "anti_persistence_correct": 3232
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2021,
+      "python": {
+        "n": 6223,
+        "up": 3119,
+        "majority_correct": 3119,
+        "persistence_correct": 3014,
+        "anti_persistence_correct": 3208
+      },
+      "sql": {
+        "n": 6223,
+        "up": 3119,
+        "majority_correct": 3119,
+        "persistence_correct": 3014,
+        "anti_persistence_correct": 3208
+      },
+      "match": true
+    },
+    {
+      "pair": "GBP/USD",
+      "test_year": 2022,
+      "python": {
+        "n": 6222,
+        "up": 3039,
+        "majority_correct": 3039,
+        "persistence_correct": 3023,
+        "anti_persistence_correct": 3198
+      },
+      "sql": {
+        "n": 6222,
+        "up": 3039,
+        "majority_correct": 3039,
+        "persistence_correct": 3023,
+        "anti_persistence_correct": 3198
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2016,
+      "python": {
+        "n": 6227,
+        "up": 3165,
+        "majority_correct": 3165,
+        "persistence_correct": 2971,
+        "anti_persistence_correct": 3260
+      },
+      "sql": {
+        "n": 6227,
+        "up": 3165,
+        "majority_correct": 3165,
+        "persistence_correct": 2971,
+        "anti_persistence_correct": 3260
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2017,
+      "python": {
+        "n": 6208,
+        "up": 3154,
+        "majority_correct": 3154,
+        "persistence_correct": 2916,
+        "anti_persistence_correct": 3292
+      },
+      "sql": {
+        "n": 6208,
+        "up": 3154,
+        "majority_correct": 3154,
+        "persistence_correct": 2916,
+        "anti_persistence_correct": 3292
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2018,
+      "python": {
+        "n": 6213,
+        "up": 3214,
+        "majority_correct": 3214,
+        "persistence_correct": 3011,
+        "anti_persistence_correct": 3201
+      },
+      "sql": {
+        "n": 6213,
+        "up": 3214,
+        "majority_correct": 3214,
+        "persistence_correct": 3011,
+        "anti_persistence_correct": 3201
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2019,
+      "python": {
+        "n": 6193,
+        "up": 3159,
+        "majority_correct": 3159,
+        "persistence_correct": 2964,
+        "anti_persistence_correct": 3229
+      },
+      "sql": {
+        "n": 6193,
+        "up": 3159,
+        "majority_correct": 3159,
+        "persistence_correct": 2964,
+        "anti_persistence_correct": 3229
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2020,
+      "python": {
+        "n": 6225,
+        "up": 3067,
+        "majority_correct": 3067,
+        "persistence_correct": 2993,
+        "anti_persistence_correct": 3232
+      },
+      "sql": {
+        "n": 6225,
+        "up": 3067,
+        "majority_correct": 3067,
+        "persistence_correct": 2993,
+        "anti_persistence_correct": 3232
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2021,
+      "python": {
+        "n": 6212,
+        "up": 3225,
+        "majority_correct": 3225,
+        "persistence_correct": 2987,
+        "anti_persistence_correct": 3215
+      },
+      "sql": {
+        "n": 6212,
+        "up": 3225,
+        "majority_correct": 3225,
+        "persistence_correct": 2987,
+        "anti_persistence_correct": 3215
+      },
+      "match": true
+    },
+    {
+      "pair": "USD/JPY",
+      "test_year": 2022,
+      "python": {
+        "n": 6218,
+        "up": 3261,
+        "majority_correct": 3261,
+        "persistence_correct": 3087,
+        "anti_persistence_correct": 3134
+      },
+      "sql": {
+        "n": 6218,
+        "up": 3261,
+        "majority_correct": 3261,
+        "persistence_correct": 3087,
+        "anti_persistence_correct": 3134
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2016,
+      "python": {
+        "n": 5905,
+        "up": 2990,
+        "majority_correct": 2990,
+        "persistence_correct": 2836,
+        "anti_persistence_correct": 3070
+      },
+      "sql": {
+        "n": 5905,
+        "up": 2990,
+        "majority_correct": 2990,
+        "persistence_correct": 2836,
+        "anti_persistence_correct": 3070
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2017,
+      "python": {
+        "n": 5880,
+        "up": 2979,
+        "majority_correct": 2979,
+        "persistence_correct": 2802,
+        "anti_persistence_correct": 3076
+      },
+      "sql": {
+        "n": 5880,
+        "up": 2979,
+        "majority_correct": 2979,
+        "persistence_correct": 2802,
+        "anti_persistence_correct": 3076
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2018,
+      "python": {
+        "n": 5902,
+        "up": 2950,
+        "majority_correct": 2950,
+        "persistence_correct": 2851,
+        "anti_persistence_correct": 3053
+      },
+      "sql": {
+        "n": 5902,
+        "up": 2950,
+        "majority_correct": 2950,
+        "persistence_correct": 2851,
+        "anti_persistence_correct": 3053
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2019,
+      "python": {
+        "n": 5901,
+        "up": 2978,
+        "majority_correct": 2978,
+        "persistence_correct": 2889,
+        "anti_persistence_correct": 3012
+      },
+      "sql": {
+        "n": 5901,
+        "up": 2978,
+        "majority_correct": 2978,
+        "persistence_correct": 2889,
+        "anti_persistence_correct": 3012
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2020,
+      "python": {
+        "n": 5925,
+        "up": 3081,
+        "majority_correct": 3081,
+        "persistence_correct": 2813,
+        "anti_persistence_correct": 3110
+      },
+      "sql": {
+        "n": 5925,
+        "up": 3081,
+        "majority_correct": 3081,
+        "persistence_correct": 2813,
+        "anti_persistence_correct": 3110
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2021,
+      "python": {
+        "n": 5906,
+        "up": 2958,
+        "majority_correct": 2958,
+        "persistence_correct": 2783,
+        "anti_persistence_correct": 3122
+      },
+      "sql": {
+        "n": 5906,
+        "up": 2958,
+        "majority_correct": 2958,
+        "persistence_correct": 2783,
+        "anti_persistence_correct": 3122
+      },
+      "match": true
+    },
+    {
+      "pair": "XAU/USD",
+      "test_year": 2022,
+      "python": {
+        "n": 5905,
+        "up": 2926,
+        "majority_correct": 2926,
+        "persistence_correct": 2884,
+        "anti_persistence_correct": 3019
+      },
+      "sql": {
+        "n": 5905,
+        "up": 2926,
+        "majority_correct": 2926,
+        "persistence_correct": 2884,
+        "anti_persistence_correct": 3019
+      },
+      "match": true
+    }
+  ],
+  "break_even": [
+    {
+      "pair": "EUR/USD",
+      "mean_move_pips": 7.151746539116037,
+      "mean_spread_pips": 0.4639021754127765,
+      "break_even_accuracy": 0.5324327891708335
+    },
+    {
+      "pair": "GBP/USD",
+      "mean_move_pips": 10.343239889705881,
+      "mean_spread_pips": 1.3323736213235295,
+      "break_even_accuracy": 0.5644079435230722
+    },
+    {
+      "pair": "USD/JPY",
+      "mean_move_pips": 7.811506805223469,
+      "mean_spread_pips": 0.5734803200294281,
+      "break_even_accuracy": 0.5367074070553166
+    },
+    {
+      "pair": "XAU/USD",
+      "mean_move_pips": 178.75892338592584,
+      "mean_spread_pips": 36.39090964088665,
+      "break_even_accuracy": 0.6017876728937376
+    }
+  ]
+}

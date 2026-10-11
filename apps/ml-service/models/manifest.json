@@ -1,0 +1,4047 @@
+{
+  "generated_at": "2026-10-11 20:06 UTC",
+  "commit": "0361864",
+  "target": "direction of the next H1 bar, mid open to close",
+  "features": "see ml_service.features.FEATURE_NAMES",
+  "lstm_grid": [
+    "lstm-h32-w32",
+    "lstm-h64-w32"
+  ],
+  "logistic_grid": [
+    "logistic-w32"
+  ],
+  "models": [
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2016,
+      "id": "EUR_USD-1h-test2016",
+      "periods": {
+        "train": [
+          1262304000,
+          1420070400
+        ],
+        "validation": [
+          1420070400,
+          1451606400
+        ],
+        "test": [
+          1451606400,
+          1483228800
+        ]
+      },
+      "samples": {
+        "train": 31070,
+        "validation": 6210,
+        "test": 6224
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -5.418471358433136e-06,
+          -1.9504348200458627e-06,
+          -3.4680365383876707e-06,
+          0.001617399159626416,
+          0.741144815657132,
+          -0.0026048834925767646,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0012029009361395272,
+          0.0011885661788406524,
+          0.00019317788744004126,
+          0.0011889707864272347,
+          0.5172856728044763,
+          0.05895729394580252,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 31219
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "EURUSD-1h-test2016-lstm.pt",
+          "sha256": "d50117c5517bae871839e8f84123091628fd4b6df5564ee366cc4927f91f090d"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2016-logistic.pt",
+          "sha256": "b8e548c44b544a74d23f3f421c0f5730b01129e7ccfafb341d901c0ad607ef6b"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2016-test.npz",
+        "sha256": "01419dc87a63cc4f63697dc55f308f9fc4e58de21ce155d81d0d8b4f12c4cc73"
+      },
+      "test": {
+        "lstm": {
+          "n": 6224,
+          "correct": 3233,
+          "accuracy": 0.5194408740359897,
+          "accuracy_ci95": [
+            0.5070203336680438,
+            0.5318374313537756
+          ],
+          "balanced_accuracy": 0.5191939721471241,
+          "log_loss": 0.6922451657084753,
+          "brier": 0.2495458596559401
+        },
+        "logistic": {
+          "n": 6224,
+          "correct": 3161,
+          "accuracy": 0.5078727506426736,
+          "accuracy_ci95": [
+            0.4954514997937045,
+            0.5202842893473629
+          ],
+          "balanced_accuracy": 0.5097566552670849,
+          "log_loss": 0.6967617337836093,
+          "brier": 0.2517040976338858
+        },
+        "majority": {
+          "n": 6224,
+          "correct": 3157,
+          "accuracy": 0.5072300771208226,
+          "accuracy_ci95": [
+            0.49480898174550714,
+            0.5196422531799628
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931371923211079,
+          "brier": 0.24999500588140555
+        },
+        "persistence": {
+          "n": 6224,
+          "correct": 3040,
+          "accuracy": 0.4884318766066838,
+          "accuracy_ci95": [
+            0.4760244007716173,
+            0.5008536233476307
+          ],
+          "balanced_accuracy": 0.4883109447035425,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6224,
+          "correct": 3177,
+          "accuracy": 0.5104434447300771,
+          "accuracy_ci95": [
+            0.4980217771085123,
+            0.5228522288949444
+          ],
+          "balanced_accuracy": 0.5105292847863248,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2017,
+      "id": "EUR_USD-1h-test2017",
+      "periods": {
+        "train": [
+          1262304000,
+          1451606400
+        ],
+        "validation": [
+          1451606400,
+          1483228800
+        ],
+        "test": [
+          1483228800,
+          1514764800
+        ]
+      },
+      "samples": {
+        "train": 37280,
+        "validation": 6224,
+        "test": 6201
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -7.4047751378186435e-06,
+          -3.0850285673559665e-06,
+          -4.319746570462904e-06,
+          0.0016798058826694526,
+          0.6944533461517919,
+          -0.0025771160781300766,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0012620318690771421,
+          0.0012446612184284478,
+          0.0002110679429604854,
+          0.0012623240036088168,
+          0.559511759640283,
+          0.058270074960815266,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 37446
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "EURUSD-1h-test2017-lstm.pt",
+          "sha256": "d7b7a0e1fdc7ee90ec0411c25e852cf806007a74317836d4afa0cdd9d060c207"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2017-logistic.pt",
+          "sha256": "7f2ac2c1df1dc0edd25606be562e0a86e5d069edf3e0af0fe69c9214711054fc"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2017-test.npz",
+        "sha256": "b389a504d4034b669ee326e1c003883d9583fb32613e06b3b3d8169f170073e6"
+      },
+      "test": {
+        "lstm": {
+          "n": 6201,
+          "correct": 3249,
+          "accuracy": 0.5239477503628447,
+          "accuracy_ci95": [
+            0.5115062658547345,
+            0.5363595824463192
+          ],
+          "balanced_accuracy": 0.5238386155454645,
+          "log_loss": 0.6918159616108795,
+          "brier": 0.24933090515883197
+        },
+        "logistic": {
+          "n": 6201,
+          "correct": 3149,
+          "accuracy": 0.5078213191420738,
+          "accuracy_ci95": [
+            0.4953770709032406,
+            0.520255882918989
+          ],
+          "balanced_accuracy": 0.5080984036327887,
+          "log_loss": 0.694636152194732,
+          "brier": 0.2507243944766605
+        },
+        "majority": {
+          "n": 6201,
+          "correct": 3126,
+          "accuracy": 0.5041122399612966,
+          "accuracy_ci95": [
+            0.4916691873006439,
+            0.5165502007914563
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931389316306714,
+          "brier": 0.24999587553689065
+        },
+        "persistence": {
+          "n": 6201,
+          "correct": 2967,
+          "accuracy": 0.4784712143202709,
+          "accuracy_ci95": [
+            0.46605514633824435,
+            0.49091393953252555
+          ],
+          "balanced_accuracy": 0.47842001778942933,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6201,
+          "correct": 3229,
+          "accuracy": 0.5207224641186905,
+          "accuracy_ci95": [
+            0.5082793901959799,
+            0.5331398792093089
+          ],
+          "balanced_accuracy": 0.5207430987937518,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2018,
+      "id": "EUR_USD-1h-test2018",
+      "periods": {
+        "train": [
+          1262304000,
+          1483228800
+        ],
+        "validation": [
+          1483228800,
+          1514764800
+        ],
+        "test": [
+          1514764800,
+          1546300800
+        ]
+      },
+      "samples": {
+        "train": 43504,
+        "validation": 6201,
+        "test": 6209
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -7.075624788525292e-06,
+          -2.708882194153851e-06,
+          -4.36674259437153e-06,
+          0.001652521734157277,
+          0.6556768758870118,
+          -0.0023765580147530247,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.001249529883552896,
+          0.0012331489591494026,
+          0.00020727197668074014,
+          0.0012607460563123936,
+          0.5933860604815345,
+          0.05422227562734163,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 43686
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "EURUSD-1h-test2018-lstm.pt",
+          "sha256": "dcbc51c2285dd0edfd3387ebf809af35b49c55beaa2f4fb4b0ce462e74423127"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2018-logistic.pt",
+          "sha256": "8543d47558adb42d0671d874cf18fd05a673b40386cc2bf125b4bcbf3f665c61"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2018-test.npz",
+        "sha256": "783885565c1bd0b1a6548e68732b4f149b80ed712b2cbc3e31f9436383d9e583"
+      },
+      "test": {
+        "lstm": {
+          "n": 6209,
+          "correct": 3222,
+          "accuracy": 0.5189241423739732,
+          "accuracy_ci95": [
+            0.5064884292460078,
+            0.531336453548379
+          ],
+          "balanced_accuracy": 0.5189078660125837,
+          "log_loss": 0.6926847770412556,
+          "brier": 0.24976598094393773
+        },
+        "logistic": {
+          "n": 6209,
+          "correct": 3123,
+          "accuracy": 0.502979545820583,
+          "accuracy_ci95": [
+            0.4905450092936181,
+            0.5154103977846471
+          ],
+          "balanced_accuracy": 0.5029770946428275,
+          "log_loss": 0.6947543616226661,
+          "brier": 0.25079641560362764
+        },
+        "majority": {
+          "n": 6209,
+          "correct": 3105,
+          "accuracy": 0.5000805282654212,
+          "accuracy_ci95": [
+            0.4876475637729916,
+            0.5125133931750695
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931511640664907,
+          "brier": 0.250001991744022
+        },
+        "persistence": {
+          "n": 6209,
+          "correct": 3013,
+          "accuracy": 0.4852633274279272,
+          "accuracy_ci95": [
+            0.4728449223233402,
+            0.49769995618145635
+          ],
+          "balanced_accuracy": 0.4852630546839982,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6209,
+          "correct": 3193,
+          "accuracy": 0.5142535029795459,
+          "accuracy_ci95": [
+            0.5018168247434677,
+            0.5266725550633685
+          ],
+          "balanced_accuracy": 0.5142533347444261,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2019,
+      "id": "EUR_USD-1h-test2019",
+      "periods": {
+        "train": [
+          1262304000,
+          1514764800
+        ],
+        "validation": [
+          1514764800,
+          1546300800
+        ],
+        "test": [
+          1546300800,
+          1577836800
+        ]
+      },
+      "samples": {
+        "train": 49705,
+        "validation": 6209,
+        "test": 6195
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -3.5479149690342946e-06,
+          6.863658901717689e-08,
+          -3.616551558051382e-06,
+          0.0016013649175270382,
+          0.6228486706337281,
+          -0.0022228401710610835,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0012134800556609126,
+          0.0011963177167113152,
+          0.0002144575392836884,
+          0.0012254111193890254,
+          0.5878738195714781,
+          0.0509816943011604,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 49911
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "EURUSD-1h-test2019-lstm.pt",
+          "sha256": "0d3f12ab698dba7df5a8dfdb47093d98467b8d444932714d9f061cd575e9268a"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2019-logistic.pt",
+          "sha256": "850f7beecd41c4bbb0ea6f7ece6b32769dc67a0dfa9814bcd5a6571fa4b71994"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2019-test.npz",
+        "sha256": "0de3b8c639515e78cf0202e2b50a682877a5935bc880d93ba3da5ba699606435"
+      },
+      "test": {
+        "lstm": {
+          "n": 6195,
+          "correct": 3211,
+          "accuracy": 0.5183212267958031,
+          "accuracy_ci95": [
+            0.5058712799857279,
+            0.5307484660600414
+          ],
+          "balanced_accuracy": 0.5189328205368728,
+          "log_loss": 0.6922044679900821,
+          "brier": 0.24952938856492315
+        },
+        "logistic": {
+          "n": 6195,
+          "correct": 3163,
+          "accuracy": 0.5105730427764326,
+          "accuracy_ci95": [
+            0.4981223253251998,
+            0.5230106558730195
+          ],
+          "balanced_accuracy": 0.510832043525163,
+          "log_loss": 0.6934573108136002,
+          "brier": 0.2501483315338818
+        },
+        "majority": {
+          "n": 6195,
+          "correct": 3105,
+          "accuracy": 0.5012106537530266,
+          "accuracy_ci95": [
+            0.48876299323830363,
+            0.5136568137691261
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931449936161782,
+          "brier": 0.2499989065256231
+        },
+        "persistence": {
+          "n": 6195,
+          "correct": 2949,
+          "accuracy": 0.47602905569007264,
+          "accuracy_ci95": [
+            0.46361126743599496,
+            0.4884765538168972
+          ],
+          "balanced_accuracy": 0.476022075262261,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6195,
+          "correct": 3244,
+          "accuracy": 0.5236481033091203,
+          "accuracy_ci95": [
+            0.5112004223485096,
+            0.5360664745299504
+          ],
+          "balanced_accuracy": 0.5236433563153698,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2020,
+      "id": "EUR_USD-1h-test2020",
+      "periods": {
+        "train": [
+          1262304000,
+          1546300800
+        ],
+        "validation": [
+          1546300800,
+          1577836800
+        ],
+        "test": [
+          1577836800,
+          1609459200
+        ]
+      },
+      "samples": {
+        "train": 55914,
+        "validation": 6195,
+        "test": 6227
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -3.968828772856105e-06,
+          -7.078038163376824e-07,
+          -3.2610249565184122e-06,
+          0.0015693506483221487,
+          0.6028234497746584,
+          -0.002011347384175226,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011852889253647198,
+          0.001169380600538753,
+          0.00020544783743174587,
+          0.001192406850403559,
+          0.5906764187093181,
+          0.048087786183709826,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 56137
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "EURUSD-1h-test2020-lstm.pt",
+          "sha256": "fbffd1f9fad5a222819686cc33cbffcd1c41b0155852517789bae71f3164db2c"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2020-logistic.pt",
+          "sha256": "3372a21f3b5855f6d9fd6a521a77931e5d6f68bf19b739f2699503b15b684635"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2020-test.npz",
+        "sha256": "9598722371cba7942fb3050ef73a516f6e0e2fb91646d2882c79fbb10d07d5d1"
+      },
+      "test": {
+        "lstm": {
+          "n": 6227,
+          "correct": 3241,
+          "accuracy": 0.5204753492853702,
+          "accuracy_ci95": [
+            0.5080581899534928,
+            0.5328672615581982
+          ],
+          "balanced_accuracy": 0.520882085941159,
+          "log_loss": 0.6928549802419757,
+          "brier": 0.24985310011098028
+        },
+        "logistic": {
+          "n": 6227,
+          "correct": 3170,
+          "accuracy": 0.5090733900754778,
+          "accuracy_ci95": [
+            0.4966548957555196,
+            0.5214806964829944
+          ],
+          "balanced_accuracy": 0.5128505541380071,
+          "log_loss": 0.6951416161640717,
+          "brier": 0.2509855900886542
+        },
+        "majority": {
+          "n": 6227,
+          "correct": 3208,
+          "accuracy": 0.515175847117392,
+          "accuracy_ci95": [
+            0.5027572636980403,
+            0.5275757180106248
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6930536830207851,
+          "brier": 0.24995325139084437
+        },
+        "persistence": {
+          "n": 6227,
+          "correct": 3010,
+          "accuracy": 0.48337883410952304,
+          "accuracy_ci95": [
+            0.470980995265858,
+            0.49579716762465176
+          ],
+          "balanced_accuracy": 0.4828683198429894,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6227,
+          "correct": 3223,
+          "accuracy": 0.5175847117392003,
+          "accuracy_ci95": [
+            0.5051666025165904,
+            0.52998113819345
+          ],
+          "balanced_accuracy": 0.5179887830110051,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2021,
+      "id": "EUR_USD-1h-test2021",
+      "periods": {
+        "train": [
+          1262304000,
+          1577836800
+        ],
+        "validation": [
+          1577836800,
+          1609459200
+        ],
+        "test": [
+          1609459200,
+          1640995200
+        ]
+      },
+      "samples": {
+        "train": 62109,
+        "validation": 6227,
+        "test": 6214
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -3.933366985732286e-06,
+          -9.944538845954305e-07,
+          -2.938913101136916e-06,
+          0.001501564097568433,
+          0.5838493978801534,
+          -0.001944249666952996,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011444787110279886,
+          0.001129556073835323,
+          0.00019561713631275777,
+          0.001169196799698003,
+          0.593186639862164,
+          0.048517086777916996,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 62363
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "EURUSD-1h-test2021-lstm.pt",
+          "sha256": "7ae8ad4514dbc84baa191684f997a286349e33172fdf6ac7a4121319250c4f2e"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2021-logistic.pt",
+          "sha256": "e65ef8bbec3e6d9c86e82a365988a6c996edd405da96fd44e58bed8cee6818fa"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2021-test.npz",
+        "sha256": "4673077d9b9ea7f4517fedb1d7725dbd53326633e4c5270b7f2d8450ad543a73"
+      },
+      "test": {
+        "lstm": {
+          "n": 6214,
+          "correct": 3194,
+          "accuracy": 0.5140006437077567,
+          "accuracy_ci95": [
+            0.5015689491031404,
+            0.5264150387730963
+          ],
+          "balanced_accuracy": 0.5141449346524561,
+          "log_loss": 0.6928874804022531,
+          "brier": 0.24986978843864774
+        },
+        "logistic": {
+          "n": 6214,
+          "correct": 3193,
+          "accuracy": 0.5138397167685871,
+          "accuracy_ci95": [
+            0.5014080102516001,
+            0.5262543225915763
+          ],
+          "balanced_accuracy": 0.5140830392655011,
+          "log_loss": 0.6952348452213262,
+          "brier": 0.2509992912840223
+        },
+        "majority": {
+          "n": 6214,
+          "correct": 3099,
+          "accuracy": 0.4987125844866431,
+          "accuracy_ci95": [
+            0.48628550606960463,
+            0.511141253665914
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931603778667023,
+          "brier": 0.25000659862703234
+        },
+        "persistence": {
+          "n": 6214,
+          "correct": 3007,
+          "accuracy": 0.4839073060830383,
+          "accuracy_ci95": [
+            0.47149576809968474,
+            0.4963387285942962
+          ],
+          "balanced_accuracy": 0.48390844247898535,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6214,
+          "correct": 3210,
+          "accuracy": 0.5165754747344705,
+          "accuracy_ci95": [
+            0.5041441459375797,
+            0.5289863224676199
+          ],
+          "balanced_accuracy": 0.5165847005998414,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "EUR/USD",
+      "instrument": "EUR_USD",
+      "timeframe": "1h",
+      "test_year": 2022,
+      "id": "EUR_USD-1h-test2022",
+      "periods": {
+        "train": [
+          1262304000,
+          1609459200
+        ],
+        "validation": [
+          1609459200,
+          1640995200
+        ],
+        "test": [
+          1640995200,
+          1672531200
+        ]
+      },
+      "samples": {
+        "train": 68336,
+        "validation": 6214,
+        "test": 6216
+      },
+      "bars_sha256": "fb6a9a3fd8333bb4267d41064bb221c0cb4dade7648ff3749f59b127ac72eb8b",
+      "scaler": {
+        "mean": [
+          -2.3247853878963046e-06,
+          3.5242962110654985e-07,
+          -2.677215009003134e-06,
+          0.0014908531712306107,
+          0.5751548540364071,
+          -0.0021770901057550983,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011337292747181226,
+          0.0011199695113584217,
+          0.00019014326279369602,
+          0.0011614543328514336,
+          0.6073022824405728,
+          0.047217549615348776,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 68613
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "EURUSD-1h-test2022-lstm.pt",
+          "sha256": "79fd0ec960b3940280979bcd175b98c6e962b9cae47fdad878b0f7b0f6867c04"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "EURUSD-1h-test2022-logistic.pt",
+          "sha256": "6d165d575d385705c0cd462396465e5481f3ef856527f5887d650ae1b09e4682"
+        }
+      },
+      "test_predictions": {
+        "path": "EURUSD-1h-test2022-test.npz",
+        "sha256": "a46ca748a7a3f13568de4d4f0a66fc2ef3e5efab86239538e77d27ec5c91383e"
+      },
+      "test": {
+        "lstm": {
+          "n": 6216,
+          "correct": 3157,
+          "accuracy": 0.5078828828828829,
+          "accuracy_ci95": [
+            0.4954536410369811,
+            0.5203023875770635
+          ],
+          "balanced_accuracy": 0.5073881674359912,
+          "log_loss": 0.6937840744805206,
+          "brier": 0.2503103842867543
+        },
+        "logistic": {
+          "n": 6216,
+          "correct": 3151,
+          "accuracy": 0.506917631917632,
+          "accuracy_ci95": [
+            0.4944886313656022,
+            0.519338087622233
+          ],
+          "balanced_accuracy": 0.5080246998608763,
+          "log_loss": 0.6954638878880873,
+          "brier": 0.2511320566216163
+        },
+        "majority": {
+          "n": 6216,
+          "correct": 3043,
+          "accuracy": 0.48954311454311455,
+          "accuracy_ci95": [
+            0.47712637223524124,
+            0.5019727734808219
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6932812678772284,
+          "brier": 0.2500670429031811
+        },
+        "persistence": {
+          "n": 6216,
+          "correct": 3023,
+          "accuracy": 0.4863256113256113,
+          "accuracy_ci95": [
+            0.4739127851284734,
+            0.4987553285002246
+          ],
+          "balanced_accuracy": 0.4861513288002752,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6216,
+          "correct": 3189,
+          "accuracy": 0.513030888030888,
+          "accuracy_ci95": [
+            0.5006011413271896,
+            0.5254445386266393
+          ],
+          "balanced_accuracy": 0.513285672458808,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2016,
+      "id": "GBP_USD-1h-test2016",
+      "periods": {
+        "train": [
+          1262304000,
+          1420070400
+        ],
+        "validation": [
+          1420070400,
+          1451606400
+        ],
+        "test": [
+          1451606400,
+          1483228800
+        ]
+      },
+      "samples": {
+        "train": 31070,
+        "validation": 6203,
+        "test": 6227
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -1.1911441398546283e-06,
+          -4.876968242144059e-07,
+          -7.034473156407492e-07,
+          0.0014158949602934084,
+          1.5725021622833713,
+          -0.00145188863229433,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0010520487647355413,
+          0.0010452778616055383,
+          0.0001464312073926668,
+          0.0010366672958404752,
+          1.013542472107257,
+          0.04950546168548573,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 31217
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "GBPUSD-1h-test2016-lstm.pt",
+          "sha256": "2f9c19ba1aacb4d841d4db8daf110c852f0b4a57e58ac3ec775fab6febe001c6"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2016-logistic.pt",
+          "sha256": "6e27c909570af3c5b0e695eced00ff534186783776f4963efa3542eab6d9c37d"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2016-test.npz",
+        "sha256": "8f849cec7fe45645ee6c5ba51121b0d6aed93fa774258d0aa9717d9bd8c6ff8f"
+      },
+      "test": {
+        "lstm": {
+          "n": 6227,
+          "correct": 3259,
+          "accuracy": 0.5233659868315401,
+          "accuracy_ci95": [
+            0.5109501931291653,
+            0.5357529691841763
+          ],
+          "balanced_accuracy": 0.5233076488540295,
+          "log_loss": 0.6907804761355343,
+          "brier": 0.2488356992494297
+        },
+        "logistic": {
+          "n": 6227,
+          "correct": 3186,
+          "accuracy": 0.5116428456720732,
+          "accuracy_ci95": [
+            0.49922408837695254,
+            0.5240472467963619
+          ],
+          "balanced_accuracy": 0.5118406708128254,
+          "log_loss": 0.6977338437879337,
+          "brier": 0.2520989848189471
+        },
+        "majority": {
+          "n": 6227,
+          "correct": 3104,
+          "accuracy": 0.49847438573952146,
+          "accuracy_ci95": [
+            0.48606044064531073,
+            0.5108902119871517
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931495917573861,
+          "brier": 0.2500012055985085
+        },
+        "persistence": {
+          "n": 6227,
+          "correct": 2992,
+          "accuracy": 0.4804881965633531,
+          "accuracy_ci95": [
+            0.468094733384612,
+            0.4929057187042473
+          ],
+          "balanced_accuracy": 0.48048776990469777,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6227,
+          "correct": 3236,
+          "accuracy": 0.5196723944114341,
+          "accuracy_ci95": [
+            0.5072549295313326,
+            0.5320656023132332
+          ],
+          "balanced_accuracy": 0.519679192621422,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2017,
+      "id": "GBP_USD-1h-test2017",
+      "periods": {
+        "train": [
+          1262304000,
+          1451606400
+        ],
+        "validation": [
+          1451606400,
+          1483228800
+        ],
+        "test": [
+          1483228800,
+          1514764800
+        ]
+      },
+      "samples": {
+        "train": 37273,
+        "validation": 6227,
+        "test": 6200
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -2.4755761825213923e-06,
+          -2.0207265108293992e-06,
+          -4.5484967169240173e-07,
+          0.0014170427777808864,
+          1.5296958042891862,
+          -0.0013571947076275281,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0010508895163816412,
+          0.0010448077712474088,
+          0.00013864077142254302,
+          0.001036843521891291,
+          1.1021250742928201,
+          0.04564055223083514,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 37443
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2017-lstm.pt",
+          "sha256": "956381c3501f415f811312f29e98285974f7e5eeaefc941534440801bf644af7"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2017-logistic.pt",
+          "sha256": "28a8310e567a3e167b966226ae2d209d7fdf152389c1e1204a7dc0270669bea9"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2017-test.npz",
+        "sha256": "c3f008a4a7b5c019b38c8b84baf110f3785ffa64497091f531686d262c6d688d"
+      },
+      "test": {
+        "lstm": {
+          "n": 6200,
+          "correct": 3221,
+          "accuracy": 0.5195161290322581,
+          "accuracy_ci95": [
+            0.5070715901091329,
+            0.5319364989283331
+          ],
+          "balanced_accuracy": 0.5194370319287865,
+          "log_loss": 0.6931897219112364,
+          "brier": 0.25000537957545416
+        },
+        "logistic": {
+          "n": 6200,
+          "correct": 3139,
+          "accuracy": 0.5062903225806452,
+          "accuracy_ci95": [
+            0.4938454817139084,
+            0.518727373430399
+          ],
+          "balanced_accuracy": 0.50696943045228,
+          "log_loss": 0.6972163033504615,
+          "brier": 0.2519597758918365
+        },
+        "majority": {
+          "n": 6200,
+          "correct": 3032,
+          "accuracy": 0.4890322580645161,
+          "accuracy_ci95": [
+            0.4766001112850364,
+            0.5014779874377101
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931998041651223,
+          "brier": 0.2500263117558496
+        },
+        "persistence": {
+          "n": 6200,
+          "correct": 3037,
+          "accuracy": 0.4898387096774194,
+          "accuracy_ci95": [
+            0.4774056396961496,
+            0.5022843635322773
+          ],
+          "balanced_accuracy": 0.48963205604861276,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6200,
+          "correct": 3157,
+          "accuracy": 0.5091935483870967,
+          "accuracy_ci95": [
+            0.49674802787861955,
+            0.5216276834861371
+          ],
+          "balanced_accuracy": 0.5094846885743983,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2018,
+      "id": "GBP_USD-1h-test2018",
+      "periods": {
+        "train": [
+          1262304000,
+          1483228800
+        ],
+        "validation": [
+          1483228800,
+          1514764800
+        ],
+        "test": [
+          1514764800,
+          1546300800
+        ]
+      },
+      "samples": {
+        "train": 43500,
+        "validation": 6200,
+        "test": 6210
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -6.1720294488730865e-06,
+          -4.513027380304381e-06,
+          -1.6590020685691481e-06,
+          0.0014965381783693533,
+          1.523958977176476,
+          -0.0012756504057455467,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011667104957133127,
+          0.0011566805023994686,
+          0.00017653566169267948,
+          0.0012444334525711597,
+          1.2041394442758966,
+          0.042417156063253476,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 43683
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2018-lstm.pt",
+          "sha256": "01f5d04f6b52fcd8b922a7d9787d721e396f5dee187b5fe14cf193146f057292"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2018-logistic.pt",
+          "sha256": "f7cf142e2c607191b3d67edc3ede78c3453ece92ae94a77603ca322c206fb421"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2018-test.npz",
+        "sha256": "cd67f2c46d87d6e364fa37882fd85b0d91511fee8c3e59a17dcb3f41c0adbea4"
+      },
+      "test": {
+        "lstm": {
+          "n": 6210,
+          "correct": 3190,
+          "accuracy": 0.5136876006441223,
+          "accuracy_ci95": [
+            0.5012518806725716,
+            0.5261063969929585
+          ],
+          "balanced_accuracy": 0.5139913797869458,
+          "log_loss": 0.6931107082039514,
+          "brier": 0.2499806171669145
+        },
+        "logistic": {
+          "n": 6210,
+          "correct": 3135,
+          "accuracy": 0.5048309178743962,
+          "accuracy_ci95": [
+            0.4923965968728511,
+            0.5172592658326302
+          ],
+          "balanced_accuracy": 0.5049348453333214,
+          "log_loss": 0.6964183772469742,
+          "brier": 0.2516072591630084
+        },
+        "majority": {
+          "n": 6210,
+          "correct": 3119,
+          "accuracy": 0.5022544283413849,
+          "accuracy_ci95": [
+            0.4898212465219485,
+            0.5146848227406096
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931392587255991,
+          "brier": 0.24999603908901227
+        },
+        "persistence": {
+          "n": 6210,
+          "correct": 2977,
+          "accuracy": 0.4793880837359098,
+          "accuracy_ci95": [
+            0.4669794732079122,
+            0.491822179248701
+          ],
+          "balanced_accuracy": 0.47937096488279174,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6210,
+          "correct": 3230,
+          "accuracy": 0.5201288244766505,
+          "accuracy_ci95": [
+            0.5076945381544943,
+            0.5325382231183443
+          ],
+          "balanced_accuracy": 0.5201350423288288,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2019,
+      "id": "GBP_USD-1h-test2019",
+      "periods": {
+        "train": [
+          1262304000,
+          1514764800
+        ],
+        "validation": [
+          1514764800,
+          1546300800
+        ],
+        "test": [
+          1546300800,
+          1577836800
+        ]
+      },
+      "samples": {
+        "train": 49700,
+        "validation": 6210,
+        "test": 6203
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -3.599736373789368e-06,
+          -1.5369895404970527e-06,
+          -2.0627468332925636e-06,
+          0.0014885625718092832,
+          1.461737597178809,
+          -0.0012064148074180609,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011562947897904713,
+          0.0011464573703174091,
+          0.00018476486740385008,
+          0.0012258839445303561,
+          1.2215063263402222,
+          0.03989399144998086,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 49908
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "GBPUSD-1h-test2019-lstm.pt",
+          "sha256": "ebfe939e0fbdfcc11a43b7d738e42c1f5f397f44304b7c34df65d46240229c1c"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2019-logistic.pt",
+          "sha256": "28ddbaafef07b6e9a08b6cfe612e541516b3f2801b47af8376a8b4636ec6fcd8"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2019-test.npz",
+        "sha256": "1bc318b3894c6819a45ba90b0d811a99733e17a02d1f20cc769c540f4be40d55"
+      },
+      "test": {
+        "lstm": {
+          "n": 6203,
+          "correct": 3206,
+          "accuracy": 0.5168466870868934,
+          "accuracy_ci95": [
+            0.5044043960804543,
+            0.5292681250217215
+          ],
+          "balanced_accuracy": 0.5168302452483202,
+          "log_loss": 0.6928799237062528,
+          "brier": 0.24986375917679907
+        },
+        "logistic": {
+          "n": 6203,
+          "correct": 3120,
+          "accuracy": 0.5029824278574883,
+          "accuracy_ci95": [
+            0.49054188045564184,
+            0.5154192835672313
+          ],
+          "balanced_accuracy": 0.5032583689131043,
+          "log_loss": 0.6952458213335976,
+          "brier": 0.2510248939812335
+        },
+        "majority": {
+          "n": 6203,
+          "correct": 3110,
+          "accuracy": 0.5013703046912784,
+          "accuracy_ci95": [
+            0.4889305805788711,
+            0.5138083326208273
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931456232621713,
+          "brier": 0.24999922135121355
+        },
+        "persistence": {
+          "n": 6203,
+          "correct": 2944,
+          "accuracy": 0.4746090601321941,
+          "accuracy_ci95": [
+            0.4622018912182034,
+            0.4870476583167946
+          ],
+          "balanced_accuracy": 0.47459760292663755,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6203,
+          "correct": 3263,
+          "accuracy": 0.5260357891342898,
+          "accuracy_ci95": [
+            0.513597617440441,
+            0.5384417333538308
+          ],
+          "balanced_accuracy": 0.5260375310705743,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2020,
+      "id": "GBP_USD-1h-test2020",
+      "periods": {
+        "train": [
+          1262304000,
+          1546300800
+        ],
+        "validation": [
+          1546300800,
+          1577836800
+        ],
+        "test": [
+          1577836800,
+          1609459200
+        ]
+      },
+      "samples": {
+        "train": 55910,
+        "validation": 6203,
+        "test": 6235
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -4.218564734336614e-06,
+          -2.276238370079941e-06,
+          -1.942326364256889e-06,
+          0.0014855765815311125,
+          1.4328642177646345,
+          -0.001161022824276849,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011473455822691612,
+          0.0011380021581982654,
+          0.00018101603567936597,
+          0.00120715422815708,
+          1.281990938987669,
+          0.03803927914513017,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 56134
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "GBPUSD-1h-test2020-lstm.pt",
+          "sha256": "8827fa330ecff2364cca919363d3b23fe458c7938ede0c2a9d2eff8e382bd228"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2020-logistic.pt",
+          "sha256": "c81c0006c7d901e2681798bd3b4ba40f946d7d25211e5e21e5747407a30dd316"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2020-test.npz",
+        "sha256": "f7ce88d69b2aad8402470aedc427c1a34590873dc7766e1bfb60d25fbe383e50"
+      },
+      "test": {
+        "lstm": {
+          "n": 6235,
+          "correct": 3246,
+          "accuracy": 0.5206094627105052,
+          "accuracy_ci95": [
+            0.5082003294059104,
+            0.5329932161740377
+          ],
+          "balanced_accuracy": 0.5200397498123057,
+          "log_loss": 0.6918345872721305,
+          "brier": 0.24934256330013296
+        },
+        "logistic": {
+          "n": 6235,
+          "correct": 3194,
+          "accuracy": 0.5122694466720128,
+          "accuracy_ci95": [
+            0.499858644612307,
+            0.5246651393321757
+          ],
+          "balanced_accuracy": 0.5119477943269901,
+          "log_loss": 0.6951405458405415,
+          "brier": 0.25095385396379566
+        },
+        "majority": {
+          "n": 6235,
+          "correct": 3177,
+          "accuracy": 0.5095429029671211,
+          "accuracy_ci95": [
+            0.49713230453799445,
+            0.5219417496410477
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.693145817652831,
+          "brier": 0.24999931854644403
+        },
+        "persistence": {
+          "n": 6235,
+          "correct": 3007,
+          "accuracy": 0.4822774659182037,
+          "accuracy_ci95": [
+            0.4698891885842393,
+            0.49468756794039676
+          ],
+          "balanced_accuracy": 0.48205818554015917,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6235,
+          "correct": 3232,
+          "accuracy": 0.518364073777065,
+          "accuracy_ci95": [
+            0.5059541512260688,
+            0.5307513816058693
+          ],
+          "balanced_accuracy": 0.5185468416407744,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2021,
+      "id": "GBP_USD-1h-test2021",
+      "periods": {
+        "train": [
+          1262304000,
+          1577836800
+        ],
+        "validation": [
+          1577836800,
+          1609459200
+        ],
+        "test": [
+          1609459200,
+          1640995200
+        ]
+      },
+      "samples": {
+        "train": 62113,
+        "validation": 6235,
+        "test": 6223
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -3.1787273229176585e-06,
+          -1.3326091658439341e-06,
+          -1.8461181570740244e-06,
+          0.0014795618893680906,
+          1.4328351507376524,
+          -0.0012176155467687004,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011414449305397387,
+          0.0011320945144896117,
+          0.0001763005553490874,
+          0.0012026476534767428,
+          1.3271222534910587,
+          0.03976457218894458,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 62360
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2021-lstm.pt",
+          "sha256": "e40f52bca7636f6c0a36a5903a1d73b20c98e7afa6a0333df34990ae84690ce4"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2021-logistic.pt",
+          "sha256": "0eee95c32be69188077b4b68d8ddfb1343150065d16a02d8a4ec3a660934ae37"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2021-test.npz",
+        "sha256": "5fd003d1c412251a48093430c9281d7a2fd0696c8acd984d45b23b472b8456b9"
+      },
+      "test": {
+        "lstm": {
+          "n": 6223,
+          "correct": 3161,
+          "accuracy": 0.5079543628475012,
+          "accuracy_ci95": [
+            0.4955320959714727,
+            0.5203668153232351
+          ],
+          "balanced_accuracy": 0.5077516357178979,
+          "log_loss": 0.6931995349714577,
+          "brier": 0.25002650864978454
+        },
+        "logistic": {
+          "n": 6223,
+          "correct": 3093,
+          "accuracy": 0.49702715731962077,
+          "accuracy_ci95": [
+            0.4846102803580788,
+            0.5094477022893538
+          ],
+          "balanced_accuracy": 0.4969165540105043,
+          "log_loss": 0.6969227276930303,
+          "brier": 0.25185328722630385
+        },
+        "majority": {
+          "n": 6223,
+          "correct": 3119,
+          "accuracy": 0.5012052064920456,
+          "accuracy_ci95": [
+            0.488785568688183,
+            0.5136233572655604
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931464227686148,
+          "brier": 0.24999962110434867
+        },
+        "persistence": {
+          "n": 6223,
+          "correct": 3014,
+          "accuracy": 0.4843323156034067,
+          "accuracy_ci95": [
+            0.47192914579778117,
+            0.49675481680355177
+          ],
+          "balanced_accuracy": 0.48432660811851536,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6223,
+          "correct": 3208,
+          "accuracy": 0.5155069901976539,
+          "accuracy_ci95": [
+            0.5030844637217103,
+            0.527910383549791
+          ],
+          "balanced_accuracy": 0.5155061119411124,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "GBP/USD",
+      "instrument": "GBP_USD",
+      "timeframe": "1h",
+      "test_year": 2022,
+      "id": "GBP_USD-1h-test2022",
+      "periods": {
+        "train": [
+          1262304000,
+          1609459200
+        ],
+        "validation": [
+          1609459200,
+          1640995200
+        ],
+        "test": [
+          1640995200,
+          1672531200
+        ]
+      },
+      "samples": {
+        "train": 68348,
+        "validation": 6223,
+        "test": 6222
+      },
+      "bars_sha256": "6ced9785bbbcc93f0aa8104d8154c2d74ff6ea8b0bbd5d02512aa4e8616c92c3",
+      "scaler": {
+        "mean": [
+          -2.4473049140718048e-06,
+          -4.43941479308142e-07,
+          -2.003363434763869e-06,
+          0.0015179454827166847,
+          1.4380168782521245,
+          -0.0013215090035268427,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011733877741391073,
+          0.0011641551817143457,
+          0.00018023242374686676,
+          0.0012391560503218603,
+          1.3915800640448197,
+          0.039170593324586715,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 68609
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2022-lstm.pt",
+          "sha256": "5638f318727451acd731d9ad170b8caf3563c91622d73d0efea769c766ab82cc"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "GBPUSD-1h-test2022-logistic.pt",
+          "sha256": "6ee3cafb47edbc8006538890c2b2c816d9e99fcf3616c169efe6cd9046f2eb67"
+        }
+      },
+      "test_predictions": {
+        "path": "GBPUSD-1h-test2022-test.npz",
+        "sha256": "fa8331f231b3dd2aebf5b922867fe01da70c079973f484b03c59981ce01ca26f"
+      },
+      "test": {
+        "lstm": {
+          "n": 6222,
+          "correct": 3205,
+          "accuracy": 0.5151076824172292,
+          "accuracy_ci95": [
+            0.5026841003201491,
+            0.5275126210778306
+          ],
+          "balanced_accuracy": 0.5170919733691356,
+          "log_loss": 0.6947155777439538,
+          "brier": 0.2507559977106557
+        },
+        "logistic": {
+          "n": 6222,
+          "correct": 3117,
+          "accuracy": 0.5009643201542913,
+          "accuracy_ci95": [
+            0.4885438205620611,
+            0.5133836297399377
+          ],
+          "balanced_accuracy": 0.5025911966304208,
+          "log_loss": 0.6968523733464614,
+          "brier": 0.2518093762435569
+        },
+        "majority": {
+          "n": 6222,
+          "correct": 3039,
+          "accuracy": 0.4884281581485053,
+          "accuracy_ci95": [
+            0.47601869515053424,
+            0.5008519012254813
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931966846333611,
+          "brier": 0.250024752001357
+        },
+        "persistence": {
+          "n": 6222,
+          "correct": 3023,
+          "accuracy": 0.48585663773706206,
+          "accuracy_ci95": [
+            0.4734504035385529,
+            0.498280325365466
+          ],
+          "balanced_accuracy": 0.48561459431412995,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6222,
+          "correct": 3198,
+          "accuracy": 0.5139826422372228,
+          "accuracy_ci95": [
+            0.5015589415145463,
+            0.5263890878644351
+          ],
+          "balanced_accuracy": 0.5142878675242581,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2016,
+      "id": "USD_JPY-1h-test2016",
+      "periods": {
+        "train": [
+          1262304000,
+          1420070400
+        ],
+        "validation": [
+          1420070400,
+          1451606400
+        ],
+        "test": [
+          1451606400,
+          1483228800
+        ]
+      },
+      "samples": {
+        "train": 31008,
+        "validation": 6204,
+        "test": 6227
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          8.090659382017766e-06,
+          6.653282634380381e-06,
+          1.4373767476375429e-06,
+          0.0016382226239225466,
+          0.8461871056592897,
+          -0.0023979030003368445,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.001256745083315813,
+          0.0012461272268705793,
+          0.00019422190352707695,
+          0.0013073796072846286,
+          0.6176083537531307,
+          0.07436145008124895,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 31223
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "USDJPY-1h-test2016-lstm.pt",
+          "sha256": "7679c2e3ad61e6bc1c7f9b7af5ca7d40e6db83808f0d16a9aec032b19c9c742c"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2016-logistic.pt",
+          "sha256": "3ef3d914886fddf8f31ca9431c6de4a534bb8306c77dae56b398709b2855c4ad"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2016-test.npz",
+        "sha256": "85292e62905635454ab37eafe483a88ff7a40bc40f030d663867c35e91d170fb"
+      },
+      "test": {
+        "lstm": {
+          "n": 6227,
+          "correct": 3219,
+          "accuracy": 0.5169423478400514,
+          "accuracy_ci95": [
+            0.504524083960521,
+            0.5293397210158195
+          ],
+          "balanced_accuracy": 0.514424123666449,
+          "log_loss": 0.692988740083548,
+          "brier": 0.24991127193321785
+        },
+        "logistic": {
+          "n": 6227,
+          "correct": 3236,
+          "accuracy": 0.5196723944114341,
+          "accuracy_ci95": [
+            0.5072549295313326,
+            0.5320656023132332
+          ],
+          "balanced_accuracy": 0.5179706291151898,
+          "log_loss": 0.6972201479001507,
+          "brier": 0.2518584939587326
+        },
+        "majority": {
+          "n": 6227,
+          "correct": 3165,
+          "accuracy": 0.5082704352015417,
+          "accuracy_ci95": [
+            0.495852090294399,
+            0.5206785822769899
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6930103791253451,
+          "brier": 0.24993160240140058
+        },
+        "persistence": {
+          "n": 6227,
+          "correct": 2971,
+          "accuracy": 0.47711578609282157,
+          "accuracy_ci95": [
+            0.4647279532031555,
+            0.48953183628377817
+          ],
+          "balanced_accuracy": 0.4769567433648773,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6227,
+          "correct": 3260,
+          "accuracy": 0.5235265778063273,
+          "accuracy_ci95": [
+            0.5111108721682913,
+            0.5359132740784751
+          ],
+          "balanced_accuracy": 0.5236539118357525,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2017,
+      "id": "USD_JPY-1h-test2017",
+      "periods": {
+        "train": [
+          1262304000,
+          1451606400
+        ],
+        "validation": [
+          1451606400,
+          1483228800
+        ],
+        "test": [
+          1483228800,
+          1514764800
+        ]
+      },
+      "samples": {
+        "train": 37212,
+        "validation": 6227,
+        "test": 6208
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          6.865437131023758e-06,
+          6.685338403326998e-06,
+          1.8009872769676067e-07,
+          0.0016007676398805035,
+          0.7988464619492657,
+          -0.0024673113324521012,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0012279605973441144,
+          0.0012170217469732914,
+          0.00019569940014987404,
+          0.0012790728573368558,
+          0.6668622132090258,
+          0.0714983008527639,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 37450
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "USDJPY-1h-test2017-lstm.pt",
+          "sha256": "c085839b5178b84ded0be8dd3e4cc579a2e6d44d73be8b5a151d722a544e6e75"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2017-logistic.pt",
+          "sha256": "011aa6fd1cb6355693c4d1ab59c096dc96cd71754fe1035afaf6a3b109c1fbcb"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2017-test.npz",
+        "sha256": "4ec7f83d108045ce372a17382a84e37688f9db6f1009e2045936d60e369971b0"
+      },
+      "test": {
+        "lstm": {
+          "n": 6208,
+          "correct": 3237,
+          "accuracy": 0.5214239690721649,
+          "accuracy_ci95": [
+            0.5089882169075566,
+            0.5338332236851173
+          ],
+          "balanced_accuracy": 0.518047684482112,
+          "log_loss": 0.6918618574569125,
+          "brier": 0.2493577276258828
+        },
+        "logistic": {
+          "n": 6208,
+          "correct": 3219,
+          "accuracy": 0.5185244845360825,
+          "accuracy_ci95": [
+            0.5060876444707271,
+            0.5309384131845926
+          ],
+          "balanced_accuracy": 0.5157599688382317,
+          "log_loss": 0.6927592143517025,
+          "brier": 0.249713452366772
+        },
+        "majority": {
+          "n": 6208,
+          "correct": 3154,
+          "accuracy": 0.5080541237113402,
+          "accuracy_ci95": [
+            0.4956168396595485,
+            0.520481446277547
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6930189434893052,
+          "brier": 0.2499358840456483
+        },
+        "persistence": {
+          "n": 6208,
+          "correct": 2916,
+          "accuracy": 0.4697164948453608,
+          "accuracy_ci95": [
+            0.4573241197537926,
+            0.48214632512272837
+          ],
+          "balanced_accuracy": 0.4695632909053233,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6208,
+          "correct": 3292,
+          "accuracy": 0.5302835051546392,
+          "accuracy_ci95": [
+            0.5178536748772716,
+            0.5426758802462074
+          ],
+          "balanced_accuracy": 0.5304055639370635,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2018,
+      "id": "USD_JPY-1h-test2018",
+      "periods": {
+        "train": [
+          1262304000,
+          1483228800
+        ],
+        "validation": [
+          1483228800,
+          1514764800
+        ],
+        "test": [
+          1514764800,
+          1546300800
+        ]
+      },
+      "samples": {
+        "train": 43439,
+        "validation": 6208,
+        "test": 6213
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          5.253741802846988e-06,
+          4.4821555146668235e-06,
+          7.715862881801305e-07,
+          0.001665079984479183,
+          0.7712771801327535,
+          -0.002375543066149955,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0012799020088509567,
+          0.0012689820396670195,
+          0.0002004126039986053,
+          0.0013615347785484718,
+          0.7048266667755652,
+          0.0665241492582609,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 43690
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "USDJPY-1h-test2018-lstm.pt",
+          "sha256": "8fe0dde226bffe8e7b5f1b05aa9b5e860dad5328bceb1f729b06ffaae4695e08"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2018-logistic.pt",
+          "sha256": "0cf8a8968a88005b6b6f3498b33e63a318a6e6671325d279acf41381b34f9054"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2018-test.npz",
+        "sha256": "d8aafdeb442b11650ef7add064d813b3a6e6944bfd7183510b7e932dc09aedcf"
+      },
+      "test": {
+        "lstm": {
+          "n": 6213,
+          "correct": 3241,
+          "accuracy": 0.5216481570899726,
+          "accuracy_ci95": [
+            0.5092175136752795,
+            0.5340520472073342
+          ],
+          "balanced_accuracy": 0.5153532301681976,
+          "log_loss": 0.6916124631823631,
+          "brier": 0.24923488531423757
+        },
+        "logistic": {
+          "n": 6213,
+          "correct": 3204,
+          "accuracy": 0.51569290197972,
+          "accuracy_ci95": [
+            0.503260410077965,
+            0.5281060002272755
+          ],
+          "balanced_accuracy": 0.5117496643249471,
+          "log_loss": 0.6935243373641152,
+          "brier": 0.25017181673635186
+        },
+        "majority": {
+          "n": 6213,
+          "correct": 3214,
+          "accuracy": 0.5173024303878964,
+          "accuracy_ci95": [
+            0.5048702639669187,
+            0.5297132140619363
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6926920090976553,
+          "brier": 0.24977243387156228
+        },
+        "persistence": {
+          "n": 6213,
+          "correct": 3011,
+          "accuracy": 0.48462900370191536,
+          "accuracy_ci95": [
+            0.4722154580093245,
+            0.4970615452301579
+          ],
+          "balanced_accuracy": 0.4839664974406528,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6213,
+          "correct": 3201,
+          "accuracy": 0.5152100434572671,
+          "accuracy_ci95": [
+            0.5027774790492319,
+            0.5276238109389244
+          ],
+          "balanced_accuracy": 0.5157998631777903,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2019,
+      "id": "USD_JPY-1h-test2019",
+      "periods": {
+        "train": [
+          1262304000,
+          1514764800
+        ],
+        "validation": [
+          1514764800,
+          1546300800
+        ],
+        "test": [
+          1546300800,
+          1577836800
+        ]
+      },
+      "samples": {
+        "train": 49647,
+        "validation": 6213,
+        "test": 6193
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          3.846919920069863e-06,
+          3.0299849183573983e-06,
+          8.169350017123943e-07,
+          0.001646137727871137,
+          0.7308664730041069,
+          -0.002436528661785327,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.00125863266035202,
+          0.0012471302123410932,
+          0.00020584983514473028,
+          0.0013228584949841395,
+          0.7072970649136837,
+          0.0637710663751133,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 49915
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "USDJPY-1h-test2019-lstm.pt",
+          "sha256": "0c12f740fad126d0b18ab483cce1610a769068881a6b0718ed9177cbd496dfc5"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2019-logistic.pt",
+          "sha256": "14567b5bc9b59e190f07db208fd7362bdfda8efae2996093dda040f54c6fe29d"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2019-test.npz",
+        "sha256": "c022e657eecaa0798bb3a1a008453e96932b38b7bd778047848656ac876b01bf"
+      },
+      "test": {
+        "lstm": {
+          "n": 6193,
+          "correct": 3220,
+          "accuracy": 0.5199418698530599,
+          "accuracy_ci95": [
+            0.5074904517602258,
+            0.5323685637787979
+          ],
+          "balanced_accuracy": 0.5137892739518756,
+          "log_loss": 0.6907042533955983,
+          "brier": 0.24878127145525014
+        },
+        "logistic": {
+          "n": 6193,
+          "correct": 3228,
+          "accuracy": 0.5212336508961731,
+          "accuracy_ci95": [
+            0.5087827566372327,
+            0.5336582194225374
+          ],
+          "balanced_accuracy": 0.519848439225133,
+          "log_loss": 0.6933895554321776,
+          "brier": 0.25010940522826414
+        },
+        "majority": {
+          "n": 6193,
+          "correct": 3159,
+          "accuracy": 0.5100920393993218,
+          "accuracy_ci95": [
+            0.49763936264124164,
+            0.5225322039270901
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6929471708027842,
+          "brier": 0.24990000141255075
+        },
+        "persistence": {
+          "n": 6193,
+          "correct": 2964,
+          "accuracy": 0.47860487647343775,
+          "accuracy_ci95": [
+            0.4661805794762017,
+            0.49105569939893495
+          ],
+          "balanced_accuracy": 0.47833694649412806,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6193,
+          "correct": 3229,
+          "accuracy": 0.5213951235265623,
+          "accuracy_ci95": [
+            0.5089443006010651,
+            0.5338194205237984
+          ],
+          "balanced_accuracy": 0.5215587173581753,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2020,
+      "id": "USD_JPY-1h-test2020",
+      "periods": {
+        "train": [
+          1262304000,
+          1546300800
+        ],
+        "validation": [
+          1546300800,
+          1577836800
+        ],
+        "test": [
+          1577836800,
+          1609459200
+        ]
+      },
+      "samples": {
+        "train": 55860,
+        "validation": 6193,
+        "test": 6225
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          2.92350307823529e-06,
+          2.2560871820012678e-06,
+          6.674158962339516e-07,
+          0.001600551404823806,
+          0.6998521579594235,
+          -0.0024072764713545304,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0012205450985742867,
+          0.0012096672278102683,
+          0.00019766674321711853,
+          0.0012780484154237249,
+          0.7067813569892316,
+          0.06035578862269391,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 56141
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "USDJPY-1h-test2020-lstm.pt",
+          "sha256": "9af177bd5139eeb108431229ef942114a164b928214e741fc1b6ed4248072502"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2020-logistic.pt",
+          "sha256": "88997919b533701cf81d5c631fc149bbb01f851bcb6fbc5312422f490bc63001"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2020-test.npz",
+        "sha256": "b34459634c0d7194e7cd21378caf017b6f43a9b741bf028abde1da5c45430681"
+      },
+      "test": {
+        "lstm": {
+          "n": 6225,
+          "correct": 3230,
+          "accuracy": 0.5188755020080321,
+          "accuracy_ci95": [
+            0.5064557702994857,
+            0.5312719518706163
+          ],
+          "balanced_accuracy": 0.5212835857324482,
+          "log_loss": 0.693698717295669,
+          "brier": 0.2501684162768588
+        },
+        "logistic": {
+          "n": 6225,
+          "correct": 3136,
+          "accuracy": 0.5037751004016064,
+          "accuracy_ci95": [
+            0.4913561895153694,
+            0.516189354918651
+          ],
+          "balanced_accuracy": 0.505733674761651,
+          "log_loss": 0.6959023936078799,
+          "brier": 0.25134514802787655
+        },
+        "majority": {
+          "n": 6225,
+          "correct": 3067,
+          "accuracy": 0.4926907630522088,
+          "accuracy_ci95": [
+            0.4802796604092805,
+            0.5051108812184673
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6936180044816067,
+          "brier": 0.2502353766500055
+        },
+        "persistence": {
+          "n": 6225,
+          "correct": 2993,
+          "accuracy": 0.48080321285140565,
+          "accuracy_ci95": [
+            0.468407264934432,
+            0.49322283890108126
+          ],
+          "balanced_accuracy": 0.48072042311120877,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6225,
+          "correct": 3232,
+          "accuracy": 0.5191967871485944,
+          "accuracy_ci95": [
+            0.5067771610989187,
+            0.531592735065568
+          ],
+          "balanced_accuracy": 0.5193359493168508,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2021,
+      "id": "USD_JPY-1h-test2021",
+      "periods": {
+        "train": [
+          1262304000,
+          1577836800
+        ],
+        "validation": [
+          1577836800,
+          1609459200
+        ],
+        "test": [
+          1609459200,
+          1640995200
+        ]
+      },
+      "samples": {
+        "train": 62053,
+        "validation": 6225,
+        "test": 6212
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          2.4948952719947563e-06,
+          2.1041029027343247e-06,
+          3.9079236926023217e-07,
+          0.0015400913351359042,
+          0.67255395568098,
+          -0.0023366056704982275,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011848412387113615,
+          0.0011741338341667267,
+          0.00019211853732220793,
+          0.0012575363703423185,
+          0.7151723460522773,
+          0.05734033828216038,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 62366
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "USDJPY-1h-test2021-lstm.pt",
+          "sha256": "53a0d462a1bffcc7f76b5ff4e35af325fd66c961d574134966c2d05818f6c8a1"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2021-logistic.pt",
+          "sha256": "4e19202df47961a3628c911ebb307c118185d44f140519b99500e3e29224e13d"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2021-test.npz",
+        "sha256": "30bd003e3dfbbde1e77bb8ce8d36b60f9014b6289533294867d94881d878ceae"
+      },
+      "test": {
+        "lstm": {
+          "n": 6212,
+          "correct": 3217,
+          "accuracy": 0.5178686413393432,
+          "accuracy_ci95": [
+            0.5054356191992371,
+            0.530279577443201
+          ],
+          "balanced_accuracy": 0.512274169982067,
+          "log_loss": 0.6922037876522658,
+          "brier": 0.24952554839173302
+        },
+        "logistic": {
+          "n": 6212,
+          "correct": 3228,
+          "accuracy": 0.519639407598197,
+          "accuracy_ci95": [
+            0.5072069423881331,
+            0.5320475980657178
+          ],
+          "balanced_accuracy": 0.5118548334773684,
+          "log_loss": 0.6913655681882522,
+          "brier": 0.24910184919638081
+        },
+        "majority": {
+          "n": 6212,
+          "correct": 3225,
+          "accuracy": 0.5191564713457824,
+          "accuracy_ci95": [
+            0.5067238387608182,
+            0.531565426108102
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6925910658441808,
+          "brier": 0.24972197174748645
+        },
+        "persistence": {
+          "n": 6212,
+          "correct": 2987,
+          "accuracy": 0.48084352865421764,
+          "accuracy_ci95": [
+            0.46843457389189813,
+            0.49327616123918194
+          ],
+          "balanced_accuracy": 0.4799753453596074,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6212,
+          "correct": 3215,
+          "accuracy": 0.5175466838377334,
+          "accuracy_ci95": [
+            0.5051135772109102,
+            0.5299581023749073
+          ],
+          "balanced_accuracy": 0.5182395548669558,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "USD/JPY",
+      "instrument": "USD_JPY",
+      "timeframe": "1h",
+      "test_year": 2022,
+      "id": "USD_JPY-1h-test2022",
+      "periods": {
+        "train": [
+          1262304000,
+          1609459200
+        ],
+        "validation": [
+          1609459200,
+          1640995200
+        ],
+        "test": [
+          1640995200,
+          1672531200
+        ]
+      },
+      "samples": {
+        "train": 68278,
+        "validation": 6212,
+        "test": 6218
+      },
+      "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+      "scaler": {
+        "mean": [
+          1.5286204866393054e-06,
+          1.6904868767178759e-06,
+          -1.6186639007872312e-07,
+          0.0015171029023997727,
+          0.6599350005829544,
+          -0.002552274831966878,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0011713514924163826,
+          0.0011602107558345688,
+          0.00019309445448586048,
+          0.001253259237179515,
+          0.758178248175141,
+          0.05512897487295105,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 68616
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "USDJPY-1h-test2022-lstm.pt",
+          "sha256": "2262a17d5235bf2e77d222b60603529ffd0f111bfd5e33664ad8575b1e171fa7"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "USDJPY-1h-test2022-logistic.pt",
+          "sha256": "84b6a652cfafa69cd01d4db9386ccd8d5d2a5b6a4c99add186a4aba1ab63a2cd"
+        }
+      },
+      "test_predictions": {
+        "path": "USDJPY-1h-test2022-test.npz",
+        "sha256": "ccd57ea3d94dd362d8f41df99d3ead1d10ddedb7c5f7fe66fe2f5140e601c2e8"
+      },
+      "test": {
+        "lstm": {
+          "n": 6218,
+          "correct": 3186,
+          "accuracy": 0.5123834030234802,
+          "accuracy_ci95": [
+            0.49995564654170793,
+            0.5247958681054025
+          ],
+          "balanced_accuracy": 0.5124918890066628,
+          "log_loss": 0.6938296190634189,
+          "brier": 0.2503162287685213
+        },
+        "logistic": {
+          "n": 6218,
+          "correct": 3173,
+          "accuracy": 0.5102926986169186,
+          "accuracy_ci95": [
+            0.4978650553779099,
+            0.522707632120987
+          ],
+          "balanced_accuracy": 0.5087804581605486,
+          "log_loss": 0.6950391548068238,
+          "brier": 0.25088959212619216
+        },
+        "majority": {
+          "n": 6218,
+          "correct": 3261,
+          "accuracy": 0.5244451592151818,
+          "accuracy_ci95": [
+            0.512020994932676,
+            0.5368391378772045
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6924815963538424,
+          "brier": 0.24966723456074688
+        },
+        "persistence": {
+          "n": 6218,
+          "correct": 3087,
+          "accuracy": 0.49646188485043424,
+          "accuracy_ci95": [
+            0.48404046080356883,
+            0.5088876778686853
+          ],
+          "balanced_accuracy": 0.49518447849618424,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 6218,
+          "correct": 3134,
+          "accuracy": 0.5040205853972338,
+          "accuracy_ci95": [
+            0.4915945850575127,
+            0.5164416209967441
+          ],
+          "balanced_accuracy": 0.5051493983527774,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2016,
+      "id": "XAU_USD-1h-test2016",
+      "periods": {
+        "train": [
+          1262304000,
+          1420070400
+        ],
+        "validation": [
+          1420070400,
+          1451606400
+        ],
+        "test": [
+          1451606400,
+          1483228800
+        ]
+      },
+      "samples": {
+        "train": 30027,
+        "validation": 5897,
+        "test": 5905
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          2.542032477088742e-06,
+          7.96696657410833e-06,
+          -5.424934097019596e-06,
+          0.0028550307771919455,
+          41.9149171999736,
+          -0.021990150285764253,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0022180197416144416,
+          0.0022131475680093418,
+          0.00018021586067275586,
+          0.0023128221061200376,
+          16.970453479478426,
+          0.1634680819572427,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 30314
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "XAUUSD-1h-test2016-lstm.pt",
+          "sha256": "166cb62f36d01e2b485382321a0122bb1f62d2d65be4078122ceb1cc87951368"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2016-logistic.pt",
+          "sha256": "2a136d00fde9e00745d3ac9b9a9bfb6599bfccfde74027d8ed0892006aa4fcb3"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2016-test.npz",
+        "sha256": "61cf71edfdf406e233985131694a725b038d6e78f9d49e7349d5b22590f20bcb"
+      },
+      "test": {
+        "lstm": {
+          "n": 5905,
+          "correct": 3087,
+          "accuracy": 0.5227773073666384,
+          "accuracy_ci95": [
+            0.5100269957705782,
+            0.5354980029748929
+          ],
+          "balanced_accuracy": 0.523707096840813,
+          "log_loss": 0.6961222334404489,
+          "brier": 0.251398017159125
+        },
+        "logistic": {
+          "n": 5905,
+          "correct": 3079,
+          "accuracy": 0.5214225232853514,
+          "accuracy_ci95": [
+            0.5086715651425106,
+            0.5341456269861297
+          ],
+          "balanced_accuracy": 0.5214055427755182,
+          "log_loss": 0.6944057078228183,
+          "brier": 0.2505575540227186
+        },
+        "majority": {
+          "n": 5905,
+          "correct": 2990,
+          "accuracy": 0.506350550381033,
+          "accuracy_ci95": [
+            0.49359871933891064,
+            0.5190941241774847
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6930675749619436,
+          "brier": 0.24996019818669918
+        },
+        "persistence": {
+          "n": 5905,
+          "correct": 2836,
+          "accuracy": 0.4802709568162574,
+          "accuracy_ci95": [
+            0.4675449748958765,
+            0.4930225912465221
+          ],
+          "balanced_accuracy": 0.48017634539373666,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5905,
+          "correct": 3070,
+          "accuracy": 0.5198983911939035,
+          "accuracy_ci95": [
+            0.5071468177991717,
+            0.5326240918855335
+          ],
+          "balanced_accuracy": 0.5199822736738241,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2017,
+      "id": "XAU_USD-1h-test2017",
+      "periods": {
+        "train": [
+          1262304000,
+          1451606400
+        ],
+        "validation": [
+          1451606400,
+          1483228800
+        ],
+        "test": [
+          1483228800,
+          1514764800
+        ]
+      },
+      "samples": {
+        "train": 35924,
+        "validation": 5905,
+        "test": 5880
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          -8.977377528244533e-07,
+          2.74301695875849e-06,
+          -3.6407547115830514e-06,
+          0.0027958439175866656,
+          40.5719622297689,
+          -0.019132771678025642,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.002164913637669713,
+          0.0021586316962143534,
+          0.00018715641709503777,
+          0.0022703940677363177,
+          16.760929452529094,
+          0.15759189868201703,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 36219
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "XAUUSD-1h-test2017-lstm.pt",
+          "sha256": "04a97283152ff824ca3a604441e40cf64200224f2f79f5ab822c23c6adbfd24b"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2017-logistic.pt",
+          "sha256": "a065eae6b622f4f9044a7fb4397009c20a507136dcc8b76811199b8499a24009"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2017-test.npz",
+        "sha256": "b211c33454c54acdd7fde34f87427cf44c3be1d5f27beb6790abc307c01c62cb"
+      },
+      "test": {
+        "lstm": {
+          "n": 5880,
+          "correct": 3042,
+          "accuracy": 0.5173469387755102,
+          "accuracy_ci95": [
+            0.5045675138528738,
+            0.5301037126626156
+          ],
+          "balanced_accuracy": 0.518651935489134,
+          "log_loss": 0.6929947891368243,
+          "brier": 0.24992472876272734
+        },
+        "logistic": {
+          "n": 5880,
+          "correct": 2964,
+          "accuracy": 0.5040816326530613,
+          "accuracy_ci95": [
+            0.4913036076557869,
+            0.5168543279949166
+          ],
+          "balanced_accuracy": 0.5050142448362251,
+          "log_loss": 0.6970220310607796,
+          "brier": 0.2518939252486658
+        },
+        "majority": {
+          "n": 5880,
+          "correct": 2979,
+          "accuracy": 0.5066326530612245,
+          "accuracy_ci95": [
+            0.49385366051775564,
+            0.5194029849146373
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6930644567136599,
+          "brier": 0.2499586390412414
+        },
+        "persistence": {
+          "n": 5880,
+          "correct": 2802,
+          "accuracy": 0.47653061224489796,
+          "accuracy_ci95": [
+            0.4637842221013547,
+            0.4893076479071008
+          ],
+          "balanced_accuracy": 0.47643396918727543,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5880,
+          "correct": 3076,
+          "accuracy": 0.5231292517006803,
+          "accuracy_ci95": [
+            0.5103520329427251,
+            0.5358762690779273
+          ],
+          "balanced_accuracy": 0.523221322091594,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2018,
+      "id": "XAU_USD-1h-test2018",
+      "periods": {
+        "train": [
+          1262304000,
+          1483228800
+        ],
+        "validation": [
+          1483228800,
+          1514764800
+        ],
+        "test": [
+          1514764800,
+          1546300800
+        ]
+      },
+      "samples": {
+        "train": 41829,
+        "validation": 5880,
+        "test": 5902
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          1.163563020244537e-06,
+          4.729564885495103e-06,
+          -3.5660018652505834e-06,
+          0.0027913236815609067,
+          40.051788469298145,
+          -0.016959360060480953,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.002151331964132549,
+          0.002143806201270648,
+          0.00019330888434142743,
+          0.0022498127918716164,
+          19.37106707446933,
+          0.15287137362568456,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 42131
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "XAUUSD-1h-test2018-lstm.pt",
+          "sha256": "b8a2e03e67e78656ecff89ae55ae3ebb60aa9284a780cc8323014534d66b7ccb"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2018-logistic.pt",
+          "sha256": "ca7495d57cbed5c786d322c666716c31f15cd31f0f41dda94364218fb7a3dbb7"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2018-test.npz",
+        "sha256": "06990a58d531c1cbb67d9a8a55140aabd4745088de54dd32686e8dc33bc65608"
+      },
+      "test": {
+        "lstm": {
+          "n": 5902,
+          "correct": 3048,
+          "accuracy": 0.5164351067434768,
+          "accuracy_ci95": [
+            0.5036793351552863,
+            0.529169497877685
+          ],
+          "balanced_accuracy": 0.5164392999862202,
+          "log_loss": 0.6914489266380538,
+          "brier": 0.24915348338619342
+        },
+        "logistic": {
+          "n": 5902,
+          "correct": 3051,
+          "accuracy": 0.5169434090138936,
+          "accuracy_ci95": [
+            0.5041877394689998,
+            0.529677036853651
+          ],
+          "balanced_accuracy": 0.5169730375269854,
+          "log_loss": 0.6930089283024744,
+          "brier": 0.24992278914220475
+        },
+        "majority": {
+          "n": 5902,
+          "correct": 2950,
+          "accuracy": 0.4998305659098611,
+          "accuracy_ci95": [
+            0.48707870917271856,
+            0.512582643064055
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6932047822950551,
+          "brier": 0.250028799341892
+        },
+        "persistence": {
+          "n": 5902,
+          "correct": 2851,
+          "accuracy": 0.4830565909861064,
+          "accuracy_ci95": [
+            0.4703229631463491,
+            0.4958122605310002
+          ],
+          "balanced_accuracy": 0.48305658904046667,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5902,
+          "correct": 3053,
+          "accuracy": 0.5172822771941714,
+          "accuracy_ci95": [
+            0.5045266830075571,
+            0.5300153888415465
+          ],
+          "balanced_accuracy": 0.5172823940103808,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2019,
+      "id": "XAU_USD-1h-test2019",
+      "periods": {
+        "train": [
+          1262304000,
+          1514764800
+        ],
+        "validation": [
+          1514764800,
+          1546300800
+        ],
+        "test": [
+          1546300800,
+          1577836800
+        ]
+      },
+      "samples": {
+        "train": 47709,
+        "validation": 5902,
+        "test": 5901
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          3.5938522273230508e-06,
+          6.4696135847206675e-06,
+          -2.875761357397564e-06,
+          0.002678779456436489,
+          38.82865086637788,
+          -0.015192101954796006,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.002067746752778365,
+          0.002059018875947167,
+          0.00019682935577885672,
+          0.002174311743156486,
+          21.590831604937488,
+          0.14695335648189295,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 48016
+      },
+      "lstm": {
+        "config": "lstm-h64-w32",
+        "window": 32,
+        "hidden": 64,
+        "file": {
+          "path": "XAUUSD-1h-test2019-lstm.pt",
+          "sha256": "0c76a3cbe4b53c1efb2f04d326fe9e8d65e870584458cf3fb9ffc85cdafe8fc2"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2019-logistic.pt",
+          "sha256": "23e1ef27612f84ad1da7596b5478368033e043e1eab9662587d7a934d737f277"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2019-test.npz",
+        "sha256": "e4d3133f66b3d8bba692926cd0e220effacb2278412ec3133c22cb575ea624dc"
+      },
+      "test": {
+        "lstm": {
+          "n": 5901,
+          "correct": 3019,
+          "accuracy": 0.5116082019996611,
+          "accuracy_ci95": [
+            0.49885103791881574,
+            0.5243502623964278
+          ],
+          "balanced_accuracy": 0.5120364943328277,
+          "log_loss": 0.6932219573524093,
+          "brier": 0.25002461728634306
+        },
+        "logistic": {
+          "n": 5901,
+          "correct": 3004,
+          "accuracy": 0.5090662599559397,
+          "accuracy_ci95": [
+            0.4963094097155943,
+            0.5218113138882822
+          ],
+          "balanced_accuracy": 0.508573420271867,
+          "log_loss": 0.6932094418721366,
+          "brier": 0.2500127733170267
+        },
+        "majority": {
+          "n": 5901,
+          "correct": 2978,
+          "accuracy": 0.5046602270801559,
+          "accuracy_ci95": [
+            0.4919047014837246,
+            0.5174096891537819
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931047702537171,
+          "brier": 0.24997879510712745
+        },
+        "persistence": {
+          "n": 5901,
+          "correct": 2889,
+          "accuracy": 0.48957803762074226,
+          "accuracy_ci95": [
+            0.4768345392223088,
+            0.5023350962610855
+          ],
+          "balanced_accuracy": 0.48953369297071214,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5901,
+          "correct": 3012,
+          "accuracy": 0.5104219623792577,
+          "accuracy_ci95": [
+            0.49766490373891437,
+            0.5231654607776911
+          ],
+          "balanced_accuracy": 0.5104631478142712,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2020,
+      "id": "XAU_USD-1h-test2020",
+      "periods": {
+        "train": [
+          1262304000,
+          1546300800
+        ],
+        "validation": [
+          1546300800,
+          1577836800
+        ],
+        "test": [
+          1577836800,
+          1609459200
+        ]
+      },
+      "samples": {
+        "train": 53611,
+        "validation": 5901,
+        "test": 5925
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          2.908918102296389e-06,
+          5.1171227776009026e-06,
+          -2.2082046753044685e-06,
+          0.0025850424449349444,
+          37.4632246578391,
+          -0.013742699739389814,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0019945503762443624,
+          0.001986329220484757,
+          0.0001885028285801446,
+          0.0021012289828629587,
+          21.352549775007027,
+          0.1400914025034824,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 53922
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2020-lstm.pt",
+          "sha256": "3f67b01693ac8e42dcb114a929661e5689ba0659a0ee781d9789ec65696422b4"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2020-logistic.pt",
+          "sha256": "1a50fd1185069d360ecfcf2ed4ec1558c359ff335bd6999bd8ea4df3b986f866"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2020-test.npz",
+        "sha256": "065861789e1de71255531e215f668c4451ff3d3ec130d28cdcb0c4f93ddbf8a1"
+      },
+      "test": {
+        "lstm": {
+          "n": 5925,
+          "correct": 3087,
+          "accuracy": 0.5210126582278481,
+          "accuracy_ci95": [
+            0.5082830711400528,
+            0.5337150159616944
+          ],
+          "balanced_accuracy": 0.5194606729416855,
+          "log_loss": 0.6909907726631718,
+          "brier": 0.24892890324234113
+        },
+        "logistic": {
+          "n": 5925,
+          "correct": 3080,
+          "accuracy": 0.5198312236286919,
+          "accuracy_ci95": [
+            0.5071011735082029,
+            0.5325355753629237
+          ],
+          "balanced_accuracy": 0.5168911608785026,
+          "log_loss": 0.6950484993080708,
+          "brier": 0.2508385438073154
+        },
+        "majority": {
+          "n": 5925,
+          "correct": 3081,
+          "accuracy": 0.52,
+          "accuracy_ci95": [
+            0.5072700116686251,
+            0.5327040712354474
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6928113319846871,
+          "brier": 0.24983208045397323
+        },
+        "persistence": {
+          "n": 5925,
+          "correct": 2813,
+          "accuracy": 0.4747679324894515,
+          "accuracy_ci95": [
+            0.46207327756946753,
+            0.4874952845051416
+          ],
+          "balanced_accuracy": 0.47392621443254357,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5925,
+          "correct": 3110,
+          "accuracy": 0.5248945147679325,
+          "accuracy_ci95": [
+            0.5121669505014756,
+            0.5375898193580237
+          ],
+          "balanced_accuracy": 0.5257221681272315,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2021,
+      "id": "XAU_USD-1h-test2021",
+      "periods": {
+        "train": [
+          1262304000,
+          1577836800
+        ],
+        "validation": [
+          1577836800,
+          1609459200
+        ],
+        "test": [
+          1609459200,
+          1640995200
+        ]
+      },
+      "samples": {
+        "train": 59512,
+        "validation": 5925,
+        "test": 5906
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          5.432637680330507e-06,
+          6.601553789581885e-06,
+          -1.1689161092513827e-06,
+          0.0025281001121826778,
+          36.906630231314345,
+          -0.012997811404554293,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0019550135185168005,
+          0.0019455255521884252,
+          0.0001962958325620652,
+          0.0020638515599926913,
+          20.892468739473344,
+          0.13710091230549878,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 59832
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2021-lstm.pt",
+          "sha256": "0d1f733e4450083868c9270300504d478ad296178b15ff9c66b70c96485268f0"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2021-logistic.pt",
+          "sha256": "e553723116ff9bf431bdc9e17137de70152eb484de0612a20408cbf735dff8d1"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2021-test.npz",
+        "sha256": "43952e9966ba88b8a0c37af351743c8e57ae14f1bb2192b287fd080fb502f665"
+      },
+      "test": {
+        "lstm": {
+          "n": 5906,
+          "correct": 3052,
+          "accuracy": 0.516762614290552,
+          "accuracy_ci95": [
+            0.5040112281299783,
+            0.5294922087015591
+          ],
+          "balanced_accuracy": 0.5168076728656185,
+          "log_loss": 0.6914111341661574,
+          "brier": 0.24913962859827682
+        },
+        "logistic": {
+          "n": 5906,
+          "correct": 3024,
+          "accuracy": 0.5120216728750423,
+          "accuracy_ci95": [
+            0.49926988995127075,
+            0.5247578273723571
+          ],
+          "balanced_accuracy": 0.5120541034455236,
+          "log_loss": 0.6940022632792046,
+          "brier": 0.2504167459294833
+        },
+        "majority": {
+          "n": 5906,
+          "correct": 2958,
+          "accuracy": 0.500846596681341,
+          "accuracy_ci95": [
+            0.48809841320148883,
+            0.5135936795677808
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6931763052708305,
+          "brier": 0.25001456157544
+        },
+        "persistence": {
+          "n": 5906,
+          "correct": 2783,
+          "accuracy": 0.47121571283440566,
+          "accuracy_ci95": [
+            0.4585078990109262,
+            0.4839609468339084
+          ],
+          "balanced_accuracy": 0.4712144835475949,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5906,
+          "correct": 3122,
+          "accuracy": 0.5286149678293262,
+          "accuracy_ci95": [
+            0.5158695958577151,
+            0.5413231397435962
+          ],
+          "balanced_accuracy": 0.5286159099395151,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    },
+    {
+      "pair": "XAU/USD",
+      "instrument": "XAU_USD",
+      "timeframe": "1h",
+      "test_year": 2022,
+      "id": "XAU_USD-1h-test2022",
+      "periods": {
+        "train": [
+          1262304000,
+          1609459200
+        ],
+        "validation": [
+          1609459200,
+          1640995200
+        ],
+        "test": [
+          1640995200,
+          1672531200
+        ]
+      },
+      "samples": {
+        "train": 65437,
+        "validation": 5906,
+        "test": 5905
+      },
+      "bars_sha256": "e18b801c3e735c6bff505614ac33417c8e4d6ad215a461d24b058ecbea6e5d20",
+      "scaler": {
+        "mean": [
+          8.349027901173338e-06,
+          7.80499843348896e-06,
+          5.440294676843501e-07,
+          0.002611462967919094,
+          38.37581167596831,
+          -0.011859813835843941,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "std": [
+          0.0020130947864152584,
+          0.002003376794860014,
+          0.00022802064505398747,
+          0.0021558164692247095,
+          25.059215469812017,
+          0.1308414940128172,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "fitted_rows": 65759
+      },
+      "lstm": {
+        "config": "lstm-h32-w32",
+        "window": 32,
+        "hidden": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2022-lstm.pt",
+          "sha256": "d006f623dcbdd519ebb8c42be273048cc3ebc3f0362eae2fa066d1a8e7bad673"
+        }
+      },
+      "logistic": {
+        "config": "logistic-w32",
+        "window": 32,
+        "file": {
+          "path": "XAUUSD-1h-test2022-logistic.pt",
+          "sha256": "4ae6ed22f8afb3b9cb8de308194c9261072ac328d87014ec20569ac98d70045b"
+        }
+      },
+      "test_predictions": {
+        "path": "XAUUSD-1h-test2022-test.npz",
+        "sha256": "3a9a269d6d37a76cdc1efec22d6e9dc6384741413c608ecaaeef20517ae1fb0b"
+      },
+      "test": {
+        "lstm": {
+          "n": 5905,
+          "correct": 3001,
+          "accuracy": 0.5082133784928027,
+          "accuracy_ci95": [
+            0.49546102776128603,
+            0.5209550498532518
+          ],
+          "balanced_accuracy": 0.5082862447705825,
+          "log_loss": 0.694304281485707,
+          "brier": 0.25057016629598733
+        },
+        "logistic": {
+          "n": 5905,
+          "correct": 2953,
+          "accuracy": 0.5000846740050804,
+          "accuracy_ci95": [
+            0.48733588904770814,
+            0.5128333488658438
+          ],
+          "balanced_accuracy": 0.5008135669210562,
+          "log_loss": 0.6940381691978915,
+          "brier": 0.25043195788256667
+        },
+        "majority": {
+          "n": 5905,
+          "correct": 2926,
+          "accuracy": 0.49551227773073664,
+          "accuracy_ci95": [
+            0.4827669783855551,
+            0.5082634121961921
+          ],
+          "balanced_accuracy": 0.5,
+          "log_loss": 0.6933326254882098,
+          "brier": 0.2500927168648088
+        },
+        "persistence": {
+          "n": 5905,
+          "correct": 2884,
+          "accuracy": 0.48839966130397966,
+          "accuracy_ci95": [
+            0.47566190219912374,
+            0.5011525036442608
+          ],
+          "balanced_accuracy": 0.4883721250393217,
+          "log_loss": null,
+          "brier": null
+        },
+        "anti_persistence": {
+          "n": 5905,
+          "correct": 3019,
+          "accuracy": 0.5112616426756985,
+          "accuracy_ci95": [
+            0.49850882317191275,
+            0.5239998193304947
+          ],
+          "balanced_accuracy": 0.5112952320377984,
+          "log_loss": null,
+          "brier": null
+        }
+      },
+      "settings": {
+        "seed": 20261011,
+        "threads": 8,
+        "max_epochs": 40,
+        "patience": 5,
+        "batch_size": 512
+      }
+    }
+  ]
+}

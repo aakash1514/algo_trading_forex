@@ -1,0 +1,37 @@
+{
+  "pair": "GBP/USD",
+  "fold": "test2022",
+  "config": "lstm-h32-w32",
+  "shuffle_seed": 777,
+  "best_epoch": 7,
+  "test": {
+    "n": 6222,
+    "correct": 3129,
+    "accuracy": 0.5028929604628737,
+    "accuracy_ci95": [
+      0.49047145554306326,
+      0.515310895362933
+    ],
+    "balanced_accuracy": 0.5092845785188403,
+    "log_loss": 0.6932494704252112,
+    "brier": 0.2500508604400637
+  },
+  "majority": {
+    "n": 6222,
+    "correct": 3039,
+    "accuracy": 0.4884281581485053,
+    "accuracy_ci95": [
+      0.47601869515053424,
+      0.5008519012254813
+    ],
+    "balanced_accuracy": 0.5,
+    "log_loss": null,
+    "brier": null
+  },
+  "mcnemar_vs_majority": {
+    "control_only": 742,
+    "majority_only": 652,
+    "p_value": 0.01710668673174074
+  },
+  "beats_majority": true
+}

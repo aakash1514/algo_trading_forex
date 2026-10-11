@@ -1,0 +1,176 @@
+{
+  "pair": "USD/JPY",
+  "fold": "test2021",
+  "test_year": 2021,
+  "periods": {
+    "train": [
+      1262304000,
+      1577836800
+    ],
+    "validation": [
+      1577836800,
+      1609459200
+    ],
+    "test": [
+      1609459200,
+      1640995200
+    ]
+  },
+  "samples": {
+    "train": 62053,
+    "validation": 6225,
+    "test": 6212
+  },
+  "train_up_rate": 0.509725557184987,
+  "test_up_rate": 0.5191564713457824,
+  "scaler": {
+    "mean": [
+      2.4948952719947563e-06,
+      2.1041029027343247e-06,
+      3.9079236926023217e-07,
+      0.0015400913351359042,
+      0.67255395568098,
+      -0.0023366056704982275,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "std": [
+      0.0011848412387113615,
+      0.0011741338341667267,
+      0.00019211853732220793,
+      0.0012575363703423185,
+      0.7151723460522773,
+      0.05734033828216038,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "fitted_rows": 62366
+  },
+  "settings": {
+    "seed": 20261011,
+    "threads": 8,
+    "max_epochs": 40,
+    "patience": 5,
+    "batch_size": 512
+  },
+  "bars_sha256": "1bbe1f39a2bc620d5b394a2034f41f00b02d7fa63d64c7576e9cb6fb455d95d5",
+  "lstm": {
+    "chosen": "lstm-h64-w32",
+    "window": 32,
+    "hidden": 64,
+    "tried": [
+      {
+        "config": "lstm-h32-w32",
+        "best_epoch": 9,
+        "epochs_run": 14,
+        "val_log_loss": 0.6928171937972595,
+        "seconds": 77.70352670003194,
+        "seconds_per_epoch": 5.550251907145139
+      },
+      {
+        "config": "lstm-h64-w32",
+        "best_epoch": 18,
+        "epochs_run": 23,
+        "val_log_loss": 0.6925529379643658,
+        "seconds": 238.62517429998843,
+        "seconds_per_epoch": 10.375007578260366
+      }
+    ]
+  },
+  "logistic": {
+    "chosen": "logistic-w32",
+    "window": 32,
+    "tried": [
+      {
+        "config": "logistic-w32",
+        "best_epoch": 2,
+        "epochs_run": 7,
+        "val_log_loss": 0.6963430564060609,
+        "seconds": 2.0801826000097208,
+        "seconds_per_epoch": 0.2971689428585315
+      }
+    ]
+  },
+  "files": {
+    "lstm": {
+      "path": "USDJPY-1h-test2021-lstm.pt",
+      "sha256": "53a0d462a1bffcc7f76b5ff4e35af325fd66c961d574134966c2d05818f6c8a1"
+    },
+    "logistic": {
+      "path": "USDJPY-1h-test2021-logistic.pt",
+      "sha256": "4e19202df47961a3628c911ebb307c118185d44f140519b99500e3e29224e13d"
+    },
+    "test_predictions": {
+      "path": "USDJPY-1h-test2021-test.npz",
+      "sha256": "30bd003e3dfbbde1e77bb8ce8d36b60f9014b6289533294867d94881d878ceae"
+    }
+  },
+  "test": {
+    "lstm": {
+      "n": 6212,
+      "correct": 3217,
+      "accuracy": 0.5178686413393432,
+      "accuracy_ci95": [
+        0.5054356191992371,
+        0.530279577443201
+      ],
+      "balanced_accuracy": 0.512274169982067,
+      "log_loss": 0.6922037876522658,
+      "brier": 0.24952554839173302
+    },
+    "logistic": {
+      "n": 6212,
+      "correct": 3228,
+      "accuracy": 0.519639407598197,
+      "accuracy_ci95": [
+        0.5072069423881331,
+        0.5320475980657178
+      ],
+      "balanced_accuracy": 0.5118548334773684,
+      "log_loss": 0.6913655681882522,
+      "brier": 0.24910184919638081
+    },
+    "majority": {
+      "n": 6212,
+      "correct": 3225,
+      "accuracy": 0.5191564713457824,
+      "accuracy_ci95": [
+        0.5067238387608182,
+        0.531565426108102
+      ],
+      "balanced_accuracy": 0.5,
+      "log_loss": 0.6925910658441808,
+      "brier": 0.24972197174748645
+    },
+    "persistence": {
+      "n": 6212,
+      "correct": 2987,
+      "accuracy": 0.48084352865421764,
+      "accuracy_ci95": [
+        0.46843457389189813,
+        0.49327616123918194
+      ],
+      "balanced_accuracy": 0.4799753453596074,
+      "log_loss": null,
+      "brier": null
+    },
+    "anti_persistence": {
+      "n": 6212,
+      "correct": 3215,
+      "accuracy": 0.5175466838377334,
+      "accuracy_ci95": [
+        0.5051135772109102,
+        0.5299581023749073
+      ],
+      "balanced_accuracy": 0.5182395548669558,
+      "log_loss": null,
+      "brier": null
+    }
+  },
+  "seconds": 319.00944550003624,
+  "finished_at": "2026-10-11T19:32:42.820846+00:00"
+}
