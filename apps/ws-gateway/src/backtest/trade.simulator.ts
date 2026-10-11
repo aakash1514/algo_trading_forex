@@ -2,7 +2,7 @@ import { Candle, Ohlc, Signal, StrategyContext, Trade } from './strategies/strat
 
 // Commission: 0.7 pips per side (round trip = 1.4 pips) — realistic ECN cost.
 // The spread is not modelled: every fill uses the bar's own bid or ask.
-const COMMISSION_PIPS = 0.7;
+export const COMMISSION_PIPS_PER_SIDE = 0.7;
 
 type Side = 'BUY' | 'SELL';
 
@@ -117,7 +117,7 @@ export class TradeSimulator {
   private close(open: OpenTrade, exitPoints: number, exitTime: Date, reason: Trade['exitReason']): Trade {
     const direction = open.action === 'BUY' ? 1 : -1;
     const pnlPips = ((exitPoints - open.entryPoints) * direction) / this.pipPoints;
-    const commissionPips = COMMISSION_PIPS * 2; // round trip
+    const commissionPips = COMMISSION_PIPS_PER_SIDE * 2; // round trip
     const price = (points: number) => points / 10 ** this.context.priceDecimals;
     return {
       entryTime: open.entryTime,
@@ -126,6 +126,8 @@ export class TradeSimulator {
       lots: open.lots,
       entryPrice: price(open.entryPoints),
       exitPrice: price(exitPoints),
+      entryPoints: open.entryPoints,
+      exitPoints,
       exitReason: reason,
       pnl: round2(pnlPips),
       commission: round2(commissionPips),
