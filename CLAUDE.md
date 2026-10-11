@@ -40,6 +40,9 @@ npm run data:validate        # FRED noon fixings + gold extremes -> docs/validat
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
+
+# Independent backtest verification (auth-service + ws-gateway running): API run vs SQL reproduction
+npm run backtest:verify -- [--pairs EUR_USD,XAU_USD] [--from 2022-01-01] [--to 2022-12-30]
 ```
 
 ## Architecture
@@ -148,8 +151,24 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Backtests read only the imported history** (shared reader `libs/database/src/lib/historical-candles.ts`,
   coverage from `historical_coverage`), never the live `candles_*`, and never apply the live market-hours clock.
   A signal fills at the NEXT bar's open (buy at the ask, sell at the bid); SL/TP are checked from the fill bar on
-  (long on bid, short on ask), gaps fill at the open, SL wins if both are inside one bar. P&L is in pips
-  (points / (pip_size x 10^decimals)); pip size always comes from `instruments`.
+  long on bid, short on ask), gaps fill at the open, SL wins if both are inside one bar. Pips = points /
+  (pip_size x 10^decimals); pip size always comes from `instruments`.
+- **Backtest money is USD, from integer points** (`ws-gateway/src/backtest/trade-money.ts`): units = lots x
+  `instruments.lot_size` (must be whole); USD-quoted pairs `points x units / 10^decimals`, USD/JPY
+  `points x units / exitPoints` (converted at the trade's own exit fill); cents rounded half away from zero (as
+  Postgres `round(numeric)`), using BigInt. A pair without a USD leg is rejected.
+- Backtest metrics (`metrics.calculator.ts`): equity marked to market at every bar close (open trade at the
+  bid/ask close, commission deducted); max drawdown % of the running peak; Sharpe from daily returns at the
+  Mon-Fri New York 17:00 closes taken from the calendar (not D1 bars), sample stdev, x √260, rf 0. A metric that
+  is undefined (no trades, no loss, < 2 returns) is **null** and shows as "—"; never store a fabricated 0 or 999.
+  No margin/stop-out in backtests. Final equity is derived (initial_capital + total_pnl_usd), not stored.
+- **Backtest dates are inclusive calendar days (UTC)**: `YYYY-MM-DD` only; the window is [From 00:00, the day
+  after To 00:00) and only whole bars inside it are used (`backtest-window.ts`), so To = Wednesday never pulls in
+  the NY-aligned D1 bar that starts Wednesday evening.
+- **Indicator comparisons must be exact.** MA crossover compares integer sums of (bid + ask) points
+  cross-multiplied, never float SMAs: a real exact tie (EUR/USD 2022-01-03 12:47, SMA 5/20) flipped a float
+  comparison and signalled a bar early. The independent SQL reproduction (`tools/backtest-verify`) only matches
+  because both sides are exact; keep any new strategy verifiable the same way.
 - Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
   right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
 
@@ -186,8 +205,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   lint (0 errors), typecheck and tests from a clean `dist/`, all 5 services start from the repo root,
   and paper trading works end to end in the browser (orders, live positions/account, session restore).
   Write-up: `docs/phase-summaries/step-1-health-check.md`.
-- **Roadmap step 2 (historical data) is done** (2026-10-11) on branch `step-2-historical-data` (PR into main,
-  not merged). Write-up: `docs/phase-summaries/step-2-historical-data.md`.
+- **Roadmap step 2 (historical data) is done** (2026-10-11), merged into main (PR #1).
+  Write-up: `docs/phase-summaries/step-2-historical-data.md`.
+- **Roadmap step 3 (backtest verification) is done** (2026-10-11) on branch `step-3-backtest-verification`
+  (PR into main, not merged). Write-up: `docs/phase-summaries/step-3-backtest-verification.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -206,10 +227,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    More pairs: one at a time (export, `historical_price_scale` row, import, validate). A cross pair (e.g. EUR/GBP)
    also needs its USD conversion pair's history, because margin and pip value convert via quote→USD.
    Production deploys only H1 and above.
-3. Backtest verification: strategies now run on the history with real bid/ask fills and non-zero results
-   (`docs/validation/backtest-proof.md`). Remaining: the metrics (equity curve, drawdown, Sharpe) add pips to a
-   10,000 base instead of valuing trades in money, so drawdown % scales with a pair's pip count (gold 93%); see
-   `docs/OVERNIGHT-QUESTIONS.md`. Verify the metrics and add engine tests beyond the simulator.
+3. ✅ **Done (2026-10-11).** Backtest verification: results in USD (initial capital, lots x lot_size, USD/JPY at
+   the exit fill), marked-to-market equity, drawdown and daily NY-close Sharpe; inclusive To date; exact MA
+   crossover. An independent SQL reproduction from raw M1 matches the API runs trade by trade and metric by
+   metric (EUR/USD 257, XAU/USD 217, USD/JPY 215 trades, 2022 H1): `docs/validation/backtest-verification.md`.
+   Write-up: `docs/phase-summaries/step-3-backtest-verification.md`. Not verified independently yet: London
+   breakout (SL/TP path); a strategy added later needs its own reproduction.
 4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
