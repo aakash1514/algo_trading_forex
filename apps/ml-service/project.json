@@ -44,6 +44,14 @@
         "command": ".venv\\Scripts\\python.exe -m pytest"
       }
     },
+    "train": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ml-service",
+        "env": { "PYTHONPATH": "src" },
+        "command": ".venv\\Scripts\\python.exe -m ml_service.walk_forward"
+      }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "options": {

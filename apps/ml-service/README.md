@@ -10,7 +10,17 @@ npx nx lint ml-service         # ruff check + ruff format --check
 npx nx typecheck ml-service    # mypy --strict
 npx nx test ml-service         # pytest (RUN_DB_TESTS=true adds the dev-DB tests)
 npx nx serve ml-service        # uvicorn on :3006
+
+# Offline walk-forward training (reads the history as the read-only login)
+npx nx train ml-service --args="--pairs EUR/USD --folds 2022 --out <dir>"
 ```
+
+Training (offline only): per pair, 7 expanding folds (test 2016..2022, validation the
+year before, training everything earlier). Each fold fits the scaler on its training
+period, trains the LSTM settings (hidden 32/64 x window 32/96) and the logistic
+baseline (window 32/96), picks by validation log loss, and scores once on the test year
+together with the majority, persistence and anti-persistence baselines. 8 threads: on
+the i5-1240P, 12 threads was 1.6x slower per batch for the largest setting.
 
 Dependencies: exact pins in `requirements.in` / `requirements-dev.in`, locked with hashes.
 To change a pin:
