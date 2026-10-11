@@ -19,6 +19,8 @@ import { BacktestJobData } from './backtest.worker';
 import { SubmitBacktestDto } from './dto/submit-backtest.dto';
 
 const MAX_M1_DAYS = 366;
+export const DEFAULT_LOTS = 0.1;
+export const DEFAULT_INITIAL_CAPITAL = 10_000;
 
 @Injectable()
 export class BacktestService {
@@ -63,6 +65,9 @@ export class BacktestService {
       throw err;
     }
 
+    const lots = dto.lots ?? DEFAULT_LOTS;
+    const initialCapital = dto.initialCapital ?? DEFAULT_INITIAL_CAPITAL;
+
     // Create DB record
     const run = this.repo.create({
       userId,
@@ -72,6 +77,8 @@ export class BacktestService {
       fromDate: window.from,           // the From day, 00:00 UTC
       toDate: parseDay(dto.toDate),    // the To day, 00:00 UTC (inclusive day)
       parameters: dto.parameters ?? {},
+      initialCapital: initialCapital.toFixed(2),
+      lots: lots.toFixed(2),
       status: 'QUEUED',
       progress: 0,
     });
@@ -86,7 +93,9 @@ export class BacktestService {
       fromDate: dto.fromDate,
       toDate: dto.toDate,
       strategyName: dto.strategyName,
-      parameters: { ...(dto.parameters ?? {}), lots: dto.lots ?? 0.1 },
+      parameters: { ...(dto.parameters ?? {}), lots },
+      lots,
+      initialCapital,
     };
 
     await this.queue.add('run-backtest', jobData, { jobId: run.id });

@@ -110,6 +110,25 @@ describe('BacktestService submit: historical coverage', () => {
       expect.objectContaining({ fromDate: '2022-01-01', toDate: '2022-12-30' }), { jobId: 'run-9' });
   });
 
+  it('stores the default capital and size, and passes them to the job', async () => {
+    const { service, queue } = submitService([coverage]);
+    const repo = (service as unknown as { repo: { create: jest.Mock } }).repo;
+    await service.submit(USER_A, dto());
+    expect(repo.create).toHaveBeenCalledWith(expect.objectContaining({ initialCapital: '10000.00', lots: '0.10' }));
+    expect(queue.add).toHaveBeenCalledWith('run-backtest',
+      expect.objectContaining({ initialCapital: 10_000, lots: 0.1, parameters: { lots: 0.1 } }), { jobId: 'run-9' });
+  });
+
+  it('stores the requested capital and size', async () => {
+    const { service, queue } = submitService([coverage]);
+    const repo = (service as unknown as { repo: { create: jest.Mock } }).repo;
+    await service.submit(USER_A, dto({ initialCapital: 25_000.5, lots: 1.25, parameters: { fastPeriod: 10, slowPeriod: 30 } }));
+    expect(repo.create).toHaveBeenCalledWith(expect.objectContaining({ initialCapital: '25000.50', lots: '1.25' }));
+    expect(queue.add).toHaveBeenCalledWith('run-backtest', expect.objectContaining({
+      initialCapital: 25_000.5, lots: 1.25, parameters: { fastPeriod: 10, slowPeriod: 30, lots: 1.25 },
+    }), { jobId: 'run-9' });
+  });
+
   it('accepts From == To (one whole day)', async () => {
     const { service, queue } = submitService([coverage]);
     await expect(service.submit(USER_A, dto({ fromDate: '2022-12-30', toDate: '2022-12-30' }))).resolves.toEqual({ runId: 'run-9' });

@@ -4,6 +4,8 @@ import {
   IsOptional,
   IsObject,
   IsNumber,
+  Max,
+  Min,
   ValidateBy,
   ValidationOptions,
   buildMessage,
@@ -50,7 +52,17 @@ export class SubmitBacktestDto {
   @IsObject()
   parameters?: Record<string, number>;
 
+  // Position size per trade (units = lots x instruments.lot_size); default 0.1
   @IsOptional()
-  @IsNumber()
+  @IsNumber({ allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2 })
+  @Min(0.01)
+  @Max(100)
   lots?: number;
+
+  // Starting equity in USD; default 10,000
+  @IsOptional()
+  @IsNumber({ allowNaN: false, allowInfinity: false, maxDecimalPlaces: 2 })
+  @Min(100)
+  @Max(10_000_000)
+  initialCapital?: number;
 }

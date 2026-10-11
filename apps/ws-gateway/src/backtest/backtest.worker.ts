@@ -18,10 +18,12 @@ export interface BacktestJobData {
   userId: string;
   instrument: string;
   timeframe: string;
-  fromDate: string;
-  toDate: string;
+  fromDate: string; // YYYY-MM-DD, inclusive
+  toDate: string;   // YYYY-MM-DD, inclusive
   strategyName: string;
-  parameters: Record<string, number>;
+  parameters: Record<string, number>; // strategy parameters (lots included for the strategies)
+  lots: number;
+  initialCapital: number; // USD
 }
 
 const MINIO_BUCKET = 'backtests';

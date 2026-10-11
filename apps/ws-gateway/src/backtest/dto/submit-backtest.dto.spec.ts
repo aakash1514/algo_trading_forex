@@ -39,4 +39,20 @@ describe('SubmitBacktestDto through the ValidationPipe', () => {
     delete missing['fromDate'];
     expect(await errors(missing)).toEqual(['fromDate must be a calendar date (YYYY-MM-DD)']);
   });
+
+  it.each([
+    [{ lots: 0.005 }, 'lots must not be less than 0.01'],
+    [{ lots: 0.015 }, 'lots must be a number conforming to the specified constraints'],
+    [{ lots: 101 }, 'lots must not be greater than 100'],
+    [{ initialCapital: 99.99 }, 'initialCapital must not be less than 100'],
+    [{ initialCapital: 10_000_000.01 }, 'initialCapital must not be greater than 10000000'],
+    [{ initialCapital: '10000' }, 'initialCapital must be a number conforming to the specified constraints'],
+  ])('rejects %p', async (over, message) => {
+    expect(await errors(body(over))).toContain(message);
+  });
+
+  it('accepts capital and lots at their limits', async () => {
+    expect(await errors(body({ lots: 0.01, initialCapital: 100 }))).toEqual([]);
+    expect(await errors(body({ lots: 100, initialCapital: 10_000_000 }))).toEqual([]);
+  });
 });
