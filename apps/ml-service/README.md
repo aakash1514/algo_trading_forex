@@ -1,0 +1,28 @@
+# ml-service
+
+Python FastAPI service (port 3006, prefix `/api/ml`) for the LSTM next-bar direction
+models trained on the imported Dukascopy history (roadmap step 4). The service only
+runs inference; training is an offline script.
+
+```sh
+npx nx setup ml-service        # venv (Python 3.12) + hash-checked install of both lock files
+npx nx lint ml-service         # ruff check + ruff format --check
+npx nx typecheck ml-service    # mypy --strict
+npx nx test ml-service         # pytest (RUN_DB_TESTS=true adds the dev-DB tests)
+npx nx serve ml-service        # uvicorn on :3006
+```
+
+Dependencies: exact pins in `requirements.in` / `requirements-dev.in`, locked with hashes.
+To change a pin:
+
+```sh
+.venv/Scripts/python.exe -m piptools compile --strip-extras --no-emit-index-url -o requirements.lock requirements.in
+.venv/Scripts/python.exe scripts/add_hashes.py requirements.lock          # sha256 of every file from PyPI
+.venv/Scripts/python.exe -m piptools compile --strip-extras --no-emit-index-url -o requirements-dev.lock requirements-dev.in
+.venv/Scripts/python.exe scripts/add_hashes.py requirements-dev.lock
+```
+
+`add_hashes.py` reads the hashes from PyPI's JSON API (pip-compile `--generate-hashes`
+downloads every platform's torch wheel, several GB) and refuses any pinned release
+younger than 14 days. The Nx commands use `.venv\Scripts\python.exe` (Windows); a Linux
+image comes with deployment (roadmap step 7).

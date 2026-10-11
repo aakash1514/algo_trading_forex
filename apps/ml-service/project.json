@@ -1,0 +1,55 @@
+{
+  "name": "ml-service",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/ml-service/src",
+  "projectType": "application",
+  "tags": ["lang:python"],
+  "targets": {
+    "setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ml-service",
+        "commands": [
+          "py -3.12 -m venv .venv",
+          ".venv\\Scripts\\python.exe -m pip install --require-hashes --no-deps -r requirements.lock -r requirements-dev.lock"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "cwd": "apps/ml-service",
+        "commands": [".venv\\Scripts\\python.exe -m ruff check .", ".venv\\Scripts\\python.exe -m ruff format --check ."],
+        "parallel": false
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "cwd": "apps/ml-service",
+        "command": ".venv\\Scripts\\python.exe -m mypy"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", { "env": "RUN_DB_TESTS" }],
+      "options": {
+        "cwd": "apps/ml-service",
+        "command": ".venv\\Scripts\\python.exe -m pytest"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/ml-service",
+        "command": ".venv\\Scripts\\python.exe -m uvicorn ml_service.main:app --app-dir src --port 3006"
+      }
+    }
+  }
+}

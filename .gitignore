@@ -64,3 +64,11 @@ next-env.d.ts
 # JForex writes the compiled strategy and saved parameter presets next to the source
 tools/market-data/jforex/*.jfx
 tools/market-data/jforex/*.xml
+
+# Python (apps/ml-service)
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
