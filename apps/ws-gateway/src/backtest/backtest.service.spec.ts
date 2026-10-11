@@ -77,7 +77,7 @@ describe('BacktestService submit: historical coverage', () => {
     return { service, queue, query };
   }
   const dto = (over: Record<string, unknown> = {}) => ({
-    instrument: 'EUR_USD', timeframe: '1h', fromDate: '2022-01-01', toDate: '2022-12-31', strategyName: 'ma_crossover', ...over,
+    instrument: 'EUR_USD', timeframe: '1h', fromDate: '2022-01-01', toDate: '2022-12-30', strategyName: 'ma_crossover', ...over,
   });
 
   it('queues a run inside the covered range, checking coverage for the DB pair', async () => {
@@ -99,9 +99,36 @@ describe('BacktestService submit: historical coverage', () => {
     await expect(service.submit(USER_A, dto({ instrument: 'EUR_GBP' }))).rejects.toThrow('No historical data for EUR/GBP');
   });
 
-  it('caps a 1m run at 366 days', async () => {
-    const { service } = submitService([coverage]);
-    await expect(service.submit(USER_A, dto({ timeframe: '1m', fromDate: '2020-01-01', toDate: '2022-01-01' })))
-      .rejects.toThrow('at most 366 days');
+  it('stores the From and To days and queues the days as entered (To inclusive)', async () => {
+    const { service, queue } = submitService([coverage]);
+    const repo = (service as unknown as { repo: { create: jest.Mock } }).repo;
+    await service.submit(USER_A, dto());
+    expect(repo.create).toHaveBeenCalledWith(expect.objectContaining({
+      fromDate: new Date('2022-01-01T00:00:00Z'), toDate: new Date('2022-12-30T00:00:00Z'),
+    }));
+    expect(queue.add).toHaveBeenCalledWith('run-backtest',
+      expect.objectContaining({ fromDate: '2022-01-01', toDate: '2022-12-30' }), { jobId: 'run-9' });
+  });
+
+  it('accepts From == To (one whole day)', async () => {
+    const { service, queue } = submitService([coverage]);
+    await expect(service.submit(USER_A, dto({ fromDate: '2022-12-30', toDate: '2022-12-30' }))).resolves.toEqual({ runId: 'run-9' });
+    expect(queue.add).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects From after To', async () => {
+    const { service, queue } = submitService([coverage]);
+    await expect(service.submit(USER_A, dto({ fromDate: '2022-12-30', toDate: '2022-12-29' })))
+      .rejects.toThrow('fromDate 2022-12-30 is after toDate 2022-12-29');
+    expect(queue.add).not.toHaveBeenCalled();
+  });
+
+  it('caps a 1m run at 366 days, both ends counted', async () => {
+    const { service, queue } = submitService([coverage]);
+    await expect(service.submit(USER_A, dto({ timeframe: '1m', fromDate: '2020-01-01', toDate: '2020-12-31' })))
+      .resolves.toEqual({ runId: 'run-9' }); // 366 days (leap year)
+    await expect(service.submit(USER_A, dto({ timeframe: '1m', fromDate: '2020-01-01', toDate: '2021-01-01' })))
+      .rejects.toThrow('at most 366 days'); // 367 days
+    expect(queue.add).toHaveBeenCalledTimes(1);
   });
 });

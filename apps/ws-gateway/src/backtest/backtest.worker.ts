@@ -11,6 +11,7 @@ import { StrategyRegistry } from './strategies/strategy.registry';
 import { TradeSimulator } from './trade.simulator';
 import { MetricsCalculator } from './metrics.calculator';
 import { Candle, StrategyContext } from './strategies/strategy.interface';
+import { backtestWindow } from './backtest-window';
 
 export interface BacktestJobData {
   runId: string;
@@ -101,11 +102,13 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
       //    and ask in integer points; contract specs from the DB. The live
       //    market-hours clock is not applied: the history is the truth.
       const pair = instrument.replace('_', '/');
-      const from = new Date(fromDate);
-      const to = new Date(toDate);
-      const coverage = await requireHistoricalCoverage(this.dataSource, pair, from, to);
+      //    The window holds whole bars only, From and To days inclusive (UTC).
+      const window = backtestWindow(fromDate, toDate, timeframe as HistoricalTimeframe);
+      const coverage = await requireHistoricalCoverage(this.dataSource, pair, window.from, window.lastBucket);
       const context: StrategyContext = { pipSize: await this.pipSize(pair), priceDecimals: coverage.priceDecimals };
-      const bars = await readHistoricalBars(this.dataSource, { pair, timeframe: timeframe as HistoricalTimeframe, from, to });
+      const bars = await readHistoricalBars(this.dataSource, {
+        pair, timeframe: timeframe as HistoricalTimeframe, from: window.from, to: window.lastBucket,
+      });
 
       if (bars.length === 0) {
         await this.repo.update(runId, {
