@@ -36,3 +36,18 @@ To change a pin:
 downloads every platform's torch wheel, several GB) and refuses any pinned release
 younger than 14 days. The Nx commands use `.venv\Scripts\python.exe` (Windows); a Linux
 image comes with deployment (roadmap step 7).
+
+## API (inference only)
+
+All data endpoints need an auth-service access token (`Authorization: Bearer ...`, HS256 with
+the shared `JWT_ACCESS_SECRET`; a token without `sub` or past `exp` is refused).
+
+| Endpoint | |
+|---|---|
+| `GET /api/ml/health` | public: status and number of models loaded |
+| `GET /api/ml/models` | the 28 walk-forward models (pair x test year): periods, samples, chosen setting, sha256, test metrics |
+| `GET /api/ml/evaluation` | the 16 pooled LSTM-vs-baseline tests (raw and Holm p), per pair-year metrics, controls, reproducibility, break-even accuracy, SQL check |
+| `GET /api/ml/predictions/{instrument}?timeframe=1h&from=YYYY-MM-DD&to=YYYY-MM-DD` | days inclusive, at most 31, within 2016-2022: one prediction per H1 target bar, from the model whose test year contains it (out of sample), with the bar's mid OHLC and actual direction |
+
+These are **historical walk-forward test results, not live signals**. Parity with the offline
+run: `python -m ml_service.parity` (writes `docs/validation/ml-inference-parity.md`).

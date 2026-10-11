@@ -85,6 +85,13 @@ def pip_points(conn: psycopg.Connection[tuple[object, ...]], pair: str) -> int:
     return int(str(points))
 
 
+def price_decimals(conn: psycopg.Connection[tuple[object, ...]], pair: str) -> int:
+    row = conn.execute("SELECT price_decimals FROM historical_price_scale WHERE pair = %s", (pair,)).fetchone()
+    if row is None:
+        raise ValueError(f"{pair}: no historical_price_scale row")
+    return int(str(row[0]))
+
+
 def read_bars(conn: psycopg.Connection[tuple[object, ...]], pair: str, start: datetime, end: datetime) -> Bars:
     """H1 bars with start <= bucket < end (historical_candles_1h)."""
     if start.tzinfo is None or end.tzinfo is None:

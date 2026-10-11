@@ -56,7 +56,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/ml-service",
-        "command": ".venv\\Scripts\\python.exe -m uvicorn ml_service.main:app --app-dir src --port 3006"
+        "command": ".venv\\Scripts\\python.exe -m uvicorn ml_service.main:create_app --factory --app-dir src --port 3006"
       }
     }
   }
