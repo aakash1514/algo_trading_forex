@@ -9,13 +9,15 @@ import {
   EconomicEventEntity,
 } from '@forexedge/database';
 import { TickConsumer } from './tick.consumer';
-import { SpreadConsumer } from './spread.consumer';
-import { SessionConsumer } from './session.consumer';
 import { PositionService } from '../position/position.service';
 import { AccountService } from '../account/account.service';
 import { OrderValidationService } from '../order/order-validation.service';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService } from '../pricing/pricing.service';
+import { OpenPairsIndex } from '../position/open-pairs.index';
+import { MarketHoursPolicy } from '../market/market-hours.policy';
+import { StopOutService } from '../account/stop-out.service';
+import { AccountInvariantMonitor } from '../account/account-invariant.monitor';
 
 @Module({
   imports: [
@@ -29,13 +31,15 @@ import { PricingService } from '../pricing/pricing.service';
   ],
   providers: [
     TickConsumer,
-    SpreadConsumer,
-    SessionConsumer,
     PositionService,
     AccountService,
     OrderValidationService,
     RealtimePublisher,
     PricingService,
+    OpenPairsIndex,
+    MarketHoursPolicy,
+    StopOutService,
+    AccountInvariantMonitor,
     {
       provide: 'KAFKA_CONFIG',
       useFactory: (config: ConfigService) => ({
@@ -46,6 +50,6 @@ import { PricingService } from '../pricing/pricing.service';
     },
   ],
   // Single instances shared with AppModule (controllers, OrderService).
-  exports: [SessionConsumer, PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService],
+  exports: [PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService, OpenPairsIndex, MarketHoursPolicy],
 })
 export class KafkaConsumerModule {}

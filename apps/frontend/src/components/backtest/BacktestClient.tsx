@@ -11,10 +11,21 @@ import {
   useDeleteBacktestMutation,
 } from '../../store/api/backtest.api';
 import { cn } from '../../lib/cn';
+import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
 import React from 'react';
 
+// Strategy ids are the backend's (SubmitBacktestDto / StrategyRegistry); labels are display only
+const STRATEGIES = [
+  { id: 'ma_crossover', label: 'MA Crossover' },
+  { id: 'london_breakout', label: 'London Breakout' },
+] as const;
+
+// Backtests run on the imported Dukascopy history (2010-2022)
+const HISTORY_FIRST_DAY = '2010-01-01';
+const HISTORY_LAST_DAY = '2022-12-30';
+
 const schema = z.object({
-  strategyName: z.enum(['moving_average_crossover', 'london_breakout']),
+  strategyName: z.enum(['ma_crossover', 'london_breakout']),
   instrument:   z.string().min(1),
   from:         z.string().min(1),
   to:           z.string().min(1),
@@ -23,6 +34,13 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+
+// Backtest P&L is in pips (net of commission), not account currency; the win rate
+// arrives as a percentage (0-100)
+function formatPips(value: string | null | undefined): string {
+  const pips = Number.parseFloat(value ?? '0');
+  return `${pips > 0 ? '+' : ''}${pips.toFixed(1)} pips`;
+}
 
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: 'text-accent-green bg-accent-green/10',
@@ -43,6 +61,7 @@ function MetricCard({ label, value, color }: { label: string; value: string; col
 export function BacktestClient() {
   const accessToken = useAppSelector((s) => s.auth.accessToken);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { data: runs = [], isLoading } = useGetBacktestsQuery(undefined, {
     skip: !accessToken,
@@ -54,10 +73,10 @@ export function BacktestClient() {
   const { register, handleSubmit, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      strategyName: 'moving_average_crossover',
+      strategyName: 'ma_crossover',
       instrument:   'EUR_USD',
-      from:         '2026-06-01',
-      to:           '2026-06-12',
+      from:         '2022-01-01',
+      to:           '2022-12-30',
       fastPeriod:   10,
       slowPeriod:   30,
     },
@@ -66,17 +85,24 @@ export function BacktestClient() {
   const strategy = watch('strategyName');
 
   async function onSubmit(data: FormData) {
-    await runBacktest({
-      strategyName: data.strategyName === 'moving_average_crossover' ? 'ma_crossover' : 'london_breakout',
-      instrument:   data.instrument,
-      fromDate:     data.from,
-      toDate:       data.to,
-      timeframe:    '1h',
-      parameters: {
-        ...(data.fastPeriod && { fastPeriod: data.fastPeriod }),
-        ...(data.slowPeriod && { slowPeriod: data.slowPeriod }),
-      },
-    });
+    setSubmitError(null);
+    try {
+      await runBacktest({
+        strategyName: data.strategyName,
+        instrument:   data.instrument,
+        fromDate:     data.from,
+        toDate:       data.to,
+        timeframe:    '1h',
+        parameters: data.strategyName === 'ma_crossover' ? {
+          ...(data.fastPeriod && { fastPeriod: data.fastPeriod }),
+          ...(data.slowPeriod && { slowPeriod: data.slowPeriod }),
+        } : {},
+      }).unwrap();
+    } catch (err: unknown) {
+      // e.g. a range outside the history: the API names the covered range
+      const message = (err as { data?: { message?: string | string[] } } | undefined)?.data?.message;
+      setSubmitError(Array.isArray(message) ? message.join(', ') : message ?? 'Backtest could not be started');
+    }
   }
 
   async function handleDelete(runId: string) {
@@ -99,29 +125,30 @@ export function BacktestClient() {
             <div>
               <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Strategy</label>
               <select {...register('strategyName')} className={inputClass}>
-                <option value="moving_average_crossover">MA Crossover</option>
-                <option value="london_breakout">London Breakout</option>
+                {STRATEGIES.map((s) => (
+                  <option key={s.id} value={s.id}>{s.label}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Instrument</label>
               <select {...register('instrument')} className={inputClass}>
-                {['EUR_USD','GBP_USD','USD_JPY','USD_CHF','AUD_USD','USD_CAD','NZD_USD','EUR_GBP'].map((p) => (
-                  <option key={p} value={p}>{p.replace('_', '/')}</option>
+                {MAJOR_PAIRS.map((p) => (
+                  <option key={p} value={p}>{PAIR_DISPLAY[p]}</option>
                 ))}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">From</label>
-                <input {...register('from')} type="date" className={inputClass} />
+                <input {...register('from')} type="date" min={HISTORY_FIRST_DAY} max={HISTORY_LAST_DAY} className={inputClass} />
               </div>
               <div>
                 <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">To</label>
-                <input {...register('to')} type="date" className={inputClass} />
+                <input {...register('to')} type="date" min={HISTORY_FIRST_DAY} max={HISTORY_LAST_DAY} className={inputClass} />
               </div>
             </div>
-            {strategy === 'moving_average_crossover' && (
+            {strategy === 'ma_crossover' && (
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Fast</label>
@@ -132,6 +159,9 @@ export function BacktestClient() {
                   <input {...register('slowPeriod', { valueAsNumber: true })} type="number" className={inputClass} />
                 </div>
               </div>
+            )}
+            {submitError && (
+              <p className="text-[11px] text-accent-red bg-accent-red/10 rounded px-2.5 py-1.5">{submitError}</p>
             )}
             <button type="submit" disabled={isSubmitting}
               className={cn(
@@ -162,7 +192,7 @@ export function BacktestClient() {
             <table className="w-full text-[11px]">
               <thead>
                 <tr className="border-b border-terminal-border">
-                  {['Strategy', 'Pair', 'Status', 'Date', 'Net profit', ''].map((h) => (
+                  {['Strategy', 'Pair', 'Status', 'Date', 'Net P&L', ''].map((h) => (
                     <th key={h} className="text-left px-4 py-2 text-[10px] text-terminal-muted uppercase tracking-wider font-medium">
                       {h}
                     </th>
@@ -181,7 +211,7 @@ export function BacktestClient() {
                       )}
                     >
                       <td className="px-4 py-2.5 font-medium text-[#e2e4e9]">
-                        {run.strategyName === 'ma_crossover' ? 'MA Crossover' : 'London Breakout'}
+                        {STRATEGIES.find((s) => s.id === run.strategyName)?.label ?? run.strategyName}
                       </td>
                       <td className="px-4 py-2.5 text-terminal-muted">
                         {run.instrument?.replace('_', '/')}
@@ -197,7 +227,7 @@ export function BacktestClient() {
                       <td className={cn('px-4 py-2.5 font-medium tabular-nums',
                         (Number.parseFloat(run.totalPnl ?? '0') ?? 0) >= 0 ? 'text-accent-green' : 'text-accent-red'
                       )}>
-                        ${Number.parseFloat(run.totalPnl ?? '0').toFixed(2)}
+                        {formatPips(run.totalPnl)}
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <button
@@ -220,14 +250,14 @@ export function BacktestClient() {
                               </p>
                               <div className="grid grid-cols-6 gap-2">
                                 <MetricCard
-                                  label="Net profit"
-                                  value={`$${Number.parseFloat(run.totalPnl ?? '0').toFixed(2)}`}
+                                  label="Net P&L"
+                                  value={formatPips(run.totalPnl)}
                                   color={Number.parseFloat(run.totalPnl ?? '0') >= 0 ? 'text-accent-green' : 'text-accent-red'}
                                 />
                                 <MetricCard
                                   label="Win rate"
-                                  value={`${(Number.parseFloat(run.winRate ?? '0') * 100).toFixed(1)}%`}
-                                  color={Number.parseFloat(run.winRate ?? '0') >= 0.5 ? 'text-accent-green' : 'text-accent-red'}
+                                  value={`${Number.parseFloat(run.winRate ?? '0').toFixed(1)}%`}
+                                  color={Number.parseFloat(run.winRate ?? '0') >= 50 ? 'text-accent-green' : 'text-accent-red'}
                                 />
                                 <MetricCard label="Total trades" value={String(run.totalTrades ?? 0)} />
                                 <MetricCard

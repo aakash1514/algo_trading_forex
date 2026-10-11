@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { KafkaConsumerService } from '@forexedge/kafka';
+import { FOREX_TICKS_TOPIC, KafkaConsumerService, parseTickMessage } from '@forexedge/kafka';
 import { AppGateway } from '../gateway/app.gateway';
 
 @Injectable()
@@ -14,13 +14,11 @@ export class TickConsumer implements OnModuleInit {
   async onModuleInit() {
     await this.kafkaConsumer.subscribe(
       'ws-gateway-tick-consumer',
-      ['forex.ticks'],
+      [FOREX_TICKS_TOPIC],
       async (_topic, _partition, message) => {
         try {
-          const payload = JSON.parse(message) as { instrument?: string };
-          const instrument = payload.instrument;
-          if (!instrument) return;
-          this.gateway.emitTick(instrument, payload);
+          const payload = parseTickMessage(message);
+          this.gateway.emitTick(payload.instrument, payload);
         } catch (err) {
           this.logger.error('Failed to process forex.ticks message', err);
         }

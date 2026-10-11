@@ -2,22 +2,11 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InstrumentEntity } from '@forexedge/database';
-import { KafkaProducerService, KafkaConsumerService, NormalizedTick } from '@forexedge/kafka';
-
-export enum SpreadStatus {
-  NORMAL = 'NORMAL',
-  WIDE   = 'WIDE',
-}
-
-export interface SpreadAlert {
-  type: SpreadStatus;
-  instrument: string;
-  pair: string;
-  currentSpread: number;
-  avgSpread: number;
-  ratio: number;
-  timestamp: string;
-}
+import { isSpreadWide, spreadRatio } from '@forexedge/common';
+import {
+  KafkaProducerService, KafkaConsumerService, TickMessage, parseTickMessage,
+  SPREAD_ALERTS_TOPIC, SpreadAlertMessage, SpreadStatus,
+} from '@forexedge/kafka';
 
 export interface SpreadStatusResult {
   pair: string;
@@ -31,7 +20,6 @@ export interface SpreadStatusResult {
 @Injectable()
 export class SpreadMonitorService implements OnModuleInit {
   private readonly logger = new Logger(SpreadMonitorService.name);
-  private readonly SPREAD_THRESHOLD = 2.0;
   private spreadCache = new Map<string, SpreadStatusResult>();
 
   constructor(
@@ -57,10 +45,11 @@ export class SpreadMonitorService implements OnModuleInit {
   }
 
   private async handleTick(rawMessage: string) {
-    let tick: NormalizedTick;
+    let tick: TickMessage;
     try {
-      tick = JSON.parse(rawMessage);
-    } catch {
+      tick = parseTickMessage(rawMessage);
+    } catch (err) {
+      this.logger.warn(`Ignoring forex.ticks message: ${err instanceof Error ? err.message : String(err)}`);
       return;
     }
 
@@ -75,8 +64,12 @@ export class SpreadMonitorService implements OnModuleInit {
     if (!dbInstrument) return;
 
     const avgSpread = Number(dbInstrument.avgSpread);
-    const ratio = Math.round((currentSpread / avgSpread) * 100) / 100;
-    const status = ratio >= this.SPREAD_THRESHOLD ? SpreadStatus.WIDE : SpreadStatus.NORMAL;
+    if (!(avgSpread > 0)) {
+      this.logger.warn(`No average spread configured for ${pair}; spread status unknown`);
+      return;
+    }
+    const ratio = spreadRatio(bid, ask, avgSpread);
+    const status: SpreadStatus = isSpreadWide(ratio) ? 'WIDE' : 'NORMAL';
 
     const result: SpreadStatusResult = {
       pair,
@@ -96,7 +89,7 @@ export class SpreadMonitorService implements OnModuleInit {
   }
 
   private async publishAlert(result: SpreadStatusResult, timestamp: string) {
-    const alert: SpreadAlert = {
+    const alert: SpreadAlertMessage = {
       type: result.status,
       instrument: result.instrument,
       pair: result.pair,
@@ -107,7 +100,7 @@ export class SpreadMonitorService implements OnModuleInit {
     };
 
     await this.kafkaProducer.publish(
-      'forex.spread-alerts',
+      SPREAD_ALERTS_TOPIC,
       result.instrument,
       alert,
     ).catch((err: Error) => this.logger.error(`Failed to publish spread alert: ${err.message}`));

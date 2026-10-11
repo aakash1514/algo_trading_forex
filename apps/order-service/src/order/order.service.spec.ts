@@ -8,8 +8,14 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { OrderValidationService } from './order-validation.service';
 import { MarginEngineService } from './margin-engine.service';
 import { BadRequestException } from '@nestjs/common';
-import { SessionConsumer } from '../kafka/session.consumer';
 import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
+import { OpenPairsIndex } from '../position/open-pairs.index';
+import { MarketHoursPolicy } from '../market/market-hours.policy';
+
+// Open-pairs index (tick consumer): the fill path must record the new position's pair
+const openPairs = { opened: jest.fn(), closed: jest.fn(), has: jest.fn().mockReturnValue(true) };
+// Market open unless a test closes it
+const marketHours = { enforced: true, status: jest.fn(() => ({ open: true }) as { open: boolean; reason?: string; reopensAt?: Date }) };
 
 jest.mock('kafkajs', () => ({
   Kafka: jest.fn().mockImplementation(() => ({
@@ -56,10 +62,7 @@ const mockMarginEngine = () => ({
 
 const mockPricing = () => ({
   getQuote: jest.fn().mockResolvedValue({ bid: 1.0849, ask: 1.0851, mid: 1.085 }),
-});
-
-const mockSessionConsumer = () => ({
-  getActiveSession: jest.fn().mockReturnValue('OFF_HOURS'),
+  getInstrumentKind: jest.fn().mockResolvedValue('MAJOR'),
 });
 
 describe('OrderService — FSM transitions', () => {
@@ -85,9 +88,10 @@ describe('OrderService — FSM transitions', () => {
         { provide: BROKER_ADAPTER, useFactory: mockBroker },
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
-        { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
         { provide: PricingService, useFactory: mockPricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
+        { provide: MarketHoursPolicy, useValue: marketHours },
       ],
     }).compile();
 
@@ -131,6 +135,21 @@ describe('OrderService — FSM transitions', () => {
   });
 
   // ── Invalid transitions ─────────────────────────────────────────────────────
+  it.each(['PENDING', 'SUBMITTED'] as const)('%s → CANCELLED is valid (cancelling works, also while the market is closed)', async (status) => {
+    const order = { id: 'o1', userId: 'user-1', status } as OrderEntity;
+    orderRepo.findOne.mockResolvedValueOnce(order);
+    const transition = jest.spyOn(serviceInternal, 'transitionState').mockResolvedValue({ ...order, status: 'CANCELLED' });
+    await expect(service.cancelOrder('user-1', 'o1')).resolves.toMatchObject({ status: 'CANCELLED' });
+    expect(transition).toHaveBeenCalledWith(order, 'CANCELLED');
+  });
+
+  it('the state machine allows PENDING/SUBMITTED → CANCELLED', async () => {
+    dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) =>
+      cb({ update: jest.fn(), findOne: jest.fn().mockResolvedValue({ id: 'o1', status: 'CANCELLED' }) }));
+    await expect(serviceInternal.transitionState({ id: 'o1', status: 'PENDING' } as OrderEntity, 'CANCELLED'))
+      .resolves.toMatchObject({ status: 'CANCELLED' });
+  });
+
   it('OPEN → PENDING throws BadRequestException', async () => {
     const order = { id: 'o1', status: 'OPEN' } as OrderEntity;
     await expect(
@@ -180,18 +199,24 @@ describe('OrderService — FSM transitions', () => {
     orderRepo.create.mockReturnValue(draft);
     orderRepo.save.mockResolvedValue(draft);
 
+    const accountQb = {
+      update: jest.fn().mockReturnThis(), set: jest.fn().mockReturnThis(), where: jest.fn().mockReturnThis(),
+      setParameters: jest.fn().mockReturnThis(), execute: jest.fn(),
+    };
     // transitionState calls dataSource.transaction which calls findOne for the updated order
     dataSource.transaction.mockImplementation(async (
       cb: (manager: {
         save: (entity: unknown, data: unknown) => Promise<unknown>;
         update: (entity: unknown, id: unknown, data: unknown) => Promise<unknown>;
         findOne: (entity: unknown, options: unknown) => Promise<unknown>;
+        createQueryBuilder: () => unknown;
       }) => Promise<unknown>
     ) => {
       return cb({
         save: jest.fn().mockResolvedValue({ ...draft, status: 'OPEN' }),
         update: jest.fn().mockResolvedValue({}),
         findOne: jest.fn().mockResolvedValue({ ...draft, status: 'PENDING' }),
+        createQueryBuilder: jest.fn(() => accountQb),
       });
     });
 
@@ -204,6 +229,32 @@ describe('OrderService — FSM transitions', () => {
       expect.objectContaining({ instrument: 'EUR_USD', pair: 'EUR/USD' }),
     );
     expect(result).toBeDefined();
+    // The fill opened a position: the tick consumer's index learns its pair
+    expect(openPairs.opened).toHaveBeenCalledWith('EUR/USD');
+    // Margin is added with a relative update, never by writing back the account row
+    expect(accountQb.set.mock.calls[0][0].marginUsed()).toBe('margin_used + :addedMargin');
+    expect(accountQb.where).toHaveBeenCalledWith('user_id = :userId', { userId: 'user-1' });
+  });
+
+  it.each([
+    ['2026-10-07T12:00:00Z', 'LONDON,NEW_YORK'], // Wednesday, London/New York overlap
+    ['2026-10-10T10:00:00Z', 'OFF_HOURS'],       // Saturday: FX closed
+  ])('stamps an order placed at %s with session %s (shared market clock, no Kafka state)', async (iso, label) => {
+    jest.useFakeTimers({
+      now: new Date(iso),
+      doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'clearImmediate', 'queueMicrotask'],
+    });
+    try {
+      orderRepo.findOne.mockResolvedValueOnce(null);
+      orderRepo.create.mockImplementation((o: OrderEntity) => o);
+      orderRepo.save.mockImplementation(async (o: OrderEntity) => ({ ...o, id: 'o3' }));
+      dataSource.transaction.mockRejectedValue(new Error('stop after DRAFT'));
+      await service.submitOrder('user-1', { instrument: 'EUR_USD', direction: 'LONG', orderType: 'MARKET', lots: 1 }, `k-${iso}`)
+        .catch(() => undefined);
+      expect(orderRepo.create).toHaveBeenCalledWith(expect.objectContaining({ sessionOpened: label }));
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 
@@ -214,6 +265,7 @@ describe('OrderService — pricing and margin', () => {
   let marginEngine: ReturnType<typeof mockMarginEngine>;
   let pricing: ReturnType<typeof mockPricing>;
   let dataSource: ReturnType<typeof mockDataSource>;
+  let broker: ReturnType<typeof mockBroker>;
 
   const draft = { id: 'o9', status: 'DRAFT', pair: 'EUR/USD', direction: 'LONG', lots: 1 } as OrderEntity;
 
@@ -228,9 +280,10 @@ describe('OrderService — pricing and margin', () => {
         { provide: BROKER_ADAPTER, useFactory: mockBroker },
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
-        { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn().mockResolvedValue(undefined) } },
         { provide: PricingService, useFactory: mockPricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
+        { provide: MarketHoursPolicy, useValue: marketHours },
       ],
     }).compile();
 
@@ -240,18 +293,43 @@ describe('OrderService — pricing and margin', () => {
     marginEngine = module.get(MarginEngineService);
     pricing = module.get(PricingService);
     dataSource = module.get(DataSource);
+    broker = module.get(BROKER_ADAPTER);
 
     orderRepo.findOne.mockResolvedValue(null);
     orderRepo.create.mockReturnValue(draft);
     orderRepo.save.mockResolvedValue(draft);
     // Run the injected margin gate like the real validation service does
-    validation.validate.mockImplementation(async (_u: string, _d: unknown, marginCheck: () => Promise<unknown>) => marginCheck());
+    validation.validate.mockImplementation(
+      async (_u: string, _d: unknown, _quote: unknown, marginCheck: () => Promise<unknown>) => marginCheck());
   });
 
   afterEach(() => jest.clearAllMocks());
 
   const submit = (direction: 'LONG' | 'SHORT') =>
     service.submitOrder('user-1', { instrument: 'EUR_USD', direction, orderType: 'MARKET', lots: 1 }, `k-${direction}`);
+
+  it('rejects with the market-closed reason before looking for a quote (the feed is silent while closed)', async () => {
+    marketHours.status.mockReturnValueOnce({ open: false, reason: 'WEEKEND', reopensAt: new Date('2026-10-11T21:00:00Z') });
+    const transition = jest.spyOn(service as unknown as { transitionState: () => Promise<unknown> }, 'transitionState')
+      .mockResolvedValue({ status: 'REJECTED' });
+    await submit('LONG');
+    expect(pricing.getQuote).not.toHaveBeenCalled();
+    expect(transition).toHaveBeenCalledWith(expect.anything(), 'REJECTED', 'Market closed for EUR/USD: weekend (reopens 2026-10-11 21:00 UTC)');
+  });
+
+  it('fetches the live quote once and fills from that same quote (gate, margin and fill agree)', async () => {
+    await submit('LONG');
+    expect(pricing.getQuote).toHaveBeenCalledTimes(1);
+    expect(broker.fillOrder).toHaveBeenCalledWith(expect.anything(), { bid: 1.0849, ask: 1.0851, mid: 1.085 });
+  });
+
+  it('validates the spread on the same live quote the order is priced at', async () => {
+    await submit('LONG');
+    expect(pricing.getQuote).toHaveBeenCalledWith('EUR/USD');
+    expect(validation.validate).toHaveBeenCalledWith(
+      'user-1', expect.objectContaining({ pair: 'EUR/USD' }),
+      { bid: 1.0849, ask: 1.0851, mid: 1.085 }, expect.any(Function));
+  });
 
   it('checks margin at the live ask for a LONG', async () => {
     await submit('LONG');
@@ -272,6 +350,7 @@ describe('OrderService — pricing and margin', () => {
     const result = await submit('LONG');
     expect(result.status).toBe('REJECTED');
     expect(result.rejectionReason).toContain('Insufficient margin');
+    expect(openPairs.opened).not.toHaveBeenCalled(); // no position, no index entry
   });
 
   it('rejects instead of validating at price 0 when no live price exists', async () => {
@@ -322,9 +401,10 @@ describe('OrderService cross-user access', () => {
         { provide: BROKER_ADAPTER, useFactory: mockBroker },
         { provide: OrderValidationService, useFactory: mockValidation },
         { provide: MarginEngineService, useFactory: mockMarginEngine },
-        { provide: SessionConsumer, useFactory: mockSessionConsumer },
         { provide: RealtimePublisher, useValue: { positionPnl: jest.fn(), positionsChanged: jest.fn() } },
         { provide: PricingService, useFactory: mockPricing },
+        { provide: OpenPairsIndex, useValue: openPairs },
+        { provide: MarketHoursPolicy, useValue: marketHours },
       ],
     }).compile();
     service = module.get(OrderService);

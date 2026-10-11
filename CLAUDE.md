@@ -32,6 +32,14 @@ npm run migration:generate -- apps/auth-service/src/migrations/<Name>
 npm run migration:run
 npm run migration:revert
 npm run seed:instruments
+
+# Historical M1 import (Dukascopy exports in data/raw/jforex/, idempotent; see tools/market-data/import)
+npm run data:import -- --years 2022 [--pairs EURUSD,XAUUSD] [--force EURUSD:2022] [--dry-run]
+npm run data:import -- --check-only
+npm run data:validate        # FRED noon fixings + gold extremes -> docs/validation/historical-spot-checks.md
+
+# DB integration tests run in <DB_NAME>_test, created and migrated per run
+RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
 ```
 
 ## Architecture
@@ -47,13 +55,15 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
-order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Topic names, socket event names and payload types live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
+order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
+
+Every Kafka topic has one message type and a validating `parse*` function in `libs/kafka/src/lib/contracts/topics.ts` (with the producer/consumer map in its header). Producers type their payloads with it; consumers parse with it, never `JSON.parse(...) as T` (two consumers once read fields no producer sent). Contract tests parse real captured messages (`contracts/fixtures/`).
 
 ### Kafka flow
 ```
 market-service ─forex.ticks─▶ market-service (DB/cache writers), domain-service (spread monitor), order-service, ws-gateway
-domain-service ─forex.sessions / forex.spread-alerts─▶ order-service
-domain-service ─forex.calendar-events─▶ (no consumer yet)
+domain-service ─forex.sessions / forex.spread-alerts─▶ (no consumer; order-service computes sessions from the shared clock)
+domain-service ─forex.calendar-events─▶ NOT BUILT: no consumer, and the producer has never fired (the calendar page uses REST)
 order-service  ─orders.lifecycle / positions.updated / accounts.updated─▶ ws-gateway ─socket.io─▶ frontend
 ```
 Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumerService.subscribe(groupId, topics, handler)` hands the handler the message value as a string, and `KafkaProducerService.publish(topic, key, value)` JSON-serializes. order-service's consumers in `apps/order-service/src/kafka/` use raw kafkajs consumers instead. `createKafkaClient` is a process-wide singleton.
@@ -76,7 +86,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 
 ## Environment
-- Windows + Docker Desktop (no WSL2). Node v24+, Nx v22.
+- Windows + Docker Desktop on the WSL2 backend (its disk is `docker_data.vhdx`, which never shrinks by itself). Node v24+, Nx v22.
+  Every block Docker writes grows the vhdx, even short-lived ones: Postgres temp files from big sorts/aggregations
+  (at the default 4 MB `work_mem` one run of the historical checks spilled ~6 GB) and the build cache. Heavy
+  historical queries set `work_mem = '256MB'` for their own session. `docker system df` reports Kafka's volume at its
+  apparent size (preallocated sparse 10 MB index files); measure real usage with `du` inside a container.
 - **Use Git Bash only.** PowerShell 5.1 crashes at startup in this environment
   (`InitialSessionState` type initializer exception), so don't use it.
 - Docker Desktop doesn't auto-start; launch it before `docker compose up`.
@@ -92,8 +106,17 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - In order-service and ws-gateway, `req.user.id` (NOT `userId`). JwtStrategy returns `{ id: payload.sub, email, role }` and rejects tokens without `sub`.
 - **Authorization:** TypeORM drops `undefined` from a `where` object, so a query scoped by a missing user id matches every row (this leaked all users' positions once). Every user-scoped service method calls `assertUserId(userId)` (`@forexedge/common`) first, and reads are scoped by owner in the query itself (`where: { id, userId }`), so another user's resource is a 404, never a 403. Idempotency keys are globally unique: another user's key is a 409.
 - TypeORM: entities are direct class references (no globs) and use `!` definite assignment. Nullable union columns need explicit `type: 'varchar'`. Webpack must keep `optimization.minimize: false`, or entity class names break.
-- Never store derived columns. `account_summary` stores only balance, margin_used and unrealized_pnl. Equity, free margin and margin level are computed on read.
+- Never store derived columns. `account_summary` stores only balance and margin_used. Open (unrealized) P&L is the sum of the open positions, and equity, free margin and margin level are computed on read (`AccountService`).
+- `account_summary` writes are relative SQL updates only (`balance + :pnl`, `margin_used + :m`). Writing back a row read earlier loses concurrent updates (reproduced; covered by `account-consistency.db.spec.ts`, run with `RUN_DB_TESTS=true`). `AccountInvariantMonitor` logs any drift once a minute.
 - Tick/time-series tables use raw SQL migrations, never ORM sync on hypertables.
+- `historical_candles` stores integer points: price = value × 10^price_decimals, volume = value × 10^6, with the
+  scale fixed per pair in `historical_price_scale` (EUR/USD and GBP/USD 5, USD/JPY and XAU/USD 3). Convert with
+  that table, never with `instruments.pip_size`. Float8 compressed 2.9×, integers 7.7× (decimal floats have noisy low bits).
+- `refresh_continuous_aggregate` only materializes buckets entirely inside the window. The New York-aligned
+  historical H4/D1 bars start at 21:00/22:00 UTC, so never refresh them in yearly windows (the Dec 31 evening bar
+  crosses the UTC year and is lost); the importer refreshes them in one window padded a week each side.
+- Integration tests that touch the DB use `createTestDatabase()` (`@forexedge/database/testing`): it drops, creates
+  and migrates `<DB_NAME>_test` and refuses any name not ending in `_test`. Never point a test at the dev DB.
 - After a DB reset, refresh the TimescaleDB continuous aggregates bottom-up (1m → 5m → … ) with `CALL refresh_continuous_aggregate(...)`.
 - Order FSM transitions are synchronous DB transactions. Kafka publish happens only after commit.
 - KafkaJS needs `Partitioners.LegacyPartitioner` and `KAFKAJS_NO_PARTITIONER_WARNING=1`. Topics are ensured before the producer connects (KRaft cold start).
@@ -108,9 +131,27 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   crosses convert via the live QUOTE/USD (or inverse USD/QUOTE) price. Never hardcode lot or pip sizes.
 - Clients send `instrument` (`EUR_USD`) only; order-service derives `pair` with `instrumentToPair()`.
 - Refresh tokens rotate on every use: never fire two refreshes concurrently (use `refreshSession()`).
-- order-service: PositionService, AccountService, OrderValidationService, SessionConsumer, RealtimePublisher
-  and PricingService are provided once, by `KafkaConsumerModule`. Don't also list them in AppModule
-  (duplicate instances have separate state).
+- order-service: PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService,
+  OpenPairsIndex, MarketHoursPolicy, StopOutService and AccountInvariantMonitor are provided once, by
+  `KafkaConsumerModule`. Don't also list them in AppModule (duplicate instances have separate state).
+- Market hours come from the shared clock `libs/common/src/lib/market-hours.ts` (FX Sun 17:00 to Fri 17:00 New York;
+  metals open Sun 18:00 and pause 17:00-18:00 Mon-Thu). Orders and manual closes are rejected while closed; SL/TP
+  changes and cancels are allowed. order-service's tick consumer ignores ticks stamped while closed. Dev-only flags,
+  both strictly `true`/`false`: `MARKET_HOURS_GATE=false` (order-service) and `MOCK_STREAM_WHEN_CLOSED=true`
+  (market-service), used together to trade on weekends. Sessions on orders come from the same clock.
+- Redis `price:<INSTRUMENT>` expires 2 s after the last tick, so nothing fills on a stale price.
+  `price:last:<INSTRUMENT>` has no expiry and is only a reference (validating SL/TP while the market is closed).
+- A triggered stop-loss/take-profit is committed on the position (`pending_exit_*`) before it is booked and is retried
+  from the DB, so a restart can't lose it. It books at the triggering tick's price, never the SL/TP level.
+- Stop-out (margin level < 50%) closes the biggest loser first until the level is back above 50%; close_reason
+  `STOP_OUT`. `MARGIN_CALL` is a log warning only and is never written to open positions.
+- **Backtests read only the imported history** (shared reader `libs/database/src/lib/historical-candles.ts`,
+  coverage from `historical_coverage`), never the live `candles_*`, and never apply the live market-hours clock.
+  A signal fills at the NEXT bar's open (buy at the ask, sell at the bid); SL/TP are checked from the fill bar on
+  (long on bid, short on ask), gaps fill at the open, SL wins if both are inside one bar. P&L is in pips
+  (points / (pip_size x 10^decimals)); pip size always comes from `instruments`.
+- Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
+  right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
 
 ### Tooling gotchas
 - **Never put `NODE_ENV` in `.env`.** Nx loads the root `.env` into every task, and
@@ -126,6 +167,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   The service webpack configs set `typeCheckOptions: false`: the in-build checker can't resolve lib
   project references until their `.d.ts` exist, so it broke clean builds (TS6305).
 - `next-env.d.ts` and `*.tsbuildinfo` are generated and gitignored; don't commit them.
+- Production frontend: `npx nx build frontend && npx nx run frontend:serve:production` (port 4200).
+  `nx start frontend` fails: it runs `next start` in `apps/frontend`, but the build is in `dist/apps/frontend`.
+- **The Nx daemon can serve stale cache for a project directory created after it started** (seen on Windows: edits to
+  a new spec replayed an old result with fewer tests). After adding a project, run `npx nx daemon --stop`, and confirm
+  a new test file actually runs.
+- **Every check fails on empty input.** A data check, validation or test assertion that compared zero rows must
+  fail, never pass (an empty comparison once read as "equal"). Assert the count compared is > 0.
 - **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
   trading: specs used `EURUSD` while the DB holds `EUR/USD` and Redis `price:EUR_USD`, and DTOs were
   built with fields the UI never sent. Assert the exact query/where clause and validate request bodies
@@ -138,6 +186,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   lint (0 errors), typecheck and tests from a clean `dist/`, all 5 services start from the repo root,
   and paper trading works end to end in the browser (orders, live positions/account, session restore).
   Write-up: `docs/phase-summaries/step-1-health-check.md`.
+- **Roadmap step 2 (historical data) is done** (2026-10-11) on branch `step-2-historical-data` (PR into main,
+  not merged). Write-up: `docs/phase-summaries/step-2-historical-data.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -147,33 +197,35 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 ## Roadmap (in order)
 1. ✅ **Done (2026-10-09).** Health check: infra up, all projects build and serve, fix breakages.
-2. Historical data seed: M1 OHLC candles, 2010–2022, imported from Dukascopy via the dukascopy-node package (UTC timestamps) for
-   8 pairs: EUR/USD, GBP/USD, USD/JPY, USD/CHF, AUD/USD, USD/CAD, NZD/USD, XAU/USD.
-   M1 goes into its own hypertable with compression. M5/M15/H1/H4/D1 are continuous
-   aggregates on it. The import script must be idempotent (safe to re-run). The market-service
-   candle queries and the ws-gateway backtester read from it. Production deploys only H1 and above.
-   First purge the June 2026 mock data still materialized in the candle continuous aggregates (the raw
-   ticks are gone, the candles_* views are not), so charts and backtests never mix mock and real candles.
-   XAU/USD integration: add it to the instruments seed with the correct contract specs (100 oz lot, pip 0.01).
-   Margin, pip value, P&L and paper fills already read lot_size/pip_size from the DB (step 1), so gold
-   needs only its row plus a price feed. Add XAU_USD to MAJOR_PAIRS, PAIR_DISPLAY and BacktestClient's
-   pair list, and remove EUR_GBP there. Verify pip value, margin and P&L for gold against the real row.
-3. Backtest verification: re-run strategies on the historical data. The all-zero
-   metrics were caused by mock random-walk data. Confirm they're fixed and fix anything remaining.
-   ws-gateway has no tests yet (`passWithNoTests`): add backtest engine tests. Clear the stale BullMQ
-   `bull:backtest:*` jobs left in Redis from earlier runs.
+2. ✅ **Done (2026-10-11).** Historical data: 19,187,987 real Dukascopy M1 bid/ask bars, EUR/USD, GBP/USD,
+   USD/JPY, XAU/USD, 2010–2022, as integer points in `historical_candles` (7.5x compressed), with M5/M15/H1 (UTC)
+   and H4/D1 (New York close) aggregates; validated against FRED noon fixings and gold extremes; candle API
+   `?source=historical`; the backtester runs only on it. Write-up: `docs/phase-summaries/step-2-historical-data.md`.
+   Source: the official JForex strategy API (`tools/market-data/jforex/`); Dukascopy's HTTP endpoints sit behind
+   bot protection and its S3 export needs AWS, so dukascopy-node and scraping are out; never work around it.
+   More pairs: one at a time (export, `historical_price_scale` row, import, validate). A cross pair (e.g. EUR/GBP)
+   also needs its USD conversion pair's history, because margin and pip value convert via quote→USD.
+   Production deploys only H1 and above.
+3. Backtest verification: strategies now run on the history with real bid/ask fills and non-zero results
+   (`docs/validation/backtest-proof.md`). Remaining: the metrics (equity curve, drawdown, Sharpe) add pips to a
+   10,000 base instead of valuing trades in money, so drawdown % scales with a pair's pip count (gold 93%); see
+   `docs/OVERNIGHT-QUESTIONS.md`. Verify the metrics and add engine tests beyond the simulator.
 4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
+   Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
+   realign the live views to the NY close here.
+   Known gap: the economic-calendar scraper has produced nothing since 2026-06-13 (it runs only at
+   00/06/12/18 UTC and not on startup, so it misses whenever the services are down then); fix it with the
+   real data feeds.
 7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
    Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
    MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
-   Restart resilience: order-service's SessionConsumer only learns sessions from OPEN/CLOSE events
-   (`fromBeginning: false`), so after a restart orders are stamped OFF_HOURS until the next session
-   boundary; seed the current state on startup (e.g. from domain-service's /sessions/current).
+   Re-check Dukascopy's terms of use before a public deployment serves its historical data.
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
-8. Known gaps: `forex.calendar-events` has no consumer.
+8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar
+   is scraped every 6 h only at 00/06/12/18 UTC, so it is stale whenever the services weren't running then.
 
 ## How to work with me
 - This is a portfolio and client project. Keep it production quality, with no shortcuts or simplified "demo" code.
@@ -185,3 +237,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **No synthetic data, ever.** Historical data must be real market data (Dukascopy).
   Never generate, interpolate, or fabricate prices to make a test or backtest pass.
   The mock live feed (`USE_MOCK_DATA`) stays only until Twelve Data is integrated in roadmap step 6.
+
+## Verification policy (keep it fast)
+- While working on a change: run only the affected project's tests, and a single test file
+  where possible (`npx nx test order-service --testFile=x.spec.ts`).
+- Before each commit: `npx nx affected -t lint typecheck test build --parallel=2`
+  (cache ON, daemon ON). Never use `--skip-nx-cache` or `NX_DAEMON=false` unless debugging a cache problem.
+- Full clean matrix (`nx reset`, delete dist/, run everything): only at the end of a roadmap step.
+- Start services or the browser only when the change affects runtime behavior or UI,
+  and only the services involved.
+- Run anything over ~2 minutes in the background and keep working meanwhile.

@@ -6,7 +6,9 @@
     "migration:generate": "typeorm-ts-node-commonjs -d data-source.ts migration:generate",
     "migration:run": "typeorm-ts-node-commonjs -d data-source.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d data-source.ts migration:revert",
-    "seed:instruments": "ts-node -r tsconfig-paths/register apps/auth-service/src/seeds/run-seeds.ts"
+    "seed:instruments": "ts-node -r tsconfig-paths/register apps/auth-service/src/seeds/run-seeds.ts",
+    "data:import": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/main.ts",
+    "data:validate": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/validate-main.ts"
   },
   "private": true,
   "devDependencies": {
@@ -35,6 +37,7 @@
     "@types/node": "20.19.9",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
+    "@types/pg-copy-streams": "1.2.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.5.0",
@@ -94,7 +97,6 @@
     "class-validator": "^0.15.1",
     "clsx": "^2.1.1",
     "cookie-parser": "^1.4.7",
-    "date-fns-tz": "^3.2.0",
     "ioredis": "^5.10.1",
     "kafkajs": "^2.2.4",
     "lightweight-charts": "^5.2.0",
@@ -104,6 +106,7 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.20.0",
+    "pg-copy-streams": "7.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.78.0",

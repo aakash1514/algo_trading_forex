@@ -8,6 +8,15 @@ import { useAppSelector } from '../../store';
 import { useCreateOrderMutation } from '../../store/api/order.api';
 import { useGetPipValueQuery } from '../../store/api/domain.api';
 import { PAIR_DISPLAY } from '../../lib/constants';
+import { getPriceStep } from '../../lib/pip';
+
+// Market orders only for now; the rest are listed so traders know they're coming.
+const ORDER_TYPE_OPTIONS = [
+  { label: 'Market', available: true },
+  { label: 'Limit', available: false },
+  { label: 'Stop', available: false },
+  { label: 'OCO', available: false },
+] as const;
 import type { OrderDirection } from '../../types/api.types';
 import { cn } from '../../lib/cn';
 
@@ -96,6 +105,29 @@ export function OrderForm() {
         </button>
       </div>
 
+      {/* Order type: only market orders are executed (the server rejects the rest
+          until a pending-order engine exists), so the others are shown disabled. */}
+      <div className="grid grid-cols-4 gap-1 mb-3" role="group" aria-label="Order type">
+        {ORDER_TYPE_OPTIONS.map(({ label, available }) => (
+          <button
+            key={label}
+            type="button"
+            disabled={!available}
+            aria-pressed={available}
+            title={available ? undefined : 'Coming soon'}
+            className={cn(
+              'py-1 rounded text-[10px] font-medium border transition-colors',
+              available
+                ? 'bg-terminal-elevated text-[#e2e4e9] border-accent-blue'
+                : 'text-terminal-muted/60 border-terminal-border cursor-not-allowed'
+            )}
+          >
+            {label}
+            {!available && <span className="block text-[8px] uppercase tracking-wider">soon</span>}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
         {/* Lots */}
         <div>
@@ -119,7 +151,7 @@ export function OrderForm() {
             <input
               {...register('stopLoss', { setValueAs: optionalNumber })}
               type="number"
-              step="0.00001"
+              step={getPriceStep(activePair)}
               placeholder="—"
               className={cn(
                 'w-full bg-terminal-elevated border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors',
@@ -132,7 +164,7 @@ export function OrderForm() {
             <input
               {...register('takeProfit', { setValueAs: optionalNumber })}
               type="number"
-              step="0.00001"
+              step={getPriceStep(activePair)}
               placeholder="—"
               className={cn(
                 'w-full bg-terminal-elevated border rounded px-2.5 py-1.5 text-[12px] text-[#e2e4e9] tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue transition-colors',

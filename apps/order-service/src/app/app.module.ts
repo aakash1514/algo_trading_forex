@@ -72,9 +72,9 @@ import { AppService } from './app.service';
     },
     OrderService,
     MarginEngineService,
-    // PositionService, AccountService, OrderValidationService, SessionConsumer and
-    // RealtimePublisher come from KafkaConsumerModule. Declaring them here too would
-    // create second instances with separate state (spread cache, sessions).
+    // PositionService, AccountService, OrderValidationService, RealtimePublisher,
+    // PricingService and OpenPairsIndex come from KafkaConsumerModule. Declaring them
+    // here too would create second instances with separate state (open pairs).
   ],
 })
 export class AppModule {}

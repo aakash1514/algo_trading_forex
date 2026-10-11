@@ -2,6 +2,7 @@
 
 import { useAppSelector } from '../../store';
 import { cn } from '../../lib/cn';
+import { formatSignedUsd } from '../../lib/format';
 
 export function AccountPanel() {
   const summary = useAppSelector((s) => s.account.summary);
@@ -41,7 +42,7 @@ const metrics = [
   },
   {
     label: 'Open P&L',
-    value: `${(summary.unrealizedPnl ?? 0) >= 0 ? '+' : ''}$${(summary.unrealizedPnl ?? 0).toFixed(2)}`,
+    value: formatSignedUsd(summary.unrealizedPnl ?? 0),
     color: (summary.unrealizedPnl ?? 0) >= 0 ? 'text-accent-green' : 'text-accent-red',
   },
 ];

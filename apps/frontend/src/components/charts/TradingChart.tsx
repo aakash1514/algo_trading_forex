@@ -6,7 +6,7 @@ import type { CandlestickData, IChartApi, ISeriesApi, UTCTimestamp } from 'light
 import { useAppSelector } from '../../store';
 import { useGetCandlesQuery } from '../../store/api/market.api';
 import { PAIR_DISPLAY, TIMEFRAMES, type Timeframe } from '../../lib/constants';
-import { getPriceDecimals, priceToPips } from '../../lib/pip';
+import { getPriceDecimals, getPriceFormat, priceToPips } from '../../lib/pip';
 import { alignToBarStart } from '../../lib/timeframe';
 import type { Candle } from '../../types/api.types';
 import { cn } from '../../lib/cn';
@@ -128,6 +128,12 @@ export function TradingChart({ pair }: TradingChartProps) {
       seriesRef.current = null;
     };
   }, []);
+
+  // Price axis precision follows the pair (EUR/USD 5 dp, USD/JPY and XAU/USD 3 dp);
+  // lightweight-charts would otherwise show every pair at 2 dp.
+  useEffect(() => {
+    seriesRef.current?.applyOptions({ priceFormat: getPriceFormat(pair) });
+  }, [pair]);
 
   // Load historical candles
   useEffect(() => {

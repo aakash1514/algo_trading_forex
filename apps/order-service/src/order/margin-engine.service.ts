@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AccountSummaryEntity } from '@forexedge/database';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ValidationResult } from './order-validation.service';
 import { PricingService, PositionValuation } from '../pricing/pricing.service';
+import { AccountService, type AccountSummaryDto } from '../account/account.service';
 
 const DEFAULT_LEVERAGE = 100;
 
@@ -12,8 +10,7 @@ const DEFAULT_LEVERAGE = 100;
 @Injectable()
 export class MarginEngineService {
   constructor(
-    @InjectRepository(AccountSummaryEntity)
-    private readonly accountRepo: Repository<AccountSummaryEntity>,
+    private readonly accounts: AccountService,
     private readonly pricing: PricingService,
   ) {}
 
@@ -28,8 +25,11 @@ export class MarginEngineService {
     lots: number,
     entryPrice: number,
   ): Promise<ValidationResult> {
-    const account = await this.accountRepo.findOne({ where: { userId } });
-    if (!account) {
+    let account: AccountSummaryDto;
+    try {
+      account = await this.accounts.getAccountSummary(userId);
+    } catch (err) {
+      if (!(err instanceof NotFoundException)) throw err;
       return {
         valid: false,
         reason: 'Account not found — call POST /api/account/initialize first',
@@ -37,8 +37,8 @@ export class MarginEngineService {
     }
 
     const { marginRequired } = await this.valuePosition(pair, lots, entryPrice, account.leverage);
-    const equity = Number(account.balance) + Number(account.unrealizedPnl);
-    const freeMargin = equity - Number(account.marginUsed);
+    // Free margin = equity - margin used, with open P&L summed from the positions
+    const freeMargin = account.freeMargin;
 
     if (marginRequired > freeMargin) {
       return {

@@ -17,20 +17,17 @@ export const SOCKET_EVENTS = {
   ACCOUNT_UPDATE: 'account:update',
 } as const;
 
-export const MAJOR_PAIRS = [
-  'EUR_USD', 'GBP_USD', 'USD_JPY', 'USD_CHF',
-  'AUD_USD', 'USD_CAD', 'NZD_USD', 'EUR_GBP',
-] as const;
+// The tradable instruments shown in the terminal and the backtester: the ones
+// with imported Dukascopy history (roadmap step 2). Other instrument rows stay
+// in the DB; add a pair here only once its history is imported. A cross pair
+// (e.g. EUR_GBP) also needs its USD conversion pair's history.
+export const MAJOR_PAIRS = ['EUR_USD', 'GBP_USD', 'USD_JPY', 'XAU_USD'] as const;
 
 export const PAIR_DISPLAY: Record<string, string> = {
   EUR_USD: 'EUR/USD',
   GBP_USD: 'GBP/USD',
   USD_JPY: 'USD/JPY',
-  USD_CHF: 'USD/CHF',
-  AUD_USD: 'AUD/USD',
-  USD_CAD: 'USD/CAD',
-  NZD_USD: 'NZD/USD',
-  EUR_GBP: 'EUR/GBP',
+  XAU_USD: 'XAU/USD',
 };
 
 export const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d'] as const;

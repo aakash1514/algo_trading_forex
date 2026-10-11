@@ -9,6 +9,7 @@ const mockEurUsd: Partial<InstrumentEntity> = {
   pipSize: 0.0001,
   pipDecimalPlaces: 4,
   lotSize: 100000,
+  maxLeverage: null,
 };
 
 const mockUsdJpy: Partial<InstrumentEntity> = {
@@ -16,6 +17,7 @@ const mockUsdJpy: Partial<InstrumentEntity> = {
   pipSize: 0.01,
   pipDecimalPlaces: 2,
   lotSize: 100000,
+  maxLeverage: null,
 };
 
 const mockEurGbp: Partial<InstrumentEntity> = {
@@ -23,6 +25,7 @@ const mockEurGbp: Partial<InstrumentEntity> = {
   pipSize: 0.0001,
   pipDecimalPlaces: 4,
   lotSize: 100000,
+  maxLeverage: null,
 };
 
 const mockGbpJpy: Partial<InstrumentEntity> = {
@@ -30,6 +33,7 @@ const mockGbpJpy: Partial<InstrumentEntity> = {
   pipSize: 0.01,
   pipDecimalPlaces: 2,
   lotSize: 100000,
+  maxLeverage: null,
 };
 
 describe('PipCalculatorService', () => {

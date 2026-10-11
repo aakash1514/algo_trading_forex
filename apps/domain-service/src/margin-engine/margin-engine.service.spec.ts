@@ -1,11 +1,11 @@
 import { MarginEngineService } from './margin-engine.service';
 import { PipCalculatorService } from '../pip-calculator/pip-calculator.service';
 
-const SPECS: Record<string, { lotSize: number; pipSize: number }> = {
-  'EUR/USD': { lotSize: 100_000, pipSize: 0.0001 },
-  'USD/JPY': { lotSize: 100_000, pipSize: 0.01 },
-  'EUR/GBP': { lotSize: 100_000, pipSize: 0.0001 },
-  'XAU/USD': { lotSize: 100, pipSize: 0.01 },
+const SPECS: Record<string, { lotSize: number; pipSize: number; maxLeverage: number | null }> = {
+  'EUR/USD': { lotSize: 100_000, pipSize: 0.0001, maxLeverage: null },
+  'USD/JPY': { lotSize: 100_000, pipSize: 0.01, maxLeverage: null },
+  'EUR/GBP': { lotSize: 100_000, pipSize: 0.0001, maxLeverage: null },
+  'XAU/USD': { lotSize: 100, pipSize: 0.01, maxLeverage: 20 },
 };
 
 // quote->USD as PipCalculatorService resolves it (GBP via live GBP/USD 1.27)
@@ -23,12 +23,12 @@ describe('domain MarginEngineService.calculateMarginRequired', () => {
   };
   const engine = new MarginEngineService(pipCalculator as unknown as PipCalculatorService);
 
-  // Hand-calculated at 1.00 lot, 100:1
+  // Hand-calculated at 1.00 lot with a 100:1 account; gold is capped at 1:20 (100 oz x 2,400 / 20)
   it.each([
     ['EUR/USD', 1.085, 1085],
     ['USD/JPY', 150, 1000],
     ['EUR/GBP', 0.85, 1079.5],
-    ['XAU/USD', 2400, 2400],
+    ['XAU/USD', 2400, 12000],
   ])('%s @ %d needs $%d', async (pair, price, expected) => {
     await expect(engine.calculateMarginRequired(pair, 1, 100, price)).resolves.toMatchObject({
       pair, marginRequired: expected, currency: 'USD',

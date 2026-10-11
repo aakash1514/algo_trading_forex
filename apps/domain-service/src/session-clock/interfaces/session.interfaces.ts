@@ -29,9 +29,4 @@ export interface CurrentSessionsResult {
   timestamp: string;
 }
 
-export interface SessionKafkaEvent {
-  type: SessionEventType;
-  session: ForexSession;
-  timestamp: string;
-  activeSessions: ForexSession[];
-}
+// The forex.sessions message type is SessionEventMessage in @forexedge/kafka.

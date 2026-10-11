@@ -4,6 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AccountSummaryEntity, PositionEntity } from '@forexedge/database';
 
+// Every paper account starts with this balance (and has no deposits), which
+// the invariant monitor relies on: balance = start + realized P&L + swaps.
+export const PAPER_STARTING_BALANCE = 10000;
+
 export interface AccountSummaryDto {
   id: string;
   userId: string;
@@ -30,76 +34,55 @@ export class AccountService {
   ) {}
 
   // ─── Get account summary with computed fields ──────────────────────────────
-  // Always reads the row: positions, fills and closes write account_summary
-  // directly, so an in-process cache would serve stale margin/P&L (including
-  // to the margin-call check).
+  // balance and margin_used come from the row; open P&L is the sum of the
+  // user's open positions (never stored, so it can't drift); equity, free
+  // margin and margin level are derived from those. Read fresh on every call.
   async getAccountSummary(userId: string): Promise<AccountSummaryDto> {
     assertUserId(userId);
     const row = await this.accountRepo.findOne({ where: { userId } });
     if (!row) throw new NotFoundException('Account not found — call POST /api/account/initialize first');
-    return this.computeSummary(row);
+    return this.computeSummary(row, await this.openPnl(userId));
   }
 
   // ─── Initialize paper account ──────────────────────────────────────────────
   async initializeAccount(userId: string): Promise<AccountSummaryDto> {
     assertUserId(userId);
-    // INSERT ... ON CONFLICT DO NOTHING — idempotent
     const existing = await this.accountRepo.findOne({ where: { userId } });
     if (existing) {
       this.logger.log(`Account already exists for user ${userId}`);
-      return this.computeSummary(existing);
+      return this.computeSummary(existing, await this.openPnl(userId));
     }
 
     const account = this.accountRepo.create({
       userId,
-      balance: 10000.00,
+      balance: PAPER_STARTING_BALANCE,
       marginUsed: 0,
-      unrealizedPnl: 0,
       leverage: 100,
     });
 
     const saved = await this.accountRepo.save(account);
 
-    this.logger.log(`Paper account initialized for user ${userId} — $10,000 balance`);
-    return this.computeSummary(saved);
-  }
-
-  // ─── Margin call check ─────────────────────────────────────────────────────
-  async checkMarginCall(userId: string): Promise<void> {
-    const summary = await this.getAccountSummary(userId);
-
-    if (summary.marginLevel === null) return; // no open positions
-
-    if (summary.marginLevel < 50) {
-      this.logger.error(
-        `STOP OUT — user ${userId} margin level ${summary.marginLevel.toFixed(2)}% — closing all positions`,
-      );
-      await this.closeAllPositions(userId);
-      return;
-    }
-
-    if (summary.marginLevel < 100) {
-      this.logger.warn(
-        `MARGIN CALL — user ${userId} margin level ${summary.marginLevel.toFixed(2)}%`,
-      );
-      return;
-    }
-
-    if (summary.marginLevel < 150) {
-      this.logger.warn(
-        `MARGIN WARNING — user ${userId} margin level ${summary.marginLevel.toFixed(2)}%`,
-      );
-    }
+    this.logger.log(`Paper account initialized for user ${userId} — $${PAPER_STARTING_BALANCE} balance`);
+    return this.computeSummary(saved, 0);
   }
 
   // ─── Private helpers ───────────────────────────────────────────────────────
-  private computeSummary(row: AccountSummaryEntity): AccountSummaryDto {
+  private async openPnl(userId: string): Promise<number> {
+    const row = await this.positionRepo
+      .createQueryBuilder('p')
+      .select('COALESCE(SUM(p.unrealized_pnl), 0)', 'openPnl')
+      .where('p.user_id = :userId', { userId })
+      .andWhere('p.is_open = true')
+      .getRawOne<{ openPnl: string }>();
+    return Number(row?.openPnl ?? 0);
+  }
+
+  private computeSummary(row: AccountSummaryEntity, unrealizedPnl: number): AccountSummaryDto {
     const balance = Number(row.balance);
     const marginUsed = Number(row.marginUsed);
-    const unrealizedPnl = Number(row.unrealizedPnl);
 
-    const equity = balance + unrealizedPnl;
-    const freeMargin = equity - marginUsed;
+    const equity = Math.round((balance + unrealizedPnl) * 100) / 100;
+    const freeMargin = Math.round((equity - marginUsed) * 100) / 100;
     const marginLevel = marginUsed > 0
       ? Math.round((equity / marginUsed) * 100 * 100) / 100
       : null;
@@ -116,16 +99,5 @@ export class AccountService {
       marginLevel,
       updatedAt: row.updatedAt,
     };
-  }
-
-  private async closeAllPositions(userId: string): Promise<void> {
-    // Mark all open positions for this user — PositionService.closePosition()
-    // handles the actual closing logic. Here we just flag them so the
-    // next tick triggers closure via PositionService.
-    await this.positionRepo.update(
-      { userId, isOpen: true },
-      { closeReason: 'MARGIN_CALL' },
-    );
-    this.logger.error(`All positions flagged for closure — user ${userId}`);
   }
 }

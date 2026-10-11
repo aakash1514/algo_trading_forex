@@ -1,7 +1,8 @@
 import {
-  Controller, Get, Delete, Param, UseGuards, Request,
+  Body, Controller, Get, Delete, Param, Patch, UseGuards, Request,
 } from '@nestjs/common';
 import { PositionService } from './position.service';
+import { UpdateExitLevelsDto } from './dto/update-exit-levels.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('positions')
@@ -21,7 +22,18 @@ export class PositionController {
     return this.positionService.getPosition(req.user.id, id);
   }
 
-  // DELETE /api/positions/:id — manual close
+  // PATCH /api/positions/:id — set or clear stop-loss / take-profit
+  // (allowed while the market is closed)
+  @Patch(':id')
+  async updateExitLevels(@Request() req: any, @Param('id') id: string, @Body() body: UpdateExitLevelsDto) {
+    // Only the fields the client sent: absent = keep, null = clear
+    const changes: { stopLoss?: number | null; takeProfit?: number | null } = {};
+    if (body.stopLoss !== undefined) changes.stopLoss = body.stopLoss;
+    if (body.takeProfit !== undefined) changes.takeProfit = body.takeProfit;
+    return this.positionService.updateExitLevels(req.user.id, id, changes);
+  }
+
+  // DELETE /api/positions/:id — manual close (rejected while the market is closed)
   @Delete(':id')
   async closePosition(@Request() req: any, @Param('id') id: string) {
     return this.positionService.closeAtMarket(req.user.id, id);

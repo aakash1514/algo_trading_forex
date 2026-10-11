@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { KafkaConsumerService, KAFKA_TOPICS, NormalizedTick } from '@forexedge/kafka';
+import { KafkaConsumerService, KAFKA_TOPICS, parseTickMessage } from '@forexedge/kafka';
 import { InjectRedis } from '../redis/redis.decorator';
 import Redis from 'ioredis';
 
@@ -32,15 +32,15 @@ export class TickCacheWriterService implements OnModuleInit {
     _partition: number,
     message: string,
   ): Promise<void> {
-    const tick = JSON.parse(message) as NormalizedTick;
+    const tick = parseTickMessage(message);
 
     // Key: price:EUR_USD
     // Value: full NormalizedTick as JSON
     // TTL: 2 seconds — auto-expires if stream stops
-    await this.redis.setex(
-      `price:${tick.instrument}`,
-      PRICE_CACHE_TTL_SECONDS,
-      JSON.stringify(tick),
-    );
+    const value = JSON.stringify(tick);
+    await this.redis.setex(`price:${tick.instrument}`, PRICE_CACHE_TTL_SECONDS, value);
+    // Last known price, no expiry: a reference for validating SL/TP levels
+    // while the market is closed. Never used to fill orders.
+    await this.redis.set(`price:last:${tick.instrument}`, value);
   }
 }

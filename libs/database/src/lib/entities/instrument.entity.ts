@@ -17,6 +17,7 @@ export enum InstrumentType {
   MAJOR = 'MAJOR',
   MINOR = 'MINOR',
   EXOTIC = 'EXOTIC',
+  METAL = 'METAL',
 }
 
 @Entity('instruments')
@@ -80,6 +81,9 @@ export class InstrumentEntity {
   })
   maxLot!: number;
 
+  // Typical spread as a PRICE difference (ask - bid), not pips: EUR/USD 0.0001
+  // (1 pip), USD/JPY 0.015 (1.5 pips), XAU/USD 0.368 (36.8 pips). The spread
+  // monitor and the order gate compare live ask - bid against it.
   @Column({
     name: 'avg_spread',
     type: 'decimal',
@@ -88,6 +92,16 @@ export class InstrumentEntity {
     nullable: true,
   })
   avgSpread!: number;
+
+  // Leverage cap for this instrument; the effective leverage is
+  // min(account leverage, max_leverage). Null means no cap (the account's
+  // leverage applies). XAU/USD: 20, the ESMA retail cap for gold.
+  @Column({
+    name: 'max_leverage',
+    type: 'smallint',
+    nullable: true,
+  })
+  maxLeverage!: number | null;
 
   // Which sessions this pair is most active in
   @Column({

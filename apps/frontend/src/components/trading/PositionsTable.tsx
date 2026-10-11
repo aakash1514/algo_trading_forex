@@ -8,6 +8,7 @@ import { removePosition } from '../../store/slices/positions.slice';
 import { useAppDispatch } from '../../store';
 import { PAIR_DISPLAY } from '../../lib/constants';
 import { cn } from '../../lib/cn';
+import { formatSignedUsd } from '../../lib/format';
 import { getPriceDecimals } from '../../lib/pip';
 
 
@@ -82,7 +83,7 @@ const positions = useAppSelector(selectPositions);
                   <td className={cn('px-3 py-2 tabular-nums font-medium',
                     pos.unrealizedPnl >= 0 ? 'text-accent-green' : 'text-accent-red'
                   )}>
-                    {pos.unrealizedPnl >= 0 ? '+' : ''}${pos.unrealizedPnl.toFixed(2)}
+                    {formatSignedUsd(pos.unrealizedPnl)}
                   </td>
                   <td className="px-3 py-2 tabular-nums text-terminal-muted">
                     ${pos.marginUsed.toFixed(2)}

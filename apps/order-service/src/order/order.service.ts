@@ -7,21 +7,23 @@ import {
   OrderEntity, OrderStatus, PositionEntity, AccountSummaryEntity
 } from '@forexedge/database';
 import { IForexBroker } from '@forexedge/common';
-import { BROKER_ADAPTER, assertUserId } from '@forexedge/common';
+import { BROKER_ADAPTER, assertUserId, sessionLabel, type InstrumentKind } from '@forexedge/common';
 import { OrderValidationService } from './order-validation.service';
 import type { OrderRequest, SubmitOrderDto } from './dto/submit-order.dto';
 import { instrumentToPair } from '../common/instrument';
 import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
 import { MarginEngineService } from './margin-engine.service';
+import { OpenPairsIndex } from '../position/open-pairs.index';
+import { MarketHoursPolicy, marketClosedReason } from '../market/market-hours.policy';
 import { Kafka, Producer } from 'kafkajs';
-import { SessionConsumer } from '../kafka/session.consumer';
+import { ORDERS_LIFECYCLE_TOPIC, type OrderLifecycleMessage } from '@forexedge/kafka';
 
 // Valid FSM transitions — key: current state, value: allowed next states
 const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   DRAFT:     ['PENDING', 'REJECTED'],
-  PENDING:   ['OPEN', 'REJECTED'],
-  SUBMITTED: ['OPEN', 'REJECTED'],
+  PENDING:   ['OPEN', 'REJECTED', 'CANCELLED'],
+  SUBMITTED: ['OPEN', 'REJECTED', 'CANCELLED'],
   OPEN:      ['CLOSED', 'CANCELLED'],
   CLOSED:    [],
   REJECTED:  [],
@@ -43,9 +45,10 @@ export class OrderService {
     private readonly broker: IForexBroker,
     private readonly validationService: OrderValidationService,
     private readonly marginEngine: MarginEngineService,
-    private readonly sessionConsumer: SessionConsumer,
     private readonly realtime: RealtimePublisher,
     private readonly pricing: PricingService,
+    private readonly openPairs: OpenPairsIndex,
+    private readonly marketHours: MarketHoursPolicy,
   ) {
     // Kafka producer — wired up in Step 10
     // Declared here so OrderService doesn't need to change in Step 10
@@ -100,25 +103,34 @@ export class OrderService {
       requestedPrice: dto.requestedPrice ?? null,
       stopLoss: dto.stopLoss ?? null,
       takeProfit: dto.takeProfit ?? null,
-      sessionOpened: this.sessionConsumer.getActiveSession(),
+      // From the shared market clock: correct right after a restart, and
+      // OFF_HOURS whenever the FX market is closed
+      sessionOpened: sessionLabel(),
       status: 'DRAFT',
     });
     order = await this.orderRepo.save(order);
 
     // Wrap post-DRAFT flow so errors never leave an order stuck in DRAFT
     try {
+      // Step 2b: market hours first. While a market is closed the feed is silent
+      // and there is no live quote, so this must come before fetching one or the
+      // trader would be told "no live price" instead of "market closed".
+      const closed = await this.marketClosedReason(dto.pair);
+      if (closed) return await this.transitionState(order, 'REJECTED', closed);
+
       // Step 3: Run validation gates, checking margin at the live entry price
-      let entryPrice: number;
+      let quote: { bid: number; ask: number };
       try {
-        const quote = await this.pricing.getQuote(dto.pair);
-        entryPrice = dto.direction === 'LONG' ? quote.ask : quote.bid;
+        quote = await this.pricing.getQuote(dto.pair);
       } catch (err) {
         if (!(err instanceof PriceUnavailableError)) throw err;
         return await this.transitionState(order, 'REJECTED', err.message);
       }
+      const entryPrice = dto.direction === 'LONG' ? quote.ask : quote.bid;
       const validation = await this.validationService.validate(
         userId,
         dto,
+        quote,
         () => this.marginEngine.canOpenPosition(userId, dto.pair, dto.lots, entryPrice),
       );
 
@@ -133,7 +145,7 @@ export class OrderService {
       // Step 5: Call broker adapter
       let fill;
       try {
-        fill = await this.broker.fillOrder(order);
+        fill = await this.broker.fillOrder(order, quote);
       } catch (err) {
         this.logger.error(`Broker fill failed: ${this.getErrorMessage(err)}`);
         order = await this.transitionState(
@@ -185,18 +197,23 @@ export class OrderService {
           openedAt: fill.executedAt,
         });
 
-        // Step 8: Update account margin_used
-        if (account) {
-          await manager.save(AccountSummaryEntity, {
-            ...account,
-            marginUsed: Number(account.marginUsed) + marginUsed,
-          });
-        }
+        // Step 8: add the margin to the account. A relative update: the tick
+        // consumer moves unrealized_pnl concurrently, and writing back the row
+        // read above would undo its changes (a lost update).
+        await manager
+          .createQueryBuilder()
+          .update(AccountSummaryEntity)
+          .set({ marginUsed: () => 'margin_used + :addedMargin' })
+          .where('user_id = :userId', { userId })
+          .setParameters({ addedMargin: marginUsed })
+          .execute();
 
         return updated;
       });
 
-      // Step 9: Publish to Kafka (fire and forget — after all DB writes succeed)
+      // Step 9: after the commit — the tick consumer's open-pairs index, then
+      // Kafka (fire and forget)
+      this.openPairs.opened(order.pair);
       this.publishLifecycleEvent(order).catch(err =>
         this.logger.warn(`Kafka publish failed: ${this.getErrorMessage(err)}`)
       );
@@ -311,23 +328,34 @@ export class OrderService {
     return qb.getMany();
   }
 
+  // The rejection reason if the pair's market is closed now, else null. An
+  // unknown pair is left to the instrument gate.
+  private async marketClosedReason(pair: string): Promise<string | null> {
+    let kind: InstrumentKind;
+    try {
+      kind = await this.pricing.getInstrumentKind(pair);
+    } catch {
+      return null;
+    }
+    const status = this.marketHours.status(kind);
+    return status.open ? null : marketClosedReason(pair, status);
+  }
+
   // ─── Kafka ─────────────────────────────────────────────────────────────────
   private async publishLifecycleEvent(order: OrderEntity): Promise<void> {
+    const message: OrderLifecycleMessage = {
+      orderId: order.id,
+      userId: order.userId,
+      status: order.status,
+      pair: order.pair,
+      direction: order.direction,
+      lots: Number(order.lots),
+      executedPrice: order.executedPrice === null ? null : Number(order.executedPrice),
+      timestamp: new Date().toISOString(),
+    };
     await this.producer.send({
-      topic: 'orders.lifecycle',
-      messages: [{
-        key: order.id,
-        value: JSON.stringify({
-          orderId: order.id,
-          userId: order.userId,
-          status: order.status,
-          pair: order.pair,
-          direction: order.direction,
-          lots: order.lots,
-          executedPrice: order.executedPrice,
-          timestamp: new Date().toISOString(),
-        }),
-      }],
+      topic: ORDERS_LIFECYCLE_TOPIC,
+      messages: [{ key: order.id, value: JSON.stringify(message) }],
     });
   }
 

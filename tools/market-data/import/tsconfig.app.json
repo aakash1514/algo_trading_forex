@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../../dist/out-tsc/tools/market-data/import/app",
+    "module": "commonjs",
+    "types": ["node"],
+    "target": "es2021",
+    "lib": ["es2021"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts", "jest.config.cts"],
+  "references": [
+    {
+      "path": "../../../libs/database/tsconfig.lib.json"
+    }
+  ]
+}

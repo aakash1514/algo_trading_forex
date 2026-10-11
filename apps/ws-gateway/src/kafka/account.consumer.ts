@@ -3,7 +3,7 @@ import {
   KafkaConsumerService,
   REALTIME_TOPICS,
   SOCKET_EVENTS,
-  type AccountUpdatedMessage,
+  parseAccountUpdatedMessage,
 } from '@forexedge/kafka';
 import { AppGateway } from '../gateway/app.gateway';
 
@@ -22,8 +22,7 @@ export class AccountConsumer implements OnModuleInit {
       [REALTIME_TOPICS.ACCOUNTS_UPDATED],
       async (_topic, _partition, message) => {
         try {
-          const payload = JSON.parse(message) as AccountUpdatedMessage;
-          if (!payload.userId) return;
+          const payload = parseAccountUpdatedMessage(message);
           this.gateway.emitToUser(payload.userId, SOCKET_EVENTS.ACCOUNT_UPDATE, payload.summary);
         } catch (err) {
           this.logger.error('Failed to process accounts.updated message', err);

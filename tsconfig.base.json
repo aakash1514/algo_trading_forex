@@ -16,6 +16,7 @@
     "paths": {
       "@forexedge/common": ["./libs/common/src/index.ts"],
       "@forexedge/database": ["./libs/database/src/index.ts"],
+      "@forexedge/database/testing": ["./libs/database/src/testing/test-database.ts"],
       "@forexedge/kafka": ["./libs/kafka/src/index.ts"]
     }
   },
