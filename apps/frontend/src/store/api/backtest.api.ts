@@ -19,6 +19,7 @@ runBacktest: build.mutation<BacktestRun, {
   timeframe?: string;
   parameters?: Record<string, number>;
   lots?: number;
+  initialCapital?: number;
 }>({
   query: (body) => ({
     url: `${API_BASE.WS}/backtest/run`,
