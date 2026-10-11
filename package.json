@@ -8,7 +8,8 @@
     "migration:revert": "typeorm-ts-node-commonjs -d data-source.ts migration:revert",
     "seed:instruments": "ts-node -r tsconfig-paths/register apps/auth-service/src/seeds/run-seeds.ts",
     "data:import": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/main.ts",
-    "data:validate": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/validate-main.ts"
+    "data:validate": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/validate-main.ts",
+    "backtest:verify": "ts-node --transpile-only --project tools/backtest-verify/tsconfig.app.json tools/backtest-verify/src/main.ts"
   },
   "private": true,
   "devDependencies": {

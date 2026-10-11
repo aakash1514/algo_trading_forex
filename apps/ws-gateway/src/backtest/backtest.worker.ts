@@ -9,18 +9,22 @@ import {
 import { AppGateway } from '../gateway/app.gateway';
 import { StrategyRegistry } from './strategies/strategy.registry';
 import { TradeSimulator } from './trade.simulator';
-import { MetricsCalculator } from './metrics.calculator';
-import { Candle, StrategyContext } from './strategies/strategy.interface';
+import { calculateMetrics } from './metrics.calculator';
+import { Candle, MoneyTrade, StrategyContext } from './strategies/strategy.interface';
+import { MoneySpec, positionUnits, tradeMoney } from './trade-money';
+import { backtestWindow, TIMEFRAME_MS } from './backtest-window';
 
 export interface BacktestJobData {
   runId: string;
   userId: string;
   instrument: string;
   timeframe: string;
-  fromDate: string;
-  toDate: string;
+  fromDate: string; // YYYY-MM-DD, inclusive
+  toDate: string;   // YYYY-MM-DD, inclusive
   strategyName: string;
-  parameters: Record<string, number>;
+  parameters: Record<string, number>; // strategy parameters (lots included for the strategies)
+  lots: number;
+  initialCapital: number; // USD
 }
 
 const MINIO_BUCKET = 'backtests';
@@ -101,11 +105,14 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
       //    and ask in integer points; contract specs from the DB. The live
       //    market-hours clock is not applied: the history is the truth.
       const pair = instrument.replace('_', '/');
-      const from = new Date(fromDate);
-      const to = new Date(toDate);
-      const coverage = await requireHistoricalCoverage(this.dataSource, pair, from, to);
-      const context: StrategyContext = { pipSize: await this.pipSize(pair), priceDecimals: coverage.priceDecimals };
-      const bars = await readHistoricalBars(this.dataSource, { pair, timeframe: timeframe as HistoricalTimeframe, from, to });
+      //    The window holds whole bars only, From and To days inclusive (UTC).
+      const window = backtestWindow(fromDate, toDate, timeframe as HistoricalTimeframe);
+      const coverage = await requireHistoricalCoverage(this.dataSource, pair, window.from, window.lastBucket);
+      const instrumentSpec = await this.instrumentSpec(pair);
+      const context: StrategyContext = { pipSize: instrumentSpec.pipSize, priceDecimals: coverage.priceDecimals };
+      const bars = await readHistoricalBars(this.dataSource, {
+        pair, timeframe: timeframe as HistoricalTimeframe, from: window.from, to: window.lastBucket,
+      });
 
       if (bars.length === 0) {
         await this.repo.update(runId, {
@@ -143,34 +150,36 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
 
       // 4. Simulate trades
       const simulator = new TradeSimulator(context);
-      const trades = simulator.simulate(candles, signals);
+      const money: MoneySpec = {
+        pair, units: positionUnits(job.data.lots, instrumentSpec.lotSize),
+        priceDecimals: coverage.priceDecimals, pipPoints: simulator.pipPoints,
+      };
+      const trades: MoneyTrade[] = simulator.simulate(candles, signals).map((t) => ({ ...t, ...tradeMoney(t, money) }));
       this.logger.log(`Simulated ${trades.length} trades`);
 
       await this.repo.update(runId, { progress: 70 });
       this.emitProgress(userId, runId, 70, `${trades.length} trades simulated — calculating metrics...`);
 
-      // 5. Calculate metrics
-      const equityCurve = MetricsCalculator.buildEquityCurve(trades);
-      const metrics = {
-        totalTrades: trades.length,
-        winRate: MetricsCalculator.calculateWinRate(trades),
-        profitFactor: MetricsCalculator.calculateProfitFactor(trades),
-        sharpeRatio: MetricsCalculator.calculateSharpeRatio(trades),
-        maxDrawdownPct: MetricsCalculator.calculateMaxDrawdown(equityCurve),
-        totalPnl: parseFloat(trades.reduce((sum, t) => sum + t.netPnl, 0).toFixed(2)),
-      };
+      // 5. Metrics in USD: equity marked to market at every bar close
+      const { metrics, dailyEquity, finalEquity } = calculateMetrics({
+        candles, trades, money, initialCapital: job.data.initialCapital,
+        barMs: TIMEFRAME_MS[timeframe as HistoricalTimeframe], window,
+      });
 
       await this.repo.update(runId, { progress: 85 });
       this.emitProgress(userId, runId, 85, 'Saving results...');
 
       // 6. Save full results to MinIO
       const objectKey = `${runId}/results.json`;
-      const resultsJson = JSON.stringify({ trades, equityCurve, metrics }, null, 2);
+      const resultsJson = JSON.stringify({
+        initialCapital: job.data.initialCapital, lots: job.data.lots, units: money.units,
+        metrics, finalEquity, dailyEquity, trades,
+      }, null, 2);
       await this.minioClient.putObject(
         MINIO_BUCKET,
         objectKey,
         resultsJson,
-        resultsJson.length,
+        Buffer.byteLength(resultsJson),
         { 'Content-Type': 'application/json' },
       );
 
@@ -184,7 +193,7 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
       });
 
       this.emitProgress(userId, runId, 100, 'Backtest complete');
-      this.logger.log(`Backtest ${runId} completed — ${trades.length} trades, PnL: ${metrics.totalPnl} pips`);
+      this.logger.log(`Backtest ${runId} completed — ${trades.length} trades, PnL: ${metrics.totalPnl} pips, ${metrics.totalPnlUsd} USD`);
 
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -203,11 +212,12 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
     this.gateway.emitToUser(userId, 'backtest:progress', { runId, progress, message });
   }
 
-  // instruments.pip_size is the source of truth (0.01 for JPY pairs and gold)
-  private async pipSize(pair: string): Promise<number> {
-    const rows = await this.dataSource.query('SELECT pip_size FROM instruments WHERE pair = $1', [pair]);
+  // Contract specs from instruments, the source of truth: pip_size (0.01 for JPY
+  // pairs and gold) and lot_size (100,000 units for FX, 100 oz for XAU/USD)
+  private async instrumentSpec(pair: string): Promise<{ pipSize: number; lotSize: number }> {
+    const rows = await this.dataSource.query('SELECT pip_size, lot_size FROM instruments WHERE pair = $1', [pair]);
     if (rows.length === 0) throw new Error(`No instruments row for ${pair}`);
-    return Number(rows[0].pip_size);
+    return { pipSize: Number(rows[0].pip_size), lotSize: Number(rows[0].lot_size) };
   }
 
   // ── Startup check — fail fast if the historical tables are missing ──

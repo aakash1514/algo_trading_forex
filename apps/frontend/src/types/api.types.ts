@@ -136,16 +136,19 @@ export interface BacktestRun {
   strategyName: string;
   instrument: string;
   timeframe: string;
-  fromDate: string;
-  toDate: string;
+  fromDate: string;           // the From day, 00:00 UTC
+  toDate: string;             // the To day, 00:00 UTC (inclusive: the whole day is tested)
+  initialCapital: string;     // USD
+  lots: string;
   status: BacktestStatus;
   progress: number;
   totalTrades: number | null;
-  winRate: string | null;
-  profitFactor: string | null;
-  sharpeRatio: string | null;
+  winRate: string | null;       // 0-100; null without trades
+  profitFactor: string | null;  // null without a losing trade
+  sharpeRatio: string | null;   // null when it can't be computed
   maxDrawdownPct: string | null;
-  totalPnl: string | null;
+  totalPnl: string | null;      // net pips
+  totalPnlUsd: string | null;   // net USD
   errorMessage: string | null;
   createdAt: string;
   completedAt: string | null;

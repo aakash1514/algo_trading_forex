@@ -10,12 +10,17 @@ import { DataSource, Repository } from 'typeorm';
 import { Queue, Job } from 'bullmq';
 import { Client as MinioClient } from 'minio';
 import { assertUserId } from '@forexedge/common';
-import { BacktestRunEntity, HistoricalDataError, requireHistoricalCoverage } from '@forexedge/database';
+import {
+  BacktestRunEntity, HistoricalDataError, HistoricalTimeframe, requireHistoricalCoverage,
+} from '@forexedge/database';
+import { BacktestWindow, backtestWindow, parseDay } from './backtest-window';
 import { BACKTEST_QUEUE } from './backtest-queue.module';
 import { BacktestJobData } from './backtest.worker';
 import { SubmitBacktestDto } from './dto/submit-backtest.dto';
 
-const MAX_M1_RANGE_MS = 366 * 86_400_000;
+const MAX_M1_DAYS = 366;
+export const DEFAULT_LOTS = 0.1;
+export const DEFAULT_INITIAL_CAPITAL = 10_000;
 
 @Injectable()
 export class BacktestService {
@@ -40,23 +45,28 @@ export class BacktestService {
   // ── Submit backtest job ──
   async submit(userId: string, dto: SubmitBacktestDto): Promise<{ runId: string }> {
     assertUserId(userId);
-    // Validate date range
-    const from = new Date(dto.fromDate);
-    const to = new Date(dto.toDate);
-    if (from >= to) {
-      throw new BadRequestException('fromDate must be before toDate');
+    // Whole days, both inclusive (UTC): [From 00:00, the day after To 00:00)
+    let window: BacktestWindow;
+    try {
+      window = backtestWindow(dto.fromDate, dto.toDate, dto.timeframe as HistoricalTimeframe);
+    } catch (err) {
+      if (err instanceof RangeError) throw new BadRequestException(err.message);
+      throw err;
     }
     // M1 runs load every minute into memory: at most a year (~375k bars)
-    if (dto.timeframe === '1m' && to.getTime() - from.getTime() > MAX_M1_RANGE_MS) {
-      throw new BadRequestException('A 1m backtest can cover at most 366 days');
+    if (dto.timeframe === '1m' && window.days > MAX_M1_DAYS) {
+      throw new BadRequestException(`A 1m backtest can cover at most ${MAX_M1_DAYS} days`);
     }
     // Backtests always read the imported history: reject a range it doesn't cover
     try {
-      await requireHistoricalCoverage(this.dataSource, dto.instrument.replace('_', '/'), from, to);
+      await requireHistoricalCoverage(this.dataSource, dto.instrument.replace('_', '/'), window.from, window.lastBucket);
     } catch (err) {
       if (err instanceof HistoricalDataError) throw new BadRequestException(err.message);
       throw err;
     }
+
+    const lots = dto.lots ?? DEFAULT_LOTS;
+    const initialCapital = dto.initialCapital ?? DEFAULT_INITIAL_CAPITAL;
 
     // Create DB record
     const run = this.repo.create({
@@ -64,9 +74,11 @@ export class BacktestService {
       strategyName: dto.strategyName,
       instrument: dto.instrument,
       timeframe: dto.timeframe,
-      fromDate: from,
-      toDate: to,
+      fromDate: window.from,           // the From day, 00:00 UTC
+      toDate: parseDay(dto.toDate),    // the To day, 00:00 UTC (inclusive day)
       parameters: dto.parameters ?? {},
+      initialCapital: initialCapital.toFixed(2),
+      lots: lots.toFixed(2),
       status: 'QUEUED',
       progress: 0,
     });
@@ -81,7 +93,9 @@ export class BacktestService {
       fromDate: dto.fromDate,
       toDate: dto.toDate,
       strategyName: dto.strategyName,
-      parameters: { ...(dto.parameters ?? {}), lots: dto.lots ?? 0.1 },
+      parameters: { ...(dto.parameters ?? {}), lots },
+      lots,
+      initialCapital,
     };
 
     await this.queue.add('run-backtest', jobData, { jobId: run.id });

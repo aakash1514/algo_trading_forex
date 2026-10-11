@@ -49,8 +49,18 @@ export interface Trade {
   lots: number;
   entryPrice: number;
   exitPrice: number;
+  entryPoints: number;  // entryPrice x 10^priceDecimals (exact)
+  exitPoints: number;
   exitReason: 'SIGNAL' | 'STOP_LOSS' | 'TAKE_PROFIT' | 'END_OF_DATA';
   pnl: number;          // in pips
   commission: number;   // in pips
   netPnl: number;       // pnl - commission
+}
+
+// A trade with its money (trade-money.ts): position size and USD amounts
+export interface MoneyTrade extends Trade {
+  units: number;          // lots x lot_size
+  grossUsd: number;
+  commissionUsd: number;
+  netUsd: number;         // grossUsd - commissionUsd
 }

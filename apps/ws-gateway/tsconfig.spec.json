@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc/apps/ws-gateway/spec",
     "module": "commonjs",
+    "target": "es2021",
     "moduleResolution": "node10",
     "types": ["jest", "node"]
   },

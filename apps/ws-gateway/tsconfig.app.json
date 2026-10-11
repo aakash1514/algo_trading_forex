@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc/apps/ws-gateway/app",
     "module": "commonjs",
+    "target": "es2021",
     "types": ["node"],
     "rootDir": "../../"
   },

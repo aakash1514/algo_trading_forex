@@ -210,8 +210,26 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
     expect(boundaries?.lines.find((l) => l.startsWith('2012/2013:'))).toMatch(/^2012\/2013: 4h (\d+)\/\1, 1d (\d+)\/\2$/);
   });
 
-  it('refuses to revert the integer layout while historical rows exist', async () => {
+  // Walks the migrations down from the newest; a new migration must be added here
+  it('refuses to revert BacktestRunMoney while runs exist, then the integer layout while historical rows exist', async () => {
+    const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('BacktestRunMoney1791800000000');
+
+    // A run in backtest_runs blocks BacktestRunMoney.down()
+    const { rows: [user] } = await client.query(
+      `INSERT INTO users (email, username, password_hash) VALUES ('migration-guard@example.com', 'migration_guard', 'x') RETURNING id`);
+    await client.query(
+      `INSERT INTO backtest_runs (user_id, strategy_name, instrument, timeframe, from_date, to_date, initial_capital, lots)
+       VALUES ($1, 'ma_crossover', 'EUR_USD', '1h', '2022-01-03', '2022-01-03', 10000, 0.1)`, [user.id]);
+    await expect(testDb.dataSource.undoLastMigration({ transaction: 'each' })).rejects.toThrow('backtest_runs has 1 run(s)');
+    expect(await last()).toBe('BacktestRunMoney1791800000000');
+
+    // Without runs it reverts, and the integer layout is next: it refuses while history exists
+    await client.query('DELETE FROM backtest_runs');
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await last()).toBe('HistoricalCandlesIntegerPoints1791720000000');
     await expect(testDb.dataSource.undoLastMigration({ transaction: 'each' }))
       .rejects.toThrow(/Refusing to restore the float8 historical layout/);
+    expect(await last()).toBe('HistoricalCandlesIntegerPoints1791720000000');
   });
 });

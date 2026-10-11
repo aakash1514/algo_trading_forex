@@ -12,6 +12,10 @@ import {
 } from '../../store/api/backtest.api';
 import { cn } from '../../lib/cn';
 import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
+import { formatSignedUsd } from '../../lib/format';
+import {
+  finalEquityUsd, formatMetric, formatPips, formatUsd, inclusiveToHint, returnPct, SHARPE_DEFINITION,
+} from '../../lib/backtest';
 import React from 'react';
 
 // Strategy ids are the backend's (SubmitBacktestDto / StrategyRegistry); labels are display only
@@ -31,16 +35,17 @@ const schema = z.object({
   to:           z.string().min(1),
   fastPeriod:   z.number().min(1).max(50).optional(),
   slowPeriod:   z.number().min(2).max(200).optional(),
+  // The API's limits (SubmitBacktestDto)
+  initialCapital: z.number().min(100).max(10_000_000),
+  lots:           z.number().min(0.01).max(100),
 });
 
 type FormData = z.infer<typeof schema>;
 
-// Backtest P&L is in pips (net of commission), not account currency; the win rate
-// arrives as a percentage (0-100)
-function formatPips(value: string | null | undefined): string {
-  const pips = Number.parseFloat(value ?? '0');
-  return `${pips > 0 ? '+' : ''}${pips.toFixed(1)} pips`;
-}
+// P&L is in USD (net of commission) with the pips alongside; the win rate arrives
+// as a percentage (0-100)
+const pnlColor = (usd: string | null) =>
+  Number.parseFloat(usd ?? '0') >= 0 ? 'text-accent-green' : 'text-accent-red';
 
 const STATUS_COLORS: Record<string, string> = {
   COMPLETED: 'text-accent-green bg-accent-green/10',
@@ -49,9 +54,9 @@ const STATUS_COLORS: Record<string, string> = {
   FAILED:    'text-accent-red bg-accent-red/10',
 };
 
-function MetricCard({ label, value, color }: { label: string; value: string; color?: string }) {
+function MetricCard({ label, value, color, title }: { label: string; value: string; color?: string; title?: string }) {
   return (
-    <div className="bg-terminal-bg rounded p-3">
+    <div className="bg-terminal-bg rounded p-3" title={title}>
       <p className="text-[10px] text-terminal-muted uppercase tracking-wider mb-1">{label}</p>
       <p className={cn('text-[15px] font-medium tabular-nums', color ?? 'text-[#e2e4e9]')}>{value}</p>
     </div>
@@ -79,10 +84,13 @@ export function BacktestClient() {
       to:           '2022-12-30',
       fastPeriod:   10,
       slowPeriod:   30,
+      initialCapital: 10_000,
+      lots:           0.1,
     },
   });
 
   const strategy = watch('strategyName');
+  const toDay = watch('to');
 
   async function onSubmit(data: FormData) {
     setSubmitError(null);
@@ -93,6 +101,8 @@ export function BacktestClient() {
         fromDate:     data.from,
         toDate:       data.to,
         timeframe:    '1h',
+        initialCapital: data.initialCapital,
+        lots:         data.lots,
         parameters: data.strategyName === 'ma_crossover' ? {
           ...(data.fastPeriod && { fastPeriod: data.fastPeriod }),
           ...(data.slowPeriod && { slowPeriod: data.slowPeriod }),
@@ -144,8 +154,21 @@ export function BacktestClient() {
                 <input {...register('from')} type="date" min={HISTORY_FIRST_DAY} max={HISTORY_LAST_DAY} className={inputClass} />
               </div>
               <div>
-                <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">To</label>
+                <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">To (inclusive)</label>
                 <input {...register('to')} type="date" min={HISTORY_FIRST_DAY} max={HISTORY_LAST_DAY} className={inputClass} />
+              </div>
+            </div>
+            <p className="text-[10px] text-terminal-muted -mt-1">{inclusiveToHint(toDay)}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Capital (USD)</label>
+                <input {...register('initialCapital', { valueAsNumber: true })} type="number" min={100} max={10_000_000} step={100}
+                  className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-[9px] text-terminal-muted uppercase tracking-wider mb-1">Lots</label>
+                <input {...register('lots', { valueAsNumber: true })} type="number" min={0.01} max={100} step={0.01}
+                  className={inputClass} />
               </div>
             </div>
             {strategy === 'ma_crossover' && (
@@ -224,10 +247,17 @@ export function BacktestClient() {
                       <td className="px-4 py-2.5 text-terminal-muted tabular-nums">
                         {new Date(run.createdAt).toLocaleDateString()}
                       </td>
-                      <td className={cn('px-4 py-2.5 font-medium tabular-nums',
-                        (Number.parseFloat(run.totalPnl ?? '0') ?? 0) >= 0 ? 'text-accent-green' : 'text-accent-red'
-                      )}>
-                        {formatPips(run.totalPnl)}
+                      <td className="px-4 py-2.5 tabular-nums">
+                        {run.totalPnlUsd === null ? (
+                          <span className="text-terminal-muted">—</span>
+                        ) : (
+                          <>
+                            <span className={cn('font-medium', pnlColor(run.totalPnlUsd))}>
+                              {formatSignedUsd(Number.parseFloat(run.totalPnlUsd))}
+                            </span>
+                            <span className="text-terminal-muted"> · {formatPips(run.totalPnl)}</span>
+                          </>
+                        )}
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <button
@@ -243,38 +273,53 @@ export function BacktestClient() {
                     {selectedId === run.id && (
                       <tr key={`${run.id}-detail`} className="border-b border-terminal-border bg-terminal-elevated/20">
                         <td colSpan={6} className="px-4 py-4">
-                          {run.status === 'COMPLETED' && run.totalTrades !== null ? (
+                          {run.status === 'COMPLETED' && run.totalPnlUsd !== null ? (
                             <>
-                              <p className="text-[10px] font-medium text-terminal-muted uppercase tracking-wider mb-3">
+                              <p className="text-[10px] font-medium text-terminal-muted uppercase tracking-wider mb-1">
                                 Performance metrics
                               </p>
-                              <div className="grid grid-cols-6 gap-2">
+                              <p className="text-[10px] text-terminal-muted mb-3">
+                                {formatUsd(Number.parseFloat(run.initialCapital))} capital · {Number.parseFloat(run.lots).toFixed(2)} lot
+                                {' '}· {run.fromDate.slice(0, 10)} to {run.toDate.slice(0, 10)} (inclusive, UTC) · {run.timeframe}
+                              </p>
+                              <div className="grid grid-cols-4 gap-2">
                                 <MetricCard
                                   label="Net P&L"
-                                  value={formatPips(run.totalPnl)}
-                                  color={Number.parseFloat(run.totalPnl ?? '0') >= 0 ? 'text-accent-green' : 'text-accent-red'}
+                                  value={`${formatSignedUsd(Number.parseFloat(run.totalPnlUsd))} · ${formatPips(run.totalPnl)}`}
+                                  color={pnlColor(run.totalPnlUsd)}
                                 />
                                 <MetricCard
-                                  label="Win rate"
-                                  value={`${Number.parseFloat(run.winRate ?? '0').toFixed(1)}%`}
-                                  color={Number.parseFloat(run.winRate ?? '0') >= 50 ? 'text-accent-green' : 'text-accent-red'}
-                                />
-                                <MetricCard label="Total trades" value={String(run.totalTrades ?? 0)} />
-                                <MetricCard
-                                  label="Profit factor"
-                                  value={Number.parseFloat(run.profitFactor ?? '0').toFixed(2)}
-                                  color={Number.parseFloat(run.profitFactor ?? '0') >= 1 ? 'text-accent-green' : 'text-accent-red'}
+                                  label="Final equity"
+                                  value={formatUsd(finalEquityUsd(run.initialCapital, run.totalPnlUsd))}
                                 />
                                 <MetricCard
-                                  label="Sharpe ratio"
-                                  value={Number.parseFloat(run.sharpeRatio ?? '0').toFixed(2)}
-                                  color={Number.parseFloat(run.sharpeRatio ?? '0') >= 1 ? 'text-accent-green' : 'text-accent-red'}
+                                  label="Return"
+                                  value={`${returnPct(run.initialCapital, run.totalPnlUsd).toFixed(2)}%`}
+                                  color={pnlColor(run.totalPnlUsd)}
                                 />
                                 <MetricCard
                                   label="Max drawdown"
-                                  value={`${Number.parseFloat(run.maxDrawdownPct ?? '0').toFixed(1)}%`}
+                                  value={formatMetric(run.maxDrawdownPct, 2, '%')}
+                                  title="Largest fall from peak equity, % of the peak (marked to market at every bar close)"
                                   color="text-accent-red"
                                 />
+                                <MetricCard
+                                  label="Sharpe ratio"
+                                  value={formatMetric(run.sharpeRatio, 2)}
+                                  title={SHARPE_DEFINITION}
+                                  color={Number.parseFloat(run.sharpeRatio ?? '0') >= 1 ? 'text-accent-green' : 'text-accent-red'}
+                                />
+                                <MetricCard
+                                  label="Win rate"
+                                  value={formatMetric(run.winRate, 1, '%')}
+                                  color={Number.parseFloat(run.winRate ?? '0') >= 50 ? 'text-accent-green' : 'text-accent-red'}
+                                />
+                                <MetricCard
+                                  label="Profit factor"
+                                  value={formatMetric(run.profitFactor, 2)}
+                                  color={Number.parseFloat(run.profitFactor ?? '0') >= 1 ? 'text-accent-green' : 'text-accent-red'}
+                                />
+                                <MetricCard label="Trades" value={String(run.totalTrades ?? 0)} />
                               </div>
                             </>
                           ) : run.status === 'FAILED' ? (

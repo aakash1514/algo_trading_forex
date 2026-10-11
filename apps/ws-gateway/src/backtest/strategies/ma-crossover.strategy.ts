@@ -8,19 +8,30 @@ export class MovingAverageCrossoverStrategy implements IStrategy {
     const slowPeriod = parameters['slowPeriod'] ?? 20;
     const lots = parameters['lots'] ?? 0.1;
 
+    if (!Number.isInteger(fastPeriod) || !Number.isInteger(slowPeriod) || fastPeriod < 1 || slowPeriod < 1) {
+      throw new Error(`MA periods must be positive integers (fast ${fastPeriod}, slow ${slowPeriod})`);
+    }
     if (candles.length < slowPeriod + 1) return [];
+
+    // Exact SMAs: the mid close doubled, bid.close + ask.close, is a whole number
+    // of points, so prefix sums are exact integers and
+    //   SMA_fast > SMA_slow  <=>  sum_fast x slowPeriod > sum_slow x fastPeriod
+    // compares without any rounding (no float near-ties).
+    const prefix = [0];
+    for (const c of candles) prefix.push(prefix[prefix.length - 1] + c.bid.close + c.ask.close);
+    if (!Number.isSafeInteger(prefix[prefix.length - 1])) throw new Error('mid sums exceed the exact integer range');
+    const sum = (end: number, period: number) => prefix[end + 1] - prefix[end + 1 - period];
+    // sign of SMA_fast - SMA_slow at bar i
+    const side = (i: number) => Math.sign(sum(i, fastPeriod) * slowPeriod - sum(i, slowPeriod) * fastPeriod);
 
     const signals: Signal[] = [];
     let position: 'LONG' | 'SHORT' | null = null;
 
     for (let i = slowPeriod; i < candles.length; i++) {
-      const fastNow = this.sma(candles, i, fastPeriod);
-      const slowNow = this.sma(candles, i, slowPeriod);
-      const fastPrev = this.sma(candles, i - 1, fastPeriod);
-      const slowPrev = this.sma(candles, i - 1, slowPeriod);
-
-      const crossedAbove = fastPrev <= slowPrev && fastNow > slowNow;
-      const crossedBelow = fastPrev >= slowPrev && fastNow < slowNow;
+      const prev = side(i - 1);
+      const now = side(i);
+      const crossedAbove = prev <= 0 && now > 0;
+      const crossedBelow = prev >= 0 && now < 0;
 
       if (crossedAbove && position !== 'LONG') {
         if (position === 'SHORT') {
@@ -60,10 +71,5 @@ export class MovingAverageCrossoverStrategy implements IStrategy {
     }
 
     return signals;
-  }
-
-  private sma(candles: Candle[], endIndex: number, period: number): number {
-    const slice = candles.slice(endIndex - period + 1, endIndex + 1);
-    return slice.reduce((sum, c) => sum + c.close, 0) / period;
   }
 }
