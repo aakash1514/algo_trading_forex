@@ -18,12 +18,15 @@ from research_agent.config import get_settings
 from research_agent.report import Report
 
 API_PREFIX = "/api/research"
+# Longest question accepted (Unicode code points, before stripping), to protect the free LLM token quota.
+# The frontend checks the same limit (apps/frontend/src/lib/research.ts).
+MAX_QUESTION_CHARS = 500
 
 
 class AskRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    question: str = Field(min_length=3, max_length=500)
+    question: str = Field(min_length=3, max_length=MAX_QUESTION_CHARS)
 
 
 def create_app(agent: ResearchAgent | None = None) -> FastAPI:
