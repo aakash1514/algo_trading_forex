@@ -4,7 +4,7 @@ import type { DataSource } from 'typeorm';
 import type Redis from 'ioredis';
 import { EconomicEventEntity } from '@forexedge/database';
 import { createTestDatabase, type TestDatabase } from '@forexedge/database/testing';
-import { OfficialCalendarService, describeFailure, type PageFetcher } from './official-calendar.service';
+import { OfficialCalendarService, describeFailure, fetchPage, type PageFetcher } from './official-calendar.service';
 import { EconomicCalendarService } from './economic-calendar.service';
 import { CALENDAR_USER_AGENT, OFFICIAL_SOURCES } from './official-sources';
 import { parseEcbCalendar } from './ecb.parser';
@@ -19,8 +19,8 @@ const PAGES: Record<string, string> = {
 };
 const NOW = new Date('2026-10-12T09:00:00Z');
 
-const recordedFetcher = (): PageFetcher & jest.Mock =>
-  jest.fn(async (url: string, _userAgent: string) => ({ status: 200, body: PAGES[url] }));
+const recordedFetcher = () =>
+  jest.fn<ReturnType<PageFetcher>, Parameters<PageFetcher>>(async (url) => ({ status: 200, body: PAGES[url] }));
 
 // Redis SET ... NX EX: the first claim of a key wins
 function fakeRedis() {
@@ -34,6 +34,12 @@ function fakeRedis() {
     }),
   };
 }
+
+describe('the default suite is offline', () => {
+  it('fails any real request (jest.setup.cjs), including the service’s own fetcher', async () => {
+    await expect(fetchPage(OFFICIAL_SOURCES.FOMC.url, CALENDAR_USER_AGENT)).rejects.toThrow(/Network access is disabled/);
+  });
+});
 
 describe('OfficialCalendarService (recorded pages, no network)', () => {
   function setup() {
@@ -72,13 +78,17 @@ describe('OfficialCalendarService (recorded pages, no network)', () => {
       .toEqual(['FOMC meeting, October 27-28', 'USD', 'HIGH', '2026-10-28T00:00:00Z', 'FOMC']);
   });
 
-  it('fetches at most once a day per source, even across restarts', async () => {
+  it('fetches at most once per UTC day per source, even across restarts, and again the next day', async () => {
     const { service, redis } = setup();
     await service.syncAll(NOW);
-    const again = await service.syncAll(new Date('2026-10-12T15:00:00Z'));
+    const again = await service.syncAll(new Date('2026-10-12T23:59:00Z'));
     expect(again).toEqual([{ source: 'FOMC', outcome: 'skipped' }, { source: 'ECB', outcome: 'skipped' }]);
     expect(service.fetcher).toHaveBeenCalledTimes(2);
-    expect(redis.set).toHaveBeenCalledWith('calendar:fetched:FOMC', NOW.toISOString(), 'EX', 86_400, 'NX');
+    expect(redis.set).toHaveBeenCalledWith('calendar:fetched:FOMC:2026-10-12', NOW.toISOString(), 'EX', 172_800, 'NX');
+
+    const nextDay = await service.syncAll(new Date('2026-10-13T06:15:00Z')); // the daily cron
+    expect(nextDay.map((o) => o.outcome)).toEqual(['synced', 'synced']);
+    expect(service.fetcher).toHaveBeenCalledTimes(4);
   });
 
   it('keeps the last good events (writes nothing) on an HTTP error or a page it cannot parse', async () => {

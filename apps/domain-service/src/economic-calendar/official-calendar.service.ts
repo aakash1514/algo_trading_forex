@@ -15,7 +15,7 @@ const PARSERS: Readonly<Record<CalendarSource, (html: string) => OfficialEvent[]
   ECB: parseEcbCalendar,
 };
 
-const ONCE_A_DAY_S = 24 * 60 * 60;
+const CLAIM_TTL_S = 48 * 60 * 60; // outlives its UTC day
 const FETCH_TIMEOUT_MS = 30_000;
 
 export type PageFetcher = (url: string, userAgent: string) => Promise<{ status: number; body: string }>;
@@ -37,8 +37,9 @@ export function describeFailure(err: unknown): string {
 export type SyncOutcome = { source: CalendarSource; outcome: 'synced'; events: number } |
   { source: CalendarSource; outcome: 'skipped' } | { source: CalendarSource; outcome: 'kept'; reason: string };
 
-// Syncs the economic calendar from the official calendars, each fetched at most once a day (a Redis key
-// per source, set before the request, so neither restarts nor failures fetch more often). On a fetch or
+// Syncs the economic calendar from the official calendars, each fetched at most once per UTC day (a Redis
+// claim per source and date, set before the request, so neither restarts nor failures fetch more often;
+// the daily cron is the first attempt of each day). On a fetch or
 // parse failure the source's stored events are kept and the failure is logged; nothing is invented.
 // On success the source's events from today on are replaced by the page's (a cancelled meeting
 // disappears), and earlier events are kept.
@@ -72,8 +73,9 @@ export class OfficialCalendarService implements OnApplicationBootstrap {
 
   async syncSource(source: CalendarSource, now = new Date()): Promise<SyncOutcome> {
     const { url } = OFFICIAL_SOURCES[source];
-    // NX: only the first caller in 24 h gets to fetch
-    const claimed = await this.redis.set(`calendar:fetched:${source}`, now.toISOString(), 'EX', ONCE_A_DAY_S, 'NX');
+    // NX: only the first caller of the UTC day gets to fetch
+    const day = now.toISOString().slice(0, 10);
+    const claimed = await this.redis.set(`calendar:fetched:${source}:${day}`, now.toISOString(), 'EX', CLAIM_TTL_S, 'NX');
     if (claimed !== 'OK') return { source, outcome: 'skipped' };
 
     let events: OfficialEvent[];
