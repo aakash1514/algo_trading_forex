@@ -65,3 +65,21 @@ runs, without retraining: the control's balanced-accuracy 95% interval must incl
 pass (EUR/USD 0.4897 [0.4785, 0.5009], GBP/USD 0.5093 [0.4989, 0.5196], USD/JPY 0.4997
 [0.4948, 0.5046], XAU/USD 0.4925 [0.4800, 0.5050]). Both criteria are reported side by side in
 docs/validation/ml-walk-forward.md, with why the original was mis-specified.
+
+# Overnight questions (2026-10-12, step 5b, Research page)
+
+Nothing was blocked or skipped; this one needs a decision later.
+
+## 4. Eval run 3, question 3 failed on a Groq HTTP 400 whose reason isn't recorded (diagnostics)
+
+Eval run 3 question 3 ("How many up and down daily bars did EUR/USD have in 2021?") ended `could_not_verify`
+with stop reason `error: BadRequestError`. After one tool call, the Groq API rejected the second model call
+with HTTP 400. The service shows no unverified numbers, as designed. Runs 1 and 2 passed the same question.
+The agent deliberately logs only the exception type, never provider messages, because a provider message
+can echo request content. So it isn't recorded whether this was `tool_use_failed` (the model emitted a
+malformed tool call, as in step 5's live-run bug) or something else.
+
+**Question:** should the agent also log the provider's machine-readable error code (e.g. Groq's
+`error.code`, such as `tool_use_failed`) and nothing else from the message? This would be a small change in
+`agent.py`'s failure logging. The alternative is to leave logging as is. Nothing in step 5b depends on it,
+and run 3 is reported as is.

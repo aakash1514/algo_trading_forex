@@ -22,7 +22,8 @@ USD/JPY and XAU/USD, the caller's completed backtest runs, and the step-4 walk-f
 - ml-service is called with the caller's own access token.
 
 **Live eval:** 10 real questions with independently computed expectations:
-`docs/validation/research-agent-eval.md`, with Run 1 and Run 2 side by side.
+`docs/validation/research-agent-eval.md`, with Run 1 and Run 2 side by side (Run 3, after step 5b's
+prompt rule 6, in §13).
 
 Branch `step-5-research-agent` (2026-10-12).
 
@@ -344,4 +345,193 @@ Every number in an answer is checked against a real tool result before it is ret
 - The free tier handles roughly one question a minute.
 
 Write-up: `docs/phase-summaries/step-5-research-agent.md`.
+````
+
+## 13. Step 5b: Research page (branch `step-5b-research-page`, 2026-10-12)
+
+**Outcome:** a `/research` page in the existing frontend. A logged-in user asks one question and sees the
+verified report from `POST /api/research/ask`. Two small backend changes go with it: CORS for the frontend
+and prompt rule 6. Eval run 3 was run once after the prompt change. **Manual browser check: pending**
+(`docs/validation/research-page-e2e.md`).
+
+### What changed
+- **research-agent CORS:** `Settings.cors_origins = ("http://localhost:4200",)`, hardcoded like ml-service.
+  Credentials allowed, methods GET and POST, headers `Authorization` and `Content-Type`.
+  - Grafana's 3001 and any other origin get no allow-origin header, and their preflight gets a 400.
+  - The other services still allow 3001 with credentials; that's noted in CLAUDE.md's step 7.
+- **Question cap:** it already existed (`max_length=500`, a 422 before the agent runs). It is now the named
+  `MAX_QUESTION_CHARS`, with tests for 500 vs 501 characters, ASCII and non-BMP, and no model call on 501.
+- **Prompt rule 6:** "For questions about a return or % change, use get_market_stats and report return_pct."
+  This targets eval run 2's question-8 miss. A test checks the rule reaches the model.
+- **Frontend:**
+  - `API_BASE.RESEARCH`.
+  - The `askResearch` mutation: 100 s timeout, no retry wrapper.
+  - `lib/research.ts`: limits in code points, error mapping, the disclaimer.
+  - Components `ResearchClient`, `ResearchReport`, `ClaimsTable` and `ToolCallLog` (native `<details>`).
+  - The route `/research` and a Sidenav link.
+- **Fixtures:** real `/ask` bodies saved byte for byte by `scripts/record_ask_fixtures.py`:
+  - answer, refusal, not_in_data;
+  - the 422 for 525 characters;
+  - a real `could_not_verify` from the service running without an LLM key (the `.env` line commented out,
+    no code change).
+- **Automated HTTP end to end:** `scripts/e2e_research_page.py`, which writes
+  `docs/validation/research-page-e2e.md` together with the manual checklist.
+
+### Decisions
+- **Mutation, not query.** No cache and no automatic retry: every call spends free LLM quota.
+  `baseQueryWithReauth` still re-sends once after a 401, which costs nothing, because the JWT check runs
+  before the agent.
+- **One request in flight.** The button is disabled while pending and the submit handler returns early.
+  The 100 s client timeout is above the server's 90 s wall clock.
+- **Plain text only.** Every report string is a React text node: no `dangerouslySetInnerHTML`, no markdown.
+  Values are shown exactly as returned, because the verifier checked those exact strings.
+- **`could_not_verify` shows a fixed warning and the disclaimer only.** Not `answer`, `claims` or
+  `verification.failures`, because a verifier failure message can quote the rejected number. An `answer`
+  whose verification isn't ok is treated the same way. The service never sends one, so that branch has no
+  real fixture and isn't tested.
+- **Code points, not `String.length`.** Pydantic counts code points, so the client counts with `Array.from`.
+- **The URL and CORS origins are hardcoded** like every other service; step 7 moves them all to env together.
+- **No shadcn/ui** (the project has none) and no new dependency: the collapsible log is native `<details>`.
+
+### Errors hit, root cause, fix
+- **jsdom has no `fetch`/`Request`/`Response`,** so RTK Query's real `fetchBaseQuery` couldn't run in a
+  component test. Fix: `apps/frontend/test/jsdom-with-fetch.cjs` (jsdom plus Node's fetch classes,
+  including Node's AbortSignal, which Node's `Request` insists on).
+- **The timeout test got `FETCH_ERROR` instead of `TIMEOUT_ERROR`.** The mock rejected with its own
+  `AbortError`, but `fetchBaseQuery` recognises a timeout only from the signal's reason (`TimeoutError`).
+  Fix: the mock rejects with `signal.reason`, like the real `fetch`.
+- **"A worker process has failed to exit gracefully".** `fetchBaseQuery`'s timeout `setTimeout` keeps
+  running after a fast response. Fix: fake timers plus `jest.clearAllTimers()` in those specs.
+- **The eval's `--note` came out with its commas replaced by spaces.** `nx run --args` splits on commas.
+  The note line (my label, not result data) was corrected by hand in the doc; CLAUDE.md gotcha added.
+- **Python `write_text` on Windows wrote CRLF** to the eval doc and the fixtures README/manifest.
+  Fix: normalised to LF, and the recorder now writes `newline="\n"`.
+- **Stopping a backgrounded `nx serve` left the uvicorn child listening on its port.** Fix: kill the PID
+  found with netstat, and confirm the port is free.
+- **A heredoc with nested quotes failed to parse, and `sed` turned `\n` into a newline in a script.**
+  Fix: these files were written and edited with the editor tools instead.
+
+### Results
+- **Eval run 3** (`27525e9`, prompt rule 6): **9/10**; 9/10 types; 35,387 tokens; 20 model and 9 tool
+  calls; 0 HTTP 429s; 121.0 s.
+  - Question 8 (run 2's failure) now passes (-0.46291%).
+  - Question 3 ended `could_not_verify` on a Groq HTTP 400 (`BadRequestError`) after one tool call;
+    runs 1 and 2 passed it.
+  - Not tuned, not rerun. The logging question is `docs/OVERNIGHT-QUESTIONS.md` #4.
+
+  | | Run 1 | Run 2 | Run 3 |
+  |---|---|---|---|
+  | Pass | 8/10 | 9/10 | 9/10 |
+  | Types as expected | 10/10 | 10/10 | 9/10 |
+  | Tokens | 36,750 | 39,781 | 35,387 |
+  | 429s | 0 | 0 | 0 |
+
+- **Automated HTTP end to end: 7/7.**
+  - answer, refusal and not_in_data with Origin 4200: 200, allow-origin and credentials present;
+  - the same refusal with Origin 3001: 200, no allow-origin;
+  - preflight: 200 from 4200, 400 from 3001;
+  - `GET http://localhost:4200/research`: 200.
+- **Frontend tests:** 29 new (endpoint 7, helpers 5, fixtures 2, report 7, client 8).
+  - A mutation check confirmed that the `could_not_verify` and XSS tests fail when the component shows the
+    answer text or renders it as HTML.
+- **Clean matrix (GROQ_API_KEY line commented out, then restored; `.env` hash checked identical):**
+  - Steps: `npx nx reset`, `dist/` deleted, then
+    `EXPECT_NO_LLM_KEY=true npx nx run-many -t lint typecheck test build --parallel=2`.
+  - **All 18 projects pass** (719 s).
+  - ESLint: 0 errors, 51 warning lines (the same 51 as before), none in a step-5b file.
+  - Jest: 590 passed, 23 skipped.
+  - pytest: research-agent 151 passed (including the no-key check), 79 skipped; ml-service 47 passed.
+- **Opt-in suites:** key restored, `--skip-nx-cache`
+
+  | Suite | Result |
+  |---|---|
+  | research-agent, `RUN_DB_TESTS=true RUN_LIVE_ML=true` (ml-service running) | 229 passed, 1 skipped (the no-key check, clean matrix only) |
+  | ml-service, `RUN_DB_TESTS=true` | 77/77 |
+  | market-data-import, `RUN_DB_TESTS=true` | 65/65 |
+  | order-service, `RUN_DB_TESTS=true` | 195/195 |
+
+### Commands
+```sh
+npx nx run research-agent:eval --args="--append --title 'Run 3' --note '...'"   # no commas in --args
+cd apps/research-agent
+.venv/Scripts/python.exe scripts/record_ask_fixtures.py answer refusal not-in-data too-long
+.venv/Scripts/python.exe scripts/record_ask_fixtures.py could-not-verify-no-llm   # key line commented out
+.venv/Scripts/python.exe scripts/e2e_research_page.py
+npx nx test frontend --testFile=components/research
+```
+
+### Interview Q&A
+- **Why is the ask a mutation with no retries?** A query caches and may refetch; a retry wrapper would
+  re-send on 5xx. Each call costs free LLM quota and can take up to 90 s, so the UI makes exactly one
+  request per click. The only re-send is the refresh-and-replay on a 401, and that never reaches the model.
+- **Why hide everything on `could_not_verify`, even the failure list?** The verifier's failure strings
+  can quote the number it rejected. Showing them would put an unverified number on screen, which is what
+  the verifier exists to prevent.
+- **How do you prove the page can't be used for XSS?** All text goes through React text nodes. A labelled
+  hand-written attack string is placed into a copy of the real answer, refusal and not_in_data fixtures, and
+  the test asserts that no `img`, `script` or `b` element appears and that the string shows literally.
+  A mutation to `dangerouslySetInnerHTML` makes the test fail.
+- **Why does CORS on 3001 matter if the service still answers?** CORS doesn't stop a request; it stops
+  a browser page on another origin from reading the response. With credentials allowed, an over-broad list
+  lets any page on that origin read a logged-in user's results. So research-agent lists only the origin
+  that needs it.
+
+### Keywords
+RTK Query mutations, AbortSignal timeout, CORS with credentials, XSS-safe rendering, jsdom test
+environments, recorded fixtures, code points vs UTF-16.
+
+### Open items
+- **The manual browser check is pending:** checklist in `docs/validation/research-page-e2e.md`.
+- **No natural verification-failure `could_not_verify` has been recorded.** The only real one comes from a
+  missing LLM key and has no tool calls; record one if a live call ever produces it.
+- **There's no per-user server-side rate limit on `/ask`.** A user can spend the shared free quota from
+  several tabs. This belongs with step 7's paid tier or rate limits.
+- **The Groq 400 diagnosis** (OVERNIGHT-QUESTIONS #4).
+
+### Pull request (step 5b)
+
+Not opened (as instructed). Compare: https://github.com/aakash1514/algo_trading_forex/compare/main...step-5b-research-page?expand=1
+
+**Title:** `Step 5b: Research page for the research agent`
+
+**Description:**
+
+````markdown
+## Summary
+A Research page (`/research`) in the frontend: a logged-in user asks one question and sees the verified report from the research agent (`POST /api/research/ask`). Two small backend changes go with it.
+
+**Manual browser check: pending.** The automated HTTP end-to-end check passes 7/7. The browser checklist is in `docs/validation/research-page-e2e.md`.
+
+### Frontend
+- **Request handling:** the `askResearch` RTK Query mutation has a 100 s timeout and no automatic retries (each call spends free LLM quota). One request is in flight at a time, and the question limit of 500 code points matches the backend.
+- **Report rendering by type:**
+  - answer: verified badge, claims table, data ranges, collapsible tool-call log;
+  - refusal and not_in_data: neutral box;
+  - could_not_verify: a fixed warning only. Never the answer text, claims or verifier failures.
+  - The disclaimer is always shown.
+- **Plain text only:** every string renders as a React text node (no HTML, no markdown), and values appear exactly as returned.
+- **Errors:** loading note (up to ~90 s), 401 handled by the existing refresh, and friendly messages for 422, 429/503/timeout and network errors.
+
+### Backend (research-agent)
+- **CORS** allows only `http://localhost:4200`, with credentials. Grafana's 3001 and other origins are denied, with no wildcard.
+- **The 500-character question cap** already existed; it is now named, and tests check it runs before any model call.
+- **Prompt rule 6:** returns and % changes come from `get_market_stats` (`return_pct`).
+
+## Verification
+- **Live eval run 3** (all 10 questions, once, not tuned): 9/10. Run 2's failure (question 8) now passes. Question 3 ended `could_not_verify` on a Groq HTTP 400 after one tool call; no unverified numbers were shown. Runs 1–3 are side by side in `docs/validation/research-agent-eval.md`.
+- **Automated HTTP end to end** (as research_demo, real services):
+  - answer, refusal and not_in_data with Origin 4200: allow-origin and credentials present;
+  - the same request with Origin 3001: no allow-origin;
+  - preflight: allowed from 4200, rejected from 3001;
+  - `/research` returns 200.
+- **Component tests** use real recorded `/ask` responses for every type, including a real `could_not_verify` from the service running without an LLM key. The only hand-written input is a labelled XSS string, which renders as text.
+
+## Testing
+- **Full clean run with `GROQ_API_KEY` removed:** lint, typecheck, test and build pass for all 18 projects. Jest 590, pytest 151 + 47.
+- **Opt-in suites:** research-agent DB + live ml-service 229 passed (1 skipped: the no-key check, which runs only in the clean matrix), ml-service DB 77/77, market-data-import DB 65/65, order-service DB 195/195.
+
+## Not in scope
+Chat history, multi-turn, streaming, saved questions, charts, example presets, changes to other services, new endpoints.
+
+Write-up: `docs/phase-summaries/step-5-research-agent.md` §13.
 ````
