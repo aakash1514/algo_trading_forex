@@ -211,8 +211,19 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('refuses to revert BacktestRunMoney while runs exist, then the integer layout while historical rows exist', async () => {
+  it('reverts ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('ReadOnlyRole1791900000000');
+
+    // ReadOnlyRole ran although the role already existed on the cluster (idempotent);
+    // its down() revokes this database's grants and keeps the cluster-wide role
+    const grants = async () => (await client.query(
+      `SELECT count(*)::int AS n FROM information_schema.role_table_grants
+       WHERE grantee = 'forexedge_readonly' AND table_name = 'historical_candles_1h'`)).rows[0].n;
+    expect(await grants()).toBe(1);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await grants()).toBe(0);
+    expect((await client.query(`SELECT 1 FROM pg_roles WHERE rolname = 'forexedge_readonly'`)).rowCount).toBe(1);
     expect(await last()).toBe('BacktestRunMoney1791800000000');
 
     // A run in backtest_runs blocks BacktestRunMoney.down()

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-ForexEdge is a forex trading platform built as an Nx monorepo (npm workspaces). It has five NestJS microservices that talk over Kafka, a Next.js 16 frontend, and three shared libraries. Trading is paper-only for now: order-service binds `BROKER_ADAPTER` to `PaperBrokerAdapter`.
+ForexEdge is a forex trading platform built as an Nx monorepo (npm workspaces). It has five NestJS microservices that talk over Kafka, a Python FastAPI ML service (`apps/ml-service`, inference only), a Next.js 16 frontend, and three shared libraries. Trading is paper-only for now: order-service binds `BROKER_ADAPTER` to `PaperBrokerAdapter`.
 
 ## Commands
 
@@ -43,6 +43,13 @@ RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
 
 # Independent backtest verification (auth-service + ws-gateway running): API run vs SQL reproduction
 npm run backtest:verify -- [--pairs EUR_USD,XAU_USD] [--from 2022-01-01] [--to 2022-12-30]
+
+# ML service (Python 3.12, apps/ml-service; see its README)
+npx nx setup ml-service                         # venv + hash-checked install of the lock files
+npx nx run-many -t lint typecheck test -p ml-service    # ruff, mypy --strict, pytest
+npx nx serve ml-service                         # :3006, /api/ml
+npx nx train ml-service --args="--out models"   # offline walk-forward training (resumable)
+npx ts-node --transpile-only tools/ops/create-ml-db-user.ts   # read-only DB login from ML_DB_USER/ML_DB_PASS
 ```
 
 ## Architecture
@@ -56,6 +63,7 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | market-service | 3002 | Tick stream ingestion (`StreamModule` picks `MockStreamProvider` or `OandaStreamProvider` based on `USE_MOCK_DATA`, default `true`). Publishes `forex.ticks`. Consumes its own ticks to write them to TimescaleDB and Redis. Serves candle and instrument queries. |
 | domain-service | 3003 | Forex domain logic: pip calc, margin, swaps, session clock, spread monitor, economic calendar. Scheduled jobs publish `forex.sessions`, `forex.spread-alerts`, `forex.calendar-events`. |
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
+| ml-service (Python) | 3006 | FastAPI, inference only: LSTM next-H1-direction models trained offline walk-forward (`models/`, manifest + sha256). `GET /api/ml/{health,models,evaluation,predictions/{instrument}}`, JWT on all but health. Reads the history as the read-only login `forexedge_ml` (role `forexedge_readonly`). Results are a **historical walk-forward test, not live signals**. |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
 order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
@@ -169,6 +177,15 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   cross-multiplied, never float SMAs: a real exact tie (EUR/USD 2022-01-03 12:47, SMA 5/20) flipped a float
   comparison and signalled a bar early. The independent SQL reproduction (`tools/backtest-verify`) only matches
   because both sides are exact; keep any new strategy verifiable the same way.
+- **ML service rules:** a prediction for bar t+1 is served only by the model whose test year contains it (2016-2022,
+  out of sample); features use bars <= t only and scaling uses training-period statistics only (both tested).
+  Every model change goes through `python -m ml_service.report`, which must keep the SQL recount, the reproducibility
+  (state_dict tensors equal; `torch.save` file hashes are not byte-stable) and the parity checks green. The decision rule
+  (pooled McNemar, Holm over 16 tests) is fixed in `ml_service/metrics.py`; don't change it after seeing results.
+  The ML service's DB login is read-only by role and by session; never give it the main DB user.
+- Python deps: exact pins in `apps/ml-service/requirements*.in`, locked with sha256 by `scripts/add_hashes.py` (PyPI JSON;
+  refuses releases younger than 14 days). Don't use `pip-compile --generate-hashes` (downloads every torch wheel).
+  A dependency whose ownership can't be proven (e.g. no PyPI provenance) isn't added.
 - Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
   right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
 
@@ -207,8 +224,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-1-health-check.md`.
 - **Roadmap step 2 (historical data) is done** (2026-10-11), merged into main (PR #1).
   Write-up: `docs/phase-summaries/step-2-historical-data.md`.
-- **Roadmap step 3 (backtest verification) is done** (2026-10-11) on branch `step-3-backtest-verification`
-  (PR into main, not merged). Write-up: `docs/phase-summaries/step-3-backtest-verification.md`.
+- **Roadmap step 3 (backtest verification) is done** (2026-10-11), merged into main (PR #2).
+  Write-up: `docs/phase-summaries/step-3-backtest-verification.md`.
+- **Roadmap step 4 (ML service, LSTM only) is done** (2026-10-12) on branch `step-4-ml-service` (PR into main,
+  not merged). Write-up: `docs/phase-summaries/step-4-ml-service.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -233,7 +252,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    metric (EUR/USD 257, XAU/USD 217, USD/JPY 215 trades, 2022 H1): `docs/validation/backtest-verification.md`.
    Write-up: `docs/phase-summaries/step-3-backtest-verification.md`. Not verified independently yet: London
    breakout (SL/TP path); a strategy added later needs its own reproduction.
-4. Python ML service: LSTM price prediction (trained on the seeded history) + FinBERT sentiment.
+4. ✅ **Done (2026-10-12), LSTM only.** Python FastAPI ML service: next-H1 direction LSTMs, walk-forward 2016-2022
+   (4 pairs x 7 test years), read-only DB login, JWT API, read-only "Model evaluation" page. Fixed Holm rule: beats 9 of
+   16 pair-baseline comparisons, never anti-persistence, below the spread break-even for every pair
+   (`docs/validation/ml-walk-forward.md`). Open: the shuffled-label control criterion (docs/OVERNIGHT-QUESTIONS.md #3).
+   FinBERT/news sentiment was taken out of step 4; GDELT headlines exist only from 2019-09-22 and their licences
+   are unconfirmed. The Nx Python targets use Windows paths (Linux image in step 7).
 5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
@@ -245,6 +269,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
    MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
    Re-check Dukascopy's terms of use before a public deployment serves its historical data.
+   ml-service: a Linux image (the Nx targets call `.venv\Scripts\python.exe`), the models/ directory, and the
+   read-only role (create it in the provider console if `CREATE ROLE` isn't allowed in SQL).
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
 8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar

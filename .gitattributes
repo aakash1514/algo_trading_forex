@@ -3,3 +3,7 @@
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
+
+# Model artifacts: never touch their bytes (models/manifest.json pins their sha256)
+*.pt binary
+*.npz binary

@@ -1,0 +1,15 @@
+# Runtime dependencies, exact pins (each released at least two weeks before 2026-10-11).
+# Lock: pip-compile --generate-hashes --output-file requirements.lock requirements.in
+torch==2.14.0
+numpy==2.5.3
+scipy==1.18.1
+fastapi==0.141.1
+uvicorn==0.54.0
+pydantic==2.13.5
+psycopg[binary]==3.3.6
+PyJWT==2.15.0
+
+# Transitive dependencies held back: their newest releases were younger than 14 days
+filelock==4.0.4
+markupsafe==3.0.3
+tzdata==2026.4

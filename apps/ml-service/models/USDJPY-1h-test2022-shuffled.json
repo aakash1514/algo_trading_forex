@@ -1,0 +1,37 @@
+{
+  "pair": "USD/JPY",
+  "fold": "test2022",
+  "config": "lstm-h64-w32",
+  "shuffle_seed": 777,
+  "best_epoch": 5,
+  "test": {
+    "n": 6218,
+    "correct": 3247,
+    "accuracy": 0.5221936313927308,
+    "accuracy_ci95": [
+      0.5097682467677827,
+      0.5345916106517141
+    ],
+    "balanced_accuracy": 0.49972922737920833,
+    "log_loss": 0.692345520893531,
+    "brier": 0.24959909536058003
+  },
+  "majority": {
+    "n": 6218,
+    "correct": 3261,
+    "accuracy": 0.5244451592151818,
+    "accuracy_ci95": [
+      0.512020994932676,
+      0.5368391378772045
+    ],
+    "balanced_accuracy": 0.5,
+    "log_loss": null,
+    "brier": null
+  },
+  "mcnemar_vs_majority": {
+    "control_only": 119,
+    "majority_only": 133,
+    "p_value": 0.4128820984486067
+  },
+  "beats_majority": false
+}

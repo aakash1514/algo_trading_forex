@@ -50,6 +50,7 @@ export function Topbar() {
           { href: '/dashboard', label: 'Terminal' },
           { href: '/backtest', label: 'Backtest' },
           { href: '/calendar', label: 'Calendar' },
+          { href: '/model-evaluation', label: 'Models' },
         ].map(({ href, label }) => (
           <Link
             key={href}

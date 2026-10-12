@@ -1,162 +1,122 @@
-# Overnight report (2026-10-11)
+# Overnight report: roadmap step 4, ML service (2026-10-12)
 
-Unattended run from the 2.4 approval to the end of roadmap step 2. Everything is on
-branch `step-2-historical-data` (pushed); `main` was not touched, nothing was
-force-pushed, no historical data was deleted or rewritten, no check was loosened.
+Branch `step-4-ml-service`, all commits pushed, **not merged**; `main` untouched. (The step-2
+overnight report this file held before is in git history.)
 
-## Status at a glance
+## Summary
 
 | Item | Result |
 |---|---|
-| 2.4 named exceptions | Done: 17 investigated days + EUR/USD 2010 median; `npm run data:validate` exits 0 only with exactly those |
-| 2.5 commit 1: `?source=historical` | Done, verified against the running service (200 / 404 / 422 / 400 cases) |
-| 2.5 commit 2: backtester on historical bid/ask, next-bar-open fills | Done, simulator tests on real bars |
-| 2.5 commit 3: strategy ids, form defaults | Done |
-| Stale BullMQ jobs | 7 removed (all from deleted mock runs); queue empty |
-| 2.5 proof: MA + London on EUR/USD 2022 H1, XAU/USD run | Done: non-zero trades and metrics; 4 trades hand-verified (`docs/validation/backtest-proof.md`) |
-| Backtest page, production build | Done (and fixed two display bugs it revealed) |
-| Full clean matrix | Pass: lint (0 errors), typecheck, test, build for all 15 projects from an empty `dist/` |
-| Phase summary, CLAUDE.md | Done |
-| **Pull request** | **Not opened: the GitHub CLI is not installed** (see below) |
+| httpx2 check | **Not provable** (no PyPI provenance attestation for its files); removed, back to httpx |
+| Grid | LSTM hidden 32/64 at window 32 (window 96 dropped on validation numbers only); logistic window 32 |
+| Training | 28 folds (4 pairs x 2016-2022) in 1 h 13 min, resumable, ETA logged; controls 5 min; rerun 1 min |
+| Fixed rule (Holm, 16 pooled tests) | **LSTM beats 9 of 16**; never anti-persistence; below the spread break-even for every pair |
+| SQL recount of samples and baselines | 28/28 pair-years match |
+| Reproducibility | EUR/USD 2022 retrained: state_dict identical, tensor for tensor |
+| Shuffled-label control | **Fixed check fails for GBP/USD**; diagnosed as a below-chance majority baseline, not a leak; question #3 in docs/OVERNIGHT-QUESTIONS.md |
+| Inference API | /models, /evaluation, /predictions with JWT; parity with the offline run: max abs. difference 5.96e-08, one month per pair, over HTTP |
+| Frontend | /model-evaluation, checked in a production build; month hit rates equal the offline predictions |
+| Clean matrix | 17 projects pass (6 min 31 s); Jest 561 + pytest 47; all DB tests pass (65 + 195 + 77) |
+| PR | Not opened (no GitHub CLI); compare link, title and description below |
 
-## Tests
+## Results (docs/validation/ml-walk-forward.md)
 
-Clean matrix (`nx reset`, `dist/` deleted, no cache hits, 38 tasks, 6 min 20 s):
+Pooled 2016-2022, accuracy (95% Wilson interval):
 
-| Project | Tests |
+| Pair | LSTM | Logistic | Majority | Persistence | Anti-persistence | Break-even (spread) |
+|---|---|---|---|---|---|---|
+| EUR/USD | 51.76% [51.29, 52.23] | 50.84% | 50.23% | 48.31% | 51.66% | 53.24% |
+| GBP/USD | 51.67% [51.20, 52.14] | 50.51% | 49.86% | 48.24% | 51.76% | 56.44% |
+| USD/JPY | 51.84% [51.37, 52.31] | 51.55% | 51.14% | 48.12% | 51.87% | 53.67% |
+| XAU/USD | 51.63% [51.15, 52.11] | 51.19% | 50.48% | 48.05% | 51.94% | 60.18% |
+
+Under the fixed rule the LSTM beats: logistic, majority and persistence (EUR/USD, GBP/USD);
+persistence (USD/JPY); majority and persistence (XAU/USD). No significant difference from
+anti-persistence for any pair, and no pair reaches the accuracy needed to cover the spread.
+
+Shuffled-label control (2022 folds): EUR/USD 48.52% vs majority 48.95%; **GBP/USD 50.29% vs
+48.84%, McNemar p 0.017 (fixed check FAILED)**; USD/JPY 52.22% vs 52.44%; XAU/USD 49.16% vs
+49.55%. The controls' balanced accuracy is 0.490-0.509 (chance); GBP/USD's majority baseline
+predicted up in a year that was 48.84% up. The check was not changed.
+
+## Commits on step-4-ml-service
+
+| Commit | |
 |---|---|
-| common | 83 |
-| order-service | 194 (+1 DB test) |
-| market-service | 47 |
-| market-data-import | 43 (+22 DB tests) |
-| frontend | 39 |
-| ws-gateway | 36 |
-| domain-service | 21 |
-| kafka | 9 |
-| database | 8 |
-| auth-service | 4 |
-| **Total** | **484 unit + 23 DB (`RUN_DB_TESTS=true`) = 507, all passing** |
+| `55d629d` | chore(ml): Python FastAPI service scaffold in Nx |
+| `9e3ef60` | feat(db): read-only role for the ML service |
+| `e0b06a2` | feat(ml): H1 bar reader, features and next-bar target |
+| `daeae7d` | feat(ml): walk-forward splits, train-only scaling and baselines |
+| `4eac27a` | feat(ml): LSTM training and evaluation (offline) |
+| `b12f556` | chore(ml): back to httpx for the test client (httpx2 unverifiable) |
+| `0361864` | feat(ml): resumable walk-forward run, window-32 grid, controls |
+| `3385c19` | feat(ml): walk-forward results, controls, reproducibility, report (commit 6) |
+| `5a7567b` | feat(ml): inference API (models, evaluation, predictions) with JWT (commit 7) |
+| `94e4bb3` | feat(frontend): read-only Model evaluation page (commit 7b) |
+| `7d4e606` | docs: complete roadmap step 4; phase summary and CLAUDE.md updates (commit 8) |
 
-Lint: 0 errors, 59 warnings (pre-existing kinds; the backtest folder went from 6 to 1).
+(plus this report)
 
-## Backtest results (EUR/USD and XAU/USD, 2022, H1, through the real API)
+## Left open
 
-| Strategy | Pair | Trades | Win rate | Profit factor | Net P&L |
-|---|---|---|---|---|---|
-| MA crossover 10/30 | EUR/USD | 257 | 31.52% | 0.95 | -272.2 pips |
-| London breakout | EUR/USD | 111 | 50.45% | 0.97 | -119.6 pips |
-| MA crossover 10/30 | XAU/USD | 217 | 35.94% | 0.96 | -5,559.2 pips (-$55.59/oz) |
+1. **docs/OVERNIGHT-QUESTIONS.md #3:** change the shuffled-label control's criterion from
+   "must not beat majority" to "balanced accuracy not significantly above 0.5" and re-run
+   the four controls? The main conclusion doesn't depend on it.
+2. The Nx Python targets use Windows paths; step 7 needs a Linux image.
+3. Live predictions would need retraining on recent data (step 6).
+4. Outside the repo: your `.env` has `ML_DB_USER`, `ML_DB_PASS` (generated) and
+   `ML_SERVICE_PORT`; the dev DB has the role `forexedge_readonly` and the login `forexedge_ml`.
 
-Hand-verified against raw M1 bid/ask (entry, exit, P&L all exact): an MA signal trade,
-a London stop-loss (touched inside the bar, filled at the level), a London take-profit,
-and a gold trade. The old mock-data period is rejected with 400 naming the covered range.
+## Pull request
 
-## Things found and fixed along the way
+Open: https://github.com/aakash1514/algo_trading_forex/compare/main...step-4-ml-service?expand=1
 
-- Simulator checked SL/TP only on bars carrying a signal, and on the entry bar's pre-fill
-  range; now bar by bar from the fill bar (with the next-bar-open rule you specified).
-- London breakout assumed pip 0.0001 for every pair (wrong for USD/JPY and gold); pip size
-  now comes from `instruments`.
-- Backtest form: strategy-name translation removed, defaults moved from the mock period
-  to 2022, dates bounded to the history, API errors shown instead of silently dropped.
-- Backtest page showed pips as dollars and the win rate x100 (3152%).
-- `nx start frontend` can't find the dist build; the working command is in CLAUDE.md.
-
-## Open items
-
-- **Pull request.** `gh` is not installed and I did not extract your GitHub token from the
-  credential manager to call the API. Open it from:
-  https://github.com/aakash1514/algo_trading_forex/compare/main...step-2-historical-data?expand=1
-  with the title and description below (or `gh pr create --base main --head
-  step-2-historical-data --title "..." --body-file <file>` once gh is installed). Note:
-  local `main` has 8 step-2 commits (2.0-2.6) that were never pushed; the branch contains
-  them, so the PR shows all 31 step-2 commits against `origin/main`.
-- `docs/OVERNIGHT-QUESTIONS.md`: (1) backtest equity/drawdown/Sharpe are computed on pips
-  added to a 10,000 base, so drawdown % depends on the pair's pip count (gold 93%):
-  valuing trades in money changes money math, so it was not changed; (2) whether a
-  backtest's To date should include that whole day.
-- Docker's `docker_data.vhdx` is ~56.7 GB with ~17.9 GB used inside; compaction steps are
-  in the phase summary (needs Docker quit and an elevated Command Prompt).
-
-## Commits (`origin/main..step-2-historical-data`, oldest first)
-
-| Commit | Subject |
-|---|---|
-| `ade7b43` | feat(market-data): JForex M1 bid/ask export strategy for step 2 |
-| `74376b0` | chore(data): purge mock live candles and ticks before the historical import |
-| `d218063` | feat(db): historical_candles hypertable and NY-close aggregates |
-| `e889af3` | fix(orders): spread gate judges the traded quote against avg_spread |
-| `243ddf2` | feat(instruments): XAU/USD row, METAL type and per-instrument leverage cap |
-| `0f5b576` | feat(market): mock feed quotes from instruments pip_size and avg_spread; add XAU/USD |
-| `761a3a3` | fix(positions): tick P&L update can no longer rewrite a closed position |
-| `39434b8` | feat(frontend): XAU/USD and the four historical pairs; price precision per pair |
-| `e0a4499` | perf(orders): batched tick consumer keeps up with the feed |
-| `1e653d7` | feat(common): shared market clock (market hours and trading sessions) |
-| `68360cd` | feat(kafka): typed, validated contracts for every topic |
-| `6db8f7c` | fix(orders): clock-based session stamps, no lost stops, no lost account updates |
-| `4474048` | chore(ops): one-off script to recompute orders.session_opened |
-| `7fd4b29` | feat(db): derive account open P&L; persist held exits; STOP_OUT close reason |
-| `cd025ca` | feat(orders): market hours, held exits, derived open P&L, stop-out, SL/TP edits |
-| `9818712` | feat(market): mock feed is silent while a market is closed; keep last price |
-| `82981c5` | docs: 2.7c notes; mark forex.calendar-events not built; drop date-fns-tz |
-| `4d1edaa` | test(db): integration tests run in a separate, freshly migrated _test database |
-| `7e85f6a` | feat(frontend): order form shows Limit/Stop/OCO as coming soon |
-| `8b7cbe3` | feat(db): historical candles as integer points with a fixed scale per pair |
-| `4d6d270` | feat(market-data): idempotent historical M1 importer with real-data checks |
-| `60c4579` | feat(market-data): vacuum (analyze) M1 and the aggregates after an import |
-| `7d973f9` | feat(market-data): exact D1 stub list; checks and refreshes stop spilling to disk |
-| `e687584` | feat(market-data): spot checks against FRED noon fixings and gold extremes (2.4) |
-| `d48999a` | feat(market-data): named exceptions for the FRED spot check; 2.4 passes |
-| `7a709f4` | feat(market): ?source=historical on the candles API via a shared historical reader |
-| `33855d7` | feat(backtest): run on historical bid/ask bars; fills at the next bar's open |
-| `e5f7e85` | chore(ops): remove stale BullMQ backtest jobs whose runs no longer exist |
-| `ccc740a` | fix(frontend): backtest form uses the backend strategy ids and the history's dates |
-| `e64cba9` | fix(frontend): backtest page shows P&L in pips and the win rate as returned |
-| `6f5b5dd` | docs: 2.5 backtest proof on historical data; overnight questions |
-| `d8c5e9a` | docs: complete roadmap step 2; phase summary and CLAUDE.md updates |
-
-## Pull request text (ready to paste)
-
-**Title:** Roadmap step 2: real Dukascopy history (2010-2022), validation, historical backtests
+**Title:** `Roadmap step 4: Python ML service (LSTM), walk-forward evaluation, inference API and evaluation page`
 
 **Description:**
 
-Imports 19,187,987 real Dukascopy M1 bid/ask bars (EUR/USD, GBP/USD, USD/JPY, XAU/USD,
-2010-2022), validates them, serves them through the candles API and runs the backtester
-on them. Also hardens the trading core found broken while integrating gold.
+```markdown
+## Summary
+A Python FastAPI service (`apps/ml-service`, port 3006) that serves next-hour direction predictions from LSTMs trained walk-forward on the Dukascopy history. Training is offline. LSTM only: FinBERT and news sentiment were taken out of this step.
 
-**Historical data**
-- JForex strategy export (Dukascopy's HTTP endpoints are bot-protected; no workaround).
-- `historical_candles` hypertable as integer points with a fixed scale per pair
-  (`historical_price_scale`), 7.5x compressed; M5/M15/H1 (UTC) and H4/D1 (New York
-  close) continuous aggregates.
-- Idempotent importer (`npm run data:import`): COPY -> SQL validation (no rounding) ->
-  plain INSERT with the import-log row in one transaction; skip by sha256, `--force`
-  decompresses only the affected chunks; NY aggregates refreshed in one padded window.
-- Real-data checks (H1/H4/D1 rebuilt from M1, year boundaries, weekly D1 shape with a
-  named stub list) and spot checks against FRED noon fixings (median 0.40-1.60 pips,
-  timezone/DST check) and cited gold extremes (`npm run data:validate`).
+- **Data access:** a read-only login. The migration `ReadOnlyRole` creates the group role `forexedge_readonly` only if it's missing, and grants SELECT on the history only. Every session is also opened read-only.
+- **Target:** the direction of the next H1 bar from its open to its close (mid prices, exact in integer points).
+- **Features:** 10, computed from bars at or before t only. Scaling uses training-period statistics only.
+- **Walk-forward:** 4 pairs × test years 2016–2022. Each test year has a validation year before it and expanding training before that.
+- **Grid:** LSTM hidden 32/64 at window 32, chosen on validation log loss; window 96 was dropped on validation numbers only.
+- **Baselines:** logistic regression, majority direction, persistence, anti-persistence.
+- **Models:** 28 models committed with a manifest and sha256 (4.6 MB). `*.pt` and `*.npz` are marked binary.
+- **API:** `/api/ml/models`, `/evaluation` and `/predictions` (JWT; `/health` is public). A prediction always comes from the model whose test year contains the bar, so it is out of sample.
+- **Frontend:** a read-only "Model evaluation" page with a monthly chart of predicted vs actual direction, labelled "historical walk-forward test, not live signals".
 
-**Routing and backtests**
-- `GET /api/market/candles/:pair/:tf?source=live|historical` (never mixed), shared
-  reader in `libs/database`.
-- Backtester reads only the history: next-bar-open fills on real bid/ask, SL/TP from the
-  fill bar, pip size from `instruments`, coverage checked at submit.
+## Results
+The rule was fixed before training: pooled McNemar test, Holm correction across 16 tests.
 
-**Trading core (2.6-2.7)**
-- XAU/USD with a per-instrument leverage cap; spread gate fixed; mock feed from DB specs.
-- Shared market clock (market hours, sessions), typed Kafka contracts, batched tick
-  consumer, held exits persisted, derived open P&L with relative updates, stop-out,
-  SL/TP validation and edits, MARKET-only orders.
-- Integration tests in a freshly migrated `_test` database per Jest worker.
+- The LSTM beats **9 of 16** pair-baseline comparisons.
+- It **never beats anti-persistence**.
+- Its pooled accuracy (51.6–51.8%) is **below the accuracy needed to cover the spread** for every pair (53.2–60.2%).
 
-**Migrations:** Extensions; HistoricalCandles; InstrumentMetalAndMaxLeverage;
-DeriveAccountOpenPnl; PositionExitsAndStopOut; HistoricalCandlesIntegerPoints.
+Details: `docs/validation/ml-walk-forward.md`.
 
-**Verification:** full clean matrix passes (lint, typecheck, test, build, 15 projects);
-507 tests including DB tests; backtests verified by hand
-(`docs/validation/backtest-proof.md`). Write-up:
-`docs/phase-summaries/step-2-historical-data.md`. Open questions:
-`docs/OVERNIGHT-QUESTIONS.md`.
+## Verification
+- Independent SQL recount of test samples and baseline hits: 28/28 pair-years match.
+- A retrained fold gives an identical state_dict, tensor for tensor. The file hash isn't byte-stable, so it's recorded for traceability only.
+- API vs the offline run, one test month per pair, over HTTP: the same samples, max abs. difference 5.96e-08 (`docs/validation/ml-inference-parity.md`).
+- Page hit rates equal the offline predictions; the page was checked in a production build.
+- **Shuffled-label control, two criteria:** under the original criterion ("must not beat the majority baseline") GBP/USD fails: 50.29% vs 48.84%, p = 0.017. That criterion was mis-specified: the majority baseline predicted up from the training years, but 2022 was 48.84% up, so it scored below 50% and a chance-level control beat it. The original result stays in the report. Under the corrected criterion (the control's balanced-accuracy 95% interval must include 0.5), evaluated on the same four runs without retraining, all four pass (GBP/USD 0.5093 [0.4989, 0.5196]). Both are shown side by side in `docs/validation/ml-walk-forward.md`.
+
+## Testing
+- Full clean run (`nx reset`, empty `dist/`): lint, typecheck, test and build pass for all 17 projects.
+- Jest: 561 tests pass. pytest: 47 pass.
+- With `RUN_DB_TESTS=true`: 65 + 195 + 77 DB tests pass.
+- Dependencies: exact pins locked with sha256 for every file; no release younger than 14 days. httpx2 was rejected because PyPI has no provenance attestation for it.
+
+## Not in scope / known limits
+- FinBERT and news sentiment.
+- The Nx Python targets are Windows-only for now (Linux image in step 7).
+- No live signals.
+
+Write-up: `docs/phase-summaries/step-4-ml-service.md`.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```

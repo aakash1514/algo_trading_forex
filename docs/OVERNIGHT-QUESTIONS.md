@@ -35,3 +35,33 @@ docs/validation/backtest-proof.md: only the end-of-data close differs). Left as 
 
 **Resolved in step 3:** inclusive. Dates are calendar days (UTC); the window ends at the
 next midnight and holds whole bars only.
+
+# Overnight questions (2026-10-12, roadmap step 4)
+
+## 3. The shuffled-label control's fixed criterion fails for GBP/USD; is the criterion right? (check definition)
+
+The plan fixed the leakage control as: the chosen LSTM of each pair's 2022 fold, retrained
+on shuffled training labels, **must not beat the majority baseline** (higher accuracy and
+McNemar p < 0.05). For GBP/USD it does: 50.29% vs 48.84%, McNemar p = 0.0171. The check
+is reported as **failed** in docs/validation/ml-walk-forward.md and was not changed.
+
+Diagnosis (evidence in the report's diagnostic table, added after the run):
+- The control is at chance: balanced accuracy 0.5093; its accuracy is not different from
+  50% (binomial p = 0.66). All four controls have balanced accuracy 0.490-0.509.
+- The majority baseline predicts the training years' more common direction (GBP/USD up,
+  50.10%), but 2022 was 48.84% up, so that baseline scores below 50% and any chance-level
+  predictor beats it. The criterion confuses "beats a below-chance baseline" with "leaks".
+- Accuracy against 50% is confounded the same way (USD/JPY 2022 was 52.44% up, so a
+  control predicting mostly "up" is "significantly above 50%" at balanced accuracy 0.4997).
+
+**Question:** replace the control criterion with "balanced accuracy not significantly
+above 0.5" (e.g. a permutation or binomial test on balanced accuracy), applied to all
+four pairs, and re-run the four controls? Nothing else depends on it; the main
+LSTM-vs-baseline conclusion is unaffected.
+
+**Resolved (2026-10-12):** keep the original result in the report as-is (GBP/USD FAILED under
+"must not beat majority") and add a corrected criterion evaluated on the existing four control
+runs, without retraining: the control's balanced-accuracy 95% interval must include 0.5. All four
+pass (EUR/USD 0.4897 [0.4785, 0.5009], GBP/USD 0.5093 [0.4989, 0.5196], USD/JPY 0.4997
+[0.4948, 0.5046], XAU/USD 0.4925 [0.4800, 0.5050]). Both criteria are reported side by side in
+docs/validation/ml-walk-forward.md, with why the original was mis-specified.

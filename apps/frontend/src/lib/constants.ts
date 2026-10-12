@@ -4,6 +4,7 @@ export const API_BASE = {
   DOMAIN: 'http://localhost:3003/api',
   ORDER:  'http://localhost:3004/api',
   WS:     'http://localhost:3005/api',
+  ML:     'http://localhost:3006/api',
 } as const;
 
 export const WS_URL = 'http://localhost:3005';

@@ -193,3 +193,67 @@ export interface SignalUpdateEvent {
   sentiment: number;
   timestamp: string;
 }
+// ML service (roadmap step 4): historical walk-forward test results, not live signals
+export interface MlScores {
+  n: number;
+  correct: number;
+  accuracy: number;
+  accuracy_ci95: [number, number];
+  balanced_accuracy: number;
+  log_loss: number | null;
+  brier: number | null;
+}
+
+export type MlModelKey = 'lstm' | 'logistic' | 'majority' | 'persistence' | 'anti_persistence';
+export type MlBaseline = Exclude<MlModelKey, 'lstm'>;
+
+export interface MlPooledTest {
+  pair: string; // 'EUR/USD'
+  baseline: MlBaseline;
+  n: number;
+  lstm_correct: number;
+  baseline_correct: number;
+  lstm_only: number;
+  baseline_only: number;
+  p_raw: number;
+  p_holm: number;
+  lstm_accuracy: number;
+  baseline_accuracy: number;
+  lstm_ci95: [number, number];
+  baseline_ci95: [number, number];
+  beats: boolean;
+  significantly_worse: boolean;
+}
+
+export interface MlEvaluation {
+  target: string;
+  disclaimer: string;
+  generatedAt: string;
+  commit: string;
+  rule: string;
+  pooled: MlPooledTest[];
+  perYear: { instrument: string; testYear: number; chosenLstm: string; test: Record<MlModelKey, MlScores> }[];
+  breakEven: { pair: string; mean_move_pips: number; mean_spread_pips: number; break_even_accuracy: number }[];
+  sqlCheck: { pairYears: number; allMatch: boolean };
+}
+
+export interface MlPrediction {
+  barTime: string;
+  targetBarTime: string;
+  pUp: number;
+  predicted: 'UP' | 'DOWN';
+  actual: 'UP' | 'DOWN' | 'FLAT';
+  scored: boolean;
+  model: string;
+  bar: { open: number; high: number; low: number; close: number };
+}
+
+export interface MlPredictions {
+  instrument: string;
+  timeframe: string;
+  from: string;
+  to: string;
+  target: string;
+  disclaimer: string;
+  predictions: MlPrediction[];
+}

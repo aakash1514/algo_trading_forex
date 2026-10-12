@@ -1,0 +1,37 @@
+{
+  "pair": "EUR/USD",
+  "fold": "test2022",
+  "config": "lstm-h32-w32",
+  "shuffle_seed": 777,
+  "best_epoch": 2,
+  "test": {
+    "n": 6216,
+    "correct": 3016,
+    "accuracy": 0.4851994851994852,
+    "accuracy_ci95": [
+      0.47278815125154006,
+      0.4976291011465801
+    ],
+    "balanced_accuracy": 0.48972698185965446,
+    "log_loss": 0.6936906683809426,
+    "brier": 0.25027153613407577
+  },
+  "majority": {
+    "n": 6216,
+    "correct": 3043,
+    "accuracy": 0.48954311454311455,
+    "accuracy_ci95": [
+      0.47712637223524124,
+      0.5019727734808219
+    ],
+    "balanced_accuracy": 0.5,
+    "log_loss": null,
+    "brier": null
+  },
+  "mcnemar_vs_majority": {
+    "control_only": 867,
+    "majority_only": 894,
+    "p_value": 0.5355497449349186
+  },
+  "beats_majority": false
+}

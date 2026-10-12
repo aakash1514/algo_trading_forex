@@ -1,0 +1,162 @@
+=== start 2026-10-12T00:13:47+05:30
+[00:13:56] EUR/USD: 81094 H1 bars, sha256 fb6a9a3fd8333bb4
+[00:13:56] GBP/USD: 81090 H1 bars, sha256 6ced9785bbbcc93f
+[00:13:56] USD/JPY: 81097 H1 bars, sha256 1bbe1f39a2bc620d
+[00:13:56] XAU/USD: 77582 H1 bars, sha256 e18b801c3e735c6b
+[00:13:56] 0 of 28 folds already finished; 28 to run
+[00:13:56]   EUR/USD test2016: train 31070, validation 6210, test 6224 samples
+[00:14:18]     lstm-h32-w32     epochs 14 (best  9)  val log loss 0.690457     20.3 s (1.5 s/epoch)
+[00:15:01]     lstm-h64-w32     epochs 11 (best  6)  val log loss 0.689984     42.5 s (3.9 s/epoch)
+[00:15:03]     logistic-w32     epochs 11 (best  6)  val log loss 0.694250      1.9 s (0.2 s/epoch)
+[00:15:03]   -> EUR/USD test2016 done in 68 s (1/28): lstm 0.5194  logistic 0.5079  majority 0.5072  persistence 0.4884  anti_persistence 0.5104; ETA 0.81 h
+[00:15:03]   EUR/USD test2017: train 37280, validation 6224, test 6201 samples
+[00:15:59]     lstm-h32-w32     epochs 15 (best 10)  val log loss 0.691507     55.3 s (3.7 s/epoch)
+[00:16:47]     lstm-h64-w32     epochs  9 (best  4)  val log loss 0.691859     48.1 s (5.3 s/epoch)
+[00:16:49]     logistic-w32     epochs 13 (best  8)  val log loss 0.694993      1.9 s (0.1 s/epoch)
+[00:16:49]   -> EUR/USD test2017 done in 106 s (2/28): lstm 0.5239  logistic 0.5078  majority 0.5041  persistence 0.4785  anti_persistence 0.5207; ETA 0.92 h
+[00:16:49]   EUR/USD test2018: train 43504, validation 6201, test 6209 samples
+[00:17:26]     lstm-h32-w32     epochs 11 (best  6)  val log loss 0.691796     37.2 s (3.4 s/epoch)
+[00:18:38]     lstm-h64-w32     epochs 11 (best  6)  val log loss 0.691568     72.3 s (6.6 s/epoch)
+[00:18:40]     logistic-w32     epochs  9 (best  4)  val log loss 0.694041      1.5 s (0.2 s/epoch)
+[00:18:40]   -> EUR/USD test2018 done in 111 s (3/28): lstm 0.5189  logistic 0.5030  majority 0.5001  persistence 0.4853  anti_persistence 0.5143; ETA 0.89 h
+[00:18:40]   EUR/USD test2019: train 49705, validation 6209, test 6195 samples
+[00:19:13]     lstm-h32-w32     epochs  7 (best  2)  val log loss 0.692062     32.9 s (4.7 s/epoch)
+[00:20:07]     lstm-h64-w32     epochs  7 (best  2)  val log loss 0.691827     53.8 s (7.7 s/epoch)
+[00:20:08]     logistic-w32     epochs  7 (best  2)  val log loss 0.694229      1.5 s (0.2 s/epoch)
+[00:20:09]   -> EUR/USD test2019 done in 89 s (4/28): lstm 0.5183  logistic 0.5106  majority 0.5012  persistence 0.4760  anti_persistence 0.5236; ETA 0.78 h
+[00:20:09]   EUR/USD test2020: train 55914, validation 6195, test 6227 samples
+[00:21:55]     lstm-h32-w32     epochs 22 (best 17)  val log loss 0.690945    106.4 s (4.8 s/epoch)
+[00:23:12]     lstm-h64-w32     epochs  9 (best  4)  val log loss 0.691262     76.3 s (8.5 s/epoch)
+[00:23:14]     logistic-w32     epochs  7 (best  2)  val log loss 0.693048      2.0 s (0.3 s/epoch)
+[00:23:14]   -> EUR/USD test2020 done in 185 s (5/28): lstm 0.5205  logistic 0.5091  majority 0.5152  persistence 0.4834  anti_persistence 0.5176; ETA 0.83 h
+[00:23:14]   EUR/USD test2021: train 62109, validation 6227, test 6214 samples
+[00:24:30]     lstm-h32-w32     epochs  9 (best  4)  val log loss 0.691984     76.5 s (8.5 s/epoch)
+[00:27:04]     lstm-h64-w32     epochs  9 (best  4)  val log loss 0.691941    154.1 s (17.1 s/epoch)
+[00:27:10]     logistic-w32     epochs 17 (best 12)  val log loss 0.693650      5.4 s (0.3 s/epoch)
+[00:27:10]   -> EUR/USD test2021 done in 237 s (6/28): lstm 0.5140  logistic 0.5138  majority 0.4987  persistence 0.4839  anti_persistence 0.5166; ETA 0.87 h
+[00:27:10]   EUR/USD test2022: train 68336, validation 6214, test 6216 samples
+[00:28:26]     lstm-h32-w32     epochs 12 (best  7)  val log loss 0.691821     75.2 s (6.3 s/epoch)
+[00:30:26]     lstm-h64-w32     epochs 12 (best  7)  val log loss 0.691827    120.0 s (10.0 s/epoch)
+[00:30:28]     logistic-w32     epochs  8 (best  3)  val log loss 0.694405      2.6 s (0.3 s/epoch)
+[00:30:29]   -> EUR/USD test2022 done in 198 s (7/28): lstm 0.5079  logistic 0.5069  majority 0.4895  persistence 0.4863  anti_persistence 0.5130; ETA 0.82 h
+[00:30:29]   GBP/USD test2016: train 31070, validation 6203, test 6227 samples
+[00:31:08]     lstm-h32-w32     epochs 20 (best 15)  val log loss 0.690139     39.4 s (2.0 s/epoch)
+[00:32:12]     lstm-h64-w32     epochs 13 (best  8)  val log loss 0.689992     64.3 s (4.9 s/epoch)
+[00:32:15]     logistic-w32     epochs 16 (best 11)  val log loss 0.693486      2.7 s (0.2 s/epoch)
+[00:32:16]   -> GBP/USD test2016 done in 107 s (8/28): lstm 0.5234  logistic 0.5116  majority 0.4985  persistence 0.4805  anti_persistence 0.5197; ETA 0.80 h
+[00:32:16]   GBP/USD test2017: train 37273, validation 6227, test 6200 samples
+[00:33:10]     lstm-h32-w32     epochs 16 (best 11)  val log loss 0.690442     54.0 s (3.4 s/epoch)
+[00:34:37]     lstm-h64-w32     epochs 16 (best 11)  val log loss 0.690645     87.4 s (5.5 s/epoch)
+[00:34:40]     logistic-w32     epochs  7 (best  2)  val log loss 0.696601      2.8 s (0.4 s/epoch)
+[00:34:40]   -> GBP/USD test2017 done in 145 s (9/28): lstm 0.5195  logistic 0.5063  majority 0.4890  persistence 0.4898  anti_persistence 0.5092; ETA 0.80 h
+[00:34:40]   GBP/USD test2018: train 43500, validation 6200, test 6210 samples
+[00:35:31]     lstm-h32-w32     epochs 12 (best  7)  val log loss 0.691922     50.7 s (4.2 s/epoch)
+[00:36:34]     lstm-h64-w32     epochs 12 (best  7)  val log loss 0.692003     62.5 s (5.2 s/epoch)
+[00:36:36]     logistic-w32     epochs 12 (best  7)  val log loss 0.695159      2.2 s (0.2 s/epoch)
+[00:36:36]   -> GBP/USD test2018 done in 116 s (10/28): lstm 0.5137  logistic 0.5048  majority 0.5023  persistence 0.4794  anti_persistence 0.5201; ETA 0.75 h
+[00:36:36]   GBP/USD test2019: train 49700, validation 6210, test 6203 samples
+[00:37:18]     lstm-h32-w32     epochs  7 (best  2)  val log loss 0.692611     41.3 s (5.9 s/epoch)
+[00:38:08]     lstm-h64-w32     epochs  7 (best  2)  val log loss 0.692528     50.4 s (7.2 s/epoch)
+[00:38:10]     logistic-w32     epochs 10 (best  5)  val log loss 0.695117      2.0 s (0.2 s/epoch)
+[00:38:10]   -> GBP/USD test2019 done in 94 s (11/28): lstm 0.5168  logistic 0.5030  majority 0.5014  persistence 0.4746  anti_persistence 0.5260; ETA 0.69 h
+[00:38:10]   GBP/USD test2020: train 55910, validation 6203, test 6235 samples
+[00:39:00]     lstm-h32-w32     epochs 17 (best 12)  val log loss 0.691221     49.3 s (2.9 s/epoch)
+[00:41:07]     lstm-h64-w32     epochs 17 (best 12)  val log loss 0.691187    127.5 s (7.5 s/epoch)
+[00:41:10]     logistic-w32     epochs 11 (best  6)  val log loss 0.694013      2.5 s (0.2 s/epoch)
+[00:41:11]   -> GBP/USD test2020 done in 180 s (12/28): lstm 0.5206  logistic 0.5123  majority 0.5095  persistence 0.4823  anti_persistence 0.5184; ETA 0.65 h
+[00:41:11]   GBP/USD test2021: train 62113, validation 6235, test 6223 samples
+[00:41:48]     lstm-h32-w32     epochs 11 (best  6)  val log loss 0.691430     37.2 s (3.4 s/epoch)
+[00:43:28]     lstm-h64-w32     epochs 11 (best  6)  val log loss 0.691560    100.0 s (9.1 s/epoch)
+[00:43:30]     logistic-w32     epochs 12 (best  7)  val log loss 0.694820      2.4 s (0.2 s/epoch)
+[00:43:30]   -> GBP/USD test2021 done in 140 s (13/28): lstm 0.5080  logistic 0.4970  majority 0.5012  persistence 0.4843  anti_persistence 0.5155; ETA 0.59 h
+[00:43:30]   GBP/USD test2022: train 68348, validation 6223, test 6222 samples
+[00:44:46]     lstm-h32-w32     epochs 20 (best 15)  val log loss 0.691831     75.1 s (3.8 s/epoch)
+[00:46:10]     lstm-h64-w32     epochs  8 (best  3)  val log loss 0.692610     84.2 s (10.5 s/epoch)
+[00:46:12]     logistic-w32     epochs  8 (best  3)  val log loss 0.695558      1.9 s (0.2 s/epoch)
+[00:46:12]   -> GBP/USD test2022 done in 161 s (14/28): lstm 0.5151  logistic 0.5010  majority 0.4884  persistence 0.4859  anti_persistence 0.5140; ETA 0.53 h
+[00:46:12]   USD/JPY test2016: train 31008, validation 6204, test 6227 samples
+[00:46:25]     lstm-h32-w32     epochs  6 (best  1)  val log loss 0.691971     12.7 s (2.1 s/epoch)
+[00:47:02]     lstm-h64-w32     epochs 11 (best  6)  val log loss 0.691689     37.6 s (3.4 s/epoch)
+[00:47:03]     logistic-w32     epochs 11 (best  6)  val log loss 0.695806      1.0 s (0.1 s/epoch)
+[00:47:04]   -> USD/JPY test2016 done in 52 s (15/28): lstm 0.5169  logistic 0.5197  majority 0.5083  persistence 0.4771  anti_persistence 0.5235; ETA 0.49 h
+[00:47:04]   USD/JPY test2017: train 37212, validation 6227, test 6208 samples
+[00:47:24]     lstm-h32-w32     epochs  6 (best  1)  val log loss 0.692398     20.7 s (3.4 s/epoch)
+[00:48:21]     lstm-h64-w32     epochs  8 (best  3)  val log loss 0.692747     57.1 s (7.1 s/epoch)
+[00:48:22]     logistic-w32     epochs  8 (best  3)  val log loss 0.695828      1.1 s (0.1 s/epoch)
+[00:48:23]   -> USD/JPY test2017 done in 79 s (16/28): lstm 0.5214  logistic 0.5185  majority 0.5081  persistence 0.4697  anti_persistence 0.5303; ETA 0.46 h
+[00:48:23]   USD/JPY test2018: train 43439, validation 6208, test 6213 samples
+[00:48:59]     lstm-h32-w32     epochs 13 (best  8)  val log loss 0.690957     36.8 s (2.8 s/epoch)
+[00:50:03]     lstm-h64-w32     epochs 13 (best  8)  val log loss 0.691016     63.7 s (4.9 s/epoch)
+[00:50:05]     logistic-w32     epochs  9 (best  4)  val log loss 0.691313      1.5 s (0.2 s/epoch)
+[00:50:05]   -> USD/JPY test2018 done in 102 s (17/28): lstm 0.5216  logistic 0.5157  majority 0.5173  persistence 0.4846  anti_persistence 0.5152; ETA 0.43 h
+[00:50:05]   USD/JPY test2019: train 49647, validation 6213, test 6193 samples
+[00:50:45]     lstm-h32-w32     epochs  7 (best  2)  val log loss 0.691364     39.8 s (5.7 s/epoch)
+[00:51:37]     lstm-h64-w32     epochs  7 (best  2)  val log loss 0.691471     52.0 s (7.4 s/epoch)
+[00:51:40]     logistic-w32     epochs  8 (best  3)  val log loss 0.692738      3.0 s (0.4 s/epoch)
+[00:51:40]   -> USD/JPY test2019 done in 95 s (18/28): lstm 0.5199  logistic 0.5212  majority 0.5101  persistence 0.4786  anti_persistence 0.5214; ETA 0.38 h
+[00:51:40]   USD/JPY test2020: train 55860, validation 6193, test 6225 samples
+[00:52:33]     lstm-h32-w32     epochs 14 (best  9)  val log loss 0.689383     52.8 s (3.8 s/epoch)
+[00:57:20]     lstm-h64-w32     epochs 29 (best 24)  val log loss 0.687953    287.4 s (9.9 s/epoch)
+[00:57:23]     logistic-w32     epochs  9 (best  4)  val log loss 0.692278      2.4 s (0.3 s/epoch)
+[00:57:23]   -> USD/JPY test2020 done in 343 s (19/28): lstm 0.5189  logistic 0.5038  majority 0.4927  persistence 0.4808  anti_persistence 0.5192; ETA 0.37 h
+[00:57:23]   USD/JPY test2021: train 62053, validation 6225, test 6212 samples
+[00:58:41]     lstm-h32-w32     epochs 14 (best  9)  val log loss 0.692817     77.7 s (5.6 s/epoch)
+[01:02:40]     lstm-h64-w32     epochs 23 (best 18)  val log loss 0.692553    238.6 s (10.4 s/epoch)
+[01:02:42]     logistic-w32     epochs  7 (best  2)  val log loss 0.696343      2.1 s (0.3 s/epoch)
+[01:02:42]   -> USD/JPY test2021 done in 319 s (20/28): lstm 0.5179  logistic 0.5196  majority 0.5192  persistence 0.4808  anti_persistence 0.5175; ETA 0.34 h
+[01:02:43]   USD/JPY test2022: train 68278, validation 6212, test 6218 samples
+[01:04:27]     lstm-h32-w32     epochs 15 (best 10)  val log loss 0.690959    104.9 s (7.0 s/epoch)
+[01:07:20]     lstm-h64-w32     epochs 15 (best 10)  val log loss 0.690924    172.6 s (11.5 s/epoch)
+[01:07:27]     logistic-w32     epochs  8 (best  3)  val log loss 0.692240      6.8 s (0.8 s/epoch)
+[01:07:28]   -> USD/JPY test2022 done in 285 s (21/28): lstm 0.5124  logistic 0.5103  majority 0.5244  persistence 0.4965  anti_persistence 0.5040; ETA 0.29 h
+[01:07:28]   XAU/USD test2016: train 30027, validation 5897, test 5905 samples
+[01:08:16]     lstm-h32-w32     epochs 14 (best  9)  val log loss 0.689784     48.2 s (3.4 s/epoch)
+[01:09:47]     lstm-h64-w32     epochs 18 (best 13)  val log loss 0.689695     90.6 s (5.0 s/epoch)
+[01:09:49]     logistic-w32     epochs 15 (best 10)  val log loss 0.690262      2.6 s (0.2 s/epoch)
+[01:09:49]   -> XAU/USD test2016 done in 142 s (22/28): lstm 0.5228  logistic 0.5214  majority 0.5064  persistence 0.4803  anti_persistence 0.5199; ETA 0.26 h
+[01:09:50]   XAU/USD test2017: train 35924, validation 5905, test 5880 samples
+[01:10:18]     lstm-h32-w32     epochs  7 (best  2)  val log loss 0.691611     28.0 s (4.0 s/epoch)
+[01:10:58]     lstm-h64-w32     epochs  7 (best  2)  val log loss 0.691518     40.7 s (5.8 s/epoch)
+[01:11:01]     logistic-w32     epochs 14 (best  9)  val log loss 0.694035      3.0 s (0.2 s/epoch)
+[01:11:02]   -> XAU/USD test2017 done in 72 s (23/28): lstm 0.5173  logistic 0.5041  majority 0.5066  persistence 0.4765  anti_persistence 0.5231; ETA 0.23 h
+[01:11:02]   XAU/USD test2018: train 41829, validation 5880, test 5902 samples
+[01:11:51]     lstm-h32-w32     epochs 10 (best  5)  val log loss 0.692458     49.8 s (5.0 s/epoch)
+[01:12:55]     lstm-h64-w32     epochs 10 (best  5)  val log loss 0.692342     63.6 s (6.4 s/epoch)
+[01:12:56]     logistic-w32     epochs  8 (best  3)  val log loss 0.695827      1.2 s (0.1 s/epoch)
+[01:12:57]   -> XAU/USD test2018 done in 115 s (24/28): lstm 0.5164  logistic 0.5169  majority 0.4998  persistence 0.4831  anti_persistence 0.5173; ETA 0.19 h
+[01:12:57]   XAU/USD test2019: train 47709, validation 5902, test 5901 samples
+[01:14:54]     lstm-h32-w32     epochs 22 (best 17)  val log loss 0.691350    117.8 s (5.4 s/epoch)
+[01:17:10]     lstm-h64-w32     epochs 19 (best 14)  val log loss 0.691059    135.9 s (7.2 s/epoch)
+[01:17:18]     logistic-w32     epochs 13 (best  8)  val log loss 0.692684      7.3 s (0.6 s/epoch)
+[01:17:18]   -> XAU/USD test2019 done in 262 s (25/28): lstm 0.5116  logistic 0.5091  majority 0.5047  persistence 0.4896  anti_persistence 0.5104; ETA 0.16 h
+[01:17:18]   XAU/USD test2020: train 53611, validation 5901, test 5925 samples
+[01:18:17]     lstm-h32-w32     epochs 10 (best  5)  val log loss 0.692790     58.8 s (5.9 s/epoch)
+[01:19:41]     lstm-h64-w32     epochs  9 (best  4)  val log loss 0.692874     84.1 s (9.3 s/epoch)
+[01:19:46]     logistic-w32     epochs 12 (best  7)  val log loss 0.692679      4.9 s (0.4 s/epoch)
+[01:19:47]   -> XAU/USD test2020 done in 148 s (26/28): lstm 0.5210  logistic 0.5198  majority 0.5200  persistence 0.4748  anti_persistence 0.5249; ETA 0.11 h
+[01:19:47]   XAU/USD test2021: train 59512, validation 5925, test 5906 samples
+[01:21:14]     lstm-h32-w32     epochs 15 (best 10)  val log loss 0.690370     87.0 s (5.8 s/epoch)
+[01:22:50]     lstm-h64-w32     epochs  9 (best  4)  val log loss 0.690833     96.6 s (10.7 s/epoch)
+[01:22:56]     logistic-w32     epochs  8 (best  3)  val log loss 0.694356      5.8 s (0.7 s/epoch)
+[01:22:57]   -> XAU/USD test2021 done in 190 s (27/28): lstm 0.5168  logistic 0.5120  majority 0.5008  persistence 0.4712  anti_persistence 0.5286; ETA 0.06 h
+[01:22:57]   XAU/USD test2022: train 65437, validation 5906, test 5905 samples
+[01:24:13]     lstm-h32-w32     epochs 14 (best  9)  val log loss 0.691141     76.2 s (5.4 s/epoch)
+[01:26:45]     lstm-h64-w32     epochs 14 (best  9)  val log loss 0.691333    151.7 s (10.8 s/epoch)
+[01:26:47]     logistic-w32     epochs  8 (best  3)  val log loss 0.693902      2.6 s (0.3 s/epoch)
+[01:26:48]   -> XAU/USD test2022 done in 231 s (28/28): lstm 0.5082  logistic 0.5001  majority 0.4955  persistence 0.4884  anti_persistence 0.5113; ETA 0.00 h
+[01:27:03] EUR/USD: 81094 H1 bars, sha256 fb6a9a3fd8333bb4
+[01:27:03] GBP/USD: 81090 H1 bars, sha256 6ced9785bbbcc93f
+[01:27:03] USD/JPY: 81097 H1 bars, sha256 1bbe1f39a2bc620d
+[01:27:03] XAU/USD: 77582 H1 bars, sha256 e18b801c3e735c6b
+[01:27:03]   EUR/USD test2022: shuffled-label control with lstm-h32-w32
+[01:27:57]   -> EUR/USD control 0.4852 vs majority 0.4895, p 0.5355
+[01:27:57]   GBP/USD test2022: shuffled-label control with lstm-h32-w32
+[01:29:13]   -> GBP/USD control 0.5029 vs majority 0.4884, p 0.0171
+[01:29:13]   USD/JPY test2022: shuffled-label control with lstm-h64-w32
+[01:31:05]   -> USD/JPY control 0.5222 vs majority 0.5244, p 0.4129
+[01:31:05]   XAU/USD test2022: shuffled-label control with lstm-h32-w32
+[01:31:52]   -> XAU/USD control 0.4916 vs majority 0.4955, p 0.6506
+[01:32:06] EUR/USD: 81094 H1 bars, sha256 fb6a9a3fd8333bb4
+[01:32:06]   reproducing EUR/USD test2022 lstm-h32-w32
+[01:33:17]   -> state_dict equal: True
+=== exit=0 2026-10-12T01:33:18+05:30
