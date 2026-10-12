@@ -38,7 +38,7 @@
     "test": {
       "executor": "nx:run-commands",
       "cache": true,
-      "inputs": ["default", { "env": "RUN_DB_TESTS" }, { "env": "RUN_LIVE_ML" }],
+      "inputs": ["default", { "env": "RUN_DB_TESTS" }, { "env": "RUN_LIVE_ML" }, { "env": "EXPECT_NO_LLM_KEY" }],
       "options": {
         "cwd": "apps/research-agent",
         "command": ".venv\\Scripts\\python.exe -m pytest"
