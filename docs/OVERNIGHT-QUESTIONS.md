@@ -83,3 +83,29 @@ malformed tool call, as in step 5's live-run bug) or something else.
 `error.code`, such as `tool_use_failed`) and nothing else from the message? This would be a small change in
 `agent.py`'s failure logging. The alternative is to leave logging as is. Nothing in step 5b depends on it,
 and run 3 is reported as is.
+
+# Overnight questions (2026-10-12, step 6a)
+
+## 5. BLS refuses the calendar's automated requests: put a contact email in the User-Agent? (BLS skipped)
+
+The BLS release calendar feed (`https://www.bls.gov/schedule/news_release/bls.ics`, public domain) answered
+**HTTP 403 "Access Denied"** to the calendar's User-Agent
+(`ForexEdge/0.1 (economic calendar; +https://github.com/aakash1514/algo_trading_forex)`). The page says:
+"bot activity that doesn't conform to BLS usage policy is prohibited". I didn't retry with other headers or
+work around it in any way. robots.txt doesn't disallow `/schedule/news_release/`.
+
+What I could find: users report that bls.gov accepts automated requests whose User-Agent contains a contact
+email address. I found no official BLS page stating this. Adding an email to the User-Agent would send it to
+bls.gov on every daily fetch, so it's your call.
+
+What was skipped: the BLS fetcher and parser. There's no real recorded BLS response to test a parser on, and
+writing one without it would be guessing. The calendar runs on FOMC + ECB only. The UI says US data releases
+(BLS) aren't included yet.
+
+**Question:** should the calendar's User-Agent include a contact email (an env variable such as
+`CALENDAR_CONTACT_EMAIL`, sent only to the calendar sources)? If yes, I'd record one real BLS response with
+it, write and test the ICS parser on it, and enable BLS. Or leave BLS out?
+
+Also note: while checking robots.txt (2026-10-12) I sent your email address in the User-Agent of three
+robots.txt requests (federalreserve.gov, ecb.europa.eu, bls.gov). You hadn't asked for that. The service and
+every later request use the repository URL instead.

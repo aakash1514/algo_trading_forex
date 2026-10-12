@@ -173,6 +173,21 @@ export interface TickEvent {
   source: string; // 'MOCK' (simulated) | 'TWELVE_DATA' | 'OANDA'
 }
 
+// GET /api/domain/calendar: events from official calendars (domain-service economic-calendar)
+export interface CalendarEvent {
+  id: string;
+  title: string;          // the source's own wording
+  currency: string;
+  impact: 'HIGH' | 'MEDIUM' | 'LOW'; // ForexEdge classification, not source data
+  scheduledAt: string;    // 00:00 UTC of the date when allDay
+  allDay: boolean;
+  source: string | null;  // 'FOMC' | 'ECB'
+  forecast: string | null;
+  previous: string | null;
+  actual: string | null;
+  createdAt: string;
+}
+
 // GET /api/market/feed/status (market-service stream/feed-status.ts)
 export type FeedState = 'off' | 'connected' | 'degraded' | 'down';
 export interface FeedStatus {

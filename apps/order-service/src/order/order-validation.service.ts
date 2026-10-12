@@ -199,10 +199,11 @@ export class OrderValidationService {
     const events = await this.economicEventRepo
       .createQueryBuilder('e')
       .where('e.currency IN (:...currencies)', { currencies })
-      .andWhere('e.scheduled_at BETWEEN :windowStart AND :windowEnd', {
-        windowStart,
-        windowEnd,
-      })
+      // Timed events within the window; date-only (all-day) events on today's date (00:00 UTC)
+      .andWhere(
+        '((NOT e.all_day AND e.scheduled_at BETWEEN :windowStart AND :windowEnd) OR (e.all_day AND e.scheduled_at = :today))',
+        { windowStart, windowEnd, today: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())) },
+      )
       .andWhere('e.impact IN (:...impacts)', { impacts: ['HIGH', 'MEDIUM'] })
       .getMany();
 

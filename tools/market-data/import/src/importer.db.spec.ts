@@ -211,8 +211,18 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('EconomicEventSource1792100000000');
+
+    // EconomicEventSource: economic_events.source and all_day, and the per-source unique index
+    const eventColumns = async () => (await client.query(
+      `SELECT column_name FROM information_schema.columns
+       WHERE table_name = 'economic_events' AND column_name IN ('source', 'all_day') ORDER BY column_name`,
+    )).rows.map((r: { column_name: string }) => r.column_name);
+    expect(await eventColumns()).toEqual(['all_day', 'source']);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await eventColumns()).toEqual([]);
     expect(await last()).toBe('ResearchReadRole1792000000000');
 
     // ResearchReadRole: column-level SELECT on backtest_runs only (never minio_object_key
