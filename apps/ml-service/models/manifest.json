@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-11 20:06 UTC",
-  "commit": "0361864",
+  "generated_at": "2026-10-12 06:53 UTC",
+  "commit": "802e20e",
   "target": "direction of the next H1 bar, mid open to close",
   "features": "see ml_service.features.FEATURE_NAMES",
   "lstm_grid": [

@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-11 20:06 UTC",
-  "commit": "0361864",
+  "generated_at": "2026-10-12 06:53 UTC",
+  "commit": "802e20e",
   "significance": [
     {
       "pair": "EUR/USD",
@@ -407,7 +407,19 @@
         "majority_only": 894,
         "p_value": 0.5355497449349186
       },
-      "beats_majority": false
+      "beats_majority": false,
+      "corrected": {
+        "tp": 2149,
+        "p": 3043,
+        "tn": 867,
+        "n": 3173,
+        "balanced_accuracy": 0.48972698185965446,
+        "ci95": [
+          0.478520578581399,
+          0.50093338513791
+        ],
+        "passes": true
+      }
     },
     {
       "pair": "GBP/USD",
@@ -444,7 +456,19 @@
         "majority_only": 652,
         "p_value": 0.01710668673174074
       },
-      "beats_majority": true
+      "beats_majority": true,
+      "corrected": {
+        "tp": 2387,
+        "p": 3039,
+        "tn": 742,
+        "n": 3183,
+        "balanced_accuracy": 0.5092845785188403,
+        "ci95": [
+          0.4989312509948591,
+          0.5196379060428216
+        ],
+        "passes": true
+      }
     },
     {
       "pair": "USD/JPY",
@@ -481,7 +505,19 @@
         "majority_only": 133,
         "p_value": 0.4128820984486067
       },
-      "beats_majority": false
+      "beats_majority": false,
+      "corrected": {
+        "tp": 3128,
+        "p": 3261,
+        "tn": 119,
+        "n": 2957,
+        "balanced_accuracy": 0.49972922737920833,
+        "ci95": [
+          0.49482356962670604,
+          0.5046348851317106
+        ],
+        "passes": true
+      }
     },
     {
       "pair": "XAU/USD",
@@ -518,7 +554,19 @@
         "majority_only": 1191,
         "p_value": 0.6505875676678576
       },
-      "beats_majority": false
+      "beats_majority": false,
+      "corrected": {
+        "tp": 1735,
+        "p": 2926,
+        "tn": 1168,
+        "n": 2979,
+        "balanced_accuracy": 0.4925187751948763,
+        "ci95": [
+          0.48002646301843677,
+          0.5050110873713158
+        ],
+        "passes": true
+      }
     }
   ],
   "reproducibility": {

@@ -103,7 +103,7 @@ Details: `docs/validation/ml-walk-forward.md`.
 - A retrained fold gives an identical state_dict, tensor for tensor. The file hash isn't byte-stable, so it's recorded for traceability only.
 - API vs the offline run, one test month per pair, over HTTP: the same samples, max abs. difference 5.96e-08 (`docs/validation/ml-inference-parity.md`).
 - Page hit rates equal the offline predictions; the page was checked in a production build.
-- **Known failing check:** the shuffled-label control fails its fixed criterion for GBP/USD (50.29% vs a majority baseline of 48.84%, p = 0.017). Diagnosis: the control is at chance (balanced accuracy 0.509), and the majority baseline was below 50% in 2022. The check is reported as failed and was not changed; the criterion is an open question.
+- **Shuffled-label control, two criteria:** under the original criterion ("must not beat the majority baseline") GBP/USD fails: 50.29% vs 48.84%, p = 0.017. That criterion was mis-specified: the majority baseline predicted up from the training years, but 2022 was 48.84% up, so it scored below 50% and a chance-level control beat it. The original result stays in the report. Under the corrected criterion (the control's balanced-accuracy 95% interval must include 0.5), evaluated on the same four runs without retraining, all four pass (GBP/USD 0.5093 [0.4989, 0.5196]). Both are shown side by side in `docs/validation/ml-walk-forward.md`.
 
 ## Testing
 - Full clean run (`nx reset`, empty `dist/`): lint, typecheck, test and build pass for all 17 projects.

@@ -58,3 +58,10 @@ Diagnosis (evidence in the report's diagnostic table, added after the run):
 above 0.5" (e.g. a permutation or binomial test on balanced accuracy), applied to all
 four pairs, and re-run the four controls? Nothing else depends on it; the main
 LSTM-vs-baseline conclusion is unaffected.
+
+**Resolved (2026-10-12):** keep the original result in the report as-is (GBP/USD FAILED under
+"must not beat majority") and add a corrected criterion evaluated on the existing four control
+runs, without retraining: the control's balanced-accuracy 95% interval must include 0.5. All four
+pass (EUR/USD 0.4897 [0.4785, 0.5009], GBP/USD 0.5093 [0.4989, 0.5196], USD/JPY 0.4997
+[0.4948, 0.5046], XAU/USD 0.4925 [0.4800, 0.5050]). Both criteria are reported side by side in
+docs/validation/ml-walk-forward.md, with why the original was mis-specified.

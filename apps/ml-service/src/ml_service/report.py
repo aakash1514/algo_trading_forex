@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import subprocess
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -15,7 +16,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-from scipy.stats import binomtest
 
 from ml_service.config import REPO_ROOT, SERVICE_ROOT
 from ml_service.data import PAIRS, read_bars
@@ -135,6 +135,39 @@ def sql_baseline_check(folds: dict[tuple[str, int], Fold]) -> list[dict[str, Any
         }
         out.append({"pair": pair, "test_year": year, "python": python, "sql": sql, "match": python == sql})
     return out
+
+
+def control_balanced(c: dict[str, Any], meta: dict[str, Any]) -> dict[str, Any]:
+    """The corrected control criterion: the balanced accuracy's 95% interval must include 0.5.
+    The confusion counts are recovered exactly from the stored accuracy (TP + TN), balanced
+    accuracy ((TP/P + TN/N) / 2) and the test up-count P; recovering non-integers fails."""
+    n_all = int(c["test"]["n"])
+    correct = int(c["test"]["correct"])
+    ba = float(c["test"]["balanced_accuracy"])
+    p_up = round(float(meta["test_up_rate"]) * n_all)
+    n_down = n_all - p_up
+    if n_all != int(meta["samples"]["test"]) or p_up <= 0 or n_down <= 0:
+        raise SystemExit(f"{c['pair']}: control and fold sample counts disagree")
+    tp_exact = (2 * ba - correct / n_down) / (1 / p_up - 1 / n_down)
+    tp = round(tp_exact)
+    tn = correct - tp
+    if abs(tp_exact - tp) > 1e-6 or not (0 <= tp <= p_up and 0 <= tn <= n_down):
+        raise SystemExit(f"{c['pair']}: confusion counts are not recoverable ({tp_exact})")
+    tpr, tnr = tp / p_up, tn / n_down
+    est = (tpr + tnr) / 2
+    if abs(est - ba) > 1e-12:
+        raise SystemExit(f"{c['pair']}: recomputed balanced accuracy differs")
+    half = 1.959963984540054 * math.sqrt(tpr * (1 - tpr) / p_up + tnr * (1 - tnr) / n_down) / 2
+    lo, hi = est - half, est + half
+    return {
+        "tp": tp,
+        "p": p_up,
+        "tn": tn,
+        "n": n_down,
+        "balanced_accuracy": est,
+        "ci95": [lo, hi],
+        "passes": lo <= 0.5 <= hi,
+    }
 
 
 def spread_cost(folds: dict[tuple[str, int], Fold]) -> list[dict[str, Any]]:
@@ -379,34 +412,59 @@ def render(
             f"{'**yes: FAILED**' if c['beats_majority'] else 'no'} |"
         )
     lines.append("")
-    if any(c["beats_majority"] for c in controls):
+    lines.append("### Original and corrected criterion, side by side")
+    lines.append("")
+    lines.append(
+        "Corrected criterion (decided 2026-10-12, docs/OVERNIGHT-QUESTIONS.md #3; evaluated on the same four control"
+    )
+    lines.append(
+        "runs, no retraining): the control's balanced accuracy 95% interval must include 0.5. The confusion counts"
+    )
+    lines.append(
+        "are recovered exactly from each run's stored accuracy, balanced accuracy and test up-count; the interval is"
+    )
+    lines.append("the normal approximation, 0.5 x sqrt(TPR(1-TPR)/P + TNR(1-TNR)/N) x 1.96 around the estimate.")
+    lines.append("")
+    lines.append(
+        "| Pair | Original: must not beat majority | Train / test up-rate | TP of P / TN of N "
+        "| Balanced accuracy [95% interval] | Corrected: interval includes 0.5 |"
+    )
+    lines.append("|---|---|---|---|---|---|")
+    for c in controls:
+        meta = folds[(c["pair"], CONTROL_YEAR)].meta
+        bal = control_balanced(c, meta)
         lines.append(
-            "**The fixed control check fails** for "
-            + ", ".join(c["pair"] for c in controls if c["beats_majority"])
-            + ". Diagnostic added after the run (not part of the fixed check): whether the control is above chance."
+            f"| {c['pair']} | {'**FAILED** (beats it)' if c['beats_majority'] else 'passed'} | "
+            f"{pct(meta['train_up_rate'])} / {pct(meta['test_up_rate'])} | "
+            f"{bal['tp']} of {bal['p']} / {bal['tn']} of {bal['n']} | "
+            f"{bal['balanced_accuracy']:.4f} [{bal['ci95'][0]:.4f}, {bal['ci95'][1]:.4f}] | "
+            f"{'passed' if bal['passes'] else '**FAILED**'} |"
         )
-        lines.append("")
-        lines.append("| Pair | Train up-rate | Test up-rate | Control balanced accuracy | Control vs 50%: binomial p |")
-        lines.append("|---|---|---|---|---|")
-        for c in controls:
-            meta = folds[(c["pair"], CONTROL_YEAR)].meta
-            p_chance = float(binomtest(c["test"]["correct"], c["test"]["n"], 0.5).pvalue)
-            lines.append(
-                f"| {c['pair']} | {pct(meta['train_up_rate'])} | {pct(meta['test_up_rate'])} | "
-                f"{c['test']['balanced_accuracy']:.4f} | {pvalue(p_chance)} |"
-            )
-        lines.append("")
-        lines.append(
-            "Reading: a control trained on shuffled labels should predict at chance, i.e. a balanced accuracy near"
-        )
-        lines.append(
-            "0.5. The majority baseline predicts the training years' more common direction; when the test year's"
-        )
-        lines.append(
-            "balance flips, that baseline scores below 50% and any chance-level predictor beats it. The check is"
-        )
-        lines.append("left as fixed and reported as failed; the criterion question is in docs/OVERNIGHT-QUESTIONS.md.")
-        lines.append("")
+    lines.append("")
+    lines.append(
+        "Why the original criterion was mis-specified: a control trained on shuffled labels has no signal, so it"
+    )
+    lines.append(
+        "should predict at chance, and the right reference is chance (balanced accuracy 0.5), not the majority"
+    )
+    lines.append(
+        "baseline. The majority baseline predicts the training years' more common direction; when the test year's"
+    )
+    lines.append(
+        "balance flips, it scores below 50%. GBP/USD's training years were 50.10% up, so it predicted up, but 2022"
+    )
+    lines.append(
+        "was 48.84% up: the baseline scored 48.84%, and a chance-level control (50.29%, balanced accuracy 0.5093)"
+    )
+    lines.append(
+        "beat it. That is not a leak. The original result stays reported above; the corrected criterion passes for"
+    )
+    lines.append(
+        "all four pairs."
+        if all(control_balanced(c, folds[(c["pair"], CONTROL_YEAR)].meta)["passes"] for c in controls)
+        else "the pairs marked passed."
+    )
+    lines.append("")
     lines.append("## Reproducibility")
     lines.append("")
     lines.append(
@@ -475,7 +533,7 @@ def main() -> None:
         "generated_at": generated,
         "commit": commit,
         "significance": sig,
-        "controls": controls,
+        "controls": [c | {"corrected": control_balanced(c, folds[(c["pair"], CONTROL_YEAR)].meta)} for c in controls],
         "reproducibility": repro,
         "sql_check": sql,
         "break_even": spread,
@@ -486,7 +544,12 @@ def main() -> None:
     print(f"report: {args.doc}")
     print(f"SQL check: {len(sql) - len(failed)}/{len(sql)} pair-years match")
     print(f"LSTM beats {sum(r['beats'] for r in sig)} of {len(sig)} comparisons under the Holm rule")
-    if failed or not repro["state_dict_equal"] or any(c["beats_majority"] for c in controls):
+    corrected = [control_balanced(c, folds[(c["pair"], CONTROL_YEAR)].meta) for c in controls]
+    print(
+        f"controls: original criterion failed for {sum(c['beats_majority'] for c in controls)}; "
+        f"corrected criterion passed for {sum(b['passes'] for b in corrected)}/{len(corrected)}"
+    )
+    if failed or not repro["state_dict_equal"] or not all(b["passes"] for b in corrected):
         raise SystemExit("a verification check failed (see the report)")
 
 
