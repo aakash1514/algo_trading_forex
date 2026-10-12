@@ -202,3 +202,14 @@ def test_a_year_outside_the_data_is_allowed_only_when_naming_what_is_missing() -
     # In an answer, 2023 is not a bare year: it must be a claimed value
     f = ok("EUR/USD fell 5.86% before 2023.", [c("-5.86", "pct", STATS)])
     assert any("'2023'" in x for x in f)
+
+
+def test_an_unrounded_mid_price_gets_the_rounding_rule_as_feedback() -> None:
+    # The exact half-point mid 115.2635 written in full: rejected, with the rule and the rounded value
+    f = ok("The low was 115.2635.", [c("115.2635", "price", BARS)])
+    assert any("exactly 3 decimals, rounded half away from zero: 115.264" in x for x in f)
+
+
+@pytest.mark.parametrize("kind", ["refusal", "not_in_data"])
+def test_an_empty_refusal_or_not_in_data_answer_fails(kind: str) -> None:
+    assert any("is empty" in x for x in ok("  ", [], [], kind))

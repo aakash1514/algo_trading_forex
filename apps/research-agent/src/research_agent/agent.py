@@ -57,6 +57,7 @@ log = logging.getLogger("research_agent")
 DEFAULT_MODEL = "groq:openai/gpt-oss-120b"
 SUBMIT = "submit_report"
 TRUNCATE_HINT = "use get_market_stats or narrow the range"
+LOG_HINT = "the full result was used for verification"
 
 
 def _squash(text: str) -> str:
@@ -74,7 +75,9 @@ RULES = (
     a sum, an average), answer with the tool values it would use and say that you don't compute derived numbers.""",
     """2. In submit_report add one claim per number in the answer: value exactly as written (with its sign, e.g.
     "-5.86"), unit = the suffix of the source field (price, pips, pct, usd, count, ratio, p, lots, param), and the
-    tool_call_id shown at the top of that tool result (e.g. call_1). Prices: write all price_decimals digits.
+    tool_call_id shown at the top of that tool result (e.g. call_1). Prices: write exactly price_decimals
+    decimals; a mid price can show one more digit (a 5): round it half away from zero, e.g. 1.424935 -> 1.42494
+    at 5 decimals.
     Percent, pips, ratios and p-values: keep at least 3 significant digits. Counts and USD: exact. For a negative
     value write the minus sign or say fell/declined/lost/dropped; never rose/gained/up for a negative value or the
     reverse. Write dates as YYYY-MM-DD.""",
@@ -151,7 +154,7 @@ def submit_tool() -> BaseTool:
     )
 
 
-def truncate_for_model(text: str, limit: int) -> str:
+def truncate_for_model(text: str, limit: int, hint: str = TRUNCATE_HINT) -> str:
     """A tool result as the model sees it: whole if it fits, else cut with an explicit marker
     (rows dropped from a columnar result, or characters), never silently."""
     if len(text) <= limit:
@@ -167,14 +170,14 @@ def truncate_for_model(text: str, limit: int) -> str:
         while keep > 0:
             keep -= 1
             cut = dict(parsed, rows=rows[:keep])
-            marker = f"truncated: {total - keep} of {total} rows omitted \u2014 {TRUNCATE_HINT}"
+            marker = f"truncated: {total - keep} of {total} rows omitted \u2014 {hint}"
             cut["truncated"] = marker
             out = json.dumps(cut, separators=(",", ":"))
             if len(out) <= limit:
                 return out
     keep_chars = max(0, limit - 120)
     omitted = len(text) - keep_chars
-    return text[:keep_chars] + f" ...[truncated: {omitted} of {len(text)} chars omitted \u2014 {TRUNCATE_HINT}]"
+    return text[:keep_chars] + f" ...[truncated: {omitted} of {len(text)} chars omitted \u2014 {hint}]"
 
 
 def _ranges(calls: Sequence[CallResult]) -> list[DataRange]:
@@ -405,7 +408,7 @@ def _log(calls: Sequence[CallResult], limit: int) -> list[ToolCallRecord]:
             name=c.name,
             args=c.args,
             ok=c.ok,
-            result_truncated=truncate_for_model(json.dumps(c.result, separators=(",", ":")), limit),
+            result_truncated=truncate_for_model(json.dumps(c.result, separators=(",", ":")), limit, LOG_HINT),
         )
         for c in calls
     ]

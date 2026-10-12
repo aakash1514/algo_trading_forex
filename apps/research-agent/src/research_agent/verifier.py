@@ -163,6 +163,13 @@ def check_claim(claim: Claim, calls: dict[str, CallResult]) -> str | None:
         return f"claim '{claim.text}' ({claim.value} {claim.unit}): no {claim.unit} field in {call.name}'s result"
     if any(_matches(value, decimals, claim.unit, leaf, price_decimals) for leaf in candidates):
         return None
+    if claim.unit == "price" and isinstance(price_decimals, int) and any(leaf.value == value for leaf in candidates):
+        # The exact mid (one digit more than the pair's decimals): say how to write it
+        expected = _round(value, price_decimals)
+        return (
+            f"claim '{claim.text}' ({claim.value} price): write prices with exactly {price_decimals} decimals, "
+            f"rounded half away from zero: {expected}"
+        )
     return f"claim '{claim.text}' ({claim.value} {claim.unit}) matches no {claim.unit} field of {call.name}'s result"
 
 
@@ -244,6 +251,8 @@ def verify(report_type: str, answer: str, claims: list[Claim], calls: list[CallR
     failures.extend(text_failures)
 
     if report_type in ("refusal", "not_in_data"):
+        if not answer.strip():
+            failures.append(f"the {report_type} answer is empty")
         if claims:
             failures.append(f"a {report_type} answer must not contain claims")
         if numbers:

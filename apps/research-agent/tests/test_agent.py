@@ -182,3 +182,11 @@ def test_the_ml_answer_verifies() -> None:
     assert report.type == "answer" and report.verification.ok, report.verification.failures
     assert report.answer == t["report"]["answer"]
     assert [c.name for c in report.tool_calls] == ["get_ml_evaluation"]
+
+
+def test_the_response_log_marks_its_own_cuts() -> None:
+    from research_agent.agent import LOG_HINT
+
+    text = (TOOL_FIXTURES / "stats-eurusd-2022-1d.json").read_text(encoding="utf-8")
+    shown = truncate_for_model(text, 300, LOG_HINT)
+    assert shown.endswith("chars omitted — the full result was used for verification]")
