@@ -213,3 +213,16 @@ def test_an_unrounded_mid_price_gets_the_rounding_rule_as_feedback() -> None:
 @pytest.mark.parametrize("kind", ["refusal", "not_in_data"])
 def test_an_empty_refusal_or_not_in_data_answer_fails(kind: str) -> None:
     assert any("is empty" in x for x in ok("  ", [], [], kind))
+
+
+@pytest.mark.parametrize("kind", ["refusal", "not_in_data"])
+@pytest.mark.parametrize(
+    "text", ["2050 pips is not in the data.", "2019% is not in the data.", "$2020 is not available.", "The 2050 price."]
+)
+def test_a_year_followed_or_preceded_by_a_unit_is_a_number(kind: str, text: str) -> None:
+    assert any("must not contain numbers" in x for x in ok(text, [], [], kind))
+
+
+@pytest.mark.parametrize("kind", ["refusal", "not_in_data"])
+def test_a_bare_year_names_what_is_missing(kind: str) -> None:
+    assert ok("2023 is not in the data.", [], [], kind) == []

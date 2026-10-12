@@ -13,7 +13,7 @@ the unit from its column names). Values are signed and are never compared by abs
   There is no unit conversion: a percent claim must come from a _pct field.
 
 Answer text. Every number in the answer must be one of the verified claims' values, with the same
-unit when the text gives one (%, percent, pip(s), $, USD). Its sign is the written sign, or else
+unit when the text gives one (%, percent, pip(s), $, USD, price). Its sign is the written sign, or else
 the closest direction word within the 3 words before it in the same clause (fell/declined/down/
 lost/dropped make it negative, rose/gained/up/climbed/increased positive), else positive; a written sign that
 contradicts the direction word fails. Not numbers: bare years 2010-2022, pair names, timeframes
@@ -21,8 +21,9 @@ contradicts the direction word fails. Not numbers: bare years 2010-2022, pair na
 tool call's arguments or result.
 
 Empty input fails: an answer needs at least one successful tool call and one claim. A refusal or
-not_in_data answer must contain no claims and no numbers other than bare years (any year 1900-2099 there,
-since it names what is missing, e.g. "2023 is not in the data")."""
+not_in_data answer must contain no claims and no numbers other than bare years (any 4-digit year 1900-2099
+there, since it names what is missing, e.g. "2023 is not in the data"; a year is bare only when no unit
+follows or precedes it: "2050 pips", "2019%", "$2020" or "2050 price" are numbers)."""
 
 from __future__ import annotations
 
@@ -53,7 +54,7 @@ _TIMEFRAME = re.compile(r"\b(?:[1-9]\d?[mhdw]|[HDM][1-9]\d?|[1-9]-?(?:hour|day|m
 _MODEL_ID = re.compile(r"\b[a-z]+(?:-[a-z]?\d+)+\b")  # e.g. lstm-h32-w32 (a config name, not a value)
 _NUMBER = re.compile(
     r"(?P<sign>[+\-\u2212])?\s?(?P<dollar>\$)?(?P<num>\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"
-    r"(?P<suffix>\s?(?:%|percent\b|pips?\b|USD\b))?"
+    r"(?P<suffix>\s?(?:%|percent\b|pips?\b|USD\b|price\b))?"
 )
 _WORD = re.compile(r"[A-Za-z]+")
 _CLAUSE_BREAK = re.compile(r"\d|[,;:()!]|\.(?:\s|$)")
@@ -187,6 +188,8 @@ def _text_unit(dollar: str | None, suffix: str | None) -> str | None:
         return "usd"
     if s in ("%", "percent"):
         return "pct"
+    if s == "price":
+        return "price"
     if s in ("pip", "pips"):
         return "pips"
     return None
