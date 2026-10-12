@@ -1,0 +1,35 @@
+{
+ "id": "call_stats-xauusd-2020-1d",
+ "name": "get_market_stats",
+ "args": {
+  "pair": "XAU/USD",
+  "timeframe": "1d",
+  "from_date": "2020-01-01",
+  "to_date": "2020-12-31"
+ },
+ "result": {
+  "pair": "XAU/USD",
+  "timeframe": "1d",
+  "from_date": "2020-01-01",
+  "to_date": "2020-12-31",
+  "first_bar_utc": "2020-01-01T22:00:00Z",
+  "last_bar_utc": "2020-12-30T22:00:00Z",
+  "price_decimals": 3,
+  "bars_count": 259,
+  "first_open_price": 1519.18,
+  "last_close_price": 1898.415,
+  "return_pct": 24.963138,
+  "up_bars_count": 148,
+  "down_bars_count": 111,
+  "flat_bars_count": 0,
+  "high_price": 2075.3615,
+  "high_time_utc": "2020-08-06T21:00:00Z",
+  "low_price": 1451.32,
+  "low_time_utc": "2020-03-15T21:00:00Z",
+  "avg_range_pips": 3075.420077,
+  "avg_spread_pips": 118.534363,
+  "realized_vol_per_bar_pct": 1.204565,
+  "realized_vol_annualized_pct": 19.423024,
+  "max_drawdown_pct": 13.885423
+ }
+}
