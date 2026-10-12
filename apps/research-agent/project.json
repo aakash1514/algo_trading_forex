@@ -44,6 +44,14 @@
         "command": ".venv\\Scripts\\python.exe -m pytest"
       }
     },
+    "eval": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/research-agent",
+        "env": { "PYTHONPATH": "src" },
+        "command": ".venv\\Scripts\\python.exe -m research_agent.live_eval"
+      }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "options": {
