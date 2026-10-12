@@ -39,6 +39,9 @@ Recorded by `scripts/record_transcripts.py` from Groq `openai/gpt-oss-120b` runn
 Each keeps only what the model said: reply text, tool calls (provider ids renamed `tc_1`, `tc_2`, ...;
 claims cite the agent's own `call_N` ids) and token counts. No keys, auth headers, provider request ids
 or response metadata. The final report and run stats are kept for reference.
+They were recorded under
+the step-5 system prompt; replay doesn't depend on the prompt text, so later prompt rules (e.g. step 5b's
+rule 6, returns from get_market_stats) don't change what these tests replay.
 
 | sha256 | File | Used for |
 |---|---|---|
