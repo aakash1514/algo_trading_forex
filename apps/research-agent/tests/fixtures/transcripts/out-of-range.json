@@ -1,0 +1,52 @@
+{
+ "question": "What was the EUR/USD return in 2023?",
+ "user": "research_demo",
+ "model": "groq:openai/gpt-oss-120b",
+ "recorded_at": "2026-10-12",
+ "replies": [
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_1",
+     "name": "submit_report",
+     "args": {
+      "answer": "The requested data for EUR/USD in 2023 is outside the available date range.",
+      "claims": [],
+      "type": "not_in_data"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1265,
+    "output_tokens": 107,
+    "total_tokens": 1372
+   }
+  }
+ ],
+ "report": {
+  "type": "not_in_data",
+  "answer": "The requested data for EUR/USD in 2023 is outside the available date range.",
+  "claims": [],
+  "tool_calls": [],
+  "data_ranges": [],
+  "disclaimer": "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.",
+  "verification": {
+   "ok": true,
+   "failures": [],
+   "claims_checked": 0,
+   "numbers_checked": 0
+  }
+ },
+ "stats": {
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 1265,
+  "output_tokens": 107,
+  "total_tokens": 1372,
+  "wall_s": 4.563000000023749,
+  "stop_reason": "verified",
+  "verification_attempts": 1,
+  "verification_failures": []
+ }
+}

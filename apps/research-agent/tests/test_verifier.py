@@ -194,3 +194,11 @@ def test_columnar_rows_take_their_units_from_the_columns() -> None:
     paths = leaf_paths(BARS.result)
     assert "rows[0].low_price" in paths and "rows[3].close_spread_pips" in paths
     assert not any("time_utc" in p for p in paths)
+
+
+def test_a_year_outside_the_data_is_allowed_only_when_naming_what_is_missing() -> None:
+    assert ok("EUR/USD in 2023 is outside ForexEdge data.", [], [], "not_in_data") == []
+    assert ok("EUR/USD in 2023 is outside ForexEdge data.", [], [], "refusal") == []
+    # In an answer, 2023 is not a bare year: it must be a claimed value
+    f = ok("EUR/USD fell 5.86% before 2023.", [c("-5.86", "pct", STATS)])
+    assert any("'2023'" in x for x in f)

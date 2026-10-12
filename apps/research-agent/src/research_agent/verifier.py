@@ -21,7 +21,8 @@ contradicts the direction word fails. Not numbers: bare years 2010-2022, pair na
 tool call's arguments or result.
 
 Empty input fails: an answer needs at least one successful tool call and one claim. A refusal or
-not_in_data answer must contain no claims and no numbers other than bare years."""
+not_in_data answer must contain no claims and no numbers other than bare years (any year 1900-2099 there,
+since it names what is missing, e.g. "2023 is not in the data")."""
 
 from __future__ import annotations
 
@@ -37,6 +38,8 @@ from research_agent.report import Claim, Verification
 EXACT_UNITS = {"count", "usd", "lots", "param"}
 ROUNDED_UNITS = {"pct", "pips", "ratio", "p"}
 MIN_SIGNIFICANT = 3
+DATA_YEARS = (2010, 2022)  # bare years in an answer
+ANY_YEARS = (1900, 2099)  # bare years in a refusal or not_in_data answer
 
 NEGATIVE_WORDS = {"fell", "declined", "down", "lost", "dropped"}
 POSITIVE_WORDS = {"rose", "gained", "up", "climbed", "increased"}
@@ -199,7 +202,7 @@ def _mask(text: str, pattern: re.Pattern[str]) -> str:
     return pattern.sub(lambda m: " " * len(m.group(0)), text)
 
 
-def text_numbers(answer: str) -> tuple[list[TextNumber], list[str], list[str]]:
+def text_numbers(answer: str, years: tuple[int, int] = DATA_YEARS) -> tuple[list[TextNumber], list[str], list[str]]:
     """(numbers, dates, failures) in an answer text."""
     failures: list[str] = []
     dates = [m.group(1) for m in _DATE.finditer(answer)]
@@ -220,7 +223,7 @@ def text_numbers(answer: str) -> tuple[list[TextNumber], list[str], list[str]]:
         sign_text = m.group("sign")
         if sign_text == "-" and m.start() > 0 and masked[m.start() - 1].isdigit():
             sign_text = None  # a range like 2016-2022, not a minus sign
-        if unit is None and sign_text is None and decimals == 0 and "," not in num and 2010 <= value <= 2022:
+        if unit is None and sign_text is None and decimals == 0 and "," not in num and years[0] <= value <= years[1]:
             continue  # a bare year
         written = -1 if sign_text in ("-", "\u2212") else 1 if sign_text == "+" else 0
         direction = _direction(masked[: m.start()])
@@ -235,7 +238,9 @@ def text_numbers(answer: str) -> tuple[list[TextNumber], list[str], list[str]]:
 def verify(report_type: str, answer: str, claims: list[Claim], calls: list[CallResult]) -> Verification:
     by_id = {c.id: c for c in calls}
     failures: list[str] = []
-    numbers, dates, text_failures = text_numbers(answer)
+    numbers, dates, text_failures = text_numbers(
+        answer, ANY_YEARS if report_type in ("refusal", "not_in_data") else DATA_YEARS
+    )
     failures.extend(text_failures)
 
     if report_type in ("refusal", "not_in_data"):

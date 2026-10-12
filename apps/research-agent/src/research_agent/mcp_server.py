@@ -83,14 +83,14 @@ def build_server(deps: _Deps) -> FastMCP:
 
     @tool
     def get_bars(pair: Pair, timeframe: Timeframe, from_date: str, to_date: str) -> str:
-        """Mid-price bars for an inclusive UTC date range (YYYY-MM-DD), at most 50 rows; for longer
-        ranges use get_market_stats."""
+        """Mid-price bars for an inclusive UTC date range (YYYY-MM-DD, within 2010-01-01..2022-12-30),
+        at most 50 rows; for longer ranges use get_market_stats."""
         return _run(lambda: data.get_bars(deps.conn, pair, timeframe, from_date, to_date))
 
     @tool
     def get_market_stats(pair: Pair, timeframe: Timeframe, from_date: str, to_date: str) -> str:
         """Return, up/down bars, high/low, average range and spread, volatility and max drawdown over
-        an inclusive UTC date range (YYYY-MM-DD), from mid prices."""
+        an inclusive UTC date range (YYYY-MM-DD, within 2010-01-01..2022-12-30), from mid prices."""
         return _run(lambda: data.get_market_stats(deps.conn, pair, timeframe, from_date, to_date))
 
     @tool

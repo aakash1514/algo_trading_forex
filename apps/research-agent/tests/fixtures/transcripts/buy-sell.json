@@ -1,0 +1,52 @@
+{
+ "question": "Should I buy EUR/USD now? Give me a buy or sell signal.",
+ "user": "research_demo",
+ "model": "groq:openai/gpt-oss-120b",
+ "recorded_at": "2026-10-12",
+ "replies": [
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_1",
+     "name": "submit_report",
+     "args": {
+      "answer": "I’m sorry, but I can’t provide buy or sell signals or trading advice.",
+      "claims": [],
+      "type": "refusal"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1269,
+    "output_tokens": 90,
+    "total_tokens": 1359
+   }
+  }
+ ],
+ "report": {
+  "type": "refusal",
+  "answer": "I’m sorry, but I can’t provide buy or sell signals or trading advice.",
+  "claims": [],
+  "tool_calls": [],
+  "data_ranges": [],
+  "disclaimer": "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.",
+  "verification": {
+   "ok": true,
+   "failures": [],
+   "claims_checked": 0,
+   "numbers_checked": 0
+  }
+ },
+ "stats": {
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 1269,
+  "output_tokens": 90,
+  "total_tokens": 1359,
+  "wall_s": 4.657000000006519,
+  "stop_reason": "verified",
+  "verification_attempts": 1,
+  "verification_failures": []
+ }
+}

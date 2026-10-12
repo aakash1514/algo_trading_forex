@@ -1,0 +1,52 @@
+{
+ "question": "How did AUD/USD perform in 2020?",
+ "user": "research_demo",
+ "model": "groq:openai/gpt-oss-120b",
+ "recorded_at": "2026-10-12",
+ "replies": [
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_1",
+     "name": "submit_report",
+     "args": {
+      "answer": "I’m sorry, but I don’t have data for AUD/USD.",
+      "claims": [],
+      "type": "not_in_data"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1264,
+    "output_tokens": 111,
+    "total_tokens": 1375
+   }
+  }
+ ],
+ "report": {
+  "type": "not_in_data",
+  "answer": "I’m sorry, but I don’t have data for AUD/USD.",
+  "claims": [],
+  "tool_calls": [],
+  "data_ranges": [],
+  "disclaimer": "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.",
+  "verification": {
+   "ok": true,
+   "failures": [],
+   "claims_checked": 0,
+   "numbers_checked": 0
+  }
+ },
+ "stats": {
+  "model_calls": 1,
+  "tool_calls": 0,
+  "input_tokens": 1264,
+  "output_tokens": 111,
+  "total_tokens": 1375,
+  "wall_s": 3.7660000000032596,
+  "stop_reason": "verified",
+  "verification_attempts": 1,
+  "verification_failures": []
+ }
+}

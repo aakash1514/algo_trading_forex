@@ -1,0 +1,164 @@
+{
+ "question": "Summarise my USD/JPY backtest run: net result in USD, win rate and maximum drawdown.",
+ "user": "research_demo",
+ "model": "groq:openai/gpt-oss-120b",
+ "recorded_at": "2026-10-12",
+ "replies": [
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_1",
+     "name": "list_backtest_runs",
+     "args": {
+      "pair": "USD/JPY"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1277,
+    "output_tokens": 65,
+    "total_tokens": 1342
+   }
+  },
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_2",
+     "name": "get_backtest_run",
+     "args": {
+      "run_id": "e0e18ad4-f22a-442c-8815-ac579e978ea4"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1429,
+    "output_tokens": 99,
+    "total_tokens": 1528
+   }
+  },
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_3",
+     "name": "submit_report",
+     "args": {
+      "answer": "The backtest produced a net profit of 1485.75 USD, a win rate of 36.74 % and a maximum drawdown of 6.2725 %.",
+      "claims": [
+       {
+        "text": "net profit USD",
+        "tool_call_id": "call_2",
+        "unit": "usd",
+        "value": "1485.75"
+       },
+       {
+        "text": "win rate",
+        "tool_call_id": "call_2",
+        "unit": "pct",
+        "value": "36.74"
+       },
+       {
+        "text": "maximum drawdown",
+        "tool_call_id": "call_2",
+        "unit": "pct",
+        "value": "6.2725"
+       }
+      ],
+      "type": "answer"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1844,
+    "output_tokens": 395,
+    "total_tokens": 2239
+   }
+  }
+ ],
+ "report": {
+  "type": "answer",
+  "answer": "The backtest produced a net profit of 1485.75 USD, a win rate of 36.74 % and a maximum drawdown of 6.2725 %.",
+  "claims": [
+   {
+    "text": "net profit USD",
+    "value": "1485.75",
+    "unit": "usd",
+    "tool_call_id": "call_2"
+   },
+   {
+    "text": "win rate",
+    "value": "36.74",
+    "unit": "pct",
+    "tool_call_id": "call_2"
+   },
+   {
+    "text": "maximum drawdown",
+    "value": "6.2725",
+    "unit": "pct",
+    "tool_call_id": "call_2"
+   }
+  ],
+  "tool_calls": [
+   {
+    "id": "call_1",
+    "name": "list_backtest_runs",
+    "args": {
+     "pair": "USD/JPY"
+    },
+    "ok": true,
+    "result_truncated": "{\"runs\":[{\"run_id\":\"e0e18ad4-f22a-442c-8815-ac579e978ea4\",\"strategy\":\"ma_crossover\",\"pair\":\"USD/JPY\",\"timeframe\":\"1h\",\"from_date\":\"2022-01-01\",\"to_date\":\"2022-12-30\",\"total_trades_count\":215,\"total_pnl_usd\":1485.75,\"completed_at_utc\":\"2026-10-12T07:53:53.744000Z\"}],\"runs_count\":1}"
+   },
+   {
+    "id": "call_2",
+    "name": "get_backtest_run",
+    "args": {
+     "run_id": "e0e18ad4-f22a-442c-8815-ac579e978ea4"
+    },
+    "ok": true,
+    "result_truncated": "{\"run_id\":\"e0e18ad4-f22a-442c-8815-ac579e978ea4\",\"strategy\":\"ma_crossover\",\"pair\":\"USD/JPY\",\"timeframe\":\"1h\",\"from_date\":\"2022-01-01\",\"to_date\":\"2022-12-30\",\"parameters\":{\"fastPeriod_param\":10,\"slowPeriod_param\":30},\"initial_capital_usd\":10000.0,\"size_lots\":0.1,\"total_trades_count\":215,\"win_rate_pct\":36.74,\"profit_factor_ratio\":1.3128,\"sharpe_ratio\":1.4623,\"max_drawdown_pct\":6.2725,\"total_pnl_pips\":1961.6,\"total_pnl_usd\":1485.75,\"final_equity_usd\":11485.75,\"started_at_utc\":\"2 ...[truncated: 646 of 1126 chars omitted - use get_market_stats or narrow the range]"
+   }
+  ],
+  "data_ranges": [
+   {
+    "tool": "list_backtest_runs",
+    "pair": "USD/JPY",
+    "timeframe": null,
+    "from_date": null,
+    "to_date": null,
+    "year": null,
+    "month": null,
+    "run_id": null
+   },
+   {
+    "tool": "get_backtest_run",
+    "pair": null,
+    "timeframe": null,
+    "from_date": null,
+    "to_date": null,
+    "year": null,
+    "month": null,
+    "run_id": "e0e18ad4-f22a-442c-8815-ac579e978ea4"
+   }
+  ],
+  "disclaimer": "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.",
+  "verification": {
+   "ok": true,
+   "failures": [],
+   "claims_checked": 3,
+   "numbers_checked": 3
+  }
+ },
+ "stats": {
+  "model_calls": 3,
+  "tool_calls": 2,
+  "input_tokens": 4550,
+  "output_tokens": 559,
+  "total_tokens": 5109,
+  "wall_s": 6.875,
+  "stop_reason": "verified",
+  "verification_attempts": 1,
+  "verification_failures": []
+ }
+}

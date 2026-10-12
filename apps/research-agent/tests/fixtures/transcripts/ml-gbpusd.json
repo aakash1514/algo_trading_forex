@@ -1,0 +1,116 @@
+{
+ "question": "Is the GBP/USD LSTM model tradable? What accuracy did it reach compared with the break-even?",
+ "user": "research_demo",
+ "model": "groq:openai/gpt-oss-120b",
+ "recorded_at": "2026-10-12",
+ "replies": [
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_1",
+     "name": "get_ml_evaluation",
+     "args": {
+      "pair": "GBP/USD"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1404,
+    "output_tokens": 260,
+    "total_tokens": 1664
+   }
+  },
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_2",
+     "name": "submit_report",
+     "args": {
+      "answer": "The GBP/USD LSTM model is not tradable. Its pooled out‑of‑sample accuracy was 51.67279411764706% and the break‑even accuracy needed to cover the average spread was 56.44079435230722%, so the model’s accuracy is below the break‑even level.",
+      "claims": [
+       {
+        "text": "GBP/USD LSTM pooled accuracy",
+        "tool_call_id": "call_1",
+        "unit": "pct",
+        "value": "51.67279411764706"
+       },
+       {
+        "text": "GBP/USD break‑even accuracy",
+        "tool_call_id": "call_1",
+        "unit": "pct",
+        "value": "56.44079435230722"
+       }
+      ],
+      "type": "answer"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1957,
+    "output_tokens": 364,
+    "total_tokens": 2321
+   }
+  }
+ ],
+ "report": {
+  "type": "answer",
+  "answer": "The GBP/USD LSTM model is not tradable. Its pooled out‑of‑sample accuracy was 51.67279411764706% and the break‑even accuracy needed to cover the average spread was 56.44079435230722%, so the model’s accuracy is below the break‑even level.",
+  "claims": [
+   {
+    "text": "GBP/USD LSTM pooled accuracy",
+    "value": "51.67279411764706",
+    "unit": "pct",
+    "tool_call_id": "call_1"
+   },
+   {
+    "text": "GBP/USD break‑even accuracy",
+    "value": "56.44079435230722",
+    "unit": "pct",
+    "tool_call_id": "call_1"
+   }
+  ],
+  "tool_calls": [
+   {
+    "id": "call_1",
+    "name": "get_ml_evaluation",
+    "args": {
+     "pair": "GBP/USD"
+    },
+    "ok": true,
+    "result_truncated": "{\"pair\":\"GBP/USD\",\"target\":\"direction of the next H1 bar, mid open to close\",\"disclaimer\":\"historical walk-forward test, not live signals\",\"rule\":\"LSTM beats a baseline only with higher pooled 2016-2022 accuracy and a McNemar p < 0.05 after Holm correction across the 16 pooled LSTM-vs-baseline tests\",\"test_years\":\"2016-2022\",\"samples_count\":43520,\"lstm_accuracy_pct\":51.67279411764706,\"lstm_ci95_low_pct\":51.20317272021387,\"lstm_ci95_high_pct\":52.14212023003631,\"baselines\":[{\"b ...[truncated: 1231 of 1711 chars omitted - use get_market_stats or narrow the range]"
+   }
+  ],
+  "data_ranges": [
+   {
+    "tool": "get_ml_evaluation",
+    "pair": "GBP/USD",
+    "timeframe": null,
+    "from_date": null,
+    "to_date": null,
+    "year": null,
+    "month": null,
+    "run_id": null
+   }
+  ],
+  "disclaimer": "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.",
+  "verification": {
+   "ok": true,
+   "failures": [],
+   "claims_checked": 2,
+   "numbers_checked": 2
+  }
+ },
+ "stats": {
+  "model_calls": 2,
+  "tool_calls": 1,
+  "input_tokens": 3361,
+  "output_tokens": 624,
+  "total_tokens": 3985,
+  "wall_s": 7.85899999999674,
+  "stop_reason": "verified",
+  "verification_attempts": 1,
+  "verification_failures": []
+ }
+}
