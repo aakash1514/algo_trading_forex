@@ -47,6 +47,7 @@ ML_MODELS = REPO_ROOT / "apps" / "ml-service" / "models"
 DEMO_REPORT = REPO_ROOT / "docs" / "validation" / "research-demo-backtests.md"
 DEMO_RUN = "29f80e07-73df-473d-9621-948797c8f9e0"  # research_demo's EUR/USD 2022 run
 SPACING_S = 60
+FLOAT_RELATIVE = Decimal("1e-12")
 
 
 @dataclass(frozen=True)
@@ -242,7 +243,10 @@ def _claim_matches(expected: Expected, claim_value: str, claim_unit: str) -> boo
     if expected.unit == "price":
         return rounded == value
     digits = len(format(abs(value), f".{d}f").replace(".", "").lstrip("0"))
-    return rounded == value and digits >= 3
+    # The tools compute in float64 (e.g. fraction x 100), so a value copied in full can differ from the exact
+    # decimal expectation in its 16th significant digit: that is float noise, not a different number
+    float_noise = abs(value - expected.value) <= abs(expected.value) * FLOAT_RELATIVE
+    return (rounded == value or float_noise) and digits >= 3
 
 
 @dataclass
@@ -356,6 +360,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "docs" / "validation" / "research-agent-eval.md")
     parser.add_argument("--title", default="Run 1")
+    parser.add_argument("--append", action="store_true", help="add this run after the runs already in --out")
+    parser.add_argument("--note", default="", help="a line printed above this run (what changed since the last)")
     args = parser.parse_args()
     with connect() as c:
         row = c.execute("SELECT user_id FROM backtest_runs WHERE id = %s", (DEMO_RUN,)).fetchone()
@@ -369,7 +375,10 @@ def main() -> None:
         f"Model `{DEFAULT_MODEL}` (unless RESEARCH_LLM_MODEL is set), commit `{commit.stdout.strip()}`, "
         f"started {started}, as research_demo, {SPACING_S} s between questions.\n\n"
     )
-    args.out.write_text(header + render(outcomes, args.title), encoding="utf-8")
+    body = header + (args.note + "\n\n" if args.note else "") + render(outcomes, args.title)
+    if args.append and args.out.is_file():
+        body = args.out.read_text(encoding="utf-8").rstrip("\n") + "\n\n" + body
+    args.out.write_text(body, encoding="utf-8")
     print(f"report: {args.out}")
     if not all(o.passed for o in outcomes):
         raise SystemExit(1)
