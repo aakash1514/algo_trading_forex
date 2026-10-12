@@ -1,0 +1,7975 @@
+{
+ "instrument": "USD_JPY",
+ "timeframe": "1h",
+ "from": "2020-03-01",
+ "to": "2020-03-31",
+ "target": "direction of the next H1 bar, mid open to close",
+ "disclaimer": "historical walk-forward test, not live signals",
+ "predictions": [
+  {
+   "barTime": "2020-02-28T21:00:00Z",
+   "targetBarTime": "2020-03-01T22:00:00Z",
+   "pUp": 0.5086926221847534,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.447,
+    "high": 107.7825,
+    "low": 107.3765,
+    "close": 107.3845
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-01T22:00:00Z",
+   "targetBarTime": "2020-03-01T23:00:00Z",
+   "pUp": 0.7466695308685303,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.386,
+    "high": 107.7715,
+    "low": 107.3765,
+    "close": 107.675
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-01T23:00:00Z",
+   "targetBarTime": "2020-03-02T00:00:00Z",
+   "pUp": 0.6425207853317261,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.6745,
+    "high": 107.8945,
+    "low": 107.572,
+    "close": 107.5725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T00:00:00Z",
+   "targetBarTime": "2020-03-02T01:00:00Z",
+   "pUp": 0.6289762854576111,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.572,
+    "high": 108.043,
+    "low": 107.537,
+    "close": 107.9075
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T01:00:00Z",
+   "targetBarTime": "2020-03-02T02:00:00Z",
+   "pUp": 0.5806620121002197,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9075,
+    "high": 108.2685,
+    "low": 107.7895,
+    "close": 108.1585
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T02:00:00Z",
+   "targetBarTime": "2020-03-02T03:00:00Z",
+   "pUp": 0.4694066345691681,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.16,
+    "high": 108.373,
+    "low": 108.148,
+    "close": 108.229
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T03:00:00Z",
+   "targetBarTime": "2020-03-02T04:00:00Z",
+   "pUp": 0.33495789766311646,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.228,
+    "high": 108.293,
+    "low": 108.061,
+    "close": 108.1265
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T04:00:00Z",
+   "targetBarTime": "2020-03-02T05:00:00Z",
+   "pUp": 0.3610360622406006,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.1265,
+    "high": 108.275,
+    "low": 108.0575,
+    "close": 108.267
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T05:00:00Z",
+   "targetBarTime": "2020-03-02T06:00:00Z",
+   "pUp": 0.3225339353084564,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.2675,
+    "high": 108.3375,
+    "low": 108.2025,
+    "close": 108.2935
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T06:00:00Z",
+   "targetBarTime": "2020-03-02T07:00:00Z",
+   "pUp": 0.3324121832847595,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.293,
+    "high": 108.5795,
+    "low": 108.243,
+    "close": 108.4595
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T07:00:00Z",
+   "targetBarTime": "2020-03-02T08:00:00Z",
+   "pUp": 0.336541086435318,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.4595,
+    "high": 108.4715,
+    "low": 108.007,
+    "close": 108.014
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T08:00:00Z",
+   "targetBarTime": "2020-03-02T09:00:00Z",
+   "pUp": 0.5480251908302307,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.0135,
+    "high": 108.1125,
+    "low": 107.7435,
+    "close": 107.8375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T09:00:00Z",
+   "targetBarTime": "2020-03-02T10:00:00Z",
+   "pUp": 0.5940276980400085,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.8365,
+    "high": 107.87,
+    "low": 107.7005,
+    "close": 107.725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T10:00:00Z",
+   "targetBarTime": "2020-03-02T11:00:00Z",
+   "pUp": 0.583548903465271,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.7255,
+    "high": 107.737,
+    "low": 107.519,
+    "close": 107.5625
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T11:00:00Z",
+   "targetBarTime": "2020-03-02T12:00:00Z",
+   "pUp": 0.5714856386184692,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.562,
+    "high": 107.819,
+    "low": 107.5535,
+    "close": 107.7935
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T12:00:00Z",
+   "targetBarTime": "2020-03-02T13:00:00Z",
+   "pUp": 0.4804491698741913,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.7935,
+    "high": 107.8285,
+    "low": 107.5385,
+    "close": 107.685
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T13:00:00Z",
+   "targetBarTime": "2020-03-02T14:00:00Z",
+   "pUp": 0.4850621223449707,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.6845,
+    "high": 107.8485,
+    "low": 107.5235,
+    "close": 107.5645
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T14:00:00Z",
+   "targetBarTime": "2020-03-02T15:00:00Z",
+   "pUp": 0.49857842922210693,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.5655,
+    "high": 107.9495,
+    "low": 107.402,
+    "close": 107.9135
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T15:00:00Z",
+   "targetBarTime": "2020-03-02T16:00:00Z",
+   "pUp": 0.5125114321708679,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9135,
+    "high": 108.138,
+    "low": 107.7865,
+    "close": 108.024
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T16:00:00Z",
+   "targetBarTime": "2020-03-02T17:00:00Z",
+   "pUp": 0.4545719027519226,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.0245,
+    "high": 108.0495,
+    "low": 107.738,
+    "close": 107.756
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T17:00:00Z",
+   "targetBarTime": "2020-03-02T18:00:00Z",
+   "pUp": 0.5095651745796204,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.757,
+    "high": 107.955,
+    "low": 107.693,
+    "close": 107.9345
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T18:00:00Z",
+   "targetBarTime": "2020-03-02T19:00:00Z",
+   "pUp": 0.5323318839073181,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.9325,
+    "high": 108.0825,
+    "low": 107.788,
+    "close": 107.8555
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T19:00:00Z",
+   "targetBarTime": "2020-03-02T20:00:00Z",
+   "pUp": 0.5549413561820984,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.8545,
+    "high": 108.4725,
+    "low": 107.854,
+    "close": 108.437
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T20:00:00Z",
+   "targetBarTime": "2020-03-02T21:00:00Z",
+   "pUp": 0.6222045421600342,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.436,
+    "high": 108.4605,
+    "low": 108.265,
+    "close": 108.335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T21:00:00Z",
+   "targetBarTime": "2020-03-02T22:00:00Z",
+   "pUp": 0.5490643382072449,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.334,
+    "high": 108.3935,
+    "low": 108.2605,
+    "close": 108.283
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T22:00:00Z",
+   "targetBarTime": "2020-03-02T23:00:00Z",
+   "pUp": 0.5018786191940308,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.2815,
+    "high": 108.5375,
+    "low": 108.2085,
+    "close": 108.528
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-02T23:00:00Z",
+   "targetBarTime": "2020-03-03T00:00:00Z",
+   "pUp": 0.41508057713508606,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.5245,
+    "high": 108.528,
+    "low": 108.2435,
+    "close": 108.3235
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T00:00:00Z",
+   "targetBarTime": "2020-03-03T01:00:00Z",
+   "pUp": 0.47383302450180054,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.323,
+    "high": 108.3235,
+    "low": 107.9955,
+    "close": 108.089
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T01:00:00Z",
+   "targetBarTime": "2020-03-03T02:00:00Z",
+   "pUp": 0.5957349538803101,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.096,
+    "high": 108.191,
+    "low": 107.9345,
+    "close": 107.9555
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T02:00:00Z",
+   "targetBarTime": "2020-03-03T03:00:00Z",
+   "pUp": 0.6554454565048218,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9565,
+    "high": 108.0515,
+    "low": 107.9145,
+    "close": 108.0075
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T03:00:00Z",
+   "targetBarTime": "2020-03-03T04:00:00Z",
+   "pUp": 0.5973731875419617,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.006,
+    "high": 108.0375,
+    "low": 107.663,
+    "close": 107.814
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T04:00:00Z",
+   "targetBarTime": "2020-03-03T05:00:00Z",
+   "pUp": 0.5777512192726135,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.815,
+    "high": 107.8865,
+    "low": 107.757,
+    "close": 107.765
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T05:00:00Z",
+   "targetBarTime": "2020-03-03T06:00:00Z",
+   "pUp": 0.5621567964553833,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.763,
+    "high": 107.956,
+    "low": 107.6935,
+    "close": 107.934
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T06:00:00Z",
+   "targetBarTime": "2020-03-03T07:00:00Z",
+   "pUp": 0.5091309547424316,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.934,
+    "high": 108.0525,
+    "low": 107.8405,
+    "close": 108.038
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T07:00:00Z",
+   "targetBarTime": "2020-03-03T08:00:00Z",
+   "pUp": 0.47655147314071655,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.0365,
+    "high": 108.1385,
+    "low": 107.889,
+    "close": 108.0755
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T08:00:00Z",
+   "targetBarTime": "2020-03-03T09:00:00Z",
+   "pUp": 0.4844941794872284,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.076,
+    "high": 108.0765,
+    "low": 107.923,
+    "close": 107.975
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T09:00:00Z",
+   "targetBarTime": "2020-03-03T10:00:00Z",
+   "pUp": 0.5429537892341614,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.976,
+    "high": 108.0415,
+    "low": 107.896,
+    "close": 108.0015
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T10:00:00Z",
+   "targetBarTime": "2020-03-03T11:00:00Z",
+   "pUp": 0.5306867957115173,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.0015,
+    "high": 108.009,
+    "low": 107.86,
+    "close": 107.9275
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T11:00:00Z",
+   "targetBarTime": "2020-03-03T12:00:00Z",
+   "pUp": 0.548872172832489,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.927,
+    "high": 108.0745,
+    "low": 107.5965,
+    "close": 107.7265
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T12:00:00Z",
+   "targetBarTime": "2020-03-03T13:00:00Z",
+   "pUp": 0.5055679082870483,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.7265,
+    "high": 107.955,
+    "low": 107.6465,
+    "close": 107.7535
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T13:00:00Z",
+   "targetBarTime": "2020-03-03T14:00:00Z",
+   "pUp": 0.5146465301513672,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.754,
+    "high": 107.8755,
+    "low": 107.614,
+    "close": 107.67
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T14:00:00Z",
+   "targetBarTime": "2020-03-03T15:00:00Z",
+   "pUp": 0.5293394327163696,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.668,
+    "high": 107.9005,
+    "low": 107.1555,
+    "close": 107.541
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T15:00:00Z",
+   "targetBarTime": "2020-03-03T16:00:00Z",
+   "pUp": 0.5021849274635315,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.54,
+    "high": 107.585,
+    "low": 107.1965,
+    "close": 107.29
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T16:00:00Z",
+   "targetBarTime": "2020-03-03T17:00:00Z",
+   "pUp": 0.5713750123977661,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.292,
+    "high": 107.468,
+    "low": 107.191,
+    "close": 107.34
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T17:00:00Z",
+   "targetBarTime": "2020-03-03T18:00:00Z",
+   "pUp": 0.5993785858154297,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.338,
+    "high": 107.3525,
+    "low": 106.982,
+    "close": 107.051
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T18:00:00Z",
+   "targetBarTime": "2020-03-03T19:00:00Z",
+   "pUp": 0.6652131676673889,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.0485,
+    "high": 107.3095,
+    "low": 106.9335,
+    "close": 107.2495
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T19:00:00Z",
+   "targetBarTime": "2020-03-03T20:00:00Z",
+   "pUp": 0.6643820405006409,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.2515,
+    "high": 107.3465,
+    "low": 107.1635,
+    "close": 107.208
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T20:00:00Z",
+   "targetBarTime": "2020-03-03T21:00:00Z",
+   "pUp": 0.6496609449386597,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.2085,
+    "high": 107.2425,
+    "low": 107.0885,
+    "close": 107.1175
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T21:00:00Z",
+   "targetBarTime": "2020-03-03T22:00:00Z",
+   "pUp": 0.6038765907287598,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.117,
+    "high": 107.1825,
+    "low": 107.0915,
+    "close": 107.154
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T22:00:00Z",
+   "targetBarTime": "2020-03-03T23:00:00Z",
+   "pUp": 0.47554320096969604,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.156,
+    "high": 107.1605,
+    "low": 106.848,
+    "close": 107.07
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-03T23:00:00Z",
+   "targetBarTime": "2020-03-04T00:00:00Z",
+   "pUp": 0.526858389377594,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.0675,
+    "high": 107.4055,
+    "low": 107.032,
+    "close": 107.3415
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T00:00:00Z",
+   "targetBarTime": "2020-03-04T01:00:00Z",
+   "pUp": 0.5503913164138794,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.339,
+    "high": 107.518,
+    "low": 107.2405,
+    "close": 107.3055
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T01:00:00Z",
+   "targetBarTime": "2020-03-04T02:00:00Z",
+   "pUp": 0.5385646820068359,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3,
+    "high": 107.3855,
+    "low": 107.1905,
+    "close": 107.339
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T02:00:00Z",
+   "targetBarTime": "2020-03-04T03:00:00Z",
+   "pUp": 0.549938440322876,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.34,
+    "high": 107.4745,
+    "low": 107.3205,
+    "close": 107.421
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T03:00:00Z",
+   "targetBarTime": "2020-03-04T04:00:00Z",
+   "pUp": 0.5035615563392639,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.421,
+    "high": 107.4435,
+    "low": 107.356,
+    "close": 107.364
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T04:00:00Z",
+   "targetBarTime": "2020-03-04T05:00:00Z",
+   "pUp": 0.53995281457901,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.363,
+    "high": 107.435,
+    "low": 107.339,
+    "close": 107.4
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T05:00:00Z",
+   "targetBarTime": "2020-03-04T06:00:00Z",
+   "pUp": 0.49790653586387634,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.4,
+    "high": 107.505,
+    "low": 107.3785,
+    "close": 107.4195
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T06:00:00Z",
+   "targetBarTime": "2020-03-04T07:00:00Z",
+   "pUp": 0.4782792031764984,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.419,
+    "high": 107.6905,
+    "low": 107.4175,
+    "close": 107.528
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T07:00:00Z",
+   "targetBarTime": "2020-03-04T08:00:00Z",
+   "pUp": 0.43955785036087036,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.529,
+    "high": 107.529,
+    "low": 107.3265,
+    "close": 107.4175
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T08:00:00Z",
+   "targetBarTime": "2020-03-04T09:00:00Z",
+   "pUp": 0.5061843395233154,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.417,
+    "high": 107.5065,
+    "low": 107.37,
+    "close": 107.4215
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T09:00:00Z",
+   "targetBarTime": "2020-03-04T10:00:00Z",
+   "pUp": 0.5062327980995178,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.421,
+    "high": 107.544,
+    "low": 107.4175,
+    "close": 107.503
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T10:00:00Z",
+   "targetBarTime": "2020-03-04T11:00:00Z",
+   "pUp": 0.4939289689064026,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.504,
+    "high": 107.5595,
+    "low": 107.463,
+    "close": 107.4925
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T11:00:00Z",
+   "targetBarTime": "2020-03-04T12:00:00Z",
+   "pUp": 0.5145968794822693,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.4915,
+    "high": 107.6645,
+    "low": 107.4625,
+    "close": 107.54
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T12:00:00Z",
+   "targetBarTime": "2020-03-04T13:00:00Z",
+   "pUp": 0.5103229880332947,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.5405,
+    "high": 107.589,
+    "low": 107.458,
+    "close": 107.4775
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T13:00:00Z",
+   "targetBarTime": "2020-03-04T14:00:00Z",
+   "pUp": 0.5300068259239197,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.4775,
+    "high": 107.4905,
+    "low": 107.1455,
+    "close": 107.1575
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T14:00:00Z",
+   "targetBarTime": "2020-03-04T15:00:00Z",
+   "pUp": 0.5660139322280884,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.173,
+    "high": 107.453,
+    "low": 107.1495,
+    "close": 107.2715
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T15:00:00Z",
+   "targetBarTime": "2020-03-04T16:00:00Z",
+   "pUp": 0.4905243515968323,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.273,
+    "high": 107.543,
+    "low": 107.2345,
+    "close": 107.341
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T16:00:00Z",
+   "targetBarTime": "2020-03-04T17:00:00Z",
+   "pUp": 0.48778781294822693,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3415,
+    "high": 107.4335,
+    "low": 107.3025,
+    "close": 107.4245
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T17:00:00Z",
+   "targetBarTime": "2020-03-04T18:00:00Z",
+   "pUp": 0.4733223021030426,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.424,
+    "high": 107.5045,
+    "low": 107.4095,
+    "close": 107.4615
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T18:00:00Z",
+   "targetBarTime": "2020-03-04T19:00:00Z",
+   "pUp": 0.4628542363643646,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.4595,
+    "high": 107.4675,
+    "low": 107.2995,
+    "close": 107.3225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T19:00:00Z",
+   "targetBarTime": "2020-03-04T20:00:00Z",
+   "pUp": 0.5900434851646423,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3235,
+    "high": 107.526,
+    "low": 107.3145,
+    "close": 107.5085
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T20:00:00Z",
+   "targetBarTime": "2020-03-04T21:00:00Z",
+   "pUp": 0.509151041507721,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.51,
+    "high": 107.5755,
+    "low": 107.458,
+    "close": 107.5315
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T21:00:00Z",
+   "targetBarTime": "2020-03-04T22:00:00Z",
+   "pUp": 0.4332265853881836,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.5325,
+    "high": 107.589,
+    "low": 107.5135,
+    "close": 107.543
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T22:00:00Z",
+   "targetBarTime": "2020-03-04T23:00:00Z",
+   "pUp": 0.4190472662448883,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.543,
+    "high": 107.7435,
+    "low": 107.512,
+    "close": 107.7165
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-04T23:00:00Z",
+   "targetBarTime": "2020-03-05T00:00:00Z",
+   "pUp": 0.400676429271698,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.7165,
+    "high": 107.7185,
+    "low": 107.4605,
+    "close": 107.521
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T00:00:00Z",
+   "targetBarTime": "2020-03-05T01:00:00Z",
+   "pUp": 0.4520266652107239,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.5205,
+    "high": 107.523,
+    "low": 107.387,
+    "close": 107.453
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T01:00:00Z",
+   "targetBarTime": "2020-03-05T02:00:00Z",
+   "pUp": 0.4888931214809418,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.4535,
+    "high": 107.457,
+    "low": 107.2635,
+    "close": 107.307
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T02:00:00Z",
+   "targetBarTime": "2020-03-05T03:00:00Z",
+   "pUp": 0.5475190877914429,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.308,
+    "high": 107.3295,
+    "low": 107.275,
+    "close": 107.322
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T03:00:00Z",
+   "targetBarTime": "2020-03-05T04:00:00Z",
+   "pUp": 0.514934241771698,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.321,
+    "high": 107.352,
+    "low": 107.275,
+    "close": 107.332
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T04:00:00Z",
+   "targetBarTime": "2020-03-05T05:00:00Z",
+   "pUp": 0.5068978071212769,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.333,
+    "high": 107.4405,
+    "low": 107.3305,
+    "close": 107.381
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T05:00:00Z",
+   "targetBarTime": "2020-03-05T06:00:00Z",
+   "pUp": 0.4827776849269867,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.3805,
+    "high": 107.3845,
+    "low": 107.2755,
+    "close": 107.325
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T06:00:00Z",
+   "targetBarTime": "2020-03-05T07:00:00Z",
+   "pUp": 0.529742956161499,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3245,
+    "high": 107.375,
+    "low": 107.191,
+    "close": 107.371
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T07:00:00Z",
+   "targetBarTime": "2020-03-05T08:00:00Z",
+   "pUp": 0.500428318977356,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.372,
+    "high": 107.387,
+    "low": 107.221,
+    "close": 107.2435
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T08:00:00Z",
+   "targetBarTime": "2020-03-05T09:00:00Z",
+   "pUp": 0.5527113676071167,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.244,
+    "high": 107.2475,
+    "low": 106.917,
+    "close": 106.946
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T09:00:00Z",
+   "targetBarTime": "2020-03-05T10:00:00Z",
+   "pUp": 0.5573422908782959,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.9455,
+    "high": 106.9785,
+    "low": 106.797,
+    "close": 106.8095
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T10:00:00Z",
+   "targetBarTime": "2020-03-05T11:00:00Z",
+   "pUp": 0.5740970969200134,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.8105,
+    "high": 107.0325,
+    "low": 106.8105,
+    "close": 106.8955
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T11:00:00Z",
+   "targetBarTime": "2020-03-05T12:00:00Z",
+   "pUp": 0.4896986782550812,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 106.898,
+    "high": 106.9415,
+    "low": 106.818,
+    "close": 106.9125
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T12:00:00Z",
+   "targetBarTime": "2020-03-05T13:00:00Z",
+   "pUp": 0.4930208623409271,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.913,
+    "high": 106.955,
+    "low": 106.81,
+    "close": 106.8335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T13:00:00Z",
+   "targetBarTime": "2020-03-05T14:00:00Z",
+   "pUp": 0.5405265092849731,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.8335,
+    "high": 106.892,
+    "low": 106.724,
+    "close": 106.7535
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T14:00:00Z",
+   "targetBarTime": "2020-03-05T15:00:00Z",
+   "pUp": 0.5681675672531128,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.7535,
+    "high": 106.9445,
+    "low": 106.642,
+    "close": 106.6635
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T15:00:00Z",
+   "targetBarTime": "2020-03-05T16:00:00Z",
+   "pUp": 0.5570365190505981,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.666,
+    "high": 106.766,
+    "low": 106.5115,
+    "close": 106.5645
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T16:00:00Z",
+   "targetBarTime": "2020-03-05T17:00:00Z",
+   "pUp": 0.5775885581970215,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.562,
+    "high": 106.574,
+    "low": 106.2475,
+    "close": 106.2635
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T17:00:00Z",
+   "targetBarTime": "2020-03-05T18:00:00Z",
+   "pUp": 0.6560438275337219,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.262,
+    "high": 106.4985,
+    "low": 106.2215,
+    "close": 106.4475
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T18:00:00Z",
+   "targetBarTime": "2020-03-05T19:00:00Z",
+   "pUp": 0.5422539710998535,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.444,
+    "high": 106.516,
+    "low": 106.373,
+    "close": 106.3985
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T19:00:00Z",
+   "targetBarTime": "2020-03-05T20:00:00Z",
+   "pUp": 0.5433629751205444,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.399,
+    "high": 106.475,
+    "low": 106.012,
+    "close": 106.0125
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T20:00:00Z",
+   "targetBarTime": "2020-03-05T21:00:00Z",
+   "pUp": 0.6235499978065491,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.0135,
+    "high": 106.1755,
+    "low": 105.971,
+    "close": 106.158
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T21:00:00Z",
+   "targetBarTime": "2020-03-05T22:00:00Z",
+   "pUp": 0.5614688992500305,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.157,
+    "high": 106.1955,
+    "low": 106.04,
+    "close": 106.1725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T22:00:00Z",
+   "targetBarTime": "2020-03-05T23:00:00Z",
+   "pUp": 0.5160694122314453,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.173,
+    "high": 106.2715,
+    "low": 106.0885,
+    "close": 106.265
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-05T23:00:00Z",
+   "targetBarTime": "2020-03-06T00:00:00Z",
+   "pUp": 0.43900978565216064,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 106.2625,
+    "high": 106.3435,
+    "low": 106.1495,
+    "close": 106.265
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T00:00:00Z",
+   "targetBarTime": "2020-03-06T01:00:00Z",
+   "pUp": 0.4189158082008362,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.264,
+    "high": 106.272,
+    "low": 105.909,
+    "close": 105.9555
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T01:00:00Z",
+   "targetBarTime": "2020-03-06T02:00:00Z",
+   "pUp": 0.6300173997879028,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.955,
+    "high": 106.013,
+    "low": 105.832,
+    "close": 105.9235
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T02:00:00Z",
+   "targetBarTime": "2020-03-06T03:00:00Z",
+   "pUp": 0.6728761196136475,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.923,
+    "high": 105.9535,
+    "low": 105.783,
+    "close": 105.8095
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T03:00:00Z",
+   "targetBarTime": "2020-03-06T04:00:00Z",
+   "pUp": 0.6799411177635193,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.809,
+    "high": 105.8795,
+    "low": 105.7555,
+    "close": 105.845
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T04:00:00Z",
+   "targetBarTime": "2020-03-06T05:00:00Z",
+   "pUp": 0.5291315913200378,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.845,
+    "high": 105.8635,
+    "low": 105.772,
+    "close": 105.8205
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T05:00:00Z",
+   "targetBarTime": "2020-03-06T06:00:00Z",
+   "pUp": 0.5141398310661316,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.822,
+    "high": 105.992,
+    "low": 105.807,
+    "close": 105.92
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T06:00:00Z",
+   "targetBarTime": "2020-03-06T07:00:00Z",
+   "pUp": 0.4734434187412262,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.919,
+    "high": 106.0645,
+    "low": 105.777,
+    "close": 105.7955
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T07:00:00Z",
+   "targetBarTime": "2020-03-06T08:00:00Z",
+   "pUp": 0.5510485172271729,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.7955,
+    "high": 105.9395,
+    "low": 105.6665,
+    "close": 105.763
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T08:00:00Z",
+   "targetBarTime": "2020-03-06T09:00:00Z",
+   "pUp": 0.5471905469894409,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.763,
+    "high": 105.8225,
+    "low": 105.1165,
+    "close": 105.1725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T09:00:00Z",
+   "targetBarTime": "2020-03-06T10:00:00Z",
+   "pUp": 0.622026264667511,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.173,
+    "high": 105.45,
+    "low": 104.9945,
+    "close": 105.432
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T10:00:00Z",
+   "targetBarTime": "2020-03-06T11:00:00Z",
+   "pUp": 0.44743257761001587,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.4315,
+    "high": 105.4875,
+    "low": 105.1245,
+    "close": 105.259
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T11:00:00Z",
+   "targetBarTime": "2020-03-06T12:00:00Z",
+   "pUp": 0.508021891117096,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.259,
+    "high": 105.374,
+    "low": 105.1415,
+    "close": 105.1855
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T12:00:00Z",
+   "targetBarTime": "2020-03-06T13:00:00Z",
+   "pUp": 0.5060019493103027,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.184,
+    "high": 105.425,
+    "low": 105.0105,
+    "close": 105.288
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T13:00:00Z",
+   "targetBarTime": "2020-03-06T14:00:00Z",
+   "pUp": 0.45739835500717163,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.287,
+    "high": 105.2955,
+    "low": 105.0215,
+    "close": 105.1675
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T14:00:00Z",
+   "targetBarTime": "2020-03-06T15:00:00Z",
+   "pUp": 0.4868116080760956,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 105.1685,
+    "high": 105.7375,
+    "low": 105.0985,
+    "close": 105.364
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T15:00:00Z",
+   "targetBarTime": "2020-03-06T16:00:00Z",
+   "pUp": 0.4681674838066101,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.3635,
+    "high": 105.4455,
+    "low": 105.1445,
+    "close": 105.3065
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T16:00:00Z",
+   "targetBarTime": "2020-03-06T17:00:00Z",
+   "pUp": 0.4447285234928131,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 105.3065,
+    "high": 105.6365,
+    "low": 105.196,
+    "close": 105.4765
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T17:00:00Z",
+   "targetBarTime": "2020-03-06T18:00:00Z",
+   "pUp": 0.47510817646980286,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 105.4755,
+    "high": 105.5625,
+    "low": 105.398,
+    "close": 105.4775
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T18:00:00Z",
+   "targetBarTime": "2020-03-06T19:00:00Z",
+   "pUp": 0.4539286196231842,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.478,
+    "high": 105.4975,
+    "low": 105.183,
+    "close": 105.192
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T19:00:00Z",
+   "targetBarTime": "2020-03-06T20:00:00Z",
+   "pUp": 0.5845842361450195,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.193,
+    "high": 105.5555,
+    "low": 105.159,
+    "close": 105.4955
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T20:00:00Z",
+   "targetBarTime": "2020-03-06T21:00:00Z",
+   "pUp": 0.5872712135314941,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.496,
+    "high": 105.498,
+    "low": 105.279,
+    "close": 105.3385
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-06T21:00:00Z",
+   "targetBarTime": "2020-03-08T21:00:00Z",
+   "pUp": 0.6262609958648682,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.2415,
+    "high": 104.4405,
+    "low": 104.2395,
+    "close": 104.4315
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-08T21:00:00Z",
+   "targetBarTime": "2020-03-08T22:00:00Z",
+   "pUp": 0.7918652892112732,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.4335,
+    "high": 104.6005,
+    "low": 103.5205,
+    "close": 103.723
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-08T22:00:00Z",
+   "targetBarTime": "2020-03-08T23:00:00Z",
+   "pUp": 0.7687999606132507,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.7235,
+    "high": 104.271,
+    "low": 103.7115,
+    "close": 103.938
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-08T23:00:00Z",
+   "targetBarTime": "2020-03-09T00:00:00Z",
+   "pUp": 0.54300856590271,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.9365,
+    "high": 104.2675,
+    "low": 103.9325,
+    "close": 104.1345
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T00:00:00Z",
+   "targetBarTime": "2020-03-09T01:00:00Z",
+   "pUp": 0.4282529652118683,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.136,
+    "high": 104.212,
+    "low": 101.5775,
+    "close": 102.248
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T01:00:00Z",
+   "targetBarTime": "2020-03-09T02:00:00Z",
+   "pUp": 0.6726873517036438,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.246,
+    "high": 102.747,
+    "low": 101.567,
+    "close": 102.658
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T02:00:00Z",
+   "targetBarTime": "2020-03-09T03:00:00Z",
+   "pUp": 0.6149608492851257,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.6525,
+    "high": 103.0675,
+    "low": 102.2565,
+    "close": 102.4625
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T03:00:00Z",
+   "targetBarTime": "2020-03-09T04:00:00Z",
+   "pUp": 0.5356324315071106,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.4615,
+    "high": 102.8645,
+    "low": 102.4015,
+    "close": 102.8215
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T04:00:00Z",
+   "targetBarTime": "2020-03-09T05:00:00Z",
+   "pUp": 0.5730408430099487,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.823,
+    "high": 102.876,
+    "low": 102.525,
+    "close": 102.5915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T05:00:00Z",
+   "targetBarTime": "2020-03-09T06:00:00Z",
+   "pUp": 0.609620988368988,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.5945,
+    "high": 102.8035,
+    "low": 102.5605,
+    "close": 102.754
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T06:00:00Z",
+   "targetBarTime": "2020-03-09T07:00:00Z",
+   "pUp": 0.5493140816688538,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.755,
+    "high": 102.756,
+    "low": 101.811,
+    "close": 102.2735
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T07:00:00Z",
+   "targetBarTime": "2020-03-09T08:00:00Z",
+   "pUp": 0.5625605583190918,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.273,
+    "high": 102.7005,
+    "low": 102.1225,
+    "close": 102.453
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T08:00:00Z",
+   "targetBarTime": "2020-03-09T09:00:00Z",
+   "pUp": 0.5737894773483276,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.4535,
+    "high": 102.805,
+    "low": 102.3835,
+    "close": 102.522
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T09:00:00Z",
+   "targetBarTime": "2020-03-09T10:00:00Z",
+   "pUp": 0.5246411561965942,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.52,
+    "high": 102.5235,
+    "low": 102.1555,
+    "close": 102.3535
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T10:00:00Z",
+   "targetBarTime": "2020-03-09T11:00:00Z",
+   "pUp": 0.5662292242050171,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.3525,
+    "high": 102.4105,
+    "low": 102.19,
+    "close": 102.2765
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T11:00:00Z",
+   "targetBarTime": "2020-03-09T12:00:00Z",
+   "pUp": 0.5789463520050049,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.2755,
+    "high": 102.4785,
+    "low": 102.226,
+    "close": 102.2925
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T12:00:00Z",
+   "targetBarTime": "2020-03-09T13:00:00Z",
+   "pUp": 0.5601701140403748,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.292,
+    "high": 102.6545,
+    "low": 101.182,
+    "close": 102.4505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T13:00:00Z",
+   "targetBarTime": "2020-03-09T14:00:00Z",
+   "pUp": 0.5622856616973877,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.4515,
+    "high": 102.497,
+    "low": 102.1355,
+    "close": 102.2935
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T14:00:00Z",
+   "targetBarTime": "2020-03-09T15:00:00Z",
+   "pUp": 0.548967719078064,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.293,
+    "high": 102.601,
+    "low": 102.1405,
+    "close": 102.519
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T15:00:00Z",
+   "targetBarTime": "2020-03-09T16:00:00Z",
+   "pUp": 0.5696285963058472,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.511,
+    "high": 102.6005,
+    "low": 102.038,
+    "close": 102.0695
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T16:00:00Z",
+   "targetBarTime": "2020-03-09T17:00:00Z",
+   "pUp": 0.6322682499885559,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.069,
+    "high": 102.34,
+    "low": 101.97,
+    "close": 102.1705
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T17:00:00Z",
+   "targetBarTime": "2020-03-09T18:00:00Z",
+   "pUp": 0.631199836730957,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.1715,
+    "high": 102.5095,
+    "low": 101.9685,
+    "close": 102.0825
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T18:00:00Z",
+   "targetBarTime": "2020-03-09T19:00:00Z",
+   "pUp": 0.6482957601547241,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.08,
+    "high": 102.4595,
+    "low": 102.0775,
+    "close": 102.375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T19:00:00Z",
+   "targetBarTime": "2020-03-09T20:00:00Z",
+   "pUp": 0.6381988525390625,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.3715,
+    "high": 102.569,
+    "low": 102.2625,
+    "close": 102.3705
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T20:00:00Z",
+   "targetBarTime": "2020-03-09T21:00:00Z",
+   "pUp": 0.5606655478477478,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 102.37,
+    "high": 102.463,
+    "low": 102.194,
+    "close": 102.285
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T21:00:00Z",
+   "targetBarTime": "2020-03-09T22:00:00Z",
+   "pUp": 0.5690924525260925,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.2855,
+    "high": 102.4785,
+    "low": 102.0075,
+    "close": 102.4405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T22:00:00Z",
+   "targetBarTime": "2020-03-09T23:00:00Z",
+   "pUp": 0.5376439690589905,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 102.439,
+    "high": 103.251,
+    "low": 102.3975,
+    "close": 103.086
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-09T23:00:00Z",
+   "targetBarTime": "2020-03-10T00:00:00Z",
+   "pUp": 0.592780351638794,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.086,
+    "high": 103.5855,
+    "low": 102.706,
+    "close": 103.3875
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T00:00:00Z",
+   "targetBarTime": "2020-03-10T01:00:00Z",
+   "pUp": 0.5400435328483582,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.3865,
+    "high": 103.68,
+    "low": 103.2435,
+    "close": 103.294
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T01:00:00Z",
+   "targetBarTime": "2020-03-10T02:00:00Z",
+   "pUp": 0.5223607420921326,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.2935,
+    "high": 103.3175,
+    "low": 103.06,
+    "close": 103.2405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T02:00:00Z",
+   "targetBarTime": "2020-03-10T03:00:00Z",
+   "pUp": 0.5833925008773804,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.2405,
+    "high": 103.8275,
+    "low": 103.2115,
+    "close": 103.701
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T03:00:00Z",
+   "targetBarTime": "2020-03-10T04:00:00Z",
+   "pUp": 0.5340546369552612,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.7005,
+    "high": 104.259,
+    "low": 103.6415,
+    "close": 104.2275
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T04:00:00Z",
+   "targetBarTime": "2020-03-10T05:00:00Z",
+   "pUp": 0.49046590924263,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 104.227,
+    "high": 105.0165,
+    "low": 104.2,
+    "close": 104.7075
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T05:00:00Z",
+   "targetBarTime": "2020-03-10T06:00:00Z",
+   "pUp": 0.46260514855384827,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.705,
+    "high": 104.816,
+    "low": 104.3065,
+    "close": 104.6315
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T06:00:00Z",
+   "targetBarTime": "2020-03-10T07:00:00Z",
+   "pUp": 0.5077674388885498,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.6305,
+    "high": 104.6305,
+    "low": 103.808,
+    "close": 103.8475
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T07:00:00Z",
+   "targetBarTime": "2020-03-10T08:00:00Z",
+   "pUp": 0.6648935079574585,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.8495,
+    "high": 104.514,
+    "low": 103.725,
+    "close": 104.4725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T08:00:00Z",
+   "targetBarTime": "2020-03-10T09:00:00Z",
+   "pUp": 0.558449923992157,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.474,
+    "high": 104.73,
+    "low": 104.2545,
+    "close": 104.6235
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T09:00:00Z",
+   "targetBarTime": "2020-03-10T10:00:00Z",
+   "pUp": 0.4903903901576996,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 104.623,
+    "high": 105.2175,
+    "low": 104.5135,
+    "close": 104.9415
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T10:00:00Z",
+   "targetBarTime": "2020-03-10T11:00:00Z",
+   "pUp": 0.5038064122200012,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.938,
+    "high": 104.945,
+    "low": 104.5375,
+    "close": 104.6645
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T11:00:00Z",
+   "targetBarTime": "2020-03-10T12:00:00Z",
+   "pUp": 0.5933516621589661,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.661,
+    "high": 104.69,
+    "low": 103.833,
+    "close": 104.2335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T12:00:00Z",
+   "targetBarTime": "2020-03-10T13:00:00Z",
+   "pUp": 0.5997124314308167,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.232,
+    "high": 104.662,
+    "low": 104.0505,
+    "close": 104.477
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T13:00:00Z",
+   "targetBarTime": "2020-03-10T14:00:00Z",
+   "pUp": 0.6057341694831848,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.478,
+    "high": 104.575,
+    "low": 103.8555,
+    "close": 103.8955
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T14:00:00Z",
+   "targetBarTime": "2020-03-10T15:00:00Z",
+   "pUp": 0.6350418925285339,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.893,
+    "high": 104.0855,
+    "low": 103.2165,
+    "close": 103.682
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T15:00:00Z",
+   "targetBarTime": "2020-03-10T16:00:00Z",
+   "pUp": 0.6422064304351807,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.682,
+    "high": 104.4135,
+    "low": 103.666,
+    "close": 104.28
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T16:00:00Z",
+   "targetBarTime": "2020-03-10T17:00:00Z",
+   "pUp": 0.6953109502792358,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.28,
+    "high": 104.67,
+    "low": 104.234,
+    "close": 104.381
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T17:00:00Z",
+   "targetBarTime": "2020-03-10T18:00:00Z",
+   "pUp": 0.5974222421646118,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.382,
+    "high": 105.286,
+    "low": 104.2385,
+    "close": 105.103
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T18:00:00Z",
+   "targetBarTime": "2020-03-10T19:00:00Z",
+   "pUp": 0.6622860431671143,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.107,
+    "high": 105.921,
+    "low": 105.105,
+    "close": 105.4915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T19:00:00Z",
+   "targetBarTime": "2020-03-10T20:00:00Z",
+   "pUp": 0.6040228605270386,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.495,
+    "high": 105.674,
+    "low": 105.2965,
+    "close": 105.6425
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T20:00:00Z",
+   "targetBarTime": "2020-03-10T21:00:00Z",
+   "pUp": 0.47696930170059204,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.644,
+    "high": 105.666,
+    "low": 105.238,
+    "close": 105.265
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T21:00:00Z",
+   "targetBarTime": "2020-03-10T22:00:00Z",
+   "pUp": 0.6638410687446594,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.2635,
+    "high": 105.3825,
+    "low": 105.0055,
+    "close": 105.1095
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T22:00:00Z",
+   "targetBarTime": "2020-03-10T23:00:00Z",
+   "pUp": 0.7603059411048889,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.107,
+    "high": 105.2415,
+    "low": 104.814,
+    "close": 105.0455
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-10T23:00:00Z",
+   "targetBarTime": "2020-03-11T00:00:00Z",
+   "pUp": 0.7265000343322754,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.0415,
+    "high": 105.2545,
+    "low": 104.778,
+    "close": 104.923
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T00:00:00Z",
+   "targetBarTime": "2020-03-11T01:00:00Z",
+   "pUp": 0.6533474922180176,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.924,
+    "high": 105.0615,
+    "low": 104.659,
+    "close": 104.7655
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T01:00:00Z",
+   "targetBarTime": "2020-03-11T02:00:00Z",
+   "pUp": 0.6423171758651733,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.767,
+    "high": 105.012,
+    "low": 104.6835,
+    "close": 104.8625
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T02:00:00Z",
+   "targetBarTime": "2020-03-11T03:00:00Z",
+   "pUp": 0.6019363403320312,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.8625,
+    "high": 105.0045,
+    "low": 104.61,
+    "close": 104.7405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T03:00:00Z",
+   "targetBarTime": "2020-03-11T04:00:00Z",
+   "pUp": 0.5776680111885071,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.7475,
+    "high": 104.7555,
+    "low": 104.391,
+    "close": 104.4365
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T04:00:00Z",
+   "targetBarTime": "2020-03-11T05:00:00Z",
+   "pUp": 0.6289665699005127,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.435,
+    "high": 104.435,
+    "low": 104.0965,
+    "close": 104.1555
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T05:00:00Z",
+   "targetBarTime": "2020-03-11T06:00:00Z",
+   "pUp": 0.6668801307678223,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.157,
+    "high": 104.5765,
+    "low": 104.157,
+    "close": 104.374
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T06:00:00Z",
+   "targetBarTime": "2020-03-11T07:00:00Z",
+   "pUp": 0.5990418195724487,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.374,
+    "high": 105.0815,
+    "low": 104.345,
+    "close": 105.0215
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T07:00:00Z",
+   "targetBarTime": "2020-03-11T08:00:00Z",
+   "pUp": 0.605533242225647,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.0205,
+    "high": 105.334,
+    "low": 104.87,
+    "close": 105.255
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T08:00:00Z",
+   "targetBarTime": "2020-03-11T09:00:00Z",
+   "pUp": 0.48158013820648193,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.2555,
+    "high": 105.3155,
+    "low": 104.9345,
+    "close": 105.0505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T09:00:00Z",
+   "targetBarTime": "2020-03-11T10:00:00Z",
+   "pUp": 0.49580082297325134,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.0505,
+    "high": 105.111,
+    "low": 104.842,
+    "close": 104.9935
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T10:00:00Z",
+   "targetBarTime": "2020-03-11T11:00:00Z",
+   "pUp": 0.5515486598014832,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.9945,
+    "high": 105.0285,
+    "low": 104.616,
+    "close": 104.74
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T11:00:00Z",
+   "targetBarTime": "2020-03-11T12:00:00Z",
+   "pUp": 0.6036438345909119,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.741,
+    "high": 105.0015,
+    "low": 104.3725,
+    "close": 104.4455
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T12:00:00Z",
+   "targetBarTime": "2020-03-11T13:00:00Z",
+   "pUp": 0.6055747866630554,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.445,
+    "high": 104.856,
+    "low": 104.4185,
+    "close": 104.6135
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T13:00:00Z",
+   "targetBarTime": "2020-03-11T14:00:00Z",
+   "pUp": 0.6200312376022339,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.616,
+    "high": 104.817,
+    "low": 104.434,
+    "close": 104.6125
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T14:00:00Z",
+   "targetBarTime": "2020-03-11T15:00:00Z",
+   "pUp": 0.589807391166687,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.613,
+    "high": 105.032,
+    "low": 104.541,
+    "close": 104.819
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T15:00:00Z",
+   "targetBarTime": "2020-03-11T16:00:00Z",
+   "pUp": 0.6181076169013977,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.8205,
+    "high": 105.1345,
+    "low": 104.705,
+    "close": 104.9665
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T16:00:00Z",
+   "targetBarTime": "2020-03-11T17:00:00Z",
+   "pUp": 0.585490882396698,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.9675,
+    "high": 104.9855,
+    "low": 104.6245,
+    "close": 104.747
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T17:00:00Z",
+   "targetBarTime": "2020-03-11T18:00:00Z",
+   "pUp": 0.6585127115249634,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.748,
+    "high": 104.8175,
+    "low": 104.5275,
+    "close": 104.5945
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T18:00:00Z",
+   "targetBarTime": "2020-03-11T19:00:00Z",
+   "pUp": 0.749129056930542,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.5955,
+    "high": 104.812,
+    "low": 104.2315,
+    "close": 104.711
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T19:00:00Z",
+   "targetBarTime": "2020-03-11T20:00:00Z",
+   "pUp": 0.7344465255737305,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.7115,
+    "high": 104.733,
+    "low": 104.4235,
+    "close": 104.5335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T20:00:00Z",
+   "targetBarTime": "2020-03-11T21:00:00Z",
+   "pUp": 0.739493727684021,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.537,
+    "high": 104.537,
+    "low": 104.335,
+    "close": 104.449
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T21:00:00Z",
+   "targetBarTime": "2020-03-11T22:00:00Z",
+   "pUp": 0.6648492813110352,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.444,
+    "high": 104.764,
+    "low": 104.385,
+    "close": 104.733
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T22:00:00Z",
+   "targetBarTime": "2020-03-11T23:00:00Z",
+   "pUp": 0.5761669278144836,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.733,
+    "high": 104.807,
+    "low": 104.436,
+    "close": 104.536
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-11T23:00:00Z",
+   "targetBarTime": "2020-03-12T00:00:00Z",
+   "pUp": 0.5548892617225647,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.5365,
+    "high": 104.66,
+    "low": 104.3615,
+    "close": 104.6035
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T00:00:00Z",
+   "targetBarTime": "2020-03-12T01:00:00Z",
+   "pUp": 0.5754131078720093,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.604,
+    "high": 104.724,
+    "low": 103.3355,
+    "close": 103.4905
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T01:00:00Z",
+   "targetBarTime": "2020-03-12T02:00:00Z",
+   "pUp": 0.5934009552001953,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.4915,
+    "high": 103.591,
+    "low": 103.0855,
+    "close": 103.3895
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T02:00:00Z",
+   "targetBarTime": "2020-03-12T03:00:00Z",
+   "pUp": 0.6617658734321594,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.3885,
+    "high": 103.5275,
+    "low": 103.2195,
+    "close": 103.3695
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T03:00:00Z",
+   "targetBarTime": "2020-03-12T04:00:00Z",
+   "pUp": 0.645599365234375,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.3695,
+    "high": 104.2865,
+    "low": 103.3685,
+    "close": 104.0275
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T04:00:00Z",
+   "targetBarTime": "2020-03-12T05:00:00Z",
+   "pUp": 0.6717044711112976,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.0275,
+    "high": 104.103,
+    "low": 103.795,
+    "close": 103.8375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T05:00:00Z",
+   "targetBarTime": "2020-03-12T06:00:00Z",
+   "pUp": 0.5895459651947021,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.8375,
+    "high": 103.8805,
+    "low": 103.6035,
+    "close": 103.7065
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T06:00:00Z",
+   "targetBarTime": "2020-03-12T07:00:00Z",
+   "pUp": 0.5717715620994568,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.705,
+    "high": 103.9445,
+    "low": 103.5525,
+    "close": 103.673
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T07:00:00Z",
+   "targetBarTime": "2020-03-12T08:00:00Z",
+   "pUp": 0.5403738617897034,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.673,
+    "high": 103.8055,
+    "low": 103.5085,
+    "close": 103.7565
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T08:00:00Z",
+   "targetBarTime": "2020-03-12T09:00:00Z",
+   "pUp": 0.5305448174476624,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.7565,
+    "high": 104.0405,
+    "low": 103.563,
+    "close": 103.8455
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T09:00:00Z",
+   "targetBarTime": "2020-03-12T10:00:00Z",
+   "pUp": 0.5193417072296143,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.8455,
+    "high": 103.9175,
+    "low": 103.6455,
+    "close": 103.852
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T10:00:00Z",
+   "targetBarTime": "2020-03-12T11:00:00Z",
+   "pUp": 0.5082414150238037,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 103.8515,
+    "high": 103.8525,
+    "low": 103.6965,
+    "close": 103.723
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T11:00:00Z",
+   "targetBarTime": "2020-03-12T12:00:00Z",
+   "pUp": 0.560539960861206,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 103.723,
+    "high": 104.215,
+    "low": 103.515,
+    "close": 104.033
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T12:00:00Z",
+   "targetBarTime": "2020-03-12T13:00:00Z",
+   "pUp": 0.5980339646339417,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.0355,
+    "high": 104.726,
+    "low": 103.856,
+    "close": 104.722
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T13:00:00Z",
+   "targetBarTime": "2020-03-12T14:00:00Z",
+   "pUp": 0.6370142102241516,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.724,
+    "high": 105.503,
+    "low": 104.6145,
+    "close": 105.063
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T14:00:00Z",
+   "targetBarTime": "2020-03-12T15:00:00Z",
+   "pUp": 0.5833342671394348,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.065,
+    "high": 105.856,
+    "low": 105.0445,
+    "close": 105.674
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T15:00:00Z",
+   "targetBarTime": "2020-03-12T16:00:00Z",
+   "pUp": 0.6174905300140381,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.6695,
+    "high": 105.72,
+    "low": 104.854,
+    "close": 105.2905
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T16:00:00Z",
+   "targetBarTime": "2020-03-12T17:00:00Z",
+   "pUp": 0.6348155736923218,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.292,
+    "high": 106.1045,
+    "low": 105.035,
+    "close": 105.39
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T17:00:00Z",
+   "targetBarTime": "2020-03-12T18:00:00Z",
+   "pUp": 0.6566409468650818,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.3905,
+    "high": 105.3965,
+    "low": 105.0235,
+    "close": 105.193
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T18:00:00Z",
+   "targetBarTime": "2020-03-12T19:00:00Z",
+   "pUp": 0.7380618453025818,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.1925,
+    "high": 105.5025,
+    "low": 105.185,
+    "close": 105.3345
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T19:00:00Z",
+   "targetBarTime": "2020-03-12T20:00:00Z",
+   "pUp": 0.7352353930473328,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.3345,
+    "high": 105.375,
+    "low": 104.6105,
+    "close": 104.642
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T20:00:00Z",
+   "targetBarTime": "2020-03-12T21:00:00Z",
+   "pUp": 0.7973229885101318,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.641,
+    "high": 104.948,
+    "low": 104.615,
+    "close": 104.854
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T21:00:00Z",
+   "targetBarTime": "2020-03-12T22:00:00Z",
+   "pUp": 0.692257285118103,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.8545,
+    "high": 104.908,
+    "low": 104.5875,
+    "close": 104.7925
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T22:00:00Z",
+   "targetBarTime": "2020-03-12T23:00:00Z",
+   "pUp": 0.6504518985748291,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 104.792,
+    "high": 104.9495,
+    "low": 104.5075,
+    "close": 104.672
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-12T23:00:00Z",
+   "targetBarTime": "2020-03-13T00:00:00Z",
+   "pUp": 0.628237247467041,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.6715,
+    "high": 105.2055,
+    "low": 104.657,
+    "close": 105.085
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T00:00:00Z",
+   "targetBarTime": "2020-03-13T01:00:00Z",
+   "pUp": 0.6064646244049072,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.085,
+    "high": 105.1385,
+    "low": 104.6825,
+    "close": 105.034
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T01:00:00Z",
+   "targetBarTime": "2020-03-13T02:00:00Z",
+   "pUp": 0.531897783279419,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.0335,
+    "high": 105.283,
+    "low": 104.9625,
+    "close": 105.0225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T02:00:00Z",
+   "targetBarTime": "2020-03-13T03:00:00Z",
+   "pUp": 0.5616797208786011,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.0225,
+    "high": 105.0755,
+    "low": 104.897,
+    "close": 104.948
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T03:00:00Z",
+   "targetBarTime": "2020-03-13T04:00:00Z",
+   "pUp": 0.6328065991401672,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 104.947,
+    "high": 105.6715,
+    "low": 104.9295,
+    "close": 105.5955
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T04:00:00Z",
+   "targetBarTime": "2020-03-13T05:00:00Z",
+   "pUp": 0.6403641700744629,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.5955,
+    "high": 106.0145,
+    "low": 105.499,
+    "close": 105.5945
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T05:00:00Z",
+   "targetBarTime": "2020-03-13T06:00:00Z",
+   "pUp": 0.5912667512893677,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.5945,
+    "high": 105.634,
+    "low": 105.3215,
+    "close": 105.5465
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T06:00:00Z",
+   "targetBarTime": "2020-03-13T07:00:00Z",
+   "pUp": 0.6221701502799988,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.5465,
+    "high": 105.9865,
+    "low": 105.3385,
+    "close": 105.831
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T07:00:00Z",
+   "targetBarTime": "2020-03-13T08:00:00Z",
+   "pUp": 0.5734872817993164,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.832,
+    "high": 106.2305,
+    "low": 105.7615,
+    "close": 105.849
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T08:00:00Z",
+   "targetBarTime": "2020-03-13T09:00:00Z",
+   "pUp": 0.5421518087387085,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.844,
+    "high": 106.2795,
+    "low": 105.7635,
+    "close": 106.265
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T09:00:00Z",
+   "targetBarTime": "2020-03-13T10:00:00Z",
+   "pUp": 0.5354415774345398,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.2645,
+    "high": 106.5705,
+    "low": 106.1995,
+    "close": 106.262
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T10:00:00Z",
+   "targetBarTime": "2020-03-13T11:00:00Z",
+   "pUp": 0.5414551496505737,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.264,
+    "high": 106.912,
+    "low": 106.212,
+    "close": 106.8945
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T11:00:00Z",
+   "targetBarTime": "2020-03-13T12:00:00Z",
+   "pUp": 0.5280970931053162,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.8935,
+    "high": 107.4975,
+    "low": 106.7395,
+    "close": 107.2995
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T12:00:00Z",
+   "targetBarTime": "2020-03-13T13:00:00Z",
+   "pUp": 0.49342116713523865,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.302,
+    "high": 107.373,
+    "low": 106.6895,
+    "close": 106.818
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T13:00:00Z",
+   "targetBarTime": "2020-03-13T14:00:00Z",
+   "pUp": 0.6241776943206787,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.8145,
+    "high": 107.2705,
+    "low": 106.7895,
+    "close": 106.9915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T14:00:00Z",
+   "targetBarTime": "2020-03-13T15:00:00Z",
+   "pUp": 0.6077563762664795,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.992,
+    "high": 107.221,
+    "low": 106.738,
+    "close": 107.134
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T15:00:00Z",
+   "targetBarTime": "2020-03-13T16:00:00Z",
+   "pUp": 0.6221064925193787,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.137,
+    "high": 107.942,
+    "low": 106.982,
+    "close": 107.7645
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T16:00:00Z",
+   "targetBarTime": "2020-03-13T17:00:00Z",
+   "pUp": 0.6634029746055603,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.764,
+    "high": 107.997,
+    "low": 107.61,
+    "close": 107.6595
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T17:00:00Z",
+   "targetBarTime": "2020-03-13T18:00:00Z",
+   "pUp": 0.6949614882469177,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.659,
+    "high": 108.1925,
+    "low": 107.3865,
+    "close": 108.156
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T18:00:00Z",
+   "targetBarTime": "2020-03-13T19:00:00Z",
+   "pUp": 0.6663718819618225,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.157,
+    "high": 108.503,
+    "low": 107.9075,
+    "close": 108.228
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T19:00:00Z",
+   "targetBarTime": "2020-03-13T20:00:00Z",
+   "pUp": 0.6474096179008484,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.245,
+    "high": 108.3855,
+    "low": 107.859,
+    "close": 107.9655
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-13T20:00:00Z",
+   "targetBarTime": "2020-03-15T21:00:00Z",
+   "pUp": 0.781751275062561,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.1065,
+    "high": 107.3245,
+    "low": 106.452,
+    "close": 107.0505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-15T21:00:00Z",
+   "targetBarTime": "2020-03-15T22:00:00Z",
+   "pUp": 0.8669410943984985,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.0085,
+    "high": 107.168,
+    "low": 105.7645,
+    "close": 106.411
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-15T22:00:00Z",
+   "targetBarTime": "2020-03-15T23:00:00Z",
+   "pUp": 0.8147181868553162,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.4105,
+    "high": 106.8525,
+    "low": 105.7315,
+    "close": 106.5015
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-15T23:00:00Z",
+   "targetBarTime": "2020-03-16T00:00:00Z",
+   "pUp": 0.695692241191864,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.498,
+    "high": 107.111,
+    "low": 106.3035,
+    "close": 106.9165
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T00:00:00Z",
+   "targetBarTime": "2020-03-16T01:00:00Z",
+   "pUp": 0.6336554884910583,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.911,
+    "high": 107.3665,
+    "low": 106.7955,
+    "close": 107.3505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T01:00:00Z",
+   "targetBarTime": "2020-03-16T02:00:00Z",
+   "pUp": 0.5171836018562317,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.344,
+    "high": 107.5735,
+    "low": 106.9985,
+    "close": 107.159
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T02:00:00Z",
+   "targetBarTime": "2020-03-16T03:00:00Z",
+   "pUp": 0.5281538367271423,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.159,
+    "high": 107.16,
+    "low": 106.7395,
+    "close": 106.8905
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T03:00:00Z",
+   "targetBarTime": "2020-03-16T04:00:00Z",
+   "pUp": 0.6778904795646667,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.8915,
+    "high": 107.277,
+    "low": 106.78,
+    "close": 106.7915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T04:00:00Z",
+   "targetBarTime": "2020-03-16T05:00:00Z",
+   "pUp": 0.6679707169532776,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.7895,
+    "high": 107.0775,
+    "low": 106.333,
+    "close": 106.4845
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T05:00:00Z",
+   "targetBarTime": "2020-03-16T06:00:00Z",
+   "pUp": 0.706149160861969,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.473,
+    "high": 106.5855,
+    "low": 106.157,
+    "close": 106.4335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T06:00:00Z",
+   "targetBarTime": "2020-03-16T07:00:00Z",
+   "pUp": 0.6901563405990601,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.434,
+    "high": 106.7425,
+    "low": 106.2335,
+    "close": 106.593
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T07:00:00Z",
+   "targetBarTime": "2020-03-16T08:00:00Z",
+   "pUp": 0.6263293623924255,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.594,
+    "high": 106.6815,
+    "low": 106.0085,
+    "close": 106.0375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T08:00:00Z",
+   "targetBarTime": "2020-03-16T09:00:00Z",
+   "pUp": 0.7070297598838806,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.037,
+    "high": 106.13,
+    "low": 105.792,
+    "close": 105.9335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T09:00:00Z",
+   "targetBarTime": "2020-03-16T10:00:00Z",
+   "pUp": 0.6751188635826111,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.9335,
+    "high": 106.0865,
+    "low": 105.7075,
+    "close": 105.917
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T10:00:00Z",
+   "targetBarTime": "2020-03-16T11:00:00Z",
+   "pUp": 0.6453328132629395,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.917,
+    "high": 106.051,
+    "low": 105.705,
+    "close": 105.7065
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T11:00:00Z",
+   "targetBarTime": "2020-03-16T12:00:00Z",
+   "pUp": 0.6755201816558838,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.7075,
+    "high": 105.8535,
+    "low": 105.1485,
+    "close": 105.309
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T12:00:00Z",
+   "targetBarTime": "2020-03-16T13:00:00Z",
+   "pUp": 0.6891602873802185,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.3035,
+    "high": 106.027,
+    "low": 105.2715,
+    "close": 105.775
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T13:00:00Z",
+   "targetBarTime": "2020-03-16T14:00:00Z",
+   "pUp": 0.6641649007797241,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.7765,
+    "high": 106.3805,
+    "low": 105.6025,
+    "close": 106.2645
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T14:00:00Z",
+   "targetBarTime": "2020-03-16T15:00:00Z",
+   "pUp": 0.608706533908844,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.2655,
+    "high": 106.477,
+    "low": 105.587,
+    "close": 105.6805
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T15:00:00Z",
+   "targetBarTime": "2020-03-16T16:00:00Z",
+   "pUp": 0.630450427532196,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.6805,
+    "high": 106.0115,
+    "low": 105.6045,
+    "close": 105.702
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T16:00:00Z",
+   "targetBarTime": "2020-03-16T17:00:00Z",
+   "pUp": 0.6462596654891968,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.702,
+    "high": 105.991,
+    "low": 105.6045,
+    "close": 105.957
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T17:00:00Z",
+   "targetBarTime": "2020-03-16T18:00:00Z",
+   "pUp": 0.6214935779571533,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.9555,
+    "high": 106.245,
+    "low": 105.857,
+    "close": 106.1355
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T18:00:00Z",
+   "targetBarTime": "2020-03-16T19:00:00Z",
+   "pUp": 0.550537109375,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.1375,
+    "high": 106.447,
+    "low": 105.747,
+    "close": 105.8465
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T19:00:00Z",
+   "targetBarTime": "2020-03-16T20:00:00Z",
+   "pUp": 0.6359928846359253,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.847,
+    "high": 106.1105,
+    "low": 105.8345,
+    "close": 105.877
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T20:00:00Z",
+   "targetBarTime": "2020-03-16T21:00:00Z",
+   "pUp": 0.5633794069290161,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 105.9545,
+    "high": 106.02,
+    "low": 105.8595,
+    "close": 105.8975
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T21:00:00Z",
+   "targetBarTime": "2020-03-16T22:00:00Z",
+   "pUp": 0.5166308879852295,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 105.899,
+    "high": 106.3095,
+    "low": 105.889,
+    "close": 106.293
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T22:00:00Z",
+   "targetBarTime": "2020-03-16T23:00:00Z",
+   "pUp": 0.49578461050987244,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.2955,
+    "high": 106.358,
+    "low": 106.083,
+    "close": 106.219
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-16T23:00:00Z",
+   "targetBarTime": "2020-03-17T00:00:00Z",
+   "pUp": 0.5114197134971619,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.2215,
+    "high": 106.6635,
+    "low": 106.078,
+    "close": 106.5935
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T00:00:00Z",
+   "targetBarTime": "2020-03-17T01:00:00Z",
+   "pUp": 0.5242646932601929,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.593,
+    "high": 107.1945,
+    "low": 106.5625,
+    "close": 106.698
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T01:00:00Z",
+   "targetBarTime": "2020-03-17T02:00:00Z",
+   "pUp": 0.49034005403518677,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.7,
+    "high": 106.7505,
+    "low": 106.2995,
+    "close": 106.3375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T02:00:00Z",
+   "targetBarTime": "2020-03-17T03:00:00Z",
+   "pUp": 0.6439323425292969,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.338,
+    "high": 106.568,
+    "low": 106.1665,
+    "close": 106.5025
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T03:00:00Z",
+   "targetBarTime": "2020-03-17T04:00:00Z",
+   "pUp": 0.6041784882545471,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.5025,
+    "high": 106.6745,
+    "low": 106.3805,
+    "close": 106.5915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T04:00:00Z",
+   "targetBarTime": "2020-03-17T05:00:00Z",
+   "pUp": 0.5458264350891113,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.593,
+    "high": 106.641,
+    "low": 106.3555,
+    "close": 106.425
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T05:00:00Z",
+   "targetBarTime": "2020-03-17T06:00:00Z",
+   "pUp": 0.6141565442085266,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.4245,
+    "high": 106.7205,
+    "low": 106.2305,
+    "close": 106.6405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T06:00:00Z",
+   "targetBarTime": "2020-03-17T07:00:00Z",
+   "pUp": 0.4618263244628906,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 106.6445,
+    "high": 106.905,
+    "low": 106.5605,
+    "close": 106.9015
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T07:00:00Z",
+   "targetBarTime": "2020-03-17T08:00:00Z",
+   "pUp": 0.37918904423713684,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.8725,
+    "high": 107.036,
+    "low": 106.6035,
+    "close": 106.8375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T08:00:00Z",
+   "targetBarTime": "2020-03-17T09:00:00Z",
+   "pUp": 0.4054945409297943,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 106.837,
+    "high": 106.8525,
+    "low": 106.2965,
+    "close": 106.576
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T09:00:00Z",
+   "targetBarTime": "2020-03-17T10:00:00Z",
+   "pUp": 0.49136093258857727,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 106.575,
+    "high": 107.0445,
+    "low": 106.5325,
+    "close": 107.02
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T10:00:00Z",
+   "targetBarTime": "2020-03-17T11:00:00Z",
+   "pUp": 0.48555412888526917,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.0195,
+    "high": 107.1465,
+    "low": 106.7325,
+    "close": 106.7525
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T11:00:00Z",
+   "targetBarTime": "2020-03-17T12:00:00Z",
+   "pUp": 0.5258538126945496,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.7495,
+    "high": 107.0705,
+    "low": 106.714,
+    "close": 107.0535
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T12:00:00Z",
+   "targetBarTime": "2020-03-17T13:00:00Z",
+   "pUp": 0.518543004989624,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.052,
+    "high": 107.146,
+    "low": 106.7715,
+    "close": 106.8675
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T13:00:00Z",
+   "targetBarTime": "2020-03-17T14:00:00Z",
+   "pUp": 0.5299026966094971,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 106.8675,
+    "high": 107.427,
+    "low": 106.8065,
+    "close": 107.299
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T14:00:00Z",
+   "targetBarTime": "2020-03-17T15:00:00Z",
+   "pUp": 0.5659564137458801,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.296,
+    "high": 107.5935,
+    "low": 107.1425,
+    "close": 107.4105
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T15:00:00Z",
+   "targetBarTime": "2020-03-17T16:00:00Z",
+   "pUp": 0.5102813839912415,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.4095,
+    "high": 107.5715,
+    "low": 107.3075,
+    "close": 107.569
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T16:00:00Z",
+   "targetBarTime": "2020-03-17T17:00:00Z",
+   "pUp": 0.4752380847930908,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.5685,
+    "high": 107.669,
+    "low": 107.231,
+    "close": 107.3975
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T17:00:00Z",
+   "targetBarTime": "2020-03-17T18:00:00Z",
+   "pUp": 0.5550491809844971,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3965,
+    "high": 107.863,
+    "low": 107.38,
+    "close": 107.854
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T18:00:00Z",
+   "targetBarTime": "2020-03-17T19:00:00Z",
+   "pUp": 0.6039168834686279,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.8545,
+    "high": 107.856,
+    "low": 107.6325,
+    "close": 107.6865
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T19:00:00Z",
+   "targetBarTime": "2020-03-17T20:00:00Z",
+   "pUp": 0.6422234773635864,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.6865,
+    "high": 107.7365,
+    "low": 107.5355,
+    "close": 107.693
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T20:00:00Z",
+   "targetBarTime": "2020-03-17T21:00:00Z",
+   "pUp": 0.6692296862602234,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.695,
+    "high": 107.7275,
+    "low": 107.48,
+    "close": 107.6545
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T21:00:00Z",
+   "targetBarTime": "2020-03-17T22:00:00Z",
+   "pUp": 0.6424681544303894,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.665,
+    "high": 107.696,
+    "low": 107.2185,
+    "close": 107.2565
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T22:00:00Z",
+   "targetBarTime": "2020-03-17T23:00:00Z",
+   "pUp": 0.7229648232460022,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.26,
+    "high": 107.448,
+    "low": 107.231,
+    "close": 107.3835
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-17T23:00:00Z",
+   "targetBarTime": "2020-03-18T00:00:00Z",
+   "pUp": 0.642360270023346,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.3855,
+    "high": 107.5745,
+    "low": 107.278,
+    "close": 107.3825
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T00:00:00Z",
+   "targetBarTime": "2020-03-18T01:00:00Z",
+   "pUp": 0.612012505531311,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.383,
+    "high": 107.4125,
+    "low": 107.094,
+    "close": 107.2635
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T01:00:00Z",
+   "targetBarTime": "2020-03-18T02:00:00Z",
+   "pUp": 0.6041914820671082,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.263,
+    "high": 107.3095,
+    "low": 107.1345,
+    "close": 107.256
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T02:00:00Z",
+   "targetBarTime": "2020-03-18T03:00:00Z",
+   "pUp": 0.597002387046814,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.2565,
+    "high": 107.3065,
+    "low": 107.062,
+    "close": 107.121
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T03:00:00Z",
+   "targetBarTime": "2020-03-18T04:00:00Z",
+   "pUp": 0.615886926651001,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.121,
+    "high": 107.2475,
+    "low": 107.108,
+    "close": 107.225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T04:00:00Z",
+   "targetBarTime": "2020-03-18T05:00:00Z",
+   "pUp": 0.5599284172058105,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.226,
+    "high": 107.2665,
+    "low": 106.944,
+    "close": 107.0405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T05:00:00Z",
+   "targetBarTime": "2020-03-18T06:00:00Z",
+   "pUp": 0.5741274356842041,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.0395,
+    "high": 107.099,
+    "low": 106.755,
+    "close": 107.0385
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T06:00:00Z",
+   "targetBarTime": "2020-03-18T07:00:00Z",
+   "pUp": 0.5404523611068726,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.038,
+    "high": 107.418,
+    "low": 106.961,
+    "close": 107.4175
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T07:00:00Z",
+   "targetBarTime": "2020-03-18T08:00:00Z",
+   "pUp": 0.5445782542228699,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.4165,
+    "high": 107.6085,
+    "low": 107.2405,
+    "close": 107.555
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T08:00:00Z",
+   "targetBarTime": "2020-03-18T09:00:00Z",
+   "pUp": 0.47149378061294556,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.5555,
+    "high": 107.5765,
+    "low": 107.2905,
+    "close": 107.3255
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T09:00:00Z",
+   "targetBarTime": "2020-03-18T10:00:00Z",
+   "pUp": 0.5412890315055847,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3225,
+    "high": 107.355,
+    "low": 107.0865,
+    "close": 107.3245
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T10:00:00Z",
+   "targetBarTime": "2020-03-18T11:00:00Z",
+   "pUp": 0.530680775642395,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.324,
+    "high": 107.538,
+    "low": 107.229,
+    "close": 107.279
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T11:00:00Z",
+   "targetBarTime": "2020-03-18T12:00:00Z",
+   "pUp": 0.5335033535957336,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.2785,
+    "high": 107.6485,
+    "low": 107.2785,
+    "close": 107.6405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T12:00:00Z",
+   "targetBarTime": "2020-03-18T13:00:00Z",
+   "pUp": 0.5435785055160522,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.642,
+    "high": 108.0955,
+    "low": 107.6045,
+    "close": 107.958
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T13:00:00Z",
+   "targetBarTime": "2020-03-18T14:00:00Z",
+   "pUp": 0.5080382823944092,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9585,
+    "high": 108.1375,
+    "low": 107.732,
+    "close": 108.0765
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T14:00:00Z",
+   "targetBarTime": "2020-03-18T15:00:00Z",
+   "pUp": 0.4544895887374878,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.0755,
+    "high": 108.503,
+    "low": 108.0125,
+    "close": 108.4335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T15:00:00Z",
+   "targetBarTime": "2020-03-18T16:00:00Z",
+   "pUp": 0.4711741805076599,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.4345,
+    "high": 108.5475,
+    "low": 108.1215,
+    "close": 108.3625
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T16:00:00Z",
+   "targetBarTime": "2020-03-18T17:00:00Z",
+   "pUp": 0.4984720051288605,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.364,
+    "high": 108.656,
+    "low": 108.121,
+    "close": 108.437
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T17:00:00Z",
+   "targetBarTime": "2020-03-18T18:00:00Z",
+   "pUp": 0.5469294786453247,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.438,
+    "high": 108.5475,
+    "low": 107.7475,
+    "close": 107.9535
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T18:00:00Z",
+   "targetBarTime": "2020-03-18T19:00:00Z",
+   "pUp": 0.6955230236053467,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9505,
+    "high": 108.332,
+    "low": 107.833,
+    "close": 108.111
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T19:00:00Z",
+   "targetBarTime": "2020-03-18T20:00:00Z",
+   "pUp": 0.7090028524398804,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.1135,
+    "high": 108.188,
+    "low": 107.9685,
+    "close": 108.0775
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T20:00:00Z",
+   "targetBarTime": "2020-03-18T21:00:00Z",
+   "pUp": 0.6641895174980164,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.076,
+    "high": 108.092,
+    "low": 107.8515,
+    "close": 108.06
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T21:00:00Z",
+   "targetBarTime": "2020-03-18T22:00:00Z",
+   "pUp": 0.6033995747566223,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.06,
+    "high": 108.252,
+    "low": 107.9995,
+    "close": 108.013
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T22:00:00Z",
+   "targetBarTime": "2020-03-18T23:00:00Z",
+   "pUp": 0.6105985641479492,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.011,
+    "high": 108.4055,
+    "low": 107.992,
+    "close": 108.366
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-18T23:00:00Z",
+   "targetBarTime": "2020-03-19T00:00:00Z",
+   "pUp": 0.574904203414917,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.3645,
+    "high": 108.9575,
+    "low": 108.197,
+    "close": 108.807
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T00:00:00Z",
+   "targetBarTime": "2020-03-19T01:00:00Z",
+   "pUp": 0.6022066473960876,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.8065,
+    "high": 109.064,
+    "low": 108.5875,
+    "close": 108.7965
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T01:00:00Z",
+   "targetBarTime": "2020-03-19T02:00:00Z",
+   "pUp": 0.4127693772315979,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.796,
+    "high": 109.5015,
+    "low": 108.7635,
+    "close": 109.0715
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T02:00:00Z",
+   "targetBarTime": "2020-03-19T03:00:00Z",
+   "pUp": 0.5005722641944885,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.0715,
+    "high": 109.397,
+    "low": 108.98,
+    "close": 109.2885
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T03:00:00Z",
+   "targetBarTime": "2020-03-19T04:00:00Z",
+   "pUp": 0.4427986443042755,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.2895,
+    "high": 109.5585,
+    "low": 108.9815,
+    "close": 109.072
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T04:00:00Z",
+   "targetBarTime": "2020-03-19T05:00:00Z",
+   "pUp": 0.5620577335357666,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.075,
+    "high": 109.077,
+    "low": 108.7645,
+    "close": 108.8435
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T05:00:00Z",
+   "targetBarTime": "2020-03-19T06:00:00Z",
+   "pUp": 0.7562741637229919,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.8425,
+    "high": 108.9585,
+    "low": 108.4545,
+    "close": 108.5715
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T06:00:00Z",
+   "targetBarTime": "2020-03-19T07:00:00Z",
+   "pUp": 0.7692770957946777,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.572,
+    "high": 109.2385,
+    "low": 108.546,
+    "close": 109.1575
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T07:00:00Z",
+   "targetBarTime": "2020-03-19T08:00:00Z",
+   "pUp": 0.6038826107978821,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.1585,
+    "high": 109.213,
+    "low": 108.8165,
+    "close": 108.9145
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T08:00:00Z",
+   "targetBarTime": "2020-03-19T09:00:00Z",
+   "pUp": 0.5121806859970093,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.913,
+    "high": 109.172,
+    "low": 108.8235,
+    "close": 109.15
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T09:00:00Z",
+   "targetBarTime": "2020-03-19T10:00:00Z",
+   "pUp": 0.5073338747024536,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.1475,
+    "high": 109.48,
+    "low": 108.975,
+    "close": 109.479
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T10:00:00Z",
+   "targetBarTime": "2020-03-19T11:00:00Z",
+   "pUp": 0.47617006301879883,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 109.48,
+    "high": 109.965,
+    "low": 109.417,
+    "close": 109.9055
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T11:00:00Z",
+   "targetBarTime": "2020-03-19T12:00:00Z",
+   "pUp": 0.4360348582267761,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.905,
+    "high": 110.0025,
+    "low": 109.5205,
+    "close": 109.7805
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T12:00:00Z",
+   "targetBarTime": "2020-03-19T13:00:00Z",
+   "pUp": 0.45302003622055054,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 109.7805,
+    "high": 110.008,
+    "low": 109.5455,
+    "close": 109.986
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T13:00:00Z",
+   "targetBarTime": "2020-03-19T14:00:00Z",
+   "pUp": 0.4684446156024933,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.988,
+    "high": 110.181,
+    "low": 109.6205,
+    "close": 109.761
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T14:00:00Z",
+   "targetBarTime": "2020-03-19T15:00:00Z",
+   "pUp": 0.5584061741828918,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.7605,
+    "high": 110.0965,
+    "low": 109.6405,
+    "close": 110.0765
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T15:00:00Z",
+   "targetBarTime": "2020-03-19T16:00:00Z",
+   "pUp": 0.5850523114204407,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.0775,
+    "high": 110.208,
+    "low": 110.012,
+    "close": 110.198
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T16:00:00Z",
+   "targetBarTime": "2020-03-19T17:00:00Z",
+   "pUp": 0.5446237921714783,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.196,
+    "high": 110.3845,
+    "low": 110.051,
+    "close": 110.381
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T17:00:00Z",
+   "targetBarTime": "2020-03-19T18:00:00Z",
+   "pUp": 0.5486511588096619,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.3805,
+    "high": 110.842,
+    "low": 110.325,
+    "close": 110.6835
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T18:00:00Z",
+   "targetBarTime": "2020-03-19T19:00:00Z",
+   "pUp": 0.5145357251167297,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.685,
+    "high": 110.9555,
+    "low": 110.592,
+    "close": 110.7375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T19:00:00Z",
+   "targetBarTime": "2020-03-19T20:00:00Z",
+   "pUp": 0.41020601987838745,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.7355,
+    "high": 110.763,
+    "low": 110.4455,
+    "close": 110.716
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T20:00:00Z",
+   "targetBarTime": "2020-03-19T21:00:00Z",
+   "pUp": 0.513685405254364,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.717,
+    "high": 110.9525,
+    "low": 110.681,
+    "close": 110.9005
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T21:00:00Z",
+   "targetBarTime": "2020-03-19T22:00:00Z",
+   "pUp": 0.39204350113868713,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.9025,
+    "high": 110.9585,
+    "low": 110.691,
+    "close": 110.8605
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T22:00:00Z",
+   "targetBarTime": "2020-03-19T23:00:00Z",
+   "pUp": 0.5153417587280273,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.8585,
+    "high": 111.366,
+    "low": 110.8375,
+    "close": 111.313
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-19T23:00:00Z",
+   "targetBarTime": "2020-03-20T00:00:00Z",
+   "pUp": 0.3743618130683899,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.314,
+    "high": 111.344,
+    "low": 111.05,
+    "close": 111.146
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T00:00:00Z",
+   "targetBarTime": "2020-03-20T01:00:00Z",
+   "pUp": 0.49201640486717224,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.146,
+    "high": 111.2015,
+    "low": 110.1075,
+    "close": 110.4225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T01:00:00Z",
+   "targetBarTime": "2020-03-20T02:00:00Z",
+   "pUp": 0.5690773725509644,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.4225,
+    "high": 110.5225,
+    "low": 109.9905,
+    "close": 110.1745
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T02:00:00Z",
+   "targetBarTime": "2020-03-20T03:00:00Z",
+   "pUp": 0.47618553042411804,
+   "predicted": "DOWN",
+   "actual": "FLAT",
+   "bar": {
+    "open": 110.1715,
+    "high": 110.3245,
+    "low": 109.9965,
+    "close": 110.1715
+   },
+   "scored": false,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T03:00:00Z",
+   "targetBarTime": "2020-03-20T04:00:00Z",
+   "pUp": 0.3989872932434082,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.172,
+    "high": 110.2405,
+    "low": 109.9305,
+    "close": 109.9455
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T04:00:00Z",
+   "targetBarTime": "2020-03-20T05:00:00Z",
+   "pUp": 0.45803356170654297,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 109.946,
+    "high": 110.079,
+    "low": 109.777,
+    "close": 110.0305
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T05:00:00Z",
+   "targetBarTime": "2020-03-20T06:00:00Z",
+   "pUp": 0.43561363220214844,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.0305,
+    "high": 110.099,
+    "low": 109.6405,
+    "close": 109.843
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T06:00:00Z",
+   "targetBarTime": "2020-03-20T07:00:00Z",
+   "pUp": 0.5484268069267273,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.843,
+    "high": 109.9655,
+    "low": 109.3335,
+    "close": 109.512
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T07:00:00Z",
+   "targetBarTime": "2020-03-20T08:00:00Z",
+   "pUp": 0.5992427468299866,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.512,
+    "high": 109.971,
+    "low": 109.487,
+    "close": 109.9105
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T08:00:00Z",
+   "targetBarTime": "2020-03-20T09:00:00Z",
+   "pUp": 0.429367333650589,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 109.908,
+    "high": 110.2825,
+    "low": 109.8055,
+    "close": 110.261
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T09:00:00Z",
+   "targetBarTime": "2020-03-20T10:00:00Z",
+   "pUp": 0.35226714611053467,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.2605,
+    "high": 110.2605,
+    "low": 109.8295,
+    "close": 109.9685
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T10:00:00Z",
+   "targetBarTime": "2020-03-20T11:00:00Z",
+   "pUp": 0.4490278959274292,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 109.9685,
+    "high": 110.2715,
+    "low": 109.9315,
+    "close": 110.107
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T11:00:00Z",
+   "targetBarTime": "2020-03-20T12:00:00Z",
+   "pUp": 0.42683145403862,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.107,
+    "high": 110.3935,
+    "low": 109.913,
+    "close": 110.365
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T12:00:00Z",
+   "targetBarTime": "2020-03-20T13:00:00Z",
+   "pUp": 0.40467286109924316,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.366,
+    "high": 110.996,
+    "low": 110.364,
+    "close": 110.9445
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T13:00:00Z",
+   "targetBarTime": "2020-03-20T14:00:00Z",
+   "pUp": 0.3911980390548706,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.945,
+    "high": 110.946,
+    "low": 110.5605,
+    "close": 110.8975
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T14:00:00Z",
+   "targetBarTime": "2020-03-20T15:00:00Z",
+   "pUp": 0.3868451416492462,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.8955,
+    "high": 111.397,
+    "low": 110.7925,
+    "close": 111.3
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T15:00:00Z",
+   "targetBarTime": "2020-03-20T16:00:00Z",
+   "pUp": 0.39970114827156067,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 111.304,
+    "high": 111.4795,
+    "low": 111.2275,
+    "close": 111.4655
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T16:00:00Z",
+   "targetBarTime": "2020-03-20T17:00:00Z",
+   "pUp": 0.3385891914367676,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.463,
+    "high": 111.5055,
+    "low": 110.854,
+    "close": 110.9465
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T17:00:00Z",
+   "targetBarTime": "2020-03-20T18:00:00Z",
+   "pUp": 0.5829998254776001,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.948,
+    "high": 111.3195,
+    "low": 110.946,
+    "close": 111.1675
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T18:00:00Z",
+   "targetBarTime": "2020-03-20T19:00:00Z",
+   "pUp": 0.516243040561676,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.168,
+    "high": 111.504,
+    "low": 111.0625,
+    "close": 111.0875
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T19:00:00Z",
+   "targetBarTime": "2020-03-20T20:00:00Z",
+   "pUp": 0.5939337611198425,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.087,
+    "high": 111.3545,
+    "low": 110.67,
+    "close": 110.776
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-20T20:00:00Z",
+   "targetBarTime": "2020-03-22T21:00:00Z",
+   "pUp": 0.7637469172477722,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.795,
+    "high": 110.8695,
+    "low": 110.73,
+    "close": 110.804
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-22T21:00:00Z",
+   "targetBarTime": "2020-03-22T22:00:00Z",
+   "pUp": 0.6840396523475647,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.8085,
+    "high": 111.258,
+    "low": 110.5285,
+    "close": 111.0815
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-22T22:00:00Z",
+   "targetBarTime": "2020-03-22T23:00:00Z",
+   "pUp": 0.5005159378051758,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.072,
+    "high": 111.091,
+    "low": 110.29,
+    "close": 110.3925
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-22T23:00:00Z",
+   "targetBarTime": "2020-03-23T00:00:00Z",
+   "pUp": 0.6047505736351013,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.3965,
+    "high": 110.7835,
+    "low": 110.2615,
+    "close": 110.5395
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T00:00:00Z",
+   "targetBarTime": "2020-03-23T01:00:00Z",
+   "pUp": 0.5863103866577148,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.5385,
+    "high": 110.733,
+    "low": 110.1365,
+    "close": 110.377
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T01:00:00Z",
+   "targetBarTime": "2020-03-23T02:00:00Z",
+   "pUp": 0.636082649230957,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.3785,
+    "high": 110.381,
+    "low": 109.998,
+    "close": 110.077
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T02:00:00Z",
+   "targetBarTime": "2020-03-23T03:00:00Z",
+   "pUp": 0.724799394607544,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.077,
+    "high": 110.393,
+    "low": 110.017,
+    "close": 110.2855
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T03:00:00Z",
+   "targetBarTime": "2020-03-23T04:00:00Z",
+   "pUp": 0.6544942259788513,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.284,
+    "high": 110.286,
+    "low": 109.998,
+    "close": 110.085
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T04:00:00Z",
+   "targetBarTime": "2020-03-23T05:00:00Z",
+   "pUp": 0.6811971664428711,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.0845,
+    "high": 110.107,
+    "low": 109.7965,
+    "close": 109.888
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T05:00:00Z",
+   "targetBarTime": "2020-03-23T06:00:00Z",
+   "pUp": 0.6919664144515991,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.889,
+    "high": 110.292,
+    "low": 109.67,
+    "close": 110.0545
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T06:00:00Z",
+   "targetBarTime": "2020-03-23T07:00:00Z",
+   "pUp": 0.6181253790855408,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.053,
+    "high": 110.296,
+    "low": 110.0345,
+    "close": 110.24
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T07:00:00Z",
+   "targetBarTime": "2020-03-23T08:00:00Z",
+   "pUp": 0.5227381587028503,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.2415,
+    "high": 110.25,
+    "low": 110.081,
+    "close": 110.1825
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T08:00:00Z",
+   "targetBarTime": "2020-03-23T09:00:00Z",
+   "pUp": 0.4977947473526001,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.1835,
+    "high": 110.741,
+    "low": 110.182,
+    "close": 110.491
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T09:00:00Z",
+   "targetBarTime": "2020-03-23T10:00:00Z",
+   "pUp": 0.4918827712535858,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.49,
+    "high": 110.7215,
+    "low": 110.481,
+    "close": 110.65
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T10:00:00Z",
+   "targetBarTime": "2020-03-23T11:00:00Z",
+   "pUp": 0.3803664743900299,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.6495,
+    "high": 110.8875,
+    "low": 110.5405,
+    "close": 110.8085
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T11:00:00Z",
+   "targetBarTime": "2020-03-23T12:00:00Z",
+   "pUp": 0.3321461081504822,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.809,
+    "high": 110.8395,
+    "low": 109.8225,
+    "close": 110.2195
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T12:00:00Z",
+   "targetBarTime": "2020-03-23T13:00:00Z",
+   "pUp": 0.4679074287414551,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.2185,
+    "high": 110.8565,
+    "low": 110.1625,
+    "close": 110.605
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T13:00:00Z",
+   "targetBarTime": "2020-03-23T14:00:00Z",
+   "pUp": 0.5104016065597534,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.606,
+    "high": 110.8755,
+    "low": 110.5885,
+    "close": 110.7915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T14:00:00Z",
+   "targetBarTime": "2020-03-23T15:00:00Z",
+   "pUp": 0.4258262813091278,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 110.7895,
+    "high": 111.3685,
+    "low": 110.716,
+    "close": 111.352
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T15:00:00Z",
+   "targetBarTime": "2020-03-23T16:00:00Z",
+   "pUp": 0.4433240592479706,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.352,
+    "high": 111.5975,
+    "low": 111.179,
+    "close": 111.2285
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T16:00:00Z",
+   "targetBarTime": "2020-03-23T17:00:00Z",
+   "pUp": 0.48669326305389404,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.2265,
+    "high": 111.3905,
+    "low": 111.144,
+    "close": 111.225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T17:00:00Z",
+   "targetBarTime": "2020-03-23T18:00:00Z",
+   "pUp": 0.5305913686752319,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.225,
+    "high": 111.5715,
+    "low": 111.1365,
+    "close": 111.5075
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T18:00:00Z",
+   "targetBarTime": "2020-03-23T19:00:00Z",
+   "pUp": 0.5154579281806946,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.506,
+    "high": 111.508,
+    "low": 111.153,
+    "close": 111.3135
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T19:00:00Z",
+   "targetBarTime": "2020-03-23T20:00:00Z",
+   "pUp": 0.6145828366279602,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.3125,
+    "high": 111.354,
+    "low": 111.123,
+    "close": 111.2365
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T20:00:00Z",
+   "targetBarTime": "2020-03-23T21:00:00Z",
+   "pUp": 0.6646328568458557,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.23,
+    "high": 111.363,
+    "low": 111.0695,
+    "close": 111.247
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T21:00:00Z",
+   "targetBarTime": "2020-03-23T22:00:00Z",
+   "pUp": 0.6261003017425537,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.2475,
+    "high": 111.277,
+    "low": 110.862,
+    "close": 110.9855
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T22:00:00Z",
+   "targetBarTime": "2020-03-23T23:00:00Z",
+   "pUp": 0.7493975758552551,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.988,
+    "high": 111.14,
+    "low": 110.785,
+    "close": 110.82
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-23T23:00:00Z",
+   "targetBarTime": "2020-03-24T00:00:00Z",
+   "pUp": 0.7628123164176941,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.816,
+    "high": 110.9825,
+    "low": 110.448,
+    "close": 110.4585
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T00:00:00Z",
+   "targetBarTime": "2020-03-24T01:00:00Z",
+   "pUp": 0.7839903831481934,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.4575,
+    "high": 110.5185,
+    "low": 110.267,
+    "close": 110.3525
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T01:00:00Z",
+   "targetBarTime": "2020-03-24T02:00:00Z",
+   "pUp": 0.7613614201545715,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.3525,
+    "high": 110.429,
+    "low": 110.0855,
+    "close": 110.3545
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T02:00:00Z",
+   "targetBarTime": "2020-03-24T03:00:00Z",
+   "pUp": 0.7148327231407166,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.356,
+    "high": 110.576,
+    "low": 110.246,
+    "close": 110.3055
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T03:00:00Z",
+   "targetBarTime": "2020-03-24T04:00:00Z",
+   "pUp": 0.683761477470398,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.305,
+    "high": 110.426,
+    "low": 110.13,
+    "close": 110.2875
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T04:00:00Z",
+   "targetBarTime": "2020-03-24T05:00:00Z",
+   "pUp": 0.6450814604759216,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.292,
+    "high": 110.472,
+    "low": 110.1785,
+    "close": 110.3955
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T05:00:00Z",
+   "targetBarTime": "2020-03-24T06:00:00Z",
+   "pUp": 0.5846846103668213,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.3955,
+    "high": 110.4915,
+    "low": 110.24,
+    "close": 110.3575
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T06:00:00Z",
+   "targetBarTime": "2020-03-24T07:00:00Z",
+   "pUp": 0.5546431541442871,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.3565,
+    "high": 110.6945,
+    "low": 110.3235,
+    "close": 110.5365
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T07:00:00Z",
+   "targetBarTime": "2020-03-24T08:00:00Z",
+   "pUp": 0.5170139074325562,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.5365,
+    "high": 110.769,
+    "low": 110.536,
+    "close": 110.7095
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T08:00:00Z",
+   "targetBarTime": "2020-03-24T09:00:00Z",
+   "pUp": 0.4496229290962219,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.7095,
+    "high": 110.9455,
+    "low": 110.3635,
+    "close": 110.421
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T09:00:00Z",
+   "targetBarTime": "2020-03-24T10:00:00Z",
+   "pUp": 0.5185302495956421,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.4205,
+    "high": 110.6375,
+    "low": 110.295,
+    "close": 110.4815
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T10:00:00Z",
+   "targetBarTime": "2020-03-24T11:00:00Z",
+   "pUp": 0.5283222794532776,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.4815,
+    "high": 110.9165,
+    "low": 110.416,
+    "close": 110.85
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T11:00:00Z",
+   "targetBarTime": "2020-03-24T12:00:00Z",
+   "pUp": 0.5383391380310059,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.849,
+    "high": 111.0055,
+    "low": 110.7315,
+    "close": 110.788
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T12:00:00Z",
+   "targetBarTime": "2020-03-24T13:00:00Z",
+   "pUp": 0.509632408618927,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.788,
+    "high": 111.19,
+    "low": 110.6015,
+    "close": 111.1835
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T13:00:00Z",
+   "targetBarTime": "2020-03-24T14:00:00Z",
+   "pUp": 0.55202716588974,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.184,
+    "high": 111.407,
+    "low": 111.0955,
+    "close": 111.402
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T14:00:00Z",
+   "targetBarTime": "2020-03-24T15:00:00Z",
+   "pUp": 0.48116379976272583,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 111.4065,
+    "high": 111.503,
+    "low": 111.1665,
+    "close": 111.4545
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T15:00:00Z",
+   "targetBarTime": "2020-03-24T16:00:00Z",
+   "pUp": 0.46325886249542236,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 111.4545,
+    "high": 111.629,
+    "low": 111.346,
+    "close": 111.48
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T16:00:00Z",
+   "targetBarTime": "2020-03-24T17:00:00Z",
+   "pUp": 0.48165756464004517,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.4805,
+    "high": 111.5135,
+    "low": 111.295,
+    "close": 111.467
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T17:00:00Z",
+   "targetBarTime": "2020-03-24T18:00:00Z",
+   "pUp": 0.5165594816207886,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.464,
+    "high": 111.5215,
+    "low": 111.3055,
+    "close": 111.474
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T18:00:00Z",
+   "targetBarTime": "2020-03-24T19:00:00Z",
+   "pUp": 0.5530792474746704,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.4745,
+    "high": 111.715,
+    "low": 111.4625,
+    "close": 111.505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T19:00:00Z",
+   "targetBarTime": "2020-03-24T20:00:00Z",
+   "pUp": 0.5778191089630127,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.506,
+    "high": 111.536,
+    "low": 111.1835,
+    "close": 111.2285
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T20:00:00Z",
+   "targetBarTime": "2020-03-24T21:00:00Z",
+   "pUp": 0.7547855973243713,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.2275,
+    "high": 111.593,
+    "low": 111.212,
+    "close": 111.3215
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T21:00:00Z",
+   "targetBarTime": "2020-03-24T22:00:00Z",
+   "pUp": 0.6833653450012207,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.321,
+    "high": 111.3735,
+    "low": 111.059,
+    "close": 111.2035
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T22:00:00Z",
+   "targetBarTime": "2020-03-24T23:00:00Z",
+   "pUp": 0.7463911175727844,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.204,
+    "high": 111.3075,
+    "low": 111.045,
+    "close": 111.126
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-24T23:00:00Z",
+   "targetBarTime": "2020-03-25T00:00:00Z",
+   "pUp": 0.6927854418754578,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.1255,
+    "high": 111.277,
+    "low": 110.941,
+    "close": 111.0085
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T00:00:00Z",
+   "targetBarTime": "2020-03-25T01:00:00Z",
+   "pUp": 0.669517457485199,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.0085,
+    "high": 111.0155,
+    "low": 110.7535,
+    "close": 110.821
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T01:00:00Z",
+   "targetBarTime": "2020-03-25T02:00:00Z",
+   "pUp": 0.6878745555877686,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.8225,
+    "high": 111.0395,
+    "low": 110.789,
+    "close": 110.8705
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T02:00:00Z",
+   "targetBarTime": "2020-03-25T03:00:00Z",
+   "pUp": 0.6252829432487488,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.8705,
+    "high": 111.137,
+    "low": 110.8705,
+    "close": 111.1065
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T03:00:00Z",
+   "targetBarTime": "2020-03-25T04:00:00Z",
+   "pUp": 0.5249536037445068,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.1075,
+    "high": 111.3495,
+    "low": 111.067,
+    "close": 111.3235
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T04:00:00Z",
+   "targetBarTime": "2020-03-25T05:00:00Z",
+   "pUp": 0.43591219186782837,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.3235,
+    "high": 111.495,
+    "low": 111.1975,
+    "close": 111.2375
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T05:00:00Z",
+   "targetBarTime": "2020-03-25T06:00:00Z",
+   "pUp": 0.474408358335495,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 111.238,
+    "high": 111.3745,
+    "low": 111.1355,
+    "close": 111.3335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T06:00:00Z",
+   "targetBarTime": "2020-03-25T07:00:00Z",
+   "pUp": 0.49891796708106995,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 111.332,
+    "high": 111.481,
+    "low": 111.1735,
+    "close": 111.4655
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T07:00:00Z",
+   "targetBarTime": "2020-03-25T08:00:00Z",
+   "pUp": 0.4912388026714325,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.4665,
+    "high": 111.5695,
+    "low": 111.302,
+    "close": 111.3095
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T08:00:00Z",
+   "targetBarTime": "2020-03-25T09:00:00Z",
+   "pUp": 0.5895208716392517,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.31,
+    "high": 111.483,
+    "low": 111.274,
+    "close": 111.4135
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T09:00:00Z",
+   "targetBarTime": "2020-03-25T10:00:00Z",
+   "pUp": 0.5304385423660278,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.413,
+    "high": 111.447,
+    "low": 111.1785,
+    "close": 111.2225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T10:00:00Z",
+   "targetBarTime": "2020-03-25T11:00:00Z",
+   "pUp": 0.5958029627799988,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.226,
+    "high": 111.327,
+    "low": 111.064,
+    "close": 111.2625
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T11:00:00Z",
+   "targetBarTime": "2020-03-25T12:00:00Z",
+   "pUp": 0.5245312452316284,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.264,
+    "high": 111.451,
+    "low": 111.2315,
+    "close": 111.3495
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T12:00:00Z",
+   "targetBarTime": "2020-03-25T13:00:00Z",
+   "pUp": 0.49639278650283813,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 111.3505,
+    "high": 111.646,
+    "low": 111.344,
+    "close": 111.6
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T13:00:00Z",
+   "targetBarTime": "2020-03-25T14:00:00Z",
+   "pUp": 0.4805368185043335,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.6005,
+    "high": 111.6815,
+    "low": 111.458,
+    "close": 111.586
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T14:00:00Z",
+   "targetBarTime": "2020-03-25T15:00:00Z",
+   "pUp": 0.4761822819709778,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.5855,
+    "high": 111.617,
+    "low": 111.399,
+    "close": 111.4205
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T15:00:00Z",
+   "targetBarTime": "2020-03-25T16:00:00Z",
+   "pUp": 0.5505883097648621,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.4205,
+    "high": 111.598,
+    "low": 111.3725,
+    "close": 111.4225
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T16:00:00Z",
+   "targetBarTime": "2020-03-25T17:00:00Z",
+   "pUp": 0.5671747922897339,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.4235,
+    "high": 111.517,
+    "low": 111.136,
+    "close": 111.16
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T17:00:00Z",
+   "targetBarTime": "2020-03-25T18:00:00Z",
+   "pUp": 0.6064945459365845,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.159,
+    "high": 111.3665,
+    "low": 111.0855,
+    "close": 111.357
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T18:00:00Z",
+   "targetBarTime": "2020-03-25T19:00:00Z",
+   "pUp": 0.5828804969787598,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.357,
+    "high": 111.3655,
+    "low": 111.1195,
+    "close": 111.18
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T19:00:00Z",
+   "targetBarTime": "2020-03-25T20:00:00Z",
+   "pUp": 0.6296424269676208,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 111.176,
+    "high": 111.255,
+    "low": 111.143,
+    "close": 111.21
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T20:00:00Z",
+   "targetBarTime": "2020-03-25T21:00:00Z",
+   "pUp": 0.5777884125709534,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.2065,
+    "high": 111.333,
+    "low": 111.0915,
+    "close": 111.177
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T21:00:00Z",
+   "targetBarTime": "2020-03-25T22:00:00Z",
+   "pUp": 0.5523799061775208,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.1735,
+    "high": 111.246,
+    "low": 110.8895,
+    "close": 111.0165
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T22:00:00Z",
+   "targetBarTime": "2020-03-25T23:00:00Z",
+   "pUp": 0.5912516713142395,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 111.0175,
+    "high": 111.0405,
+    "low": 110.825,
+    "close": 110.837
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-25T23:00:00Z",
+   "targetBarTime": "2020-03-26T00:00:00Z",
+   "pUp": 0.5879309177398682,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.8365,
+    "high": 110.9545,
+    "low": 110.594,
+    "close": 110.748
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T00:00:00Z",
+   "targetBarTime": "2020-03-26T01:00:00Z",
+   "pUp": 0.56795734167099,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.7485,
+    "high": 110.781,
+    "low": 110.4575,
+    "close": 110.6515
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T01:00:00Z",
+   "targetBarTime": "2020-03-26T02:00:00Z",
+   "pUp": 0.603766143321991,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.654,
+    "high": 110.857,
+    "low": 110.543,
+    "close": 110.725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T02:00:00Z",
+   "targetBarTime": "2020-03-26T03:00:00Z",
+   "pUp": 0.5753008723258972,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.724,
+    "high": 110.768,
+    "low": 110.5725,
+    "close": 110.697
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T03:00:00Z",
+   "targetBarTime": "2020-03-26T04:00:00Z",
+   "pUp": 0.563075602054596,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 110.697,
+    "high": 110.855,
+    "low": 110.675,
+    "close": 110.729
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T04:00:00Z",
+   "targetBarTime": "2020-03-26T05:00:00Z",
+   "pUp": 0.5650151371955872,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.729,
+    "high": 110.747,
+    "low": 110.562,
+    "close": 110.6215
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T05:00:00Z",
+   "targetBarTime": "2020-03-26T06:00:00Z",
+   "pUp": 0.6641504168510437,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.621,
+    "high": 110.7485,
+    "low": 110.5275,
+    "close": 110.559
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T06:00:00Z",
+   "targetBarTime": "2020-03-26T07:00:00Z",
+   "pUp": 0.6607095003128052,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.559,
+    "high": 110.6345,
+    "low": 110.3685,
+    "close": 110.4725
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T07:00:00Z",
+   "targetBarTime": "2020-03-26T08:00:00Z",
+   "pUp": 0.6562545299530029,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.4725,
+    "high": 110.5065,
+    "low": 110.0645,
+    "close": 110.1035
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T08:00:00Z",
+   "targetBarTime": "2020-03-26T09:00:00Z",
+   "pUp": 0.7195618748664856,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.1035,
+    "high": 110.1365,
+    "low": 109.812,
+    "close": 110.046
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T09:00:00Z",
+   "targetBarTime": "2020-03-26T10:00:00Z",
+   "pUp": 0.630987823009491,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 110.046,
+    "high": 110.172,
+    "low": 109.8155,
+    "close": 109.9825
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T10:00:00Z",
+   "targetBarTime": "2020-03-26T11:00:00Z",
+   "pUp": 0.6028488278388977,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.9825,
+    "high": 109.983,
+    "low": 109.5815,
+    "close": 109.733
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T11:00:00Z",
+   "targetBarTime": "2020-03-26T12:00:00Z",
+   "pUp": 0.6727018356323242,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.7325,
+    "high": 109.9455,
+    "low": 109.555,
+    "close": 109.6525
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T12:00:00Z",
+   "targetBarTime": "2020-03-26T13:00:00Z",
+   "pUp": 0.6267271637916565,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.6525,
+    "high": 109.872,
+    "low": 109.3765,
+    "close": 109.667
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T13:00:00Z",
+   "targetBarTime": "2020-03-26T14:00:00Z",
+   "pUp": 0.5844696164131165,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.664,
+    "high": 110.0835,
+    "low": 109.613,
+    "close": 109.848
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T14:00:00Z",
+   "targetBarTime": "2020-03-26T15:00:00Z",
+   "pUp": 0.5215068459510803,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.847,
+    "high": 109.8895,
+    "low": 109.35,
+    "close": 109.455
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T15:00:00Z",
+   "targetBarTime": "2020-03-26T16:00:00Z",
+   "pUp": 0.6300384402275085,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.4565,
+    "high": 109.765,
+    "low": 109.45,
+    "close": 109.4555
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T16:00:00Z",
+   "targetBarTime": "2020-03-26T17:00:00Z",
+   "pUp": 0.6092193722724915,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.4565,
+    "high": 109.5915,
+    "low": 109.409,
+    "close": 109.504
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T17:00:00Z",
+   "targetBarTime": "2020-03-26T18:00:00Z",
+   "pUp": 0.5907243490219116,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.508,
+    "high": 109.5775,
+    "low": 109.208,
+    "close": 109.2275
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T18:00:00Z",
+   "targetBarTime": "2020-03-26T19:00:00Z",
+   "pUp": 0.6850132346153259,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.2275,
+    "high": 109.4865,
+    "low": 109.2275,
+    "close": 109.393
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T19:00:00Z",
+   "targetBarTime": "2020-03-26T20:00:00Z",
+   "pUp": 0.6546511054039001,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 109.394,
+    "high": 109.6285,
+    "low": 109.3835,
+    "close": 109.5865
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T20:00:00Z",
+   "targetBarTime": "2020-03-26T21:00:00Z",
+   "pUp": 0.49068203568458557,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.5735,
+    "high": 109.7275,
+    "low": 109.413,
+    "close": 109.4475
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T21:00:00Z",
+   "targetBarTime": "2020-03-26T22:00:00Z",
+   "pUp": 0.5093226432800293,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.445,
+    "high": 109.4865,
+    "low": 109.247,
+    "close": 109.3405
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T22:00:00Z",
+   "targetBarTime": "2020-03-26T23:00:00Z",
+   "pUp": 0.584793746471405,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.34,
+    "high": 109.393,
+    "low": 109.0895,
+    "close": 109.134
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-26T23:00:00Z",
+   "targetBarTime": "2020-03-27T00:00:00Z",
+   "pUp": 0.729059636592865,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.133,
+    "high": 109.3945,
+    "low": 108.8845,
+    "close": 109.0485
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T00:00:00Z",
+   "targetBarTime": "2020-03-27T01:00:00Z",
+   "pUp": 0.7245085835456848,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 109.047,
+    "high": 109.0825,
+    "low": 108.4955,
+    "close": 108.6585
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T01:00:00Z",
+   "targetBarTime": "2020-03-27T02:00:00Z",
+   "pUp": 0.7602411508560181,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.659,
+    "high": 108.715,
+    "low": 108.2885,
+    "close": 108.379
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T02:00:00Z",
+   "targetBarTime": "2020-03-27T03:00:00Z",
+   "pUp": 0.7557867169380188,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.3765,
+    "high": 108.459,
+    "low": 108.262,
+    "close": 108.4045
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T03:00:00Z",
+   "targetBarTime": "2020-03-27T04:00:00Z",
+   "pUp": 0.632888674736023,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.4045,
+    "high": 108.604,
+    "low": 108.294,
+    "close": 108.3505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T04:00:00Z",
+   "targetBarTime": "2020-03-27T05:00:00Z",
+   "pUp": 0.567114531993866,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.3505,
+    "high": 108.529,
+    "low": 108.239,
+    "close": 108.452
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T05:00:00Z",
+   "targetBarTime": "2020-03-27T06:00:00Z",
+   "pUp": 0.48589152097702026,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.4525,
+    "high": 108.7895,
+    "low": 108.323,
+    "close": 108.606
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T06:00:00Z",
+   "targetBarTime": "2020-03-27T07:00:00Z",
+   "pUp": 0.4186547100543976,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.6085,
+    "high": 109.001,
+    "low": 108.533,
+    "close": 108.887
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T07:00:00Z",
+   "targetBarTime": "2020-03-27T08:00:00Z",
+   "pUp": 0.36796247959136963,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.8865,
+    "high": 108.9815,
+    "low": 108.673,
+    "close": 108.918
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T08:00:00Z",
+   "targetBarTime": "2020-03-27T09:00:00Z",
+   "pUp": 0.3756999671459198,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.919,
+    "high": 109.071,
+    "low": 108.727,
+    "close": 108.8425
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T09:00:00Z",
+   "targetBarTime": "2020-03-27T10:00:00Z",
+   "pUp": 0.45399710536003113,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.843,
+    "high": 108.9525,
+    "low": 108.6035,
+    "close": 108.623
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T10:00:00Z",
+   "targetBarTime": "2020-03-27T11:00:00Z",
+   "pUp": 0.5452306270599365,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.6235,
+    "high": 108.835,
+    "low": 108.5285,
+    "close": 108.8235
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T11:00:00Z",
+   "targetBarTime": "2020-03-27T12:00:00Z",
+   "pUp": 0.46474987268447876,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.824,
+    "high": 108.8525,
+    "low": 108.639,
+    "close": 108.788
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T12:00:00Z",
+   "targetBarTime": "2020-03-27T13:00:00Z",
+   "pUp": 0.4684017598628998,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.788,
+    "high": 108.9005,
+    "low": 108.424,
+    "close": 108.4815
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T13:00:00Z",
+   "targetBarTime": "2020-03-27T14:00:00Z",
+   "pUp": 0.5157786011695862,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.4815,
+    "high": 108.548,
+    "low": 108.049,
+    "close": 108.09
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T14:00:00Z",
+   "targetBarTime": "2020-03-27T15:00:00Z",
+   "pUp": 0.5594146251678467,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.089,
+    "high": 108.2605,
+    "low": 107.868,
+    "close": 108.1615
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T15:00:00Z",
+   "targetBarTime": "2020-03-27T16:00:00Z",
+   "pUp": 0.5176565051078796,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.1615,
+    "high": 108.2005,
+    "low": 107.9545,
+    "close": 107.9935
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T16:00:00Z",
+   "targetBarTime": "2020-03-27T17:00:00Z",
+   "pUp": 0.5487292408943176,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9955,
+    "high": 108.1785,
+    "low": 107.971,
+    "close": 108.0025
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T17:00:00Z",
+   "targetBarTime": "2020-03-27T18:00:00Z",
+   "pUp": 0.5318362712860107,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.0025,
+    "high": 108.0025,
+    "low": 107.759,
+    "close": 107.7755
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T18:00:00Z",
+   "targetBarTime": "2020-03-27T19:00:00Z",
+   "pUp": 0.6015869379043579,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.7805,
+    "high": 107.9545,
+    "low": 107.7755,
+    "close": 107.896
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T19:00:00Z",
+   "targetBarTime": "2020-03-27T20:00:00Z",
+   "pUp": 0.5594722032546997,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.8965,
+    "high": 108.053,
+    "low": 107.8645,
+    "close": 107.9545
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-27T20:00:00Z",
+   "targetBarTime": "2020-03-29T21:00:00Z",
+   "pUp": 0.4581715166568756,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.719,
+    "high": 107.8825,
+    "low": 107.6215,
+    "close": 107.7585
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-29T21:00:00Z",
+   "targetBarTime": "2020-03-29T22:00:00Z",
+   "pUp": 0.49376800656318665,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.756,
+    "high": 107.9765,
+    "low": 107.619,
+    "close": 107.665
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-29T22:00:00Z",
+   "targetBarTime": "2020-03-29T23:00:00Z",
+   "pUp": 0.6103847622871399,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.6615,
+    "high": 107.781,
+    "low": 107.366,
+    "close": 107.4575
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-29T23:00:00Z",
+   "targetBarTime": "2020-03-30T00:00:00Z",
+   "pUp": 0.6990639567375183,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.459,
+    "high": 107.778,
+    "low": 107.4055,
+    "close": 107.5145
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T00:00:00Z",
+   "targetBarTime": "2020-03-30T01:00:00Z",
+   "pUp": 0.5755972862243652,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.515,
+    "high": 107.5735,
+    "low": 107.254,
+    "close": 107.285
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T01:00:00Z",
+   "targetBarTime": "2020-03-30T02:00:00Z",
+   "pUp": 0.6146371960639954,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.285,
+    "high": 107.405,
+    "low": 107.1235,
+    "close": 107.3155
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T02:00:00Z",
+   "targetBarTime": "2020-03-30T03:00:00Z",
+   "pUp": 0.5219343304634094,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.3165,
+    "high": 107.5175,
+    "low": 107.233,
+    "close": 107.355
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T03:00:00Z",
+   "targetBarTime": "2020-03-30T04:00:00Z",
+   "pUp": 0.4923144578933716,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.354,
+    "high": 107.7075,
+    "low": 107.3265,
+    "close": 107.606
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T04:00:00Z",
+   "targetBarTime": "2020-03-30T05:00:00Z",
+   "pUp": 0.43937063217163086,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.605,
+    "high": 107.9455,
+    "low": 107.582,
+    "close": 107.734
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T05:00:00Z",
+   "targetBarTime": "2020-03-30T06:00:00Z",
+   "pUp": 0.4085015058517456,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.7335,
+    "high": 108.1755,
+    "low": 107.6565,
+    "close": 108.1505
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T06:00:00Z",
+   "targetBarTime": "2020-03-30T07:00:00Z",
+   "pUp": 0.40531718730926514,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.151,
+    "high": 108.2475,
+    "low": 107.9345,
+    "close": 107.9915
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T07:00:00Z",
+   "targetBarTime": "2020-03-30T08:00:00Z",
+   "pUp": 0.5193840861320496,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.991,
+    "high": 108.0475,
+    "low": 107.6055,
+    "close": 107.6335
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T08:00:00Z",
+   "targetBarTime": "2020-03-30T09:00:00Z",
+   "pUp": 0.6069412231445312,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.63,
+    "high": 107.8505,
+    "low": 107.4955,
+    "close": 107.841
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T09:00:00Z",
+   "targetBarTime": "2020-03-30T10:00:00Z",
+   "pUp": 0.49127569794654846,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.839,
+    "high": 108.0355,
+    "low": 107.818,
+    "close": 107.9455
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T10:00:00Z",
+   "targetBarTime": "2020-03-30T11:00:00Z",
+   "pUp": 0.4425691068172455,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.946,
+    "high": 108.0735,
+    "low": 107.826,
+    "close": 107.991
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T11:00:00Z",
+   "targetBarTime": "2020-03-30T12:00:00Z",
+   "pUp": 0.42911526560783386,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.991,
+    "high": 108.296,
+    "low": 107.983,
+    "close": 108.273
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T12:00:00Z",
+   "targetBarTime": "2020-03-30T13:00:00Z",
+   "pUp": 0.3838931918144226,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.272,
+    "high": 108.287,
+    "low": 107.8135,
+    "close": 107.875
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T13:00:00Z",
+   "targetBarTime": "2020-03-30T14:00:00Z",
+   "pUp": 0.5083156824111938,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.876,
+    "high": 108.1645,
+    "low": 107.6565,
+    "close": 108.069
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T14:00:00Z",
+   "targetBarTime": "2020-03-30T15:00:00Z",
+   "pUp": 0.48718348145484924,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.0705,
+    "high": 108.175,
+    "low": 107.905,
+    "close": 108.0635
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T15:00:00Z",
+   "targetBarTime": "2020-03-30T16:00:00Z",
+   "pUp": 0.4753096103668213,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.063,
+    "high": 108.0825,
+    "low": 107.8185,
+    "close": 107.9145
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T16:00:00Z",
+   "targetBarTime": "2020-03-30T17:00:00Z",
+   "pUp": 0.5293118357658386,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9195,
+    "high": 108.105,
+    "low": 107.855,
+    "close": 108.025
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T17:00:00Z",
+   "targetBarTime": "2020-03-30T18:00:00Z",
+   "pUp": 0.5275989174842834,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.0245,
+    "high": 108.074,
+    "low": 107.8345,
+    "close": 107.999
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T18:00:00Z",
+   "targetBarTime": "2020-03-30T19:00:00Z",
+   "pUp": 0.5482740998268127,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.001,
+    "high": 108.046,
+    "low": 107.747,
+    "close": 107.755
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T19:00:00Z",
+   "targetBarTime": "2020-03-30T20:00:00Z",
+   "pUp": 0.6271910071372986,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.7545,
+    "high": 107.9535,
+    "low": 107.7265,
+    "close": 107.7615
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T20:00:00Z",
+   "targetBarTime": "2020-03-30T21:00:00Z",
+   "pUp": 0.5555654764175415,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.759,
+    "high": 107.916,
+    "low": 107.729,
+    "close": 107.8425
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T21:00:00Z",
+   "targetBarTime": "2020-03-30T22:00:00Z",
+   "pUp": 0.46574294567108154,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.842,
+    "high": 107.993,
+    "low": 107.8035,
+    "close": 107.9805
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T22:00:00Z",
+   "targetBarTime": "2020-03-30T23:00:00Z",
+   "pUp": 0.3907758891582489,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.9775,
+    "high": 108.2145,
+    "low": 107.9765,
+    "close": 108.0755
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-30T23:00:00Z",
+   "targetBarTime": "2020-03-31T00:00:00Z",
+   "pUp": 0.3431268334388733,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.0755,
+    "high": 108.7275,
+    "low": 107.925,
+    "close": 108.5295
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T00:00:00Z",
+   "targetBarTime": "2020-03-31T01:00:00Z",
+   "pUp": 0.4249282777309418,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.5305,
+    "high": 108.7065,
+    "low": 108.402,
+    "close": 108.485
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T01:00:00Z",
+   "targetBarTime": "2020-03-31T02:00:00Z",
+   "pUp": 0.4173913598060608,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.4845,
+    "high": 108.667,
+    "low": 108.431,
+    "close": 108.543
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T02:00:00Z",
+   "targetBarTime": "2020-03-31T03:00:00Z",
+   "pUp": 0.42712217569351196,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.5425,
+    "high": 108.575,
+    "low": 108.32,
+    "close": 108.3965
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T03:00:00Z",
+   "targetBarTime": "2020-03-31T04:00:00Z",
+   "pUp": 0.6065155863761902,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.393,
+    "high": 108.489,
+    "low": 108.185,
+    "close": 108.259
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T04:00:00Z",
+   "targetBarTime": "2020-03-31T05:00:00Z",
+   "pUp": 0.720005989074707,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.259,
+    "high": 108.368,
+    "low": 108.175,
+    "close": 108.217
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T05:00:00Z",
+   "targetBarTime": "2020-03-31T06:00:00Z",
+   "pUp": 0.6385458111763,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 108.215,
+    "high": 108.457,
+    "low": 108.0975,
+    "close": 108.3545
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T06:00:00Z",
+   "targetBarTime": "2020-03-31T07:00:00Z",
+   "pUp": 0.4518793225288391,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.356,
+    "high": 108.6145,
+    "low": 108.314,
+    "close": 108.418
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T07:00:00Z",
+   "targetBarTime": "2020-03-31T08:00:00Z",
+   "pUp": 0.42950767278671265,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.417,
+    "high": 108.523,
+    "low": 108.259,
+    "close": 108.516
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T08:00:00Z",
+   "targetBarTime": "2020-03-31T09:00:00Z",
+   "pUp": 0.425680935382843,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.5165,
+    "high": 108.529,
+    "low": 108.33,
+    "close": 108.4705
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T09:00:00Z",
+   "targetBarTime": "2020-03-31T10:00:00Z",
+   "pUp": 0.4718349277973175,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 108.4705,
+    "high": 108.62,
+    "low": 108.4245,
+    "close": 108.6165
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T10:00:00Z",
+   "targetBarTime": "2020-03-31T11:00:00Z",
+   "pUp": 0.45791295170783997,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.6165,
+    "high": 108.7285,
+    "low": 108.5175,
+    "close": 108.569
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T11:00:00Z",
+   "targetBarTime": "2020-03-31T12:00:00Z",
+   "pUp": 0.49291953444480896,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.569,
+    "high": 108.6215,
+    "low": 108.26,
+    "close": 108.4075
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T12:00:00Z",
+   "targetBarTime": "2020-03-31T13:00:00Z",
+   "pUp": 0.5105571746826172,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.4075,
+    "high": 108.4885,
+    "low": 108.0555,
+    "close": 108.244
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T13:00:00Z",
+   "targetBarTime": "2020-03-31T14:00:00Z",
+   "pUp": 0.5268892645835876,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 108.2425,
+    "high": 108.323,
+    "low": 107.8755,
+    "close": 107.934
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T14:00:00Z",
+   "targetBarTime": "2020-03-31T15:00:00Z",
+   "pUp": 0.5779978632926941,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.9335,
+    "high": 108.058,
+    "low": 107.462,
+    "close": 107.547
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T15:00:00Z",
+   "targetBarTime": "2020-03-31T16:00:00Z",
+   "pUp": 0.653454065322876,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.5465,
+    "high": 107.9105,
+    "low": 107.537,
+    "close": 107.7765
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T16:00:00Z",
+   "targetBarTime": "2020-03-31T17:00:00Z",
+   "pUp": 0.6112277507781982,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.7755,
+    "high": 107.933,
+    "low": 107.662,
+    "close": 107.697
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T17:00:00Z",
+   "targetBarTime": "2020-03-31T18:00:00Z",
+   "pUp": 0.6256307363510132,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.6975,
+    "high": 107.839,
+    "low": 107.5825,
+    "close": 107.6355
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T18:00:00Z",
+   "targetBarTime": "2020-03-31T19:00:00Z",
+   "pUp": 0.6587565541267395,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.6345,
+    "high": 107.7385,
+    "low": 107.495,
+    "close": 107.514
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T19:00:00Z",
+   "targetBarTime": "2020-03-31T20:00:00Z",
+   "pUp": 0.7097547054290771,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 107.5145,
+    "high": 107.6405,
+    "low": 107.4775,
+    "close": 107.554
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T20:00:00Z",
+   "targetBarTime": "2020-03-31T21:00:00Z",
+   "pUp": 0.5842190980911255,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.565,
+    "high": 107.6035,
+    "low": 107.5065,
+    "close": 107.5245
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T21:00:00Z",
+   "targetBarTime": "2020-03-31T22:00:00Z",
+   "pUp": 0.49379852414131165,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 107.537,
+    "high": 107.765,
+    "low": 107.505,
+    "close": 107.7645
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  },
+  {
+   "barTime": "2020-03-31T22:00:00Z",
+   "targetBarTime": "2020-03-31T23:00:00Z",
+   "pUp": 0.431371808052063,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 107.7635,
+    "high": 107.765,
+    "low": 107.403,
+    "close": 107.515
+   },
+   "scored": true,
+   "model": "USD_JPY-1h-test2020"
+  }
+ ]
+}

@@ -211,8 +211,26 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('ResearchReadRole1792000000000');
+
+    // ResearchReadRole: column-level SELECT on backtest_runs only (never minio_object_key
+    // or error_message); down() revokes this database's grants and keeps the cluster-wide role
+    const researchColumns = async () => (await client.query(
+      `SELECT column_name FROM information_schema.column_privileges
+       WHERE grantee = 'forexedge_research_reader' AND table_name = 'backtest_runs' AND privilege_type = 'SELECT'
+       ORDER BY column_name`)).rows.map((r: { column_name: string }) => r.column_name);
+    const granted = await researchColumns();
+    expect(granted).toHaveLength(21);
+    expect(granted).not.toContain('minio_object_key');
+    expect(granted).not.toContain('error_message');
+    expect((await client.query(
+      `SELECT count(*)::int AS n FROM information_schema.role_table_grants WHERE grantee = 'forexedge_research_reader'`,
+    )).rows[0].n).toBe(0); // no table-level grant on anything
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await researchColumns()).toEqual([]);
+    expect((await client.query(`SELECT 1 FROM pg_roles WHERE rolname = 'forexedge_research_reader'`)).rowCount).toBe(1);
     expect(await last()).toBe('ReadOnlyRole1791900000000');
 
     // ReadOnlyRole ran although the role already existed on the cluster (idempotent);

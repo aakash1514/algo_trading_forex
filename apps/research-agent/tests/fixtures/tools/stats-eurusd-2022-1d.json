@@ -1,0 +1,35 @@
+{
+ "id": "call_stats-eurusd-2022-1d",
+ "name": "get_market_stats",
+ "args": {
+  "pair": "EUR/USD",
+  "timeframe": "1d",
+  "from_date": "2022-01-01",
+  "to_date": "2022-12-30"
+ },
+ "result": {
+  "pair": "EUR/USD",
+  "timeframe": "1d",
+  "from_date": "2022-01-01",
+  "to_date": "2022-12-30",
+  "first_bar_utc": "2022-01-02T22:00:00Z",
+  "last_bar_utc": "2022-12-29T22:00:00Z",
+  "price_decimals": 5,
+  "bars_count": 260,
+  "first_open_price": 1.13733,
+  "last_close_price": 1.07068,
+  "return_pct": -5.860216,
+  "up_bars_count": 130,
+  "down_bars_count": 130,
+  "flat_bars_count": 0,
+  "high_price": 1.149495,
+  "high_time_utc": "2022-02-09T22:00:00Z",
+  "low_price": 0.9536,
+  "low_time_utc": "2022-09-27T21:00:00Z",
+  "avg_range_pips": 102.246731,
+  "avg_spread_pips": 3.676538,
+  "realized_vol_per_bar_pct": 0.625247,
+  "realized_vol_annualized_pct": 10.081812,
+  "max_drawdown_pct": 16.243622
+ }
+}

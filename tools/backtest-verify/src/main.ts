@@ -9,6 +9,7 @@
 //
 //   npm run backtest:verify -- [--pairs EUR_USD,XAU_USD] [--from 2022-01-01] [--to 2022-12-30]
 //                              [--fast 10] [--slow 30] [--lots 0.1] [--capital 10000]
+//                              [--report docs/validation/backtest-verification.md]
 //
 // It logs in with VERIFY_EMAIL / VERIFY_PASSWORD from the environment, or
 // registers a fresh verification user when they are not set.
@@ -33,6 +34,7 @@ interface Options {
   slow: number;
   lots: number;
   capital: number;
+  report: string;
 }
 
 function parseOptions(argv: string[]): Options {
@@ -48,6 +50,7 @@ function parseOptions(argv: string[]): Options {
     slow: Number(get('--slow', '30')),
     lots: Number(get('--lots', '0.1')),
     capital: Number(get('--capital', '10000')),
+    report: resolve(REPO_ROOT, get('--report', REPORT)),
   };
 }
 
@@ -180,8 +183,8 @@ async function main(): Promise<void> {
       for (const m of comparison.mismatches.slice(0, 20)) console.log(`  ${m.where} ${m.field}: backtester ${m.engine}, SQL ${m.sql}`);
     }
     const commit = execSync('git rev-parse --short HEAD', { cwd: REPO_ROOT }).toString().trim();
-    writeFileSync(REPORT, report(o, runs, user, commit));
-    console.log(`report: ${REPORT}`);
+    writeFileSync(o.report, report(o, runs, user, commit));
+    console.log(`report: ${o.report}`);
   } finally {
     await db.end();
   }

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-ForexEdge is a forex trading platform built as an Nx monorepo (npm workspaces). It has five NestJS microservices that talk over Kafka, a Python FastAPI ML service (`apps/ml-service`, inference only), a Next.js 16 frontend, and three shared libraries. Trading is paper-only for now: order-service binds `BROKER_ADAPTER` to `PaperBrokerAdapter`.
+ForexEdge is a forex trading platform built as an Nx monorepo (npm workspaces). It has five NestJS microservices that talk over Kafka, a Python FastAPI ML service (`apps/ml-service`, inference only), a Python research agent (`apps/research-agent`, LangGraph + MCP, read-only), a Next.js 16 frontend, and three shared libraries. Trading is paper-only for now: order-service binds `BROKER_ADAPTER` to `PaperBrokerAdapter`.
 
 ## Commands
 
@@ -50,6 +50,15 @@ npx nx run-many -t lint typecheck test -p ml-service    # ruff, mypy --strict, p
 npx nx serve ml-service                         # :3006, /api/ml
 npx nx train ml-service --args="--out models"   # offline walk-forward training (resumable)
 npx ts-node --transpile-only tools/ops/create-ml-db-user.ts   # read-only DB login from ML_DB_USER/ML_DB_PASS
+
+# Research agent (Python 3.12, apps/research-agent; see its README)
+npx nx setup research-agent
+npx nx run-many -t lint typecheck test -p research-agent     # default suite never calls the LLM
+RUN_DB_TESTS=true RUN_LIVE_ML=true npx nx test research-agent  # + dev DB tools, ml-service (running) tools
+npx nx serve research-agent                     # :3007, POST /api/research/ask
+npx nx run research-agent:eval                  # opt-in live eval (free-tier LLM quota, ml-service running)
+npx ts-node --transpile-only tools/ops/create-research-db-user.ts   # login from RESEARCH_DB_USER/RESEARCH_DB_PASS
+npx ts-node --transpile-only tools/ops/research-demo-data.ts        # demo users + verified runs (auth + ws-gateway up)
 ```
 
 ## Architecture
@@ -64,6 +73,7 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | domain-service | 3003 | Forex domain logic: pip calc, margin, swaps, session clock, spread monitor, economic calendar. Scheduled jobs publish `forex.sessions`, `forex.spread-alerts`, `forex.calendar-events`. |
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ml-service (Python) | 3006 | FastAPI, inference only: LSTM next-H1-direction models trained offline walk-forward (`models/`, manifest + sha256). `GET /api/ml/{health,models,evaluation,predictions/{instrument}}`, JWT on all but health. Reads the history as the read-only login `forexedge_ml` (role `forexedge_readonly`). Results are a **historical walk-forward test, not live signals**. |
+| research-agent (Python) | 3007 | FastAPI + LangGraph agent over a FastMCP stdio server (7 read-only tools: available data, bars, market stats, the caller's backtest runs, ML evaluation/predictions). `POST /api/research/ask` (JWT) returns a structured report whose every number is checked by a deterministic verifier. LLM from env (`RESEARCH_LLM_MODEL`, default `groq:openai/gpt-oss-120b`, free tier). DB login `forexedge_research` (roles `forexedge_readonly` + `forexedge_research_reader`); calls ml-service with the caller's own token. |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
 order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
@@ -88,6 +98,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Every service has its own small `redis/` module (with an injection decorator) instead of a shared lib.
 - order-service and ws-gateway don't issue tokens. They validate JWTs from auth-service with their own `auth/jwt.strategy.ts` and `jwt-auth.guard.ts`, so the `JWT_ACCESS_SECRET` values must match.
 - Config comes from `@nestjs/config` with `ConfigModule.forRoot({ isGlobal: true })`, which reads `.env` from the cwd, so every service (and `npm run migration:*`) runs from the repo root, which has the only `.env`. Docker Compose needs `--env-file .env` because the compose file lives in `infra/`. Postgres and Redis support TLS through env flags (e.g. `DB_SSL=true`) for managed hosting (Aiven).
+
+### Git conventions
+- **No Claude attribution in commits or PRs:** no `Co-Authored-By: Claude ...` trailer, no "Generated with Claude Code"
+  line, nothing similar, in any commit message or PR description. `.claude/settings.json` turns Claude Code's
+  attribution off (`attribution.commit` and `attribution.pr` empty, `sessionUrl` false). Existing history is not rewritten.
 
 ### Frontend (`apps/frontend`)
 - Next.js App Router with route groups `(auth)` and `(dashboard)`, Tailwind, Radix UI, and `lightweight-charts`.
@@ -183,9 +198,19 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   (state_dict tensors equal; `torch.save` file hashes are not byte-stable) and the parity checks green. The decision rule
   (pooled McNemar, Holm over 16 tests) is fixed in `ml_service/metrics.py`; don't change it after seeing results.
   The ML service's DB login is read-only by role and by session; never give it the main DB user.
-- Python deps: exact pins in `apps/ml-service/requirements*.in`, locked with sha256 by `scripts/add_hashes.py` (PyPI JSON;
-  refuses releases younger than 14 days). Don't use `pip-compile --generate-hashes` (downloads every torch wheel).
-  A dependency whose ownership can't be proven (e.g. no PyPI provenance) isn't added.
+- Python deps: exact pins in `apps/{ml-service,research-agent}/requirements*.in`, locked with sha256 by `scripts/add_hashes.py`
+  (PyPI JSON; refuses releases younger than 14 days). Don't use `pip-compile --generate-hashes` (downloads every torch wheel).
+  A dependency whose ownership can't be proven (e.g. no PyPI provenance) isn't added. httpx2 is unproven, so
+  research-agent holds back mcp at 1.30.0 (2.x needs httpx2) and langsmith at 0.11.2 (0.12+ needs httpx2); check
+  this before bumping either. langchain-mcp-adapters 0.3.2 was accepted by a byte diff against its tag (README).
+- **Research agent rules:** every number in an answer must be a claim that the verifier (`research_agent/verifier.py`,
+  no LLM) matches to a unit-suffixed field of a successful tool call (prices at the pair's price_decimals, pct/pips
+  with >= 3 significant digits, counts/USD exact, signed, no unit conversion); otherwise the response is
+  `could_not_verify`, never the unverified text. Tool output fields carry their unit as a suffix (`_price`, `_pct`,
+  `_pips`, `_usd`, `_count`, ...): keep that for any new field. Backtest tools filter by the caller's user id in
+  every WHERE clause (one DB login serves all users). The caller's token reaches ml-service only through the MCP
+  child's environment, never tool arguments. The default test suite must never call the LLM (transcripts are
+  replayed); record new ones with `scripts/record_transcripts.py`.
 - Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
   right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
 
@@ -208,6 +233,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **The Nx daemon can serve stale cache for a project directory created after it started** (seen on Windows: edits to
   a new spec replayed an old result with fewer tests). After adding a project, run `npx nx daemon --stop`, and confirm
   a new test file actually runs.
+- **Jest's inferred `test` targets don't hash `RUN_DB_TESTS`**, so a DB run right after a normal run replays the
+  cached "skipped" result. Run DB suites with `--skip-nx-cache` (the Python targets list it as an input).
+- **On Windows an empty env var is unset**, so `VAR= npx nx ...` doesn't override a value in `.env` (Nx loads it into
+  every task). To run without a key (e.g. the clean matrix without `GROQ_API_KEY`), comment the line out and restore it.
 - **Every check fails on empty input.** A data check, validation or test assertion that compared zero rows must
   fail, never pass (an empty comparison once read as "equal"). Assert the count compared is > 0.
 - **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
@@ -226,8 +255,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-2-historical-data.md`.
 - **Roadmap step 3 (backtest verification) is done** (2026-10-11), merged into main (PR #2).
   Write-up: `docs/phase-summaries/step-3-backtest-verification.md`.
-- **Roadmap step 4 (ML service, LSTM only) is done** (2026-10-12) on branch `step-4-ml-service` (PR into main,
-  not merged). Write-up: `docs/phase-summaries/step-4-ml-service.md`.
+- **Roadmap step 4 (ML service, LSTM only) is done** (2026-10-12), merged into main (PR #3).
+  Write-up: `docs/phase-summaries/step-4-ml-service.md`.
+- **Roadmap step 5 (research agent) is done** (2026-10-12) on branch `step-5-research-agent` (PR into main,
+  not merged). Write-up: `docs/phase-summaries/step-5-research-agent.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -255,10 +286,14 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 4. ✅ **Done (2026-10-12), LSTM only.** Python FastAPI ML service: next-H1 direction LSTMs, walk-forward 2016-2022
    (4 pairs x 7 test years), read-only DB login, JWT API, read-only "Model evaluation" page. Fixed Holm rule: beats 9 of
    16 pair-baseline comparisons, never anti-persistence, below the spread break-even for every pair
-   (`docs/validation/ml-walk-forward.md`). Open: the shuffled-label control criterion (docs/OVERNIGHT-QUESTIONS.md #3).
+   (`docs/validation/ml-walk-forward.md`). Shuffled-label control: original criterion fails for GBP/USD, corrected
+   criterion (balanced-accuracy interval includes 0.5) passes for all four (docs/OVERNIGHT-QUESTIONS.md #3, resolved).
    FinBERT/news sentiment was taken out of step 4; GDELT headlines exist only from 2019-09-22 and their licences
    are unconfirmed. The Nx Python targets use Windows paths (Linux image in step 7).
-5. Research agent: Python/FastAPI + LangGraph + MCP, forex news and economic analysis per pair.
+5. ✅ **Done (2026-10-12).** Research agent (`apps/research-agent`): FastAPI + LangGraph + MCP (FastMCP, stdio, one
+   server per request) answering questions about ForexEdge's own data only (history, the caller's backtest runs,
+   ML evaluation), with a deterministic verifier, per-request budgets and a free-tier Groq model. News, web search,
+   sentiment and the economic calendar were out of scope. Live eval: `docs/validation/research-agent-eval.md`.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
    realign the live views to the NY close here.
@@ -271,6 +306,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    Re-check Dukascopy's terms of use before a public deployment serves its historical data.
    ml-service: a Linux image (the Nx targets call `.venv\Scripts\python.exe`), the models/ directory, and the
    read-only role (create it in the provider console if `CREATE ROLE` isn't allowed in SQL).
+   research-agent: a Linux image and a Linux lock (mcp pulls in `pywin32`, Windows only), the role
+   `forexedge_research_reader` the same way, and a non-free LLM tier or rate limits for real traffic (free Groq
+   is about one question per minute).
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
 8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar

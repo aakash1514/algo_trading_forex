@@ -1,0 +1,8305 @@
+{
+ "instrument": "EUR_USD",
+ "timeframe": "1h",
+ "from": "2022-03-01",
+ "to": "2022-03-31",
+ "target": "direction of the next H1 bar, mid open to close",
+ "disclaimer": "historical walk-forward test, not live signals",
+ "predictions": [
+  {
+   "barTime": "2022-02-28T23:00:00Z",
+   "targetBarTime": "2022-03-01T00:00:00Z",
+   "pUp": 0.4881579577922821,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.12143,
+    "high": 1.121475,
+    "low": 1.120545,
+    "close": 1.120565
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T00:00:00Z",
+   "targetBarTime": "2022-03-01T01:00:00Z",
+   "pUp": 0.5424299836158752,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.120585,
+    "high": 1.121055,
+    "low": 1.12018,
+    "close": 1.12018
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T01:00:00Z",
+   "targetBarTime": "2022-03-01T02:00:00Z",
+   "pUp": 0.5455294251441956,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.120185,
+    "high": 1.120535,
+    "low": 1.119305,
+    "close": 1.11965
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T02:00:00Z",
+   "targetBarTime": "2022-03-01T03:00:00Z",
+   "pUp": 0.5536303520202637,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.119645,
+    "high": 1.12012,
+    "low": 1.119215,
+    "close": 1.11922
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T03:00:00Z",
+   "targetBarTime": "2022-03-01T04:00:00Z",
+   "pUp": 0.5496406555175781,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11923,
+    "high": 1.11998,
+    "low": 1.11908,
+    "close": 1.11965
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T04:00:00Z",
+   "targetBarTime": "2022-03-01T05:00:00Z",
+   "pUp": 0.5115915536880493,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11964,
+    "high": 1.12032,
+    "low": 1.11939,
+    "close": 1.11962
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T05:00:00Z",
+   "targetBarTime": "2022-03-01T06:00:00Z",
+   "pUp": 0.5094777941703796,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11961,
+    "high": 1.12077,
+    "low": 1.11946,
+    "close": 1.120605
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T06:00:00Z",
+   "targetBarTime": "2022-03-01T07:00:00Z",
+   "pUp": 0.4733580946922302,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1206,
+    "high": 1.122995,
+    "low": 1.120525,
+    "close": 1.12297
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T07:00:00Z",
+   "targetBarTime": "2022-03-01T08:00:00Z",
+   "pUp": 0.4405040144920349,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.122965,
+    "high": 1.12331,
+    "low": 1.12118,
+    "close": 1.12268
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T08:00:00Z",
+   "targetBarTime": "2022-03-01T09:00:00Z",
+   "pUp": 0.47404804825782776,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.12269,
+    "high": 1.122965,
+    "low": 1.119015,
+    "close": 1.119655
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T09:00:00Z",
+   "targetBarTime": "2022-03-01T10:00:00Z",
+   "pUp": 0.5063078999519348,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11963,
+    "high": 1.119875,
+    "low": 1.11663,
+    "close": 1.11815
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T10:00:00Z",
+   "targetBarTime": "2022-03-01T11:00:00Z",
+   "pUp": 0.5105900168418884,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.118135,
+    "high": 1.118635,
+    "low": 1.11733,
+    "close": 1.11758
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T11:00:00Z",
+   "targetBarTime": "2022-03-01T12:00:00Z",
+   "pUp": 0.5138027667999268,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.117575,
+    "high": 1.11806,
+    "low": 1.11561,
+    "close": 1.116025
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T12:00:00Z",
+   "targetBarTime": "2022-03-01T13:00:00Z",
+   "pUp": 0.522703230381012,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.116025,
+    "high": 1.117015,
+    "low": 1.114045,
+    "close": 1.11603
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T13:00:00Z",
+   "targetBarTime": "2022-03-01T14:00:00Z",
+   "pUp": 0.5173583626747131,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.116025,
+    "high": 1.11621,
+    "low": 1.11426,
+    "close": 1.115175
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T14:00:00Z",
+   "targetBarTime": "2022-03-01T15:00:00Z",
+   "pUp": 0.5303851366043091,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.115135,
+    "high": 1.115155,
+    "low": 1.11282,
+    "close": 1.11402
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T15:00:00Z",
+   "targetBarTime": "2022-03-01T16:00:00Z",
+   "pUp": 0.5454557538032532,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.114035,
+    "high": 1.114445,
+    "low": 1.10992,
+    "close": 1.110325
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T16:00:00Z",
+   "targetBarTime": "2022-03-01T17:00:00Z",
+   "pUp": 0.5477767586708069,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.110335,
+    "high": 1.11265,
+    "low": 1.108975,
+    "close": 1.11092
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T17:00:00Z",
+   "targetBarTime": "2022-03-01T18:00:00Z",
+   "pUp": 0.5461492538452148,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.110915,
+    "high": 1.11261,
+    "low": 1.10985,
+    "close": 1.11227
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T18:00:00Z",
+   "targetBarTime": "2022-03-01T19:00:00Z",
+   "pUp": 0.5085515975952148,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11226,
+    "high": 1.1135,
+    "low": 1.11134,
+    "close": 1.11221
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T19:00:00Z",
+   "targetBarTime": "2022-03-01T20:00:00Z",
+   "pUp": 0.5119609236717224,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.112215,
+    "high": 1.113305,
+    "low": 1.11166,
+    "close": 1.11305
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T20:00:00Z",
+   "targetBarTime": "2022-03-01T21:00:00Z",
+   "pUp": 0.46882233023643494,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11302,
+    "high": 1.11381,
+    "low": 1.112295,
+    "close": 1.112555
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T21:00:00Z",
+   "targetBarTime": "2022-03-01T22:00:00Z",
+   "pUp": 0.48249849677085876,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11261,
+    "high": 1.112895,
+    "low": 1.111815,
+    "close": 1.111955
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T22:00:00Z",
+   "targetBarTime": "2022-03-01T23:00:00Z",
+   "pUp": 0.5145875811576843,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11195,
+    "high": 1.11344,
+    "low": 1.111835,
+    "close": 1.113245
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-01T23:00:00Z",
+   "targetBarTime": "2022-03-02T00:00:00Z",
+   "pUp": 0.4549257457256317,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.113225,
+    "high": 1.11338,
+    "low": 1.112175,
+    "close": 1.11266
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T00:00:00Z",
+   "targetBarTime": "2022-03-02T01:00:00Z",
+   "pUp": 0.5151363015174866,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.112665,
+    "high": 1.113575,
+    "low": 1.112275,
+    "close": 1.112835
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T01:00:00Z",
+   "targetBarTime": "2022-03-02T02:00:00Z",
+   "pUp": 0.5070042014122009,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11282,
+    "high": 1.113195,
+    "low": 1.111115,
+    "close": 1.112535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T02:00:00Z",
+   "targetBarTime": "2022-03-02T03:00:00Z",
+   "pUp": 0.5258185267448425,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112545,
+    "high": 1.112915,
+    "low": 1.1118,
+    "close": 1.111915
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T03:00:00Z",
+   "targetBarTime": "2022-03-02T04:00:00Z",
+   "pUp": 0.539634644985199,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11192,
+    "high": 1.112365,
+    "low": 1.11176,
+    "close": 1.11231
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T04:00:00Z",
+   "targetBarTime": "2022-03-02T05:00:00Z",
+   "pUp": 0.49841395020484924,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112305,
+    "high": 1.112315,
+    "low": 1.11133,
+    "close": 1.11149
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T05:00:00Z",
+   "targetBarTime": "2022-03-02T06:00:00Z",
+   "pUp": 0.5223985910415649,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1115,
+    "high": 1.111805,
+    "low": 1.10967,
+    "close": 1.10975
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T06:00:00Z",
+   "targetBarTime": "2022-03-02T07:00:00Z",
+   "pUp": 0.5387160181999207,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10976,
+    "high": 1.111275,
+    "low": 1.10839,
+    "close": 1.10935
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T07:00:00Z",
+   "targetBarTime": "2022-03-02T08:00:00Z",
+   "pUp": 0.5180259346961975,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109355,
+    "high": 1.11041,
+    "low": 1.10797,
+    "close": 1.108575
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T08:00:00Z",
+   "targetBarTime": "2022-03-02T09:00:00Z",
+   "pUp": 0.5117906332015991,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10857,
+    "high": 1.10988,
+    "low": 1.105895,
+    "close": 1.10824
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T09:00:00Z",
+   "targetBarTime": "2022-03-02T10:00:00Z",
+   "pUp": 0.5016123056411743,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10825,
+    "high": 1.110225,
+    "low": 1.107595,
+    "close": 1.10978
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T10:00:00Z",
+   "targetBarTime": "2022-03-02T11:00:00Z",
+   "pUp": 0.4828643500804901,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10981,
+    "high": 1.110315,
+    "low": 1.108515,
+    "close": 1.10997
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T11:00:00Z",
+   "targetBarTime": "2022-03-02T12:00:00Z",
+   "pUp": 0.4791502058506012,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.109965,
+    "high": 1.11194,
+    "low": 1.109455,
+    "close": 1.111715
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T12:00:00Z",
+   "targetBarTime": "2022-03-02T13:00:00Z",
+   "pUp": 0.4553269147872925,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11174,
+    "high": 1.11174,
+    "low": 1.10888,
+    "close": 1.11049
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T13:00:00Z",
+   "targetBarTime": "2022-03-02T14:00:00Z",
+   "pUp": 0.4972328245639801,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11048,
+    "high": 1.11049,
+    "low": 1.1076,
+    "close": 1.109355
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T14:00:00Z",
+   "targetBarTime": "2022-03-02T15:00:00Z",
+   "pUp": 0.5172705054283142,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109395,
+    "high": 1.109815,
+    "low": 1.10575,
+    "close": 1.106845
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T15:00:00Z",
+   "targetBarTime": "2022-03-02T16:00:00Z",
+   "pUp": 0.5317029356956482,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10685,
+    "high": 1.114395,
+    "low": 1.106365,
+    "close": 1.110255
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T16:00:00Z",
+   "targetBarTime": "2022-03-02T17:00:00Z",
+   "pUp": 0.5464643239974976,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.110245,
+    "high": 1.110375,
+    "low": 1.107875,
+    "close": 1.110265
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T17:00:00Z",
+   "targetBarTime": "2022-03-02T18:00:00Z",
+   "pUp": 0.5198423266410828,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.110255,
+    "high": 1.113125,
+    "low": 1.10998,
+    "close": 1.11282
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T18:00:00Z",
+   "targetBarTime": "2022-03-02T19:00:00Z",
+   "pUp": 0.45900076627731323,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112825,
+    "high": 1.113425,
+    "low": 1.11165,
+    "close": 1.112425
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T19:00:00Z",
+   "targetBarTime": "2022-03-02T20:00:00Z",
+   "pUp": 0.4811488091945648,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11242,
+    "high": 1.113035,
+    "low": 1.111765,
+    "close": 1.112715
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T20:00:00Z",
+   "targetBarTime": "2022-03-02T21:00:00Z",
+   "pUp": 0.4643591046333313,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112705,
+    "high": 1.11292,
+    "low": 1.11182,
+    "close": 1.11185
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T21:00:00Z",
+   "targetBarTime": "2022-03-02T22:00:00Z",
+   "pUp": 0.5147199630737305,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.111875,
+    "high": 1.112305,
+    "low": 1.1114,
+    "close": 1.11194
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T22:00:00Z",
+   "targetBarTime": "2022-03-02T23:00:00Z",
+   "pUp": 0.48715445399284363,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11195,
+    "high": 1.112195,
+    "low": 1.11105,
+    "close": 1.111255
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-02T23:00:00Z",
+   "targetBarTime": "2022-03-03T00:00:00Z",
+   "pUp": 0.5313452482223511,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11121,
+    "high": 1.111545,
+    "low": 1.110085,
+    "close": 1.110235
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T00:00:00Z",
+   "targetBarTime": "2022-03-03T01:00:00Z",
+   "pUp": 0.5760952234268188,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.110245,
+    "high": 1.110405,
+    "low": 1.109425,
+    "close": 1.109775
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T01:00:00Z",
+   "targetBarTime": "2022-03-03T02:00:00Z",
+   "pUp": 0.567846953868866,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.109785,
+    "high": 1.11067,
+    "low": 1.10902,
+    "close": 1.110605
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T02:00:00Z",
+   "targetBarTime": "2022-03-03T03:00:00Z",
+   "pUp": 0.505032479763031,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1106,
+    "high": 1.110675,
+    "low": 1.109575,
+    "close": 1.10998
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T03:00:00Z",
+   "targetBarTime": "2022-03-03T04:00:00Z",
+   "pUp": 0.529434323310852,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10999,
+    "high": 1.11034,
+    "low": 1.109725,
+    "close": 1.109785
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T04:00:00Z",
+   "targetBarTime": "2022-03-03T05:00:00Z",
+   "pUp": 0.5167111754417419,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10979,
+    "high": 1.11048,
+    "low": 1.10979,
+    "close": 1.110185
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T05:00:00Z",
+   "targetBarTime": "2022-03-03T06:00:00Z",
+   "pUp": 0.483944296836853,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.110175,
+    "high": 1.11064,
+    "low": 1.10938,
+    "close": 1.110455
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T06:00:00Z",
+   "targetBarTime": "2022-03-03T07:00:00Z",
+   "pUp": 0.47479403018951416,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.110445,
+    "high": 1.11059,
+    "low": 1.109125,
+    "close": 1.109765
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T07:00:00Z",
+   "targetBarTime": "2022-03-03T08:00:00Z",
+   "pUp": 0.49484381079673767,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109755,
+    "high": 1.110015,
+    "low": 1.10826,
+    "close": 1.109125
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T08:00:00Z",
+   "targetBarTime": "2022-03-03T09:00:00Z",
+   "pUp": 0.49635252356529236,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10913,
+    "high": 1.109525,
+    "low": 1.10718,
+    "close": 1.10802
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T09:00:00Z",
+   "targetBarTime": "2022-03-03T10:00:00Z",
+   "pUp": 0.5004374384880066,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.108025,
+    "high": 1.10941,
+    "low": 1.10779,
+    "close": 1.10867
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T10:00:00Z",
+   "targetBarTime": "2022-03-03T11:00:00Z",
+   "pUp": 0.4742269515991211,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10867,
+    "high": 1.108765,
+    "low": 1.107815,
+    "close": 1.108675
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T11:00:00Z",
+   "targetBarTime": "2022-03-03T12:00:00Z",
+   "pUp": 0.4726529121398926,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.108665,
+    "high": 1.1097,
+    "low": 1.107255,
+    "close": 1.107535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T12:00:00Z",
+   "targetBarTime": "2022-03-03T13:00:00Z",
+   "pUp": 0.49462053179740906,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10756,
+    "high": 1.108765,
+    "low": 1.10648,
+    "close": 1.10857
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T13:00:00Z",
+   "targetBarTime": "2022-03-03T14:00:00Z",
+   "pUp": 0.47355374693870544,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10856,
+    "high": 1.10952,
+    "low": 1.107455,
+    "close": 1.108
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T14:00:00Z",
+   "targetBarTime": "2022-03-03T15:00:00Z",
+   "pUp": 0.4958919882774353,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10813,
+    "high": 1.108685,
+    "low": 1.105765,
+    "close": 1.106195
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T15:00:00Z",
+   "targetBarTime": "2022-03-03T16:00:00Z",
+   "pUp": 0.5293673872947693,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.106185,
+    "high": 1.106525,
+    "low": 1.10377,
+    "close": 1.105445
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T16:00:00Z",
+   "targetBarTime": "2022-03-03T17:00:00Z",
+   "pUp": 0.5377421975135803,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105455,
+    "high": 1.106795,
+    "low": 1.10336,
+    "close": 1.105115
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T17:00:00Z",
+   "targetBarTime": "2022-03-03T18:00:00Z",
+   "pUp": 0.539023756980896,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10513,
+    "high": 1.106655,
+    "low": 1.104745,
+    "close": 1.10624
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T18:00:00Z",
+   "targetBarTime": "2022-03-03T19:00:00Z",
+   "pUp": 0.5000723600387573,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.106255,
+    "high": 1.106565,
+    "low": 1.105515,
+    "close": 1.105785
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T19:00:00Z",
+   "targetBarTime": "2022-03-03T20:00:00Z",
+   "pUp": 0.5262394547462463,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.105775,
+    "high": 1.106375,
+    "low": 1.105645,
+    "close": 1.106305
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T20:00:00Z",
+   "targetBarTime": "2022-03-03T21:00:00Z",
+   "pUp": 0.4881995618343353,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10629,
+    "high": 1.1067,
+    "low": 1.106235,
+    "close": 1.10666
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T21:00:00Z",
+   "targetBarTime": "2022-03-03T22:00:00Z",
+   "pUp": 0.4629329442977905,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10666,
+    "high": 1.106705,
+    "low": 1.10632,
+    "close": 1.106615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T22:00:00Z",
+   "targetBarTime": "2022-03-03T23:00:00Z",
+   "pUp": 0.46942201256752014,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.106625,
+    "high": 1.10679,
+    "low": 1.106315,
+    "close": 1.106585
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-03T23:00:00Z",
+   "targetBarTime": "2022-03-04T00:00:00Z",
+   "pUp": 0.48137354850769043,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10659,
+    "high": 1.106665,
+    "low": 1.101015,
+    "close": 1.101265
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T00:00:00Z",
+   "targetBarTime": "2022-03-04T01:00:00Z",
+   "pUp": 0.5946465134620667,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10124,
+    "high": 1.1052,
+    "low": 1.10114,
+    "close": 1.10491
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T01:00:00Z",
+   "targetBarTime": "2022-03-04T02:00:00Z",
+   "pUp": 0.48983439803123474,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1049,
+    "high": 1.10495,
+    "low": 1.102565,
+    "close": 1.102915
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T02:00:00Z",
+   "targetBarTime": "2022-03-04T03:00:00Z",
+   "pUp": 0.5611739158630371,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.102905,
+    "high": 1.10314,
+    "low": 1.10194,
+    "close": 1.102605
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T03:00:00Z",
+   "targetBarTime": "2022-03-04T04:00:00Z",
+   "pUp": 0.5530152320861816,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102575,
+    "high": 1.103675,
+    "low": 1.102365,
+    "close": 1.10356
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T04:00:00Z",
+   "targetBarTime": "2022-03-04T05:00:00Z",
+   "pUp": 0.4961830675601959,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103565,
+    "high": 1.10393,
+    "low": 1.10235,
+    "close": 1.10287
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T05:00:00Z",
+   "targetBarTime": "2022-03-04T06:00:00Z",
+   "pUp": 0.5215913653373718,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10286,
+    "high": 1.103195,
+    "low": 1.101475,
+    "close": 1.10154
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T06:00:00Z",
+   "targetBarTime": "2022-03-04T07:00:00Z",
+   "pUp": 0.5384916067123413,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101545,
+    "high": 1.10239,
+    "low": 1.10084,
+    "close": 1.101225
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T07:00:00Z",
+   "targetBarTime": "2022-03-04T08:00:00Z",
+   "pUp": 0.5183428525924683,
+   "predicted": "UP",
+   "actual": "FLAT",
+   "bar": {
+    "open": 1.101215,
+    "high": 1.101705,
+    "low": 1.100855,
+    "close": 1.101215
+   },
+   "scored": false,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T08:00:00Z",
+   "targetBarTime": "2022-03-04T09:00:00Z",
+   "pUp": 0.4999205470085144,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101195,
+    "high": 1.10243,
+    "low": 1.101195,
+    "close": 1.10142
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T09:00:00Z",
+   "targetBarTime": "2022-03-04T10:00:00Z",
+   "pUp": 0.4849250614643097,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10144,
+    "high": 1.10199,
+    "low": 1.10001,
+    "close": 1.100135
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T10:00:00Z",
+   "targetBarTime": "2022-03-04T11:00:00Z",
+   "pUp": 0.505054235458374,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100125,
+    "high": 1.100675,
+    "low": 1.097305,
+    "close": 1.09757
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T11:00:00Z",
+   "targetBarTime": "2022-03-04T12:00:00Z",
+   "pUp": 0.5081486701965332,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.097565,
+    "high": 1.09821,
+    "low": 1.09342,
+    "close": 1.09373
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T12:00:00Z",
+   "targetBarTime": "2022-03-04T13:00:00Z",
+   "pUp": 0.49791306257247925,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09374,
+    "high": 1.09449,
+    "low": 1.088575,
+    "close": 1.090895
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T13:00:00Z",
+   "targetBarTime": "2022-03-04T14:00:00Z",
+   "pUp": 0.49380040168762207,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.090875,
+    "high": 1.092805,
+    "low": 1.089625,
+    "close": 1.090885
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T14:00:00Z",
+   "targetBarTime": "2022-03-04T15:00:00Z",
+   "pUp": 0.5094541311264038,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.090855,
+    "high": 1.092395,
+    "low": 1.090135,
+    "close": 1.091865
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T15:00:00Z",
+   "targetBarTime": "2022-03-04T16:00:00Z",
+   "pUp": 0.49878427386283875,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091915,
+    "high": 1.092285,
+    "low": 1.090855,
+    "close": 1.090865
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T16:00:00Z",
+   "targetBarTime": "2022-03-04T17:00:00Z",
+   "pUp": 0.5363045334815979,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.090885,
+    "high": 1.092625,
+    "low": 1.09081,
+    "close": 1.092575
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T17:00:00Z",
+   "targetBarTime": "2022-03-04T18:00:00Z",
+   "pUp": 0.4783882200717926,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.092605,
+    "high": 1.09335,
+    "low": 1.092165,
+    "close": 1.09334
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T18:00:00Z",
+   "targetBarTime": "2022-03-04T19:00:00Z",
+   "pUp": 0.4629829227924347,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.093355,
+    "high": 1.09369,
+    "low": 1.090985,
+    "close": 1.091325
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T19:00:00Z",
+   "targetBarTime": "2022-03-04T20:00:00Z",
+   "pUp": 0.5619903206825256,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09129,
+    "high": 1.09363,
+    "low": 1.09127,
+    "close": 1.093445
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T20:00:00Z",
+   "targetBarTime": "2022-03-04T21:00:00Z",
+   "pUp": 0.46510419249534607,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.093455,
+    "high": 1.094065,
+    "low": 1.09256,
+    "close": 1.093485
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-04T21:00:00Z",
+   "targetBarTime": "2022-03-06T22:00:00Z",
+   "pUp": 0.4384271800518036,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.092425,
+    "high": 1.093,
+    "low": 1.09213,
+    "close": 1.09264
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-06T22:00:00Z",
+   "targetBarTime": "2022-03-06T23:00:00Z",
+   "pUp": 0.4781096577644348,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.092645,
+    "high": 1.09269,
+    "low": 1.08636,
+    "close": 1.08737
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-06T23:00:00Z",
+   "targetBarTime": "2022-03-07T00:00:00Z",
+   "pUp": 0.5610837340354919,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.087365,
+    "high": 1.088455,
+    "low": 1.08624,
+    "close": 1.08625
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T00:00:00Z",
+   "targetBarTime": "2022-03-07T01:00:00Z",
+   "pUp": 0.581925630569458,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.086205,
+    "high": 1.086645,
+    "low": 1.082165,
+    "close": 1.084355
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T01:00:00Z",
+   "targetBarTime": "2022-03-07T02:00:00Z",
+   "pUp": 0.5897427201271057,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.084345,
+    "high": 1.085385,
+    "low": 1.08359,
+    "close": 1.084565
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T02:00:00Z",
+   "targetBarTime": "2022-03-07T03:00:00Z",
+   "pUp": 0.5740864872932434,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.084575,
+    "high": 1.088665,
+    "low": 1.0841,
+    "close": 1.087115
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T03:00:00Z",
+   "targetBarTime": "2022-03-07T04:00:00Z",
+   "pUp": 0.5324727892875671,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.087125,
+    "high": 1.088035,
+    "low": 1.086295,
+    "close": 1.087975
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T04:00:00Z",
+   "targetBarTime": "2022-03-07T05:00:00Z",
+   "pUp": 0.4977583587169647,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.087935,
+    "high": 1.08876,
+    "low": 1.086665,
+    "close": 1.087705
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T05:00:00Z",
+   "targetBarTime": "2022-03-07T06:00:00Z",
+   "pUp": 0.514895498752594,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08772,
+    "high": 1.088955,
+    "low": 1.087135,
+    "close": 1.087375
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T06:00:00Z",
+   "targetBarTime": "2022-03-07T07:00:00Z",
+   "pUp": 0.5224184989929199,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08737,
+    "high": 1.089795,
+    "low": 1.08665,
+    "close": 1.08713
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T07:00:00Z",
+   "targetBarTime": "2022-03-07T08:00:00Z",
+   "pUp": 0.5205912590026855,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.087135,
+    "high": 1.089085,
+    "low": 1.085405,
+    "close": 1.086275
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T08:00:00Z",
+   "targetBarTime": "2022-03-07T09:00:00Z",
+   "pUp": 0.5200524926185608,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08628,
+    "high": 1.08708,
+    "low": 1.08503,
+    "close": 1.085845
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T09:00:00Z",
+   "targetBarTime": "2022-03-07T10:00:00Z",
+   "pUp": 0.5209477543830872,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08585,
+    "high": 1.085955,
+    "low": 1.08061,
+    "close": 1.083265
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T10:00:00Z",
+   "targetBarTime": "2022-03-07T11:00:00Z",
+   "pUp": 0.50601726770401,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.083275,
+    "high": 1.086475,
+    "low": 1.082615,
+    "close": 1.085945
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T11:00:00Z",
+   "targetBarTime": "2022-03-07T12:00:00Z",
+   "pUp": 0.5128880143165588,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08594,
+    "high": 1.09254,
+    "low": 1.085555,
+    "close": 1.088745
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T12:00:00Z",
+   "targetBarTime": "2022-03-07T13:00:00Z",
+   "pUp": 0.5231720805168152,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.088785,
+    "high": 1.09213,
+    "low": 1.08851,
+    "close": 1.08977
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T13:00:00Z",
+   "targetBarTime": "2022-03-07T14:00:00Z",
+   "pUp": 0.4931185245513916,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08976,
+    "high": 1.09326,
+    "low": 1.08895,
+    "close": 1.08915
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T14:00:00Z",
+   "targetBarTime": "2022-03-07T15:00:00Z",
+   "pUp": 0.4986450672149658,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.089135,
+    "high": 1.08966,
+    "low": 1.085795,
+    "close": 1.087615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T15:00:00Z",
+   "targetBarTime": "2022-03-07T16:00:00Z",
+   "pUp": 0.5167552828788757,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.087635,
+    "high": 1.087745,
+    "low": 1.08485,
+    "close": 1.086005
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T16:00:00Z",
+   "targetBarTime": "2022-03-07T17:00:00Z",
+   "pUp": 0.5447484850883484,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.086015,
+    "high": 1.088975,
+    "low": 1.085855,
+    "close": 1.08752
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T17:00:00Z",
+   "targetBarTime": "2022-03-07T18:00:00Z",
+   "pUp": 0.5104153752326965,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.0875,
+    "high": 1.09005,
+    "low": 1.08718,
+    "close": 1.088015
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T18:00:00Z",
+   "targetBarTime": "2022-03-07T19:00:00Z",
+   "pUp": 0.4948325455188751,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08801,
+    "high": 1.089065,
+    "low": 1.084565,
+    "close": 1.084805
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T19:00:00Z",
+   "targetBarTime": "2022-03-07T20:00:00Z",
+   "pUp": 0.5410133004188538,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.084845,
+    "high": 1.08717,
+    "low": 1.08467,
+    "close": 1.08706
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T20:00:00Z",
+   "targetBarTime": "2022-03-07T21:00:00Z",
+   "pUp": 0.46625006198883057,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.087035,
+    "high": 1.087185,
+    "low": 1.08519,
+    "close": 1.0854
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T21:00:00Z",
+   "targetBarTime": "2022-03-07T22:00:00Z",
+   "pUp": 0.5079262852668762,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.085395,
+    "high": 1.08584,
+    "low": 1.08499,
+    "close": 1.085415
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T22:00:00Z",
+   "targetBarTime": "2022-03-07T23:00:00Z",
+   "pUp": 0.5018088221549988,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08539,
+    "high": 1.08663,
+    "low": 1.08523,
+    "close": 1.086625
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-07T23:00:00Z",
+   "targetBarTime": "2022-03-08T00:00:00Z",
+   "pUp": 0.44784852862358093,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08663,
+    "high": 1.086985,
+    "low": 1.08491,
+    "close": 1.085735
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T00:00:00Z",
+   "targetBarTime": "2022-03-08T01:00:00Z",
+   "pUp": 0.5200821161270142,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.085745,
+    "high": 1.08806,
+    "low": 1.085335,
+    "close": 1.087515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T01:00:00Z",
+   "targetBarTime": "2022-03-08T02:00:00Z",
+   "pUp": 0.4629993736743927,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08752,
+    "high": 1.088495,
+    "low": 1.08708,
+    "close": 1.087495
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T02:00:00Z",
+   "targetBarTime": "2022-03-08T03:00:00Z",
+   "pUp": 0.47873929142951965,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08749,
+    "high": 1.08794,
+    "low": 1.08676,
+    "close": 1.08679
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T03:00:00Z",
+   "targetBarTime": "2022-03-08T04:00:00Z",
+   "pUp": 0.5174412131309509,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08678,
+    "high": 1.087285,
+    "low": 1.08651,
+    "close": 1.087005
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T04:00:00Z",
+   "targetBarTime": "2022-03-08T05:00:00Z",
+   "pUp": 0.4959074556827545,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.087,
+    "high": 1.087045,
+    "low": 1.085595,
+    "close": 1.085995
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T05:00:00Z",
+   "targetBarTime": "2022-03-08T06:00:00Z",
+   "pUp": 0.5319691896438599,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08599,
+    "high": 1.086665,
+    "low": 1.08523,
+    "close": 1.08606
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T06:00:00Z",
+   "targetBarTime": "2022-03-08T07:00:00Z",
+   "pUp": 0.5108922123908997,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.086085,
+    "high": 1.08839,
+    "low": 1.08512,
+    "close": 1.08614
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T07:00:00Z",
+   "targetBarTime": "2022-03-08T08:00:00Z",
+   "pUp": 0.5072675943374634,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08617,
+    "high": 1.09218,
+    "low": 1.085605,
+    "close": 1.089665
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T08:00:00Z",
+   "targetBarTime": "2022-03-08T09:00:00Z",
+   "pUp": 0.5134198665618896,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.089675,
+    "high": 1.090535,
+    "low": 1.08657,
+    "close": 1.088765
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T09:00:00Z",
+   "targetBarTime": "2022-03-08T10:00:00Z",
+   "pUp": 0.5034215450286865,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08877,
+    "high": 1.09049,
+    "low": 1.08656,
+    "close": 1.089825
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T10:00:00Z",
+   "targetBarTime": "2022-03-08T11:00:00Z",
+   "pUp": 0.4979815185070038,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.08986,
+    "high": 1.09039,
+    "low": 1.08816,
+    "close": 1.089125
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T11:00:00Z",
+   "targetBarTime": "2022-03-08T12:00:00Z",
+   "pUp": 0.5038579702377319,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08914,
+    "high": 1.09213,
+    "low": 1.08914,
+    "close": 1.090555
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T12:00:00Z",
+   "targetBarTime": "2022-03-08T13:00:00Z",
+   "pUp": 0.4853282868862152,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09055,
+    "high": 1.09176,
+    "low": 1.08838,
+    "close": 1.09157
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T13:00:00Z",
+   "targetBarTime": "2022-03-08T14:00:00Z",
+   "pUp": 0.4768369495868683,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091545,
+    "high": 1.09245,
+    "low": 1.090175,
+    "close": 1.090445
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T14:00:00Z",
+   "targetBarTime": "2022-03-08T15:00:00Z",
+   "pUp": 0.5064458847045898,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.090455,
+    "high": 1.09064,
+    "low": 1.0872,
+    "close": 1.087575
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T15:00:00Z",
+   "targetBarTime": "2022-03-08T16:00:00Z",
+   "pUp": 0.5396755337715149,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08757,
+    "high": 1.089295,
+    "low": 1.0875,
+    "close": 1.088075
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T16:00:00Z",
+   "targetBarTime": "2022-03-08T17:00:00Z",
+   "pUp": 0.519191563129425,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08809,
+    "high": 1.09563,
+    "low": 1.08778,
+    "close": 1.09422
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T17:00:00Z",
+   "targetBarTime": "2022-03-08T18:00:00Z",
+   "pUp": 0.49998873472213745,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09421,
+    "high": 1.095845,
+    "low": 1.090435,
+    "close": 1.09173
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T18:00:00Z",
+   "targetBarTime": "2022-03-08T19:00:00Z",
+   "pUp": 0.5139530301094055,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091695,
+    "high": 1.09172,
+    "low": 1.090235,
+    "close": 1.090645
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T19:00:00Z",
+   "targetBarTime": "2022-03-08T20:00:00Z",
+   "pUp": 0.552125871181488,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09065,
+    "high": 1.091365,
+    "low": 1.08998,
+    "close": 1.090665
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T20:00:00Z",
+   "targetBarTime": "2022-03-08T21:00:00Z",
+   "pUp": 0.5358900427818298,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.090675,
+    "high": 1.090955,
+    "low": 1.089425,
+    "close": 1.090215
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T21:00:00Z",
+   "targetBarTime": "2022-03-08T22:00:00Z",
+   "pUp": 0.5250796675682068,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.08981,
+    "high": 1.09038,
+    "low": 1.089775,
+    "close": 1.090085
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T22:00:00Z",
+   "targetBarTime": "2022-03-08T23:00:00Z",
+   "pUp": 0.5112167000770569,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.0901,
+    "high": 1.0905,
+    "low": 1.089015,
+    "close": 1.089795
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-08T23:00:00Z",
+   "targetBarTime": "2022-03-09T00:00:00Z",
+   "pUp": 0.5386080145835876,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.089845,
+    "high": 1.091475,
+    "low": 1.089675,
+    "close": 1.09142
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T00:00:00Z",
+   "targetBarTime": "2022-03-09T01:00:00Z",
+   "pUp": 0.4799794852733612,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091425,
+    "high": 1.092015,
+    "low": 1.091045,
+    "close": 1.0914
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T01:00:00Z",
+   "targetBarTime": "2022-03-09T02:00:00Z",
+   "pUp": 0.5010247826576233,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.091395,
+    "high": 1.092035,
+    "low": 1.091265,
+    "close": 1.09163
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T02:00:00Z",
+   "targetBarTime": "2022-03-09T03:00:00Z",
+   "pUp": 0.4933774173259735,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091625,
+    "high": 1.091755,
+    "low": 1.09052,
+    "close": 1.09074
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T03:00:00Z",
+   "targetBarTime": "2022-03-09T04:00:00Z",
+   "pUp": 0.5369535088539124,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09073,
+    "high": 1.091915,
+    "low": 1.09071,
+    "close": 1.0917
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T04:00:00Z",
+   "targetBarTime": "2022-03-09T05:00:00Z",
+   "pUp": 0.47968682646751404,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091705,
+    "high": 1.09298,
+    "low": 1.091455,
+    "close": 1.091605
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T05:00:00Z",
+   "targetBarTime": "2022-03-09T06:00:00Z",
+   "pUp": 0.4925599992275238,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09162,
+    "high": 1.092785,
+    "low": 1.09141,
+    "close": 1.091745
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T06:00:00Z",
+   "targetBarTime": "2022-03-09T07:00:00Z",
+   "pUp": 0.48458799719810486,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09172,
+    "high": 1.09255,
+    "low": 1.090925,
+    "close": 1.091655
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T07:00:00Z",
+   "targetBarTime": "2022-03-09T08:00:00Z",
+   "pUp": 0.4861491024494171,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09167,
+    "high": 1.095615,
+    "low": 1.09108,
+    "close": 1.09496
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T08:00:00Z",
+   "targetBarTime": "2022-03-09T09:00:00Z",
+   "pUp": 0.46335241198539734,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.094985,
+    "high": 1.09729,
+    "low": 1.093995,
+    "close": 1.09701
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T09:00:00Z",
+   "targetBarTime": "2022-03-09T10:00:00Z",
+   "pUp": 0.4496399164199829,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.097005,
+    "high": 1.099275,
+    "low": 1.096545,
+    "close": 1.09667
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T10:00:00Z",
+   "targetBarTime": "2022-03-09T11:00:00Z",
+   "pUp": 0.47111767530441284,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.096705,
+    "high": 1.0972,
+    "low": 1.094185,
+    "close": 1.09712
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T11:00:00Z",
+   "targetBarTime": "2022-03-09T12:00:00Z",
+   "pUp": 0.47153177857398987,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.097125,
+    "high": 1.09888,
+    "low": 1.096345,
+    "close": 1.09855
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T12:00:00Z",
+   "targetBarTime": "2022-03-09T13:00:00Z",
+   "pUp": 0.4538561999797821,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098545,
+    "high": 1.10165,
+    "low": 1.098345,
+    "close": 1.101415
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T13:00:00Z",
+   "targetBarTime": "2022-03-09T14:00:00Z",
+   "pUp": 0.42659488320350647,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101425,
+    "high": 1.105035,
+    "low": 1.100435,
+    "close": 1.103125
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T14:00:00Z",
+   "targetBarTime": "2022-03-09T15:00:00Z",
+   "pUp": 0.4446161389350891,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10312,
+    "high": 1.1048,
+    "low": 1.10115,
+    "close": 1.104415
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T15:00:00Z",
+   "targetBarTime": "2022-03-09T16:00:00Z",
+   "pUp": 0.4431171715259552,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.104405,
+    "high": 1.109175,
+    "low": 1.1043,
+    "close": 1.107045
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T16:00:00Z",
+   "targetBarTime": "2022-03-09T17:00:00Z",
+   "pUp": 0.43725529313087463,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.107065,
+    "high": 1.109525,
+    "low": 1.106515,
+    "close": 1.109185
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T17:00:00Z",
+   "targetBarTime": "2022-03-09T18:00:00Z",
+   "pUp": 0.4014396071434021,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10918,
+    "high": 1.109505,
+    "low": 1.10635,
+    "close": 1.106585
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T18:00:00Z",
+   "targetBarTime": "2022-03-09T19:00:00Z",
+   "pUp": 0.49981868267059326,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10658,
+    "high": 1.107955,
+    "low": 1.106175,
+    "close": 1.10773
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T19:00:00Z",
+   "targetBarTime": "2022-03-09T20:00:00Z",
+   "pUp": 0.4495697319507599,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10772,
+    "high": 1.108345,
+    "low": 1.106225,
+    "close": 1.10706
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T20:00:00Z",
+   "targetBarTime": "2022-03-09T21:00:00Z",
+   "pUp": 0.49191170930862427,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.107055,
+    "high": 1.107915,
+    "low": 1.10648,
+    "close": 1.107575
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T21:00:00Z",
+   "targetBarTime": "2022-03-09T22:00:00Z",
+   "pUp": 0.4264127314090729,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10759,
+    "high": 1.10769,
+    "low": 1.106815,
+    "close": 1.1069
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T22:00:00Z",
+   "targetBarTime": "2022-03-09T23:00:00Z",
+   "pUp": 0.47991570830345154,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.106885,
+    "high": 1.10784,
+    "low": 1.10654,
+    "close": 1.107355
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-09T23:00:00Z",
+   "targetBarTime": "2022-03-10T00:00:00Z",
+   "pUp": 0.45900091528892517,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10735,
+    "high": 1.10737,
+    "low": 1.10472,
+    "close": 1.105405
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T00:00:00Z",
+   "targetBarTime": "2022-03-10T01:00:00Z",
+   "pUp": 0.5698994994163513,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105385,
+    "high": 1.105795,
+    "low": 1.10417,
+    "close": 1.10514
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T01:00:00Z",
+   "targetBarTime": "2022-03-10T02:00:00Z",
+   "pUp": 0.5544294118881226,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.105135,
+    "high": 1.105785,
+    "low": 1.10474,
+    "close": 1.10522
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T02:00:00Z",
+   "targetBarTime": "2022-03-10T03:00:00Z",
+   "pUp": 0.525435209274292,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10523,
+    "high": 1.10594,
+    "low": 1.10454,
+    "close": 1.1059
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T03:00:00Z",
+   "targetBarTime": "2022-03-10T04:00:00Z",
+   "pUp": 0.4842376112937927,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10591,
+    "high": 1.10627,
+    "low": 1.10514,
+    "close": 1.1054
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T04:00:00Z",
+   "targetBarTime": "2022-03-10T05:00:00Z",
+   "pUp": 0.5076561570167542,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.105415,
+    "high": 1.10596,
+    "low": 1.105215,
+    "close": 1.10591
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T05:00:00Z",
+   "targetBarTime": "2022-03-10T06:00:00Z",
+   "pUp": 0.4721016585826874,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105915,
+    "high": 1.106775,
+    "low": 1.105235,
+    "close": 1.105635
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T06:00:00Z",
+   "targetBarTime": "2022-03-10T07:00:00Z",
+   "pUp": 0.48700642585754395,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10563,
+    "high": 1.1072,
+    "low": 1.10531,
+    "close": 1.10652
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T07:00:00Z",
+   "targetBarTime": "2022-03-10T08:00:00Z",
+   "pUp": 0.45909833908081055,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.106525,
+    "high": 1.106525,
+    "low": 1.10263,
+    "close": 1.10328
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T08:00:00Z",
+   "targetBarTime": "2022-03-10T09:00:00Z",
+   "pUp": 0.50005704164505,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.103285,
+    "high": 1.108025,
+    "low": 1.10328,
+    "close": 1.10413
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T09:00:00Z",
+   "targetBarTime": "2022-03-10T10:00:00Z",
+   "pUp": 0.49253761768341064,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.104135,
+    "high": 1.104885,
+    "low": 1.10257,
+    "close": 1.103505
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T10:00:00Z",
+   "targetBarTime": "2022-03-10T11:00:00Z",
+   "pUp": 0.49145379662513733,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1035,
+    "high": 1.105325,
+    "low": 1.10304,
+    "close": 1.10402
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T11:00:00Z",
+   "targetBarTime": "2022-03-10T12:00:00Z",
+   "pUp": 0.4792196750640869,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10399,
+    "high": 1.11213,
+    "low": 1.10331,
+    "close": 1.109835
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T12:00:00Z",
+   "targetBarTime": "2022-03-10T13:00:00Z",
+   "pUp": 0.5179471969604492,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109845,
+    "high": 1.11078,
+    "low": 1.105175,
+    "close": 1.106425
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T13:00:00Z",
+   "targetBarTime": "2022-03-10T14:00:00Z",
+   "pUp": 0.5032771825790405,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1064,
+    "high": 1.107035,
+    "low": 1.100015,
+    "close": 1.101645
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T14:00:00Z",
+   "targetBarTime": "2022-03-10T15:00:00Z",
+   "pUp": 0.4907664954662323,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101655,
+    "high": 1.102365,
+    "low": 1.098025,
+    "close": 1.10189
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T15:00:00Z",
+   "targetBarTime": "2022-03-10T16:00:00Z",
+   "pUp": 0.5193537473678589,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101875,
+    "high": 1.102,
+    "low": 1.09958,
+    "close": 1.100675
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T16:00:00Z",
+   "targetBarTime": "2022-03-10T17:00:00Z",
+   "pUp": 0.5387199521064758,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100665,
+    "high": 1.100865,
+    "low": 1.099015,
+    "close": 1.099035
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T17:00:00Z",
+   "targetBarTime": "2022-03-10T18:00:00Z",
+   "pUp": 0.570568859577179,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09904,
+    "high": 1.099305,
+    "low": 1.098665,
+    "close": 1.09868
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T18:00:00Z",
+   "targetBarTime": "2022-03-10T19:00:00Z",
+   "pUp": 0.5693573951721191,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09864,
+    "high": 1.099395,
+    "low": 1.098305,
+    "close": 1.098505
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T19:00:00Z",
+   "targetBarTime": "2022-03-10T20:00:00Z",
+   "pUp": 0.5612549781799316,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098495,
+    "high": 1.099105,
+    "low": 1.097635,
+    "close": 1.097735
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T20:00:00Z",
+   "targetBarTime": "2022-03-10T21:00:00Z",
+   "pUp": 0.583942174911499,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09772,
+    "high": 1.098925,
+    "low": 1.09762,
+    "close": 1.09866
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T21:00:00Z",
+   "targetBarTime": "2022-03-10T22:00:00Z",
+   "pUp": 0.5044072270393372,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098685,
+    "high": 1.099325,
+    "low": 1.098355,
+    "close": 1.09878
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T22:00:00Z",
+   "targetBarTime": "2022-03-10T23:00:00Z",
+   "pUp": 0.5080627799034119,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098785,
+    "high": 1.10151,
+    "low": 1.098705,
+    "close": 1.10135
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-10T23:00:00Z",
+   "targetBarTime": "2022-03-11T00:00:00Z",
+   "pUp": 0.4242219030857086,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10134,
+    "high": 1.1019,
+    "low": 1.099775,
+    "close": 1.09982
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T00:00:00Z",
+   "targetBarTime": "2022-03-11T01:00:00Z",
+   "pUp": 0.5447100400924683,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09983,
+    "high": 1.100175,
+    "low": 1.09807,
+    "close": 1.098765
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T01:00:00Z",
+   "targetBarTime": "2022-03-11T02:00:00Z",
+   "pUp": 0.5824928283691406,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09878,
+    "high": 1.100305,
+    "low": 1.098745,
+    "close": 1.09946
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T02:00:00Z",
+   "targetBarTime": "2022-03-11T03:00:00Z",
+   "pUp": 0.527097761631012,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099455,
+    "high": 1.100495,
+    "low": 1.099135,
+    "close": 1.100455
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T03:00:00Z",
+   "targetBarTime": "2022-03-11T04:00:00Z",
+   "pUp": 0.47988247871398926,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10044,
+    "high": 1.10104,
+    "low": 1.100035,
+    "close": 1.100125
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T04:00:00Z",
+   "targetBarTime": "2022-03-11T05:00:00Z",
+   "pUp": 0.5039542317390442,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10016,
+    "high": 1.100405,
+    "low": 1.099345,
+    "close": 1.09992
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T05:00:00Z",
+   "targetBarTime": "2022-03-11T06:00:00Z",
+   "pUp": 0.5065134167671204,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099925,
+    "high": 1.10078,
+    "low": 1.099635,
+    "close": 1.100415
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T06:00:00Z",
+   "targetBarTime": "2022-03-11T07:00:00Z",
+   "pUp": 0.4791978895664215,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10042,
+    "high": 1.100885,
+    "low": 1.098105,
+    "close": 1.09836
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T07:00:00Z",
+   "targetBarTime": "2022-03-11T08:00:00Z",
+   "pUp": 0.5220179557800293,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098405,
+    "high": 1.09923,
+    "low": 1.09658,
+    "close": 1.09782
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T08:00:00Z",
+   "targetBarTime": "2022-03-11T09:00:00Z",
+   "pUp": 0.5098810791969299,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09781,
+    "high": 1.098595,
+    "low": 1.096025,
+    "close": 1.09673
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T09:00:00Z",
+   "targetBarTime": "2022-03-11T10:00:00Z",
+   "pUp": 0.5075979828834534,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09673,
+    "high": 1.098515,
+    "low": 1.096585,
+    "close": 1.097925
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T10:00:00Z",
+   "targetBarTime": "2022-03-11T11:00:00Z",
+   "pUp": 0.47859859466552734,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09795,
+    "high": 1.104365,
+    "low": 1.097925,
+    "close": 1.10113
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T11:00:00Z",
+   "targetBarTime": "2022-03-11T12:00:00Z",
+   "pUp": 0.4996117949485779,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101145,
+    "high": 1.10324,
+    "low": 1.097385,
+    "close": 1.098665
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T12:00:00Z",
+   "targetBarTime": "2022-03-11T13:00:00Z",
+   "pUp": 0.4913647174835205,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09867,
+    "high": 1.101125,
+    "low": 1.09856,
+    "close": 1.099835
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T13:00:00Z",
+   "targetBarTime": "2022-03-11T14:00:00Z",
+   "pUp": 0.49278950691223145,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09983,
+    "high": 1.100175,
+    "low": 1.09733,
+    "close": 1.098185
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T14:00:00Z",
+   "targetBarTime": "2022-03-11T15:00:00Z",
+   "pUp": 0.5230789184570312,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098185,
+    "high": 1.09824,
+    "low": 1.09463,
+    "close": 1.09653
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T15:00:00Z",
+   "targetBarTime": "2022-03-11T16:00:00Z",
+   "pUp": 0.5408958792686462,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09654,
+    "high": 1.096995,
+    "low": 1.092875,
+    "close": 1.09359
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T16:00:00Z",
+   "targetBarTime": "2022-03-11T17:00:00Z",
+   "pUp": 0.5551483035087585,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.093595,
+    "high": 1.09367,
+    "low": 1.09127,
+    "close": 1.091615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T17:00:00Z",
+   "targetBarTime": "2022-03-11T18:00:00Z",
+   "pUp": 0.5861726403236389,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091605,
+    "high": 1.092135,
+    "low": 1.0902,
+    "close": 1.09033
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T18:00:00Z",
+   "targetBarTime": "2022-03-11T19:00:00Z",
+   "pUp": 0.601239800453186,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.090325,
+    "high": 1.091335,
+    "low": 1.09029,
+    "close": 1.09092
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T19:00:00Z",
+   "targetBarTime": "2022-03-11T20:00:00Z",
+   "pUp": 0.5610741376876831,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09091,
+    "high": 1.09139,
+    "low": 1.090545,
+    "close": 1.091075
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T20:00:00Z",
+   "targetBarTime": "2022-03-11T21:00:00Z",
+   "pUp": 0.5480214357376099,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09107,
+    "high": 1.091705,
+    "low": 1.09086,
+    "close": 1.09121
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-11T21:00:00Z",
+   "targetBarTime": "2022-03-13T21:00:00Z",
+   "pUp": 0.5284348130226135,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09236,
+    "high": 1.092755,
+    "low": 1.091705,
+    "close": 1.091895
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-13T21:00:00Z",
+   "targetBarTime": "2022-03-13T22:00:00Z",
+   "pUp": 0.4596821069717407,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09189,
+    "high": 1.093625,
+    "low": 1.091135,
+    "close": 1.092775
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-13T22:00:00Z",
+   "targetBarTime": "2022-03-13T23:00:00Z",
+   "pUp": 0.46035444736480713,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.0928,
+    "high": 1.093895,
+    "low": 1.092585,
+    "close": 1.093185
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-13T23:00:00Z",
+   "targetBarTime": "2022-03-14T00:00:00Z",
+   "pUp": 0.4669848680496216,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09319,
+    "high": 1.093275,
+    "low": 1.092015,
+    "close": 1.092925
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T00:00:00Z",
+   "targetBarTime": "2022-03-14T01:00:00Z",
+   "pUp": 0.49976658821105957,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.092945,
+    "high": 1.09377,
+    "low": 1.091285,
+    "close": 1.091725
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T01:00:00Z",
+   "targetBarTime": "2022-03-14T02:00:00Z",
+   "pUp": 0.5599039793014526,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09175,
+    "high": 1.091815,
+    "low": 1.090065,
+    "close": 1.090945
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T02:00:00Z",
+   "targetBarTime": "2022-03-14T03:00:00Z",
+   "pUp": 0.5744686126708984,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09094,
+    "high": 1.091215,
+    "low": 1.09042,
+    "close": 1.090465
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T03:00:00Z",
+   "targetBarTime": "2022-03-14T04:00:00Z",
+   "pUp": 0.571342408657074,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09047,
+    "high": 1.09175,
+    "low": 1.09013,
+    "close": 1.09173
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T04:00:00Z",
+   "targetBarTime": "2022-03-14T05:00:00Z",
+   "pUp": 0.5086629986763,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.091725,
+    "high": 1.091835,
+    "low": 1.090865,
+    "close": 1.091135
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T05:00:00Z",
+   "targetBarTime": "2022-03-14T06:00:00Z",
+   "pUp": 0.534172773361206,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.091115,
+    "high": 1.092295,
+    "low": 1.09092,
+    "close": 1.09176
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T06:00:00Z",
+   "targetBarTime": "2022-03-14T07:00:00Z",
+   "pUp": 0.5048527121543884,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.091755,
+    "high": 1.094055,
+    "low": 1.09107,
+    "close": 1.093185
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T07:00:00Z",
+   "targetBarTime": "2022-03-14T08:00:00Z",
+   "pUp": 0.4865114688873291,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.0932,
+    "high": 1.096,
+    "low": 1.093025,
+    "close": 1.095655
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T08:00:00Z",
+   "targetBarTime": "2022-03-14T09:00:00Z",
+   "pUp": 0.46109920740127563,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.095635,
+    "high": 1.09898,
+    "low": 1.095175,
+    "close": 1.098235
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T09:00:00Z",
+   "targetBarTime": "2022-03-14T10:00:00Z",
+   "pUp": 0.45519331097602844,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09822,
+    "high": 1.098425,
+    "low": 1.09594,
+    "close": 1.09607
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T10:00:00Z",
+   "targetBarTime": "2022-03-14T11:00:00Z",
+   "pUp": 0.49677133560180664,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.096075,
+    "high": 1.09669,
+    "low": 1.094005,
+    "close": 1.09432
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T11:00:00Z",
+   "targetBarTime": "2022-03-14T12:00:00Z",
+   "pUp": 0.5200901627540588,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.094325,
+    "high": 1.09649,
+    "low": 1.09429,
+    "close": 1.09579
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T12:00:00Z",
+   "targetBarTime": "2022-03-14T13:00:00Z",
+   "pUp": 0.4860023260116577,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09574,
+    "high": 1.096195,
+    "low": 1.093505,
+    "close": 1.094275
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T13:00:00Z",
+   "targetBarTime": "2022-03-14T14:00:00Z",
+   "pUp": 0.5171960592269897,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.094265,
+    "high": 1.0972,
+    "low": 1.09395,
+    "close": 1.096525
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T14:00:00Z",
+   "targetBarTime": "2022-03-14T15:00:00Z",
+   "pUp": 0.4837827980518341,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.096515,
+    "high": 1.098645,
+    "low": 1.09616,
+    "close": 1.097915
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T15:00:00Z",
+   "targetBarTime": "2022-03-14T16:00:00Z",
+   "pUp": 0.45500150322914124,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09791,
+    "high": 1.099395,
+    "low": 1.096815,
+    "close": 1.097415
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T16:00:00Z",
+   "targetBarTime": "2022-03-14T17:00:00Z",
+   "pUp": 0.48491451144218445,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09742,
+    "high": 1.097935,
+    "low": 1.096395,
+    "close": 1.097505
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T17:00:00Z",
+   "targetBarTime": "2022-03-14T18:00:00Z",
+   "pUp": 0.4808138906955719,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09751,
+    "high": 1.09762,
+    "low": 1.095705,
+    "close": 1.095795
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T18:00:00Z",
+   "targetBarTime": "2022-03-14T19:00:00Z",
+   "pUp": 0.5490440726280212,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.095815,
+    "high": 1.09661,
+    "low": 1.09458,
+    "close": 1.09497
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T19:00:00Z",
+   "targetBarTime": "2022-03-14T20:00:00Z",
+   "pUp": 0.5652853846549988,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.094975,
+    "high": 1.09537,
+    "low": 1.09393,
+    "close": 1.094045
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T20:00:00Z",
+   "targetBarTime": "2022-03-14T21:00:00Z",
+   "pUp": 0.5824108719825745,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.094055,
+    "high": 1.09529,
+    "low": 1.093315,
+    "close": 1.094495
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T21:00:00Z",
+   "targetBarTime": "2022-03-14T22:00:00Z",
+   "pUp": 0.5241319537162781,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09446,
+    "high": 1.0949,
+    "low": 1.09334,
+    "close": 1.093575
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T22:00:00Z",
+   "targetBarTime": "2022-03-14T23:00:00Z",
+   "pUp": 0.5682672262191772,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09361,
+    "high": 1.09455,
+    "low": 1.09306,
+    "close": 1.094285
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-14T23:00:00Z",
+   "targetBarTime": "2022-03-15T00:00:00Z",
+   "pUp": 0.5191440582275391,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09429,
+    "high": 1.095545,
+    "low": 1.094285,
+    "close": 1.095045
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T00:00:00Z",
+   "targetBarTime": "2022-03-15T01:00:00Z",
+   "pUp": 0.48564058542251587,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09504,
+    "high": 1.09559,
+    "low": 1.09377,
+    "close": 1.09548
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T01:00:00Z",
+   "targetBarTime": "2022-03-15T02:00:00Z",
+   "pUp": 0.4852898120880127,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.095475,
+    "high": 1.097695,
+    "low": 1.09536,
+    "close": 1.09713
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T02:00:00Z",
+   "targetBarTime": "2022-03-15T03:00:00Z",
+   "pUp": 0.44650861620903015,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09714,
+    "high": 1.098055,
+    "low": 1.09688,
+    "close": 1.09776
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T03:00:00Z",
+   "targetBarTime": "2022-03-15T04:00:00Z",
+   "pUp": 0.4430240988731384,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09778,
+    "high": 1.09854,
+    "low": 1.09748,
+    "close": 1.09825
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T04:00:00Z",
+   "targetBarTime": "2022-03-15T05:00:00Z",
+   "pUp": 0.4450877010822296,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09826,
+    "high": 1.0985,
+    "low": 1.09782,
+    "close": 1.098315
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T05:00:00Z",
+   "targetBarTime": "2022-03-15T06:00:00Z",
+   "pUp": 0.4578254818916321,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098285,
+    "high": 1.098385,
+    "low": 1.097015,
+    "close": 1.0971
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T06:00:00Z",
+   "targetBarTime": "2022-03-15T07:00:00Z",
+   "pUp": 0.512282133102417,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09711,
+    "high": 1.101985,
+    "low": 1.096705,
+    "close": 1.1005
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T07:00:00Z",
+   "targetBarTime": "2022-03-15T08:00:00Z",
+   "pUp": 0.4808923900127411,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10051,
+    "high": 1.101935,
+    "low": 1.098775,
+    "close": 1.10038
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T08:00:00Z",
+   "targetBarTime": "2022-03-15T09:00:00Z",
+   "pUp": 0.4869515895843506,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10037,
+    "high": 1.10078,
+    "low": 1.09912,
+    "close": 1.100565
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T09:00:00Z",
+   "targetBarTime": "2022-03-15T10:00:00Z",
+   "pUp": 0.4803236126899719,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10056,
+    "high": 1.10056,
+    "low": 1.099275,
+    "close": 1.099515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T10:00:00Z",
+   "targetBarTime": "2022-03-15T11:00:00Z",
+   "pUp": 0.5067290663719177,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09952,
+    "high": 1.099725,
+    "low": 1.09781,
+    "close": 1.098385
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T11:00:00Z",
+   "targetBarTime": "2022-03-15T12:00:00Z",
+   "pUp": 0.5174258947372437,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09839,
+    "high": 1.100425,
+    "low": 1.09839,
+    "close": 1.09904
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T12:00:00Z",
+   "targetBarTime": "2022-03-15T13:00:00Z",
+   "pUp": 0.49452489614486694,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099035,
+    "high": 1.099995,
+    "low": 1.097385,
+    "close": 1.099735
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T13:00:00Z",
+   "targetBarTime": "2022-03-15T14:00:00Z",
+   "pUp": 0.4854593276977539,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099745,
+    "high": 1.099975,
+    "low": 1.097725,
+    "close": 1.098295
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T14:00:00Z",
+   "targetBarTime": "2022-03-15T15:00:00Z",
+   "pUp": 0.5221689343452454,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098315,
+    "high": 1.098685,
+    "low": 1.096325,
+    "close": 1.097285
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T15:00:00Z",
+   "targetBarTime": "2022-03-15T16:00:00Z",
+   "pUp": 0.5386155247688293,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09729,
+    "high": 1.09758,
+    "low": 1.093815,
+    "close": 1.095155
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T16:00:00Z",
+   "targetBarTime": "2022-03-15T17:00:00Z",
+   "pUp": 0.5522350072860718,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.095175,
+    "high": 1.095385,
+    "low": 1.093685,
+    "close": 1.09384
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T17:00:00Z",
+   "targetBarTime": "2022-03-15T18:00:00Z",
+   "pUp": 0.5771902799606323,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.093835,
+    "high": 1.094305,
+    "low": 1.09261,
+    "close": 1.094025
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T18:00:00Z",
+   "targetBarTime": "2022-03-15T19:00:00Z",
+   "pUp": 0.5559936165809631,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09403,
+    "high": 1.09532,
+    "low": 1.093955,
+    "close": 1.09528
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T19:00:00Z",
+   "targetBarTime": "2022-03-15T20:00:00Z",
+   "pUp": 0.4919631779193878,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.095275,
+    "high": 1.095705,
+    "low": 1.09419,
+    "close": 1.095635
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T20:00:00Z",
+   "targetBarTime": "2022-03-15T21:00:00Z",
+   "pUp": 0.46031472086906433,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.095515,
+    "high": 1.09573,
+    "low": 1.094855,
+    "close": 1.095
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T21:00:00Z",
+   "targetBarTime": "2022-03-15T22:00:00Z",
+   "pUp": 0.5062827467918396,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.095005,
+    "high": 1.096505,
+    "low": 1.09499,
+    "close": 1.096505
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T22:00:00Z",
+   "targetBarTime": "2022-03-15T23:00:00Z",
+   "pUp": 0.43307092785835266,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09649,
+    "high": 1.09742,
+    "low": 1.09578,
+    "close": 1.096695
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-15T23:00:00Z",
+   "targetBarTime": "2022-03-16T00:00:00Z",
+   "pUp": 0.4561442732810974,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.0967,
+    "high": 1.09722,
+    "low": 1.09552,
+    "close": 1.095705
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T00:00:00Z",
+   "targetBarTime": "2022-03-16T01:00:00Z",
+   "pUp": 0.5303838849067688,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.0957,
+    "high": 1.096975,
+    "low": 1.095605,
+    "close": 1.096725
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T01:00:00Z",
+   "targetBarTime": "2022-03-16T02:00:00Z",
+   "pUp": 0.46980178356170654,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.096705,
+    "high": 1.09773,
+    "low": 1.096555,
+    "close": 1.09713
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T02:00:00Z",
+   "targetBarTime": "2022-03-16T03:00:00Z",
+   "pUp": 0.4613941013813019,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.097125,
+    "high": 1.097275,
+    "low": 1.09667,
+    "close": 1.096715
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T03:00:00Z",
+   "targetBarTime": "2022-03-16T04:00:00Z",
+   "pUp": 0.48889943957328796,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09671,
+    "high": 1.096965,
+    "low": 1.096575,
+    "close": 1.096795
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T04:00:00Z",
+   "targetBarTime": "2022-03-16T05:00:00Z",
+   "pUp": 0.47539612650871277,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09679,
+    "high": 1.097805,
+    "low": 1.09647,
+    "close": 1.097755
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T05:00:00Z",
+   "targetBarTime": "2022-03-16T06:00:00Z",
+   "pUp": 0.44067373871803284,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.097725,
+    "high": 1.09823,
+    "low": 1.09711,
+    "close": 1.0979
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T06:00:00Z",
+   "targetBarTime": "2022-03-16T07:00:00Z",
+   "pUp": 0.45243528485298157,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.097895,
+    "high": 1.09798,
+    "low": 1.09559,
+    "close": 1.095825
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T07:00:00Z",
+   "targetBarTime": "2022-03-16T08:00:00Z",
+   "pUp": 0.5112247467041016,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09582,
+    "high": 1.10052,
+    "low": 1.09582,
+    "close": 1.099085
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T08:00:00Z",
+   "targetBarTime": "2022-03-16T09:00:00Z",
+   "pUp": 0.4774136245250702,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099075,
+    "high": 1.100125,
+    "low": 1.098015,
+    "close": 1.098695
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T09:00:00Z",
+   "targetBarTime": "2022-03-16T10:00:00Z",
+   "pUp": 0.48378872871398926,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098675,
+    "high": 1.101475,
+    "low": 1.098455,
+    "close": 1.099925
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T10:00:00Z",
+   "targetBarTime": "2022-03-16T11:00:00Z",
+   "pUp": 0.466309517621994,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099895,
+    "high": 1.102485,
+    "low": 1.09984,
+    "close": 1.101235
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T11:00:00Z",
+   "targetBarTime": "2022-03-16T12:00:00Z",
+   "pUp": 0.4535553753376007,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101225,
+    "high": 1.101385,
+    "low": 1.09823,
+    "close": 1.098925
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T12:00:00Z",
+   "targetBarTime": "2022-03-16T13:00:00Z",
+   "pUp": 0.4988992512226105,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098935,
+    "high": 1.100555,
+    "low": 1.098555,
+    "close": 1.099995
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T13:00:00Z",
+   "targetBarTime": "2022-03-16T14:00:00Z",
+   "pUp": 0.47462180256843567,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1,
+    "high": 1.10401,
+    "low": 1.098675,
+    "close": 1.101765
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T14:00:00Z",
+   "targetBarTime": "2022-03-16T15:00:00Z",
+   "pUp": 0.4845435619354248,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101725,
+    "high": 1.10233,
+    "low": 1.099045,
+    "close": 1.09921
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T15:00:00Z",
+   "targetBarTime": "2022-03-16T16:00:00Z",
+   "pUp": 0.520073413848877,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.0992,
+    "high": 1.10135,
+    "low": 1.09916,
+    "close": 1.100095
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T16:00:00Z",
+   "targetBarTime": "2022-03-16T17:00:00Z",
+   "pUp": 0.4963304400444031,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100075,
+    "high": 1.100185,
+    "low": 1.098265,
+    "close": 1.098425
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T17:00:00Z",
+   "targetBarTime": "2022-03-16T18:00:00Z",
+   "pUp": 0.5501353144645691,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098335,
+    "high": 1.10107,
+    "low": 1.095015,
+    "close": 1.1001
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T18:00:00Z",
+   "targetBarTime": "2022-03-16T19:00:00Z",
+   "pUp": 0.5205076932907104,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10011,
+    "high": 1.104505,
+    "low": 1.099325,
+    "close": 1.104495
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T19:00:00Z",
+   "targetBarTime": "2022-03-16T20:00:00Z",
+   "pUp": 0.46000444889068604,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10448,
+    "high": 1.10467,
+    "low": 1.10317,
+    "close": 1.10357
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T20:00:00Z",
+   "targetBarTime": "2022-03-16T21:00:00Z",
+   "pUp": 0.45098403096199036,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1036,
+    "high": 1.103725,
+    "low": 1.1031,
+    "close": 1.103205
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T21:00:00Z",
+   "targetBarTime": "2022-03-16T22:00:00Z",
+   "pUp": 0.47760018706321716,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103195,
+    "high": 1.103235,
+    "low": 1.100775,
+    "close": 1.101795
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T22:00:00Z",
+   "targetBarTime": "2022-03-16T23:00:00Z",
+   "pUp": 0.5615950226783752,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10182,
+    "high": 1.102505,
+    "low": 1.101615,
+    "close": 1.102165
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-16T23:00:00Z",
+   "targetBarTime": "2022-03-17T00:00:00Z",
+   "pUp": 0.5218611359596252,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10218,
+    "high": 1.10525,
+    "low": 1.102035,
+    "close": 1.105145
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T00:00:00Z",
+   "targetBarTime": "2022-03-17T01:00:00Z",
+   "pUp": 0.4381982684135437,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105155,
+    "high": 1.105215,
+    "low": 1.102985,
+    "close": 1.1036
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T01:00:00Z",
+   "targetBarTime": "2022-03-17T02:00:00Z",
+   "pUp": 0.5333782434463501,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.103625,
+    "high": 1.104275,
+    "low": 1.10306,
+    "close": 1.1042
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T02:00:00Z",
+   "targetBarTime": "2022-03-17T03:00:00Z",
+   "pUp": 0.4922729730606079,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.104205,
+    "high": 1.104225,
+    "low": 1.103275,
+    "close": 1.10351
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T03:00:00Z",
+   "targetBarTime": "2022-03-17T04:00:00Z",
+   "pUp": 0.5228230357170105,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103525,
+    "high": 1.10388,
+    "low": 1.103025,
+    "close": 1.103455
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T04:00:00Z",
+   "targetBarTime": "2022-03-17T05:00:00Z",
+   "pUp": 0.5060821175575256,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10346,
+    "high": 1.103465,
+    "low": 1.102345,
+    "close": 1.102345
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T05:00:00Z",
+   "targetBarTime": "2022-03-17T06:00:00Z",
+   "pUp": 0.5336070656776428,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10237,
+    "high": 1.103895,
+    "low": 1.10221,
+    "close": 1.103615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T06:00:00Z",
+   "targetBarTime": "2022-03-17T07:00:00Z",
+   "pUp": 0.46866029500961304,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.103625,
+    "high": 1.10459,
+    "low": 1.10301,
+    "close": 1.104485
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T07:00:00Z",
+   "targetBarTime": "2022-03-17T08:00:00Z",
+   "pUp": 0.451989084482193,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.104475,
+    "high": 1.106715,
+    "low": 1.10397,
+    "close": 1.105295
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T08:00:00Z",
+   "targetBarTime": "2022-03-17T09:00:00Z",
+   "pUp": 0.4541524350643158,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10529,
+    "high": 1.105535,
+    "low": 1.10409,
+    "close": 1.105435
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T09:00:00Z",
+   "targetBarTime": "2022-03-17T10:00:00Z",
+   "pUp": 0.45845088362693787,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10544,
+    "high": 1.105445,
+    "low": 1.10231,
+    "close": 1.10468
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T10:00:00Z",
+   "targetBarTime": "2022-03-17T11:00:00Z",
+   "pUp": 0.4796864986419678,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10467,
+    "high": 1.10584,
+    "low": 1.10463,
+    "close": 1.105115
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T11:00:00Z",
+   "targetBarTime": "2022-03-17T12:00:00Z",
+   "pUp": 0.46472182869911194,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10512,
+    "high": 1.10655,
+    "low": 1.104025,
+    "close": 1.10459
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T12:00:00Z",
+   "targetBarTime": "2022-03-17T13:00:00Z",
+   "pUp": 0.48342660069465637,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.104585,
+    "high": 1.107075,
+    "low": 1.104435,
+    "close": 1.107005
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T13:00:00Z",
+   "targetBarTime": "2022-03-17T14:00:00Z",
+   "pUp": 0.44775062799453735,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.107015,
+    "high": 1.109175,
+    "low": 1.106735,
+    "close": 1.10829
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T14:00:00Z",
+   "targetBarTime": "2022-03-17T15:00:00Z",
+   "pUp": 0.4431605339050293,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.108295,
+    "high": 1.11113,
+    "low": 1.108015,
+    "close": 1.110995
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T15:00:00Z",
+   "targetBarTime": "2022-03-17T16:00:00Z",
+   "pUp": 0.4148619771003723,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11099,
+    "high": 1.113355,
+    "low": 1.110465,
+    "close": 1.1131
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T16:00:00Z",
+   "targetBarTime": "2022-03-17T17:00:00Z",
+   "pUp": 0.4024592638015747,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.113105,
+    "high": 1.113765,
+    "low": 1.112315,
+    "close": 1.112695
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T17:00:00Z",
+   "targetBarTime": "2022-03-17T18:00:00Z",
+   "pUp": 0.4495578706264496,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112685,
+    "high": 1.112745,
+    "low": 1.109875,
+    "close": 1.110045
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T18:00:00Z",
+   "targetBarTime": "2022-03-17T19:00:00Z",
+   "pUp": 0.5528458952903748,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.110035,
+    "high": 1.110035,
+    "low": 1.10931,
+    "close": 1.109865
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T19:00:00Z",
+   "targetBarTime": "2022-03-17T20:00:00Z",
+   "pUp": 0.5370297431945801,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109855,
+    "high": 1.11,
+    "low": 1.10895,
+    "close": 1.109155
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T20:00:00Z",
+   "targetBarTime": "2022-03-17T21:00:00Z",
+   "pUp": 0.5582104325294495,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109195,
+    "high": 1.10947,
+    "low": 1.109055,
+    "close": 1.10916
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T21:00:00Z",
+   "targetBarTime": "2022-03-17T22:00:00Z",
+   "pUp": 0.5292826294898987,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.109155,
+    "high": 1.109615,
+    "low": 1.10905,
+    "close": 1.109385
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T22:00:00Z",
+   "targetBarTime": "2022-03-17T23:00:00Z",
+   "pUp": 0.49883684515953064,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.109375,
+    "high": 1.110025,
+    "low": 1.108935,
+    "close": 1.10992
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-17T23:00:00Z",
+   "targetBarTime": "2022-03-18T00:00:00Z",
+   "pUp": 0.4695212244987488,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10993,
+    "high": 1.111875,
+    "low": 1.109655,
+    "close": 1.109965
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T00:00:00Z",
+   "targetBarTime": "2022-03-18T01:00:00Z",
+   "pUp": 0.49700549244880676,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10997,
+    "high": 1.11038,
+    "low": 1.108585,
+    "close": 1.108775
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T01:00:00Z",
+   "targetBarTime": "2022-03-18T02:00:00Z",
+   "pUp": 0.5592327117919922,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.108785,
+    "high": 1.109055,
+    "low": 1.108135,
+    "close": 1.10858
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T02:00:00Z",
+   "targetBarTime": "2022-03-18T03:00:00Z",
+   "pUp": 0.5432933568954468,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.108565,
+    "high": 1.108985,
+    "low": 1.10773,
+    "close": 1.108405
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T03:00:00Z",
+   "targetBarTime": "2022-03-18T04:00:00Z",
+   "pUp": 0.5341249108314514,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.108395,
+    "high": 1.108725,
+    "low": 1.10766,
+    "close": 1.10769
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T04:00:00Z",
+   "targetBarTime": "2022-03-18T05:00:00Z",
+   "pUp": 0.5453757047653198,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.107685,
+    "high": 1.108565,
+    "low": 1.107575,
+    "close": 1.108415
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T05:00:00Z",
+   "targetBarTime": "2022-03-18T06:00:00Z",
+   "pUp": 0.4932158887386322,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10841,
+    "high": 1.10944,
+    "low": 1.108205,
+    "close": 1.108355
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T06:00:00Z",
+   "targetBarTime": "2022-03-18T07:00:00Z",
+   "pUp": 0.4957854151725769,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10834,
+    "high": 1.10895,
+    "low": 1.10714,
+    "close": 1.107875
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T07:00:00Z",
+   "targetBarTime": "2022-03-18T08:00:00Z",
+   "pUp": 0.503055989742279,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10787,
+    "high": 1.10806,
+    "low": 1.105525,
+    "close": 1.10678
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T08:00:00Z",
+   "targetBarTime": "2022-03-18T09:00:00Z",
+   "pUp": 0.5096692442893982,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.106775,
+    "high": 1.10719,
+    "low": 1.10531,
+    "close": 1.105735
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T09:00:00Z",
+   "targetBarTime": "2022-03-18T10:00:00Z",
+   "pUp": 0.5108047723770142,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105755,
+    "high": 1.10603,
+    "low": 1.10317,
+    "close": 1.103835
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T10:00:00Z",
+   "targetBarTime": "2022-03-18T11:00:00Z",
+   "pUp": 0.5093679428100586,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103865,
+    "high": 1.104165,
+    "low": 1.102095,
+    "close": 1.10226
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T11:00:00Z",
+   "targetBarTime": "2022-03-18T12:00:00Z",
+   "pUp": 0.512468159198761,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.102255,
+    "high": 1.10364,
+    "low": 1.101525,
+    "close": 1.102045
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T12:00:00Z",
+   "targetBarTime": "2022-03-18T13:00:00Z",
+   "pUp": 0.5035900473594666,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102055,
+    "high": 1.102625,
+    "low": 1.100315,
+    "close": 1.102535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T13:00:00Z",
+   "targetBarTime": "2022-03-18T14:00:00Z",
+   "pUp": 0.4941112697124481,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10253,
+    "high": 1.10438,
+    "low": 1.10244,
+    "close": 1.10298
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T14:00:00Z",
+   "targetBarTime": "2022-03-18T15:00:00Z",
+   "pUp": 0.49256032705307007,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102985,
+    "high": 1.10537,
+    "low": 1.102695,
+    "close": 1.104815
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T15:00:00Z",
+   "targetBarTime": "2022-03-18T16:00:00Z",
+   "pUp": 0.4657825231552124,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10482,
+    "high": 1.10723,
+    "low": 1.104245,
+    "close": 1.106075
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T16:00:00Z",
+   "targetBarTime": "2022-03-18T17:00:00Z",
+   "pUp": 0.46266496181488037,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.106085,
+    "high": 1.106415,
+    "low": 1.10507,
+    "close": 1.105875
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T17:00:00Z",
+   "targetBarTime": "2022-03-18T18:00:00Z",
+   "pUp": 0.48852333426475525,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105865,
+    "high": 1.10593,
+    "low": 1.104235,
+    "close": 1.10486
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T18:00:00Z",
+   "targetBarTime": "2022-03-18T19:00:00Z",
+   "pUp": 0.5443479418754578,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.104855,
+    "high": 1.105685,
+    "low": 1.10464,
+    "close": 1.105215
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T19:00:00Z",
+   "targetBarTime": "2022-03-18T20:00:00Z",
+   "pUp": 0.5124847292900085,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10522,
+    "high": 1.10539,
+    "low": 1.10475,
+    "close": 1.105065
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-18T20:00:00Z",
+   "targetBarTime": "2022-03-20T21:00:00Z",
+   "pUp": 0.5044679641723633,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.105975,
+    "high": 1.10625,
+    "low": 1.105125,
+    "close": 1.105205
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-20T21:00:00Z",
+   "targetBarTime": "2022-03-20T22:00:00Z",
+   "pUp": 0.47225484251976013,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10518,
+    "high": 1.10577,
+    "low": 1.10434,
+    "close": 1.1045
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-20T22:00:00Z",
+   "targetBarTime": "2022-03-20T23:00:00Z",
+   "pUp": 0.5313600301742554,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10451,
+    "high": 1.104775,
+    "low": 1.104105,
+    "close": 1.10427
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-20T23:00:00Z",
+   "targetBarTime": "2022-03-21T00:00:00Z",
+   "pUp": 0.5403369069099426,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10426,
+    "high": 1.1048,
+    "low": 1.10377,
+    "close": 1.104535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T00:00:00Z",
+   "targetBarTime": "2022-03-21T01:00:00Z",
+   "pUp": 0.5166993141174316,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.104525,
+    "high": 1.10539,
+    "low": 1.10444,
+    "close": 1.10451
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T01:00:00Z",
+   "targetBarTime": "2022-03-21T02:00:00Z",
+   "pUp": 0.5203269720077515,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10452,
+    "high": 1.105075,
+    "low": 1.104295,
+    "close": 1.104915
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T02:00:00Z",
+   "targetBarTime": "2022-03-21T03:00:00Z",
+   "pUp": 0.49817007780075073,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10492,
+    "high": 1.1052,
+    "low": 1.10452,
+    "close": 1.10456
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T03:00:00Z",
+   "targetBarTime": "2022-03-21T04:00:00Z",
+   "pUp": 0.5227757692337036,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.104555,
+    "high": 1.104575,
+    "low": 1.10407,
+    "close": 1.1041
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T04:00:00Z",
+   "targetBarTime": "2022-03-21T05:00:00Z",
+   "pUp": 0.5347998142242432,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.104105,
+    "high": 1.1044,
+    "low": 1.10379,
+    "close": 1.104195
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T05:00:00Z",
+   "targetBarTime": "2022-03-21T06:00:00Z",
+   "pUp": 0.5190073251724243,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.104185,
+    "high": 1.10471,
+    "low": 1.10346,
+    "close": 1.103845
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T06:00:00Z",
+   "targetBarTime": "2022-03-21T07:00:00Z",
+   "pUp": 0.5269654989242554,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.103835,
+    "high": 1.1056,
+    "low": 1.10351,
+    "close": 1.105115
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T07:00:00Z",
+   "targetBarTime": "2022-03-21T08:00:00Z",
+   "pUp": 0.48672470450401306,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1051,
+    "high": 1.106285,
+    "low": 1.10465,
+    "close": 1.10565
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T08:00:00Z",
+   "targetBarTime": "2022-03-21T09:00:00Z",
+   "pUp": 0.48251110315322876,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.105675,
+    "high": 1.10702,
+    "low": 1.10514,
+    "close": 1.10571
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T09:00:00Z",
+   "targetBarTime": "2022-03-21T10:00:00Z",
+   "pUp": 0.49004819989204407,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1057,
+    "high": 1.10584,
+    "low": 1.104515,
+    "close": 1.10455
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T10:00:00Z",
+   "targetBarTime": "2022-03-21T11:00:00Z",
+   "pUp": 0.5181297659873962,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10454,
+    "high": 1.10456,
+    "low": 1.102565,
+    "close": 1.103135
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T11:00:00Z",
+   "targetBarTime": "2022-03-21T12:00:00Z",
+   "pUp": 0.5306885242462158,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.103115,
+    "high": 1.104365,
+    "low": 1.10292,
+    "close": 1.10339
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T12:00:00Z",
+   "targetBarTime": "2022-03-21T13:00:00Z",
+   "pUp": 0.5142413973808289,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10338,
+    "high": 1.104395,
+    "low": 1.103255,
+    "close": 1.103355
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T13:00:00Z",
+   "targetBarTime": "2022-03-21T14:00:00Z",
+   "pUp": 0.5132152438163757,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10337,
+    "high": 1.104575,
+    "low": 1.102875,
+    "close": 1.104225
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T14:00:00Z",
+   "targetBarTime": "2022-03-21T15:00:00Z",
+   "pUp": 0.48905956745147705,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10425,
+    "high": 1.105085,
+    "low": 1.103755,
+    "close": 1.104515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T15:00:00Z",
+   "targetBarTime": "2022-03-21T16:00:00Z",
+   "pUp": 0.48783814907073975,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.104505,
+    "high": 1.10523,
+    "low": 1.10264,
+    "close": 1.10421
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T16:00:00Z",
+   "targetBarTime": "2022-03-21T17:00:00Z",
+   "pUp": 0.5096806883811951,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10422,
+    "high": 1.10437,
+    "low": 1.101805,
+    "close": 1.103065
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T17:00:00Z",
+   "targetBarTime": "2022-03-21T18:00:00Z",
+   "pUp": 0.5456243753433228,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10307,
+    "high": 1.1031,
+    "low": 1.10149,
+    "close": 1.101605
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T18:00:00Z",
+   "targetBarTime": "2022-03-21T19:00:00Z",
+   "pUp": 0.5842732787132263,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10161,
+    "high": 1.10197,
+    "low": 1.10103,
+    "close": 1.10143
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T19:00:00Z",
+   "targetBarTime": "2022-03-21T20:00:00Z",
+   "pUp": 0.5709822773933411,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101415,
+    "high": 1.101745,
+    "low": 1.10126,
+    "close": 1.101615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T20:00:00Z",
+   "targetBarTime": "2022-03-21T21:00:00Z",
+   "pUp": 0.5296292901039124,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10162,
+    "high": 1.10199,
+    "low": 1.101525,
+    "close": 1.101965
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T21:00:00Z",
+   "targetBarTime": "2022-03-21T22:00:00Z",
+   "pUp": 0.484515905380249,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10195,
+    "high": 1.10259,
+    "low": 1.10173,
+    "close": 1.10206
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T22:00:00Z",
+   "targetBarTime": "2022-03-21T23:00:00Z",
+   "pUp": 0.4997340738773346,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.102095,
+    "high": 1.102185,
+    "low": 1.10147,
+    "close": 1.10168
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-21T23:00:00Z",
+   "targetBarTime": "2022-03-22T00:00:00Z",
+   "pUp": 0.5361324548721313,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101675,
+    "high": 1.10175,
+    "low": 1.09811,
+    "close": 1.098665
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T00:00:00Z",
+   "targetBarTime": "2022-03-22T01:00:00Z",
+   "pUp": 0.6017151474952698,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09866,
+    "high": 1.099715,
+    "low": 1.098405,
+    "close": 1.09957
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T01:00:00Z",
+   "targetBarTime": "2022-03-22T02:00:00Z",
+   "pUp": 0.5435926914215088,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099565,
+    "high": 1.10025,
+    "low": 1.09908,
+    "close": 1.10018
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T02:00:00Z",
+   "targetBarTime": "2022-03-22T03:00:00Z",
+   "pUp": 0.5148422718048096,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.100185,
+    "high": 1.10052,
+    "low": 1.09967,
+    "close": 1.10024
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T03:00:00Z",
+   "targetBarTime": "2022-03-22T04:00:00Z",
+   "pUp": 0.5155818462371826,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100255,
+    "high": 1.100285,
+    "low": 1.0984,
+    "close": 1.098555
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T04:00:00Z",
+   "targetBarTime": "2022-03-22T05:00:00Z",
+   "pUp": 0.5640878081321716,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09855,
+    "high": 1.09912,
+    "low": 1.09809,
+    "close": 1.098165
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T05:00:00Z",
+   "targetBarTime": "2022-03-22T06:00:00Z",
+   "pUp": 0.5480843186378479,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09821,
+    "high": 1.09862,
+    "low": 1.096755,
+    "close": 1.0968
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T06:00:00Z",
+   "targetBarTime": "2022-03-22T07:00:00Z",
+   "pUp": 0.553048849105835,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09681,
+    "high": 1.098325,
+    "low": 1.096095,
+    "close": 1.098235
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T07:00:00Z",
+   "targetBarTime": "2022-03-22T08:00:00Z",
+   "pUp": 0.5047897100448608,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09823,
+    "high": 1.101155,
+    "low": 1.098095,
+    "close": 1.10074
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T08:00:00Z",
+   "targetBarTime": "2022-03-22T09:00:00Z",
+   "pUp": 0.47382986545562744,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100735,
+    "high": 1.101455,
+    "low": 1.099225,
+    "close": 1.09965
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T09:00:00Z",
+   "targetBarTime": "2022-03-22T10:00:00Z",
+   "pUp": 0.5020098686218262,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099645,
+    "high": 1.10068,
+    "low": 1.098715,
+    "close": 1.100345
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T10:00:00Z",
+   "targetBarTime": "2022-03-22T11:00:00Z",
+   "pUp": 0.48489680886268616,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10034,
+    "high": 1.100545,
+    "low": 1.09916,
+    "close": 1.099945
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T11:00:00Z",
+   "targetBarTime": "2022-03-22T12:00:00Z",
+   "pUp": 0.49657490849494934,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09994,
+    "high": 1.10345,
+    "low": 1.09994,
+    "close": 1.101565
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T12:00:00Z",
+   "targetBarTime": "2022-03-22T13:00:00Z",
+   "pUp": 0.47897329926490784,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10157,
+    "high": 1.10429,
+    "low": 1.101525,
+    "close": 1.104115
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T13:00:00Z",
+   "targetBarTime": "2022-03-22T14:00:00Z",
+   "pUp": 0.437587171792984,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10412,
+    "high": 1.104585,
+    "low": 1.10286,
+    "close": 1.10338
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T14:00:00Z",
+   "targetBarTime": "2022-03-22T15:00:00Z",
+   "pUp": 0.47938278317451477,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103395,
+    "high": 1.10343,
+    "low": 1.101525,
+    "close": 1.1022
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T15:00:00Z",
+   "targetBarTime": "2022-03-22T16:00:00Z",
+   "pUp": 0.521629273891449,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10217,
+    "high": 1.10237,
+    "low": 1.101145,
+    "close": 1.101785
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T16:00:00Z",
+   "targetBarTime": "2022-03-22T17:00:00Z",
+   "pUp": 0.5257264971733093,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101775,
+    "high": 1.10297,
+    "low": 1.101475,
+    "close": 1.102335
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T17:00:00Z",
+   "targetBarTime": "2022-03-22T18:00:00Z",
+   "pUp": 0.4911253750324249,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10234,
+    "high": 1.102615,
+    "low": 1.102025,
+    "close": 1.10223
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T18:00:00Z",
+   "targetBarTime": "2022-03-22T19:00:00Z",
+   "pUp": 0.49246305227279663,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102215,
+    "high": 1.103205,
+    "low": 1.102035,
+    "close": 1.103025
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T19:00:00Z",
+   "targetBarTime": "2022-03-22T20:00:00Z",
+   "pUp": 0.44966304302215576,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10303,
+    "high": 1.103325,
+    "low": 1.102665,
+    "close": 1.10298
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T20:00:00Z",
+   "targetBarTime": "2022-03-22T21:00:00Z",
+   "pUp": 0.4363189935684204,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10298,
+    "high": 1.10312,
+    "low": 1.102595,
+    "close": 1.102965
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T21:00:00Z",
+   "targetBarTime": "2022-03-22T22:00:00Z",
+   "pUp": 0.442212849855423,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102975,
+    "high": 1.10439,
+    "low": 1.102915,
+    "close": 1.1032
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T22:00:00Z",
+   "targetBarTime": "2022-03-22T23:00:00Z",
+   "pUp": 0.4548104703426361,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103175,
+    "high": 1.103465,
+    "low": 1.102615,
+    "close": 1.10294
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-22T23:00:00Z",
+   "targetBarTime": "2022-03-23T00:00:00Z",
+   "pUp": 0.4875531792640686,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10298,
+    "high": 1.10322,
+    "low": 1.10209,
+    "close": 1.102535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T00:00:00Z",
+   "targetBarTime": "2022-03-23T01:00:00Z",
+   "pUp": 0.5202963948249817,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102545,
+    "high": 1.103235,
+    "low": 1.10211,
+    "close": 1.102595
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T01:00:00Z",
+   "targetBarTime": "2022-03-23T02:00:00Z",
+   "pUp": 0.50809246301651,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1026,
+    "high": 1.10343,
+    "low": 1.10256,
+    "close": 1.103225
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T02:00:00Z",
+   "targetBarTime": "2022-03-23T03:00:00Z",
+   "pUp": 0.4680285155773163,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10323,
+    "high": 1.10348,
+    "low": 1.10257,
+    "close": 1.102645
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T03:00:00Z",
+   "targetBarTime": "2022-03-23T04:00:00Z",
+   "pUp": 0.5048026442527771,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102635,
+    "high": 1.102895,
+    "low": 1.102405,
+    "close": 1.10276
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T04:00:00Z",
+   "targetBarTime": "2022-03-23T05:00:00Z",
+   "pUp": 0.4839581251144409,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102755,
+    "high": 1.103985,
+    "low": 1.10269,
+    "close": 1.103725
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T05:00:00Z",
+   "targetBarTime": "2022-03-23T06:00:00Z",
+   "pUp": 0.4466709494590759,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103705,
+    "high": 1.103985,
+    "low": 1.10308,
+    "close": 1.1031
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T06:00:00Z",
+   "targetBarTime": "2022-03-23T07:00:00Z",
+   "pUp": 0.48536816239356995,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103125,
+    "high": 1.1036,
+    "low": 1.10146,
+    "close": 1.101735
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T07:00:00Z",
+   "targetBarTime": "2022-03-23T08:00:00Z",
+   "pUp": 0.513688325881958,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10176,
+    "high": 1.10237,
+    "low": 1.10105,
+    "close": 1.10163
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T08:00:00Z",
+   "targetBarTime": "2022-03-23T09:00:00Z",
+   "pUp": 0.49431443214416504,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10164,
+    "high": 1.10175,
+    "low": 1.09887,
+    "close": 1.09972
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T09:00:00Z",
+   "targetBarTime": "2022-03-23T10:00:00Z",
+   "pUp": 0.5070216655731201,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099725,
+    "high": 1.100705,
+    "low": 1.099595,
+    "close": 1.100205
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T10:00:00Z",
+   "targetBarTime": "2022-03-23T11:00:00Z",
+   "pUp": 0.4814314544200897,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10022,
+    "high": 1.100675,
+    "low": 1.09749,
+    "close": 1.09831
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T11:00:00Z",
+   "targetBarTime": "2022-03-23T12:00:00Z",
+   "pUp": 0.49932268261909485,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098325,
+    "high": 1.09945,
+    "low": 1.098125,
+    "close": 1.098675
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T12:00:00Z",
+   "targetBarTime": "2022-03-23T13:00:00Z",
+   "pUp": 0.4861578047275543,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09868,
+    "high": 1.099095,
+    "low": 1.096405,
+    "close": 1.096615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T13:00:00Z",
+   "targetBarTime": "2022-03-23T14:00:00Z",
+   "pUp": 0.5123931169509888,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.096605,
+    "high": 1.098835,
+    "low": 1.096595,
+    "close": 1.097795
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T14:00:00Z",
+   "targetBarTime": "2022-03-23T15:00:00Z",
+   "pUp": 0.48708483576774597,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09783,
+    "high": 1.10052,
+    "low": 1.09766,
+    "close": 1.10018
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T15:00:00Z",
+   "targetBarTime": "2022-03-23T16:00:00Z",
+   "pUp": 0.4508681893348694,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10016,
+    "high": 1.10071,
+    "low": 1.099805,
+    "close": 1.100215
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T16:00:00Z",
+   "targetBarTime": "2022-03-23T17:00:00Z",
+   "pUp": 0.4616415202617645,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.100225,
+    "high": 1.10072,
+    "low": 1.099735,
+    "close": 1.100585
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T17:00:00Z",
+   "targetBarTime": "2022-03-23T18:00:00Z",
+   "pUp": 0.45520731806755066,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10056,
+    "high": 1.10111,
+    "low": 1.10046,
+    "close": 1.100915
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T18:00:00Z",
+   "targetBarTime": "2022-03-23T19:00:00Z",
+   "pUp": 0.44577375054359436,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100925,
+    "high": 1.101185,
+    "low": 1.100265,
+    "close": 1.10049
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T19:00:00Z",
+   "targetBarTime": "2022-03-23T20:00:00Z",
+   "pUp": 0.48426371812820435,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100485,
+    "high": 1.10108,
+    "low": 1.100305,
+    "close": 1.100365
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T20:00:00Z",
+   "targetBarTime": "2022-03-23T21:00:00Z",
+   "pUp": 0.4756057560443878,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10039,
+    "high": 1.101265,
+    "low": 1.100325,
+    "close": 1.100795
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T21:00:00Z",
+   "targetBarTime": "2022-03-23T22:00:00Z",
+   "pUp": 0.44458380341529846,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10075,
+    "high": 1.101005,
+    "low": 1.100105,
+    "close": 1.100275
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T22:00:00Z",
+   "targetBarTime": "2022-03-23T23:00:00Z",
+   "pUp": 0.4981507658958435,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10029,
+    "high": 1.10072,
+    "low": 1.10029,
+    "close": 1.1006
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-23T23:00:00Z",
+   "targetBarTime": "2022-03-24T00:00:00Z",
+   "pUp": 0.470226526260376,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100595,
+    "high": 1.101385,
+    "low": 1.10013,
+    "close": 1.10026
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T00:00:00Z",
+   "targetBarTime": "2022-03-24T01:00:00Z",
+   "pUp": 0.5075426697731018,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100255,
+    "high": 1.10033,
+    "low": 1.098225,
+    "close": 1.09883
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T01:00:00Z",
+   "targetBarTime": "2022-03-24T02:00:00Z",
+   "pUp": 0.5726606845855713,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098835,
+    "high": 1.09899,
+    "low": 1.098255,
+    "close": 1.098525
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T02:00:00Z",
+   "targetBarTime": "2022-03-24T03:00:00Z",
+   "pUp": 0.5499311685562134,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09853,
+    "high": 1.099155,
+    "low": 1.09807,
+    "close": 1.09854
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T03:00:00Z",
+   "targetBarTime": "2022-03-24T04:00:00Z",
+   "pUp": 0.5243535041809082,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09853,
+    "high": 1.09875,
+    "low": 1.09806,
+    "close": 1.098575
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T04:00:00Z",
+   "targetBarTime": "2022-03-24T05:00:00Z",
+   "pUp": 0.5056143403053284,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098565,
+    "high": 1.098625,
+    "low": 1.09767,
+    "close": 1.09778
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T05:00:00Z",
+   "targetBarTime": "2022-03-24T06:00:00Z",
+   "pUp": 0.5240207314491272,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.097775,
+    "high": 1.09892,
+    "low": 1.097545,
+    "close": 1.09862
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T06:00:00Z",
+   "targetBarTime": "2022-03-24T07:00:00Z",
+   "pUp": 0.47514086961746216,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098605,
+    "high": 1.09871,
+    "low": 1.09753,
+    "close": 1.097815
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T07:00:00Z",
+   "targetBarTime": "2022-03-24T08:00:00Z",
+   "pUp": 0.49934473633766174,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09786,
+    "high": 1.10009,
+    "low": 1.09723,
+    "close": 1.09776
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T08:00:00Z",
+   "targetBarTime": "2022-03-24T09:00:00Z",
+   "pUp": 0.48871174454689026,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.097755,
+    "high": 1.099675,
+    "low": 1.09775,
+    "close": 1.09881
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T09:00:00Z",
+   "targetBarTime": "2022-03-24T10:00:00Z",
+   "pUp": 0.46321702003479004,
+   "predicted": "DOWN",
+   "actual": "FLAT",
+   "bar": {
+    "open": 1.0988,
+    "high": 1.09933,
+    "low": 1.09818,
+    "close": 1.0988
+   },
+   "scored": false,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T10:00:00Z",
+   "targetBarTime": "2022-03-24T11:00:00Z",
+   "pUp": 0.4667622447013855,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098805,
+    "high": 1.10013,
+    "low": 1.09723,
+    "close": 1.098775
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T11:00:00Z",
+   "targetBarTime": "2022-03-24T12:00:00Z",
+   "pUp": 0.47500160336494446,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09879,
+    "high": 1.099545,
+    "low": 1.097475,
+    "close": 1.098325
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T12:00:00Z",
+   "targetBarTime": "2022-03-24T13:00:00Z",
+   "pUp": 0.48627969622612,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098335,
+    "high": 1.098405,
+    "low": 1.09661,
+    "close": 1.097395
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T13:00:00Z",
+   "targetBarTime": "2022-03-24T14:00:00Z",
+   "pUp": 0.5036260485649109,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.097355,
+    "high": 1.09984,
+    "low": 1.09715,
+    "close": 1.09955
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T14:00:00Z",
+   "targetBarTime": "2022-03-24T15:00:00Z",
+   "pUp": 0.4628097414970398,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09956,
+    "high": 1.101355,
+    "low": 1.099375,
+    "close": 1.100615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T15:00:00Z",
+   "targetBarTime": "2022-03-24T16:00:00Z",
+   "pUp": 0.4509409964084625,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10062,
+    "high": 1.100855,
+    "low": 1.09853,
+    "close": 1.098585
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T16:00:00Z",
+   "targetBarTime": "2022-03-24T17:00:00Z",
+   "pUp": 0.530815601348877,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09859,
+    "high": 1.09986,
+    "low": 1.09825,
+    "close": 1.09938
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T17:00:00Z",
+   "targetBarTime": "2022-03-24T18:00:00Z",
+   "pUp": 0.49147698283195496,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.099375,
+    "high": 1.100085,
+    "low": 1.099075,
+    "close": 1.09984
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T18:00:00Z",
+   "targetBarTime": "2022-03-24T19:00:00Z",
+   "pUp": 0.47377461194992065,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09983,
+    "high": 1.100585,
+    "low": 1.09966,
+    "close": 1.099925
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T19:00:00Z",
+   "targetBarTime": "2022-03-24T20:00:00Z",
+   "pUp": 0.4766581654548645,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099945,
+    "high": 1.100025,
+    "low": 1.099615,
+    "close": 1.099685
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T20:00:00Z",
+   "targetBarTime": "2022-03-24T21:00:00Z",
+   "pUp": 0.4870220422744751,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.0997,
+    "high": 1.1001,
+    "low": 1.099525,
+    "close": 1.09978
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T21:00:00Z",
+   "targetBarTime": "2022-03-24T22:00:00Z",
+   "pUp": 0.45959731936454773,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09985,
+    "high": 1.100665,
+    "low": 1.09984,
+    "close": 1.100565
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T22:00:00Z",
+   "targetBarTime": "2022-03-24T23:00:00Z",
+   "pUp": 0.4324357807636261,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10061,
+    "high": 1.10099,
+    "low": 1.100375,
+    "close": 1.10086
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-24T23:00:00Z",
+   "targetBarTime": "2022-03-25T00:00:00Z",
+   "pUp": 0.4436139166355133,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10088,
+    "high": 1.101115,
+    "low": 1.100345,
+    "close": 1.10091
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T00:00:00Z",
+   "targetBarTime": "2022-03-25T01:00:00Z",
+   "pUp": 0.46756458282470703,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.100905,
+    "high": 1.10356,
+    "low": 1.100795,
+    "close": 1.10326
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T01:00:00Z",
+   "targetBarTime": "2022-03-25T02:00:00Z",
+   "pUp": 0.40818461775779724,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103245,
+    "high": 1.10358,
+    "low": 1.102365,
+    "close": 1.10287
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T02:00:00Z",
+   "targetBarTime": "2022-03-25T03:00:00Z",
+   "pUp": 0.4653335511684418,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.102865,
+    "high": 1.103435,
+    "low": 1.102615,
+    "close": 1.102775
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T03:00:00Z",
+   "targetBarTime": "2022-03-25T04:00:00Z",
+   "pUp": 0.47660931944847107,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.102765,
+    "high": 1.103785,
+    "low": 1.10261,
+    "close": 1.1032
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T04:00:00Z",
+   "targetBarTime": "2022-03-25T05:00:00Z",
+   "pUp": 0.4617382884025574,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.103195,
+    "high": 1.10341,
+    "low": 1.10251,
+    "close": 1.10288
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T05:00:00Z",
+   "targetBarTime": "2022-03-25T06:00:00Z",
+   "pUp": 0.4839339554309845,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.102885,
+    "high": 1.102905,
+    "low": 1.101915,
+    "close": 1.10279
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T06:00:00Z",
+   "targetBarTime": "2022-03-25T07:00:00Z",
+   "pUp": 0.483677476644516,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.102785,
+    "high": 1.10307,
+    "low": 1.102145,
+    "close": 1.10232
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T07:00:00Z",
+   "targetBarTime": "2022-03-25T08:00:00Z",
+   "pUp": 0.4950282871723175,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10231,
+    "high": 1.10266,
+    "low": 1.10111,
+    "close": 1.101605
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T08:00:00Z",
+   "targetBarTime": "2022-03-25T09:00:00Z",
+   "pUp": 0.5029123425483704,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10161,
+    "high": 1.102015,
+    "low": 1.100065,
+    "close": 1.100515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T09:00:00Z",
+   "targetBarTime": "2022-03-25T10:00:00Z",
+   "pUp": 0.5079742074012756,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.100525,
+    "high": 1.101465,
+    "low": 1.10017,
+    "close": 1.10144
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T10:00:00Z",
+   "targetBarTime": "2022-03-25T11:00:00Z",
+   "pUp": 0.4701792299747467,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101425,
+    "high": 1.10224,
+    "low": 1.10107,
+    "close": 1.101855
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T11:00:00Z",
+   "targetBarTime": "2022-03-25T12:00:00Z",
+   "pUp": 0.4657600224018097,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10185,
+    "high": 1.10185,
+    "low": 1.10028,
+    "close": 1.10033
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T12:00:00Z",
+   "targetBarTime": "2022-03-25T13:00:00Z",
+   "pUp": 0.5084055662155151,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.100345,
+    "high": 1.10187,
+    "low": 1.09923,
+    "close": 1.10118
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T13:00:00Z",
+   "targetBarTime": "2022-03-25T14:00:00Z",
+   "pUp": 0.48351332545280457,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.101175,
+    "high": 1.102445,
+    "low": 1.10071,
+    "close": 1.10179
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T14:00:00Z",
+   "targetBarTime": "2022-03-25T15:00:00Z",
+   "pUp": 0.4771402180194855,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.101795,
+    "high": 1.102175,
+    "low": 1.09821,
+    "close": 1.098235
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T15:00:00Z",
+   "targetBarTime": "2022-03-25T16:00:00Z",
+   "pUp": 0.5302265286445618,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098265,
+    "high": 1.09918,
+    "low": 1.098095,
+    "close": 1.098785
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T16:00:00Z",
+   "targetBarTime": "2022-03-25T17:00:00Z",
+   "pUp": 0.5115560293197632,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09879,
+    "high": 1.099335,
+    "low": 1.09844,
+    "close": 1.09908
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T17:00:00Z",
+   "targetBarTime": "2022-03-25T18:00:00Z",
+   "pUp": 0.5029405355453491,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099075,
+    "high": 1.099675,
+    "low": 1.09835,
+    "close": 1.09869
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T18:00:00Z",
+   "targetBarTime": "2022-03-25T19:00:00Z",
+   "pUp": 0.5315854549407959,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098695,
+    "high": 1.099055,
+    "low": 1.09823,
+    "close": 1.098345
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T19:00:00Z",
+   "targetBarTime": "2022-03-25T20:00:00Z",
+   "pUp": 0.5468530058860779,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09835,
+    "high": 1.09864,
+    "low": 1.098105,
+    "close": 1.098235
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-25T20:00:00Z",
+   "targetBarTime": "2022-03-27T21:00:00Z",
+   "pUp": 0.5328240990638733,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09875,
+    "high": 1.098915,
+    "low": 1.098155,
+    "close": 1.098515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-27T21:00:00Z",
+   "targetBarTime": "2022-03-27T22:00:00Z",
+   "pUp": 0.4695189595222473,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098505,
+    "high": 1.09854,
+    "low": 1.09794,
+    "close": 1.09814
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-27T22:00:00Z",
+   "targetBarTime": "2022-03-27T23:00:00Z",
+   "pUp": 0.5246126055717468,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09811,
+    "high": 1.09845,
+    "low": 1.09774,
+    "close": 1.09815
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-27T23:00:00Z",
+   "targetBarTime": "2022-03-28T00:00:00Z",
+   "pUp": 0.5331248044967651,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09816,
+    "high": 1.098455,
+    "low": 1.096745,
+    "close": 1.097085
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T00:00:00Z",
+   "targetBarTime": "2022-03-28T01:00:00Z",
+   "pUp": 0.5850409269332886,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09707,
+    "high": 1.097495,
+    "low": 1.095395,
+    "close": 1.095425
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T01:00:00Z",
+   "targetBarTime": "2022-03-28T02:00:00Z",
+   "pUp": 0.6162474751472473,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09542,
+    "high": 1.096215,
+    "low": 1.095115,
+    "close": 1.09555
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T02:00:00Z",
+   "targetBarTime": "2022-03-28T03:00:00Z",
+   "pUp": 0.5813244581222534,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09557,
+    "high": 1.0959,
+    "low": 1.095055,
+    "close": 1.09556
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T03:00:00Z",
+   "targetBarTime": "2022-03-28T04:00:00Z",
+   "pUp": 0.5636348724365234,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.095555,
+    "high": 1.09565,
+    "low": 1.09511,
+    "close": 1.095425
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T04:00:00Z",
+   "targetBarTime": "2022-03-28T05:00:00Z",
+   "pUp": 0.5552523732185364,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09542,
+    "high": 1.09543,
+    "low": 1.094485,
+    "close": 1.095135
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T05:00:00Z",
+   "targetBarTime": "2022-03-28T06:00:00Z",
+   "pUp": 0.5523030757904053,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09512,
+    "high": 1.096555,
+    "low": 1.094845,
+    "close": 1.095535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T06:00:00Z",
+   "targetBarTime": "2022-03-28T07:00:00Z",
+   "pUp": 0.5277152061462402,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09553,
+    "high": 1.0961,
+    "low": 1.09476,
+    "close": 1.09516
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T07:00:00Z",
+   "targetBarTime": "2022-03-28T08:00:00Z",
+   "pUp": 0.5309703946113586,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09518,
+    "high": 1.09995,
+    "low": 1.09447,
+    "close": 1.099095
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T08:00:00Z",
+   "targetBarTime": "2022-03-28T09:00:00Z",
+   "pUp": 0.5099589824676514,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099065,
+    "high": 1.09915,
+    "low": 1.09702,
+    "close": 1.097955
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T09:00:00Z",
+   "targetBarTime": "2022-03-28T10:00:00Z",
+   "pUp": 0.5161272287368774,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09795,
+    "high": 1.099055,
+    "low": 1.09745,
+    "close": 1.098855
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T10:00:00Z",
+   "targetBarTime": "2022-03-28T11:00:00Z",
+   "pUp": 0.48958876729011536,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09886,
+    "high": 1.09934,
+    "low": 1.095925,
+    "close": 1.096375
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T11:00:00Z",
+   "targetBarTime": "2022-03-28T12:00:00Z",
+   "pUp": 0.5183558464050293,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.096355,
+    "high": 1.097025,
+    "low": 1.09512,
+    "close": 1.09566
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T12:00:00Z",
+   "targetBarTime": "2022-03-28T13:00:00Z",
+   "pUp": 0.5268346071243286,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09565,
+    "high": 1.09726,
+    "low": 1.094665,
+    "close": 1.096865
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T13:00:00Z",
+   "targetBarTime": "2022-03-28T14:00:00Z",
+   "pUp": 0.5020555257797241,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09687,
+    "high": 1.09788,
+    "low": 1.0964,
+    "close": 1.096985
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T14:00:00Z",
+   "targetBarTime": "2022-03-28T15:00:00Z",
+   "pUp": 0.49985936284065247,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.096975,
+    "high": 1.097645,
+    "low": 1.096615,
+    "close": 1.097625
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T15:00:00Z",
+   "targetBarTime": "2022-03-28T16:00:00Z",
+   "pUp": 0.4772452116012573,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.097615,
+    "high": 1.099965,
+    "low": 1.097415,
+    "close": 1.09941
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T16:00:00Z",
+   "targetBarTime": "2022-03-28T17:00:00Z",
+   "pUp": 0.438495934009552,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099405,
+    "high": 1.09993,
+    "low": 1.09831,
+    "close": 1.09831
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T17:00:00Z",
+   "targetBarTime": "2022-03-28T18:00:00Z",
+   "pUp": 0.5005788207054138,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098315,
+    "high": 1.099065,
+    "low": 1.097735,
+    "close": 1.099
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T18:00:00Z",
+   "targetBarTime": "2022-03-28T19:00:00Z",
+   "pUp": 0.46506860852241516,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099025,
+    "high": 1.099025,
+    "low": 1.097465,
+    "close": 1.098745
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T19:00:00Z",
+   "targetBarTime": "2022-03-28T20:00:00Z",
+   "pUp": 0.48863840103149414,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.098775,
+    "high": 1.0989,
+    "low": 1.09839,
+    "close": 1.098515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T20:00:00Z",
+   "targetBarTime": "2022-03-28T21:00:00Z",
+   "pUp": 0.4651111662387848,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09853,
+    "high": 1.098725,
+    "low": 1.09818,
+    "close": 1.098625
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T21:00:00Z",
+   "targetBarTime": "2022-03-28T22:00:00Z",
+   "pUp": 0.42912834882736206,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09862,
+    "high": 1.099435,
+    "low": 1.09852,
+    "close": 1.09885
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T22:00:00Z",
+   "targetBarTime": "2022-03-28T23:00:00Z",
+   "pUp": 0.446889728307724,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09886,
+    "high": 1.099795,
+    "low": 1.09883,
+    "close": 1.09913
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-28T23:00:00Z",
+   "targetBarTime": "2022-03-29T00:00:00Z",
+   "pUp": 0.45641911029815674,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099135,
+    "high": 1.099725,
+    "low": 1.096905,
+    "close": 1.097385
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T00:00:00Z",
+   "targetBarTime": "2022-03-29T01:00:00Z",
+   "pUp": 0.5569707155227661,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09738,
+    "high": 1.0995,
+    "low": 1.097335,
+    "close": 1.09922
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T01:00:00Z",
+   "targetBarTime": "2022-03-29T02:00:00Z",
+   "pUp": 0.47217869758605957,
+   "predicted": "DOWN",
+   "actual": "FLAT",
+   "bar": {
+    "open": 1.099215,
+    "high": 1.099495,
+    "low": 1.09874,
+    "close": 1.099215
+   },
+   "scored": false,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T02:00:00Z",
+   "targetBarTime": "2022-03-29T03:00:00Z",
+   "pUp": 0.4821135401725769,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.09921,
+    "high": 1.0994,
+    "low": 1.098445,
+    "close": 1.099275
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T03:00:00Z",
+   "targetBarTime": "2022-03-29T04:00:00Z",
+   "pUp": 0.48646339774131775,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.099265,
+    "high": 1.09974,
+    "low": 1.09852,
+    "close": 1.098535
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T04:00:00Z",
+   "targetBarTime": "2022-03-29T05:00:00Z",
+   "pUp": 0.5212826728820801,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.09854,
+    "high": 1.098835,
+    "low": 1.097925,
+    "close": 1.0983
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T05:00:00Z",
+   "targetBarTime": "2022-03-29T06:00:00Z",
+   "pUp": 0.5158973932266235,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098295,
+    "high": 1.100915,
+    "low": 1.09827,
+    "close": 1.10035
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T06:00:00Z",
+   "targetBarTime": "2022-03-29T07:00:00Z",
+   "pUp": 0.4625512361526489,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.100355,
+    "high": 1.101815,
+    "low": 1.099765,
+    "close": 1.100005
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T07:00:00Z",
+   "targetBarTime": "2022-03-29T08:00:00Z",
+   "pUp": 0.48928743600845337,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1,
+    "high": 1.10055,
+    "low": 1.09791,
+    "close": 1.098495
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T08:00:00Z",
+   "targetBarTime": "2022-03-29T09:00:00Z",
+   "pUp": 0.5142108201980591,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.098485,
+    "high": 1.104595,
+    "low": 1.097505,
+    "close": 1.103745
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T09:00:00Z",
+   "targetBarTime": "2022-03-29T10:00:00Z",
+   "pUp": 0.5165139436721802,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.103735,
+    "high": 1.105785,
+    "low": 1.10349,
+    "close": 1.10473
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T10:00:00Z",
+   "targetBarTime": "2022-03-29T11:00:00Z",
+   "pUp": 0.47758665680885315,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10474,
+    "high": 1.11026,
+    "low": 1.103185,
+    "close": 1.108465
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T11:00:00Z",
+   "targetBarTime": "2022-03-29T12:00:00Z",
+   "pUp": 0.4969042241573334,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.108475,
+    "high": 1.11291,
+    "low": 1.10791,
+    "close": 1.11129
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T12:00:00Z",
+   "targetBarTime": "2022-03-29T13:00:00Z",
+   "pUp": 0.47467637062072754,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1113,
+    "high": 1.113715,
+    "low": 1.109745,
+    "close": 1.112995
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T13:00:00Z",
+   "targetBarTime": "2022-03-29T14:00:00Z",
+   "pUp": 0.4593812823295593,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112985,
+    "high": 1.113225,
+    "low": 1.10905,
+    "close": 1.10996
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T14:00:00Z",
+   "targetBarTime": "2022-03-29T15:00:00Z",
+   "pUp": 0.49416306614875793,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10998,
+    "high": 1.11172,
+    "low": 1.109825,
+    "close": 1.11067
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T15:00:00Z",
+   "targetBarTime": "2022-03-29T16:00:00Z",
+   "pUp": 0.48133012652397156,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.110675,
+    "high": 1.110695,
+    "low": 1.10789,
+    "close": 1.1079
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T16:00:00Z",
+   "targetBarTime": "2022-03-29T17:00:00Z",
+   "pUp": 0.5413755774497986,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.108075,
+    "high": 1.108285,
+    "low": 1.107175,
+    "close": 1.10775
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T17:00:00Z",
+   "targetBarTime": "2022-03-29T18:00:00Z",
+   "pUp": 0.534218430519104,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.107745,
+    "high": 1.109095,
+    "low": 1.10736,
+    "close": 1.108925
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T18:00:00Z",
+   "targetBarTime": "2022-03-29T19:00:00Z",
+   "pUp": 0.47474250197410583,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10892,
+    "high": 1.109435,
+    "low": 1.108345,
+    "close": 1.108855
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T19:00:00Z",
+   "targetBarTime": "2022-03-29T20:00:00Z",
+   "pUp": 0.48050981760025024,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10885,
+    "high": 1.10885,
+    "low": 1.10839,
+    "close": 1.10865
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T20:00:00Z",
+   "targetBarTime": "2022-03-29T21:00:00Z",
+   "pUp": 0.4783029854297638,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.1087,
+    "high": 1.10897,
+    "low": 1.108095,
+    "close": 1.108765
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T21:00:00Z",
+   "targetBarTime": "2022-03-29T22:00:00Z",
+   "pUp": 0.45724302530288696,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.108755,
+    "high": 1.10994,
+    "low": 1.10865,
+    "close": 1.10921
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T22:00:00Z",
+   "targetBarTime": "2022-03-29T23:00:00Z",
+   "pUp": 0.4507482051849365,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109195,
+    "high": 1.109475,
+    "low": 1.109025,
+    "close": 1.109115
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-29T23:00:00Z",
+   "targetBarTime": "2022-03-30T00:00:00Z",
+   "pUp": 0.4698038101196289,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10912,
+    "high": 1.109815,
+    "low": 1.108795,
+    "close": 1.10976
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T00:00:00Z",
+   "targetBarTime": "2022-03-30T01:00:00Z",
+   "pUp": 0.4518900215625763,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.109755,
+    "high": 1.11102,
+    "low": 1.109715,
+    "close": 1.110455
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T01:00:00Z",
+   "targetBarTime": "2022-03-30T02:00:00Z",
+   "pUp": 0.43778249621391296,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.110445,
+    "high": 1.11162,
+    "low": 1.110135,
+    "close": 1.11126
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T02:00:00Z",
+   "targetBarTime": "2022-03-30T03:00:00Z",
+   "pUp": 0.42560720443725586,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.111255,
+    "high": 1.112065,
+    "low": 1.11092,
+    "close": 1.111515
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T03:00:00Z",
+   "targetBarTime": "2022-03-30T04:00:00Z",
+   "pUp": 0.43689656257629395,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.111525,
+    "high": 1.112145,
+    "low": 1.11096,
+    "close": 1.111065
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T04:00:00Z",
+   "targetBarTime": "2022-03-30T05:00:00Z",
+   "pUp": 0.473798006772995,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.111065,
+    "high": 1.11133,
+    "low": 1.11076,
+    "close": 1.11129
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T05:00:00Z",
+   "targetBarTime": "2022-03-30T06:00:00Z",
+   "pUp": 0.45675599575042725,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.1113,
+    "high": 1.1121,
+    "low": 1.110555,
+    "close": 1.11121
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T06:00:00Z",
+   "targetBarTime": "2022-03-30T07:00:00Z",
+   "pUp": 0.46902531385421753,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11123,
+    "high": 1.11347,
+    "low": 1.11123,
+    "close": 1.112835
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T07:00:00Z",
+   "targetBarTime": "2022-03-30T08:00:00Z",
+   "pUp": 0.43140605092048645,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.112835,
+    "high": 1.115675,
+    "low": 1.111425,
+    "close": 1.11563
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T08:00:00Z",
+   "targetBarTime": "2022-03-30T09:00:00Z",
+   "pUp": 0.4297272562980652,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11563,
+    "high": 1.11617,
+    "low": 1.114345,
+    "close": 1.11462
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T09:00:00Z",
+   "targetBarTime": "2022-03-30T10:00:00Z",
+   "pUp": 0.47289037704467773,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.114635,
+    "high": 1.11464,
+    "low": 1.11163,
+    "close": 1.11292
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T10:00:00Z",
+   "targetBarTime": "2022-03-30T11:00:00Z",
+   "pUp": 0.4980016052722931,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.112935,
+    "high": 1.11478,
+    "low": 1.112585,
+    "close": 1.113905
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T11:00:00Z",
+   "targetBarTime": "2022-03-30T12:00:00Z",
+   "pUp": 0.4725691080093384,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11388,
+    "high": 1.114015,
+    "low": 1.1112,
+    "close": 1.112505
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T12:00:00Z",
+   "targetBarTime": "2022-03-30T13:00:00Z",
+   "pUp": 0.49781399965286255,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.112515,
+    "high": 1.11658,
+    "low": 1.111965,
+    "close": 1.11641
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T13:00:00Z",
+   "targetBarTime": "2022-03-30T14:00:00Z",
+   "pUp": 0.4737057089805603,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.116415,
+    "high": 1.11711,
+    "low": 1.115075,
+    "close": 1.116265
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T14:00:00Z",
+   "targetBarTime": "2022-03-30T15:00:00Z",
+   "pUp": 0.48185208439826965,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11627,
+    "high": 1.11688,
+    "low": 1.11556,
+    "close": 1.1163
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T15:00:00Z",
+   "targetBarTime": "2022-03-30T16:00:00Z",
+   "pUp": 0.4839979112148285,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.116295,
+    "high": 1.116565,
+    "low": 1.115215,
+    "close": 1.115735
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T16:00:00Z",
+   "targetBarTime": "2022-03-30T17:00:00Z",
+   "pUp": 0.5098906755447388,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11572,
+    "high": 1.115735,
+    "low": 1.114835,
+    "close": 1.114835
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T17:00:00Z",
+   "targetBarTime": "2022-03-30T18:00:00Z",
+   "pUp": 0.5423165559768677,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11483,
+    "high": 1.11624,
+    "low": 1.11478,
+    "close": 1.116095
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T18:00:00Z",
+   "targetBarTime": "2022-03-30T19:00:00Z",
+   "pUp": 0.4676699936389923,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.116105,
+    "high": 1.11626,
+    "low": 1.11515,
+    "close": 1.115205
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T19:00:00Z",
+   "targetBarTime": "2022-03-30T20:00:00Z",
+   "pUp": 0.52581787109375,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.115195,
+    "high": 1.11603,
+    "low": 1.115195,
+    "close": 1.115865
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T20:00:00Z",
+   "targetBarTime": "2022-03-30T21:00:00Z",
+   "pUp": 0.46891263127326965,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11584,
+    "high": 1.11612,
+    "low": 1.11573,
+    "close": 1.11582
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T21:00:00Z",
+   "targetBarTime": "2022-03-30T22:00:00Z",
+   "pUp": 0.4606397747993469,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.115805,
+    "high": 1.116485,
+    "low": 1.1157,
+    "close": 1.115875
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T22:00:00Z",
+   "targetBarTime": "2022-03-30T23:00:00Z",
+   "pUp": 0.46864214539527893,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.115865,
+    "high": 1.11619,
+    "low": 1.115785,
+    "close": 1.11614
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-30T23:00:00Z",
+   "targetBarTime": "2022-03-31T00:00:00Z",
+   "pUp": 0.45865362882614136,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11614,
+    "high": 1.1175,
+    "low": 1.115625,
+    "close": 1.117405
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T00:00:00Z",
+   "targetBarTime": "2022-03-31T01:00:00Z",
+   "pUp": 0.42377597093582153,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11742,
+    "high": 1.1185,
+    "low": 1.11712,
+    "close": 1.117615
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T01:00:00Z",
+   "targetBarTime": "2022-03-31T02:00:00Z",
+   "pUp": 0.4453183710575104,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11762,
+    "high": 1.11762,
+    "low": 1.11661,
+    "close": 1.116655
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T02:00:00Z",
+   "targetBarTime": "2022-03-31T03:00:00Z",
+   "pUp": 0.50731360912323,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11666,
+    "high": 1.11695,
+    "low": 1.11617,
+    "close": 1.11642
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T03:00:00Z",
+   "targetBarTime": "2022-03-31T04:00:00Z",
+   "pUp": 0.5015309453010559,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.116415,
+    "high": 1.116435,
+    "low": 1.115765,
+    "close": 1.116065
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T04:00:00Z",
+   "targetBarTime": "2022-03-31T05:00:00Z",
+   "pUp": 0.5029453635215759,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.11607,
+    "high": 1.11679,
+    "low": 1.11575,
+    "close": 1.11658
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T05:00:00Z",
+   "targetBarTime": "2022-03-31T06:00:00Z",
+   "pUp": 0.4682704508304596,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.116625,
+    "high": 1.117305,
+    "low": 1.115155,
+    "close": 1.116875
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T06:00:00Z",
+   "targetBarTime": "2022-03-31T07:00:00Z",
+   "pUp": 0.46903669834136963,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.116885,
+    "high": 1.117575,
+    "low": 1.114995,
+    "close": 1.115065
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T07:00:00Z",
+   "targetBarTime": "2022-03-31T08:00:00Z",
+   "pUp": 0.5063349008560181,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.115035,
+    "high": 1.115165,
+    "low": 1.11128,
+    "close": 1.112955
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T08:00:00Z",
+   "targetBarTime": "2022-03-31T09:00:00Z",
+   "pUp": 0.5035728812217712,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.112945,
+    "high": 1.113185,
+    "low": 1.11062,
+    "close": 1.11117
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T09:00:00Z",
+   "targetBarTime": "2022-03-31T10:00:00Z",
+   "pUp": 0.505232036113739,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.111175,
+    "high": 1.111555,
+    "low": 1.10881,
+    "close": 1.109365
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T10:00:00Z",
+   "targetBarTime": "2022-03-31T11:00:00Z",
+   "pUp": 0.5012548565864563,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.109355,
+    "high": 1.11086,
+    "low": 1.109255,
+    "close": 1.110285
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T11:00:00Z",
+   "targetBarTime": "2022-03-31T12:00:00Z",
+   "pUp": 0.477207750082016,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.110275,
+    "high": 1.111325,
+    "low": 1.109435,
+    "close": 1.110215
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T12:00:00Z",
+   "targetBarTime": "2022-03-31T13:00:00Z",
+   "pUp": 0.4806102514266968,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.110225,
+    "high": 1.110725,
+    "low": 1.106835,
+    "close": 1.109275
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T13:00:00Z",
+   "targetBarTime": "2022-03-31T14:00:00Z",
+   "pUp": 0.49469298124313354,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10926,
+    "high": 1.11328,
+    "low": 1.107095,
+    "close": 1.11196
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T14:00:00Z",
+   "targetBarTime": "2022-03-31T15:00:00Z",
+   "pUp": 0.5073301792144775,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.11193,
+    "high": 1.11318,
+    "low": 1.109275,
+    "close": 1.109275
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T15:00:00Z",
+   "targetBarTime": "2022-03-31T16:00:00Z",
+   "pUp": 0.522545576095581,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.109285,
+    "high": 1.10938,
+    "low": 1.107605,
+    "close": 1.108175
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T16:00:00Z",
+   "targetBarTime": "2022-03-31T17:00:00Z",
+   "pUp": 0.55081707239151,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10818,
+    "high": 1.109365,
+    "low": 1.107925,
+    "close": 1.10813
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T17:00:00Z",
+   "targetBarTime": "2022-03-31T18:00:00Z",
+   "pUp": 0.540794312953949,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10814,
+    "high": 1.10814,
+    "low": 1.106405,
+    "close": 1.10698
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T18:00:00Z",
+   "targetBarTime": "2022-03-31T19:00:00Z",
+   "pUp": 0.5718396902084351,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.10697,
+    "high": 1.107545,
+    "low": 1.106095,
+    "close": 1.106405
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T19:00:00Z",
+   "targetBarTime": "2022-03-31T20:00:00Z",
+   "pUp": 0.5773411989212036,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.10641,
+    "high": 1.10721,
+    "low": 1.106405,
+    "close": 1.106725
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T20:00:00Z",
+   "targetBarTime": "2022-03-31T21:00:00Z",
+   "pUp": 0.540284276008606,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.106715,
+    "high": 1.10682,
+    "low": 1.106485,
+    "close": 1.10676
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T21:00:00Z",
+   "targetBarTime": "2022-03-31T22:00:00Z",
+   "pUp": 0.5325430631637573,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.106745,
+    "high": 1.107625,
+    "low": 1.10665,
+    "close": 1.10733
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  },
+  {
+   "barTime": "2022-03-31T22:00:00Z",
+   "targetBarTime": "2022-03-31T23:00:00Z",
+   "pUp": 0.4966948628425598,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.107335,
+    "high": 1.10745,
+    "low": 1.106745,
+    "close": 1.107285
+   },
+   "scored": true,
+   "model": "EUR_USD-1h-test2022"
+  }
+ ]
+}

@@ -1,0 +1,59 @@
+{
+ "id": "call_ml-evaluation-eurusd",
+ "name": "get_ml_evaluation",
+ "args": {
+  "pair": "EUR/USD"
+ },
+ "result": {
+  "pair": "EUR/USD",
+  "target": "direction of the next H1 bar, mid open to close",
+  "disclaimer": "historical walk-forward test, not live signals",
+  "rule": "LSTM beats a baseline only with higher pooled 2016-2022 accuracy and a McNemar p < 0.05 after Holm correction across the 16 pooled LSTM-vs-baseline tests",
+  "test_years": "2016-2022",
+  "samples_count": 43486,
+  "lstm_accuracy_pct": 51.75688727406522,
+  "lstm_ci95_low_pct": 51.287101973499894,
+  "lstm_ci95_high_pct": 52.22636220283384,
+  "baselines": [
+   {
+    "baseline": "logistic",
+    "baseline_accuracy_pct": 50.8439497769397,
+    "raw_p": 0.000683743501274341,
+    "holm_p": 0.0061536915114690695,
+    "lstm_beats_baseline": true,
+    "lstm_significantly_worse": false
+   },
+   {
+    "baseline": "majority",
+    "baseline_accuracy_pct": 50.229959067286025,
+    "raw_p": 9.278833104469173e-06,
+    "holm_p": 0.00010206716414916091,
+    "lstm_beats_baseline": true,
+    "lstm_significantly_worse": false
+   },
+   {
+    "baseline": "persistence",
+    "baseline_accuracy_pct": 48.312100446120596,
+    "raw_p": 1.8055431581429636e-17,
+    "holm_p": 2.7083147372144455e-16,
+    "lstm_beats_baseline": true,
+    "lstm_significantly_worse": false
+   },
+   {
+    "baseline": "anti_persistence",
+    "baseline_accuracy_pct": 51.66030446580508,
+    "raw_p": 0.7139861582488704,
+    "holm_p": 1.0,
+    "lstm_beats_baseline": false,
+    "lstm_significantly_worse": false
+   }
+  ],
+  "baselines_beaten_count": 3,
+  "break_even_accuracy_pct": 53.243278917083344,
+  "mean_spread_pips": 0.4639021754127765,
+  "mean_move_pips": 7.151746539116037,
+  "below_break_even": true,
+  "derived": "below_break_even and conclusion are derived here from ml-service's lstm accuracy and break-even",
+  "conclusion": "The LSTM's pooled out-of-sample accuracy is below the accuracy needed to cover the average spread, so its predictions are not tradable. This is a historical walk-forward test, not live signals."
+ }
+}

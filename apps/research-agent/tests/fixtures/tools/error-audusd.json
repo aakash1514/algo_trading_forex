@@ -1,0 +1,16 @@
+{
+ "id": "call_error-audusd",
+ "name": "get_bars",
+ "args": {
+  "pair": "AUD/USD",
+  "timeframe": "1d",
+  "from_date": "2022-03-07",
+  "to_date": "2022-03-11"
+ },
+ "result": {
+  "error": {
+   "code": "OUT_OF_DATA",
+   "message": "AUD/USD is not in ForexEdge data; pairs: EUR/USD, GBP/USD, USD/JPY, XAU/USD"
+  }
+ }
+}

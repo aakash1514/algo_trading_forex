@@ -1,0 +1,41 @@
+{
+ "id": "call_backtest-demo-eurusd-2022",
+ "name": "get_backtest_run",
+ "args": {
+  "run_id": "29f80e07-73df-473d-9621-948797c8f9e0"
+ },
+ "result": {
+  "run_id": "29f80e07-73df-473d-9621-948797c8f9e0",
+  "strategy": "ma_crossover",
+  "pair": "EUR/USD",
+  "timeframe": "1h",
+  "from_date": "2022-01-01",
+  "to_date": "2022-12-30",
+  "parameters": {
+   "fastPeriod_param": 10,
+   "slowPeriod_param": 30
+  },
+  "initial_capital_usd": 10000.0,
+  "size_lots": 0.1,
+  "total_trades_count": 257,
+  "win_rate_pct": 31.52,
+  "profit_factor_ratio": 0.9546,
+  "sharpe_ratio": -0.2145,
+  "max_drawdown_pct": 11.1369,
+  "total_pnl_pips": -272.2,
+  "total_pnl_usd": -272.2,
+  "final_equity_usd": 9727.8,
+  "started_at_utc": "2026-10-12T07:53:41.786000Z",
+  "completed_at_utc": "2026-10-12T07:53:42.145000Z",
+  "metric_notes": {
+   "win_rate_pct": "percent of trades with a positive net USD result",
+   "profit_factor_ratio": "gross profit / gross loss in net USD",
+   "sharpe_ratio": "annualised from daily New York-close returns (x sqrt(260), risk-free 0)",
+   "max_drawdown_pct": "largest fall of marked-to-market equity from its running peak, in percent (positive)",
+   "total_pnl_pips": "net of commission",
+   "final_equity_usd": "initial_capital_usd + total_pnl_usd"
+  },
+  "trades_available": false,
+  "trades_note": "the per-trade list is stored in object storage (MinIO), which the research agent does not read"
+ }
+}

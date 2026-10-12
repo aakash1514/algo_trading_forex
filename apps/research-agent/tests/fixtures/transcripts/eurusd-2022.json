@@ -1,0 +1,122 @@
+{
+ "question": "How did EUR/USD do in 2022 on daily bars? Give the return and the maximum drawdown.",
+ "user": "research_demo",
+ "model": "groq:openai/gpt-oss-120b",
+ "recorded_at": "2026-10-12",
+ "replies": [
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_1",
+     "name": "get_market_stats",
+     "args": {
+      "from_date": "2022-01-01",
+      "pair": "EUR/USD",
+      "timeframe": "1d",
+      "to_date": "2022-12-30"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1379,
+    "output_tokens": 124,
+    "total_tokens": 1503
+   }
+  },
+  {
+   "content": "",
+   "tool_calls": [
+    {
+     "id": "tc_2",
+     "name": "submit_report",
+     "args": {
+      "answer": "The EUR/USD returned -5.860216% in 2022 on daily bars, and its maximum drawdown was 16.243622%.",
+      "claims": [
+       {
+        "text": "EUR/USD return 2022 daily",
+        "tool_call_id": "call_1",
+        "unit": "pct",
+        "value": "-5.860216"
+       },
+       {
+        "text": "EUR/USD max drawdown 2022 daily",
+        "tool_call_id": "call_1",
+        "unit": "pct",
+        "value": "16.243622"
+       }
+      ],
+      "type": "answer"
+     }
+    }
+   ],
+   "usage": {
+    "input_tokens": 1686,
+    "output_tokens": 285,
+    "total_tokens": 1971
+   }
+  }
+ ],
+ "report": {
+  "type": "answer",
+  "answer": "The EUR/USD returned -5.860216% in 2022 on daily bars, and its maximum drawdown was 16.243622%.",
+  "claims": [
+   {
+    "text": "EUR/USD return 2022 daily",
+    "value": "-5.860216",
+    "unit": "pct",
+    "tool_call_id": "call_1"
+   },
+   {
+    "text": "EUR/USD max drawdown 2022 daily",
+    "value": "16.243622",
+    "unit": "pct",
+    "tool_call_id": "call_1"
+   }
+  ],
+  "tool_calls": [
+   {
+    "id": "call_1",
+    "name": "get_market_stats",
+    "args": {
+     "from_date": "2022-01-01",
+     "pair": "EUR/USD",
+     "timeframe": "1d",
+     "to_date": "2022-12-30"
+    },
+    "ok": true,
+    "result_truncated": "{\"pair\":\"EUR/USD\",\"timeframe\":\"1d\",\"from_date\":\"2022-01-01\",\"to_date\":\"2022-12-30\",\"first_bar_utc\":\"2022-01-02T22:00:00Z\",\"last_bar_utc\":\"2022-12-29T22:00:00Z\",\"price_decimals\":5,\"bars_count\":260,\"first_open_price\":1.13733,\"last_close_price\":1.07068,\"return_pct\":-5.860216,\"up_bars_count\":130,\"down_bars_count\":130,\"flat_bars_count\":0,\"high_price\":1.149495,\"high_time_utc\":\"2022-02-09T22:00:00Z\",\"low_price\":0.9536,\"low_time_utc\":\"2022-09-27T21:00:00Z\",\"avg_range_pips\":102.246731 ...[truncated: 133 of 613 chars omitted - use get_market_stats or narrow the range]"
+   }
+  ],
+  "data_ranges": [
+   {
+    "tool": "get_market_stats",
+    "pair": "EUR/USD",
+    "timeframe": "1d",
+    "from_date": "2022-01-01",
+    "to_date": "2022-12-30",
+    "year": null,
+    "month": null,
+    "run_id": null
+   }
+  ],
+  "disclaimer": "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.",
+  "verification": {
+   "ok": true,
+   "failures": [],
+   "claims_checked": 2,
+   "numbers_checked": 2
+  }
+ },
+ "stats": {
+  "model_calls": 2,
+  "tool_calls": 1,
+  "input_tokens": 3065,
+  "output_tokens": 409,
+  "total_tokens": 3474,
+  "wall_s": 5.0939999999827705,
+  "stop_reason": "verified",
+  "verification_attempts": 1,
+  "verification_failures": []
+ }
+}

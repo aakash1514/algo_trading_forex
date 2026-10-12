@@ -1,0 +1,7630 @@
+{
+ "instrument": "XAU_USD",
+ "timeframe": "1h",
+ "from": "2017-10-01",
+ "to": "2017-10-31",
+ "target": "direction of the next H1 bar, mid open to close",
+ "disclaimer": "historical walk-forward test, not live signals",
+ "predictions": [
+  {
+   "barTime": "2017-09-29T20:00:00Z",
+   "targetBarTime": "2017-10-01T22:00:00Z",
+   "pUp": 0.5398526787757874,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.9,
+    "high": 1280.25,
+    "low": 1276.9745,
+    "close": 1278.24
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-01T22:00:00Z",
+   "targetBarTime": "2017-10-01T23:00:00Z",
+   "pUp": 0.5687336325645447,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.24,
+    "high": 1278.789,
+    "low": 1277.385,
+    "close": 1277.9935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-01T23:00:00Z",
+   "targetBarTime": "2017-10-02T00:00:00Z",
+   "pUp": 0.5584056377410889,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.99,
+    "high": 1278.0035,
+    "low": 1274.368,
+    "close": 1275.487
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T00:00:00Z",
+   "targetBarTime": "2017-10-02T01:00:00Z",
+   "pUp": 0.5729475617408752,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.4865,
+    "high": 1276.0055,
+    "low": 1274.7545,
+    "close": 1275.275
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T01:00:00Z",
+   "targetBarTime": "2017-10-02T02:00:00Z",
+   "pUp": 0.5490097999572754,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.27,
+    "high": 1275.7615,
+    "low": 1274.951,
+    "close": 1275.0
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T02:00:00Z",
+   "targetBarTime": "2017-10-02T03:00:00Z",
+   "pUp": 0.5294991135597229,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.0,
+    "high": 1275.405,
+    "low": 1274.175,
+    "close": 1275.1135
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T03:00:00Z",
+   "targetBarTime": "2017-10-02T04:00:00Z",
+   "pUp": 0.509515643119812,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.11,
+    "high": 1275.7505,
+    "low": 1273.6105,
+    "close": 1275.285
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T04:00:00Z",
+   "targetBarTime": "2017-10-02T05:00:00Z",
+   "pUp": 0.49403002858161926,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.2695,
+    "high": 1275.29,
+    "low": 1273.8645,
+    "close": 1274.25
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T05:00:00Z",
+   "targetBarTime": "2017-10-02T06:00:00Z",
+   "pUp": 0.4981822073459625,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.17,
+    "high": 1274.9665,
+    "low": 1272.7435,
+    "close": 1274.36
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T06:00:00Z",
+   "targetBarTime": "2017-10-02T07:00:00Z",
+   "pUp": 0.48748841881752014,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.3505,
+    "high": 1274.5865,
+    "low": 1271.2315,
+    "close": 1272.415
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T07:00:00Z",
+   "targetBarTime": "2017-10-02T08:00:00Z",
+   "pUp": 0.5042604207992554,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.4185,
+    "high": 1274.895,
+    "low": 1272.048,
+    "close": 1274.46
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T08:00:00Z",
+   "targetBarTime": "2017-10-02T09:00:00Z",
+   "pUp": 0.4695607125759125,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.479,
+    "high": 1274.5105,
+    "low": 1272.855,
+    "close": 1273.08
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T09:00:00Z",
+   "targetBarTime": "2017-10-02T10:00:00Z",
+   "pUp": 0.4850548207759857,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.085,
+    "high": 1274.63,
+    "low": 1273.0785,
+    "close": 1274.318
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T10:00:00Z",
+   "targetBarTime": "2017-10-02T11:00:00Z",
+   "pUp": 0.46658238768577576,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.308,
+    "high": 1274.472,
+    "low": 1272.0645,
+    "close": 1272.69
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T11:00:00Z",
+   "targetBarTime": "2017-10-02T12:00:00Z",
+   "pUp": 0.4915435314178467,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.695,
+    "high": 1275.9115,
+    "low": 1272.259,
+    "close": 1275.2885
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T12:00:00Z",
+   "targetBarTime": "2017-10-02T13:00:00Z",
+   "pUp": 0.46287965774536133,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.293,
+    "high": 1276.807,
+    "low": 1274.6045,
+    "close": 1274.955
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T13:00:00Z",
+   "targetBarTime": "2017-10-02T14:00:00Z",
+   "pUp": 0.4780542254447937,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.955,
+    "high": 1277.316,
+    "low": 1272.129,
+    "close": 1273.63
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T14:00:00Z",
+   "targetBarTime": "2017-10-02T15:00:00Z",
+   "pUp": 0.5047511458396912,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.564,
+    "high": 1275.095,
+    "low": 1272.8015,
+    "close": 1274.905
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T15:00:00Z",
+   "targetBarTime": "2017-10-02T16:00:00Z",
+   "pUp": 0.48830702900886536,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.925,
+    "high": 1275.9235,
+    "low": 1274.3035,
+    "close": 1274.405
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T16:00:00Z",
+   "targetBarTime": "2017-10-02T17:00:00Z",
+   "pUp": 0.49954551458358765,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.395,
+    "high": 1274.8815,
+    "low": 1272.989,
+    "close": 1274.639
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T17:00:00Z",
+   "targetBarTime": "2017-10-02T18:00:00Z",
+   "pUp": 0.5000056028366089,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.657,
+    "high": 1275.075,
+    "low": 1273.4645,
+    "close": 1273.4835
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T18:00:00Z",
+   "targetBarTime": "2017-10-02T19:00:00Z",
+   "pUp": 0.5179058313369751,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.4685,
+    "high": 1274.203,
+    "low": 1271.218,
+    "close": 1271.295
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T19:00:00Z",
+   "targetBarTime": "2017-10-02T20:00:00Z",
+   "pUp": 0.5430623888969421,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.32,
+    "high": 1272.292,
+    "low": 1269.5835,
+    "close": 1271.045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T20:00:00Z",
+   "targetBarTime": "2017-10-02T22:00:00Z",
+   "pUp": 0.5433235168457031,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.55,
+    "high": 1271.94,
+    "low": 1270.4735,
+    "close": 1271.795
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T22:00:00Z",
+   "targetBarTime": "2017-10-02T23:00:00Z",
+   "pUp": 0.5360748767852783,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.795,
+    "high": 1272.2205,
+    "low": 1271.0895,
+    "close": 1271.21
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-02T23:00:00Z",
+   "targetBarTime": "2017-10-03T00:00:00Z",
+   "pUp": 0.5356372594833374,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.2,
+    "high": 1273.123,
+    "low": 1270.054,
+    "close": 1270.1145
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T00:00:00Z",
+   "targetBarTime": "2017-10-03T01:00:00Z",
+   "pUp": 0.5398821830749512,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.064,
+    "high": 1270.475,
+    "low": 1268.413,
+    "close": 1268.675
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T01:00:00Z",
+   "targetBarTime": "2017-10-03T02:00:00Z",
+   "pUp": 0.543297529220581,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.67,
+    "high": 1270.7605,
+    "low": 1268.4915,
+    "close": 1270.0
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T02:00:00Z",
+   "targetBarTime": "2017-10-03T03:00:00Z",
+   "pUp": 0.5060749053955078,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.005,
+    "high": 1270.3955,
+    "low": 1269.135,
+    "close": 1269.6985
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T03:00:00Z",
+   "targetBarTime": "2017-10-03T04:00:00Z",
+   "pUp": 0.49911826848983765,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.695,
+    "high": 1270.222,
+    "low": 1269.308,
+    "close": 1269.313
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T04:00:00Z",
+   "targetBarTime": "2017-10-03T05:00:00Z",
+   "pUp": 0.4920765459537506,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.3185,
+    "high": 1270.2485,
+    "low": 1268.718,
+    "close": 1269.7185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T05:00:00Z",
+   "targetBarTime": "2017-10-03T06:00:00Z",
+   "pUp": 0.476846307516098,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.7235,
+    "high": 1272.46,
+    "low": 1269.369,
+    "close": 1272.1535
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T06:00:00Z",
+   "targetBarTime": "2017-10-03T07:00:00Z",
+   "pUp": 0.4444221258163452,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.158,
+    "high": 1272.205,
+    "low": 1269.415,
+    "close": 1270.039
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T07:00:00Z",
+   "targetBarTime": "2017-10-03T08:00:00Z",
+   "pUp": 0.4765172600746155,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.0385,
+    "high": 1271.369,
+    "low": 1269.985,
+    "close": 1270.339
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T08:00:00Z",
+   "targetBarTime": "2017-10-03T09:00:00Z",
+   "pUp": 0.46595513820648193,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.3435,
+    "high": 1271.0655,
+    "low": 1269.6705,
+    "close": 1271.06
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T09:00:00Z",
+   "targetBarTime": "2017-10-03T10:00:00Z",
+   "pUp": 0.45564329624176025,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1271.075,
+    "high": 1271.8385,
+    "low": 1270.611,
+    "close": 1271.116
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T10:00:00Z",
+   "targetBarTime": "2017-10-03T11:00:00Z",
+   "pUp": 0.4578009843826294,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.1165,
+    "high": 1271.7855,
+    "low": 1270.32,
+    "close": 1270.5185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T11:00:00Z",
+   "targetBarTime": "2017-10-03T12:00:00Z",
+   "pUp": 0.4690752625465393,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.518,
+    "high": 1271.4665,
+    "low": 1269.339,
+    "close": 1270.4435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T12:00:00Z",
+   "targetBarTime": "2017-10-03T13:00:00Z",
+   "pUp": 0.471599280834198,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.4235,
+    "high": 1272.53,
+    "low": 1270.22,
+    "close": 1272.185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T13:00:00Z",
+   "targetBarTime": "2017-10-03T14:00:00Z",
+   "pUp": 0.4548051953315735,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.19,
+    "high": 1274.1155,
+    "low": 1271.305,
+    "close": 1273.406
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T14:00:00Z",
+   "targetBarTime": "2017-10-03T15:00:00Z",
+   "pUp": 0.45280903577804565,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.42,
+    "high": 1274.775,
+    "low": 1273.0845,
+    "close": 1273.8115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T15:00:00Z",
+   "targetBarTime": "2017-10-03T16:00:00Z",
+   "pUp": 0.4609649181365967,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.806,
+    "high": 1274.6115,
+    "low": 1272.9455,
+    "close": 1273.222
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T16:00:00Z",
+   "targetBarTime": "2017-10-03T17:00:00Z",
+   "pUp": 0.4798780381679535,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.225,
+    "high": 1273.4205,
+    "low": 1271.716,
+    "close": 1272.121
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T17:00:00Z",
+   "targetBarTime": "2017-10-03T18:00:00Z",
+   "pUp": 0.5007167458534241,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.12,
+    "high": 1272.3255,
+    "low": 1271.1095,
+    "close": 1272.0285
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T18:00:00Z",
+   "targetBarTime": "2017-10-03T19:00:00Z",
+   "pUp": 0.5024856328964233,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.025,
+    "high": 1272.31,
+    "low": 1271.418,
+    "close": 1272.024
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T19:00:00Z",
+   "targetBarTime": "2017-10-03T20:00:00Z",
+   "pUp": 0.5028792023658752,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.0385,
+    "high": 1272.124,
+    "low": 1270.7095,
+    "close": 1271.685
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T20:00:00Z",
+   "targetBarTime": "2017-10-03T22:00:00Z",
+   "pUp": 0.513569712638855,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1271.81,
+    "high": 1272.645,
+    "low": 1271.439,
+    "close": 1272.455
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T22:00:00Z",
+   "targetBarTime": "2017-10-03T23:00:00Z",
+   "pUp": 0.501034677028656,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.45,
+    "high": 1272.644,
+    "low": 1272.0115,
+    "close": 1272.5585
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-03T23:00:00Z",
+   "targetBarTime": "2017-10-04T00:00:00Z",
+   "pUp": 0.5002299547195435,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.549,
+    "high": 1275.617,
+    "low": 1272.529,
+    "close": 1275.374
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T00:00:00Z",
+   "targetBarTime": "2017-10-04T01:00:00Z",
+   "pUp": 0.4636726975440979,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.369,
+    "high": 1275.6935,
+    "low": 1274.52,
+    "close": 1275.17
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T01:00:00Z",
+   "targetBarTime": "2017-10-04T02:00:00Z",
+   "pUp": 0.4755224585533142,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.17,
+    "high": 1276.2615,
+    "low": 1275.05,
+    "close": 1275.4385
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T02:00:00Z",
+   "targetBarTime": "2017-10-04T03:00:00Z",
+   "pUp": 0.4743567407131195,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.435,
+    "high": 1275.8555,
+    "low": 1275.12,
+    "close": 1275.403
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T03:00:00Z",
+   "targetBarTime": "2017-10-04T04:00:00Z",
+   "pUp": 0.47330746054649353,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.4035,
+    "high": 1275.7585,
+    "low": 1275.2985,
+    "close": 1275.448
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T04:00:00Z",
+   "targetBarTime": "2017-10-04T05:00:00Z",
+   "pUp": 0.46975433826446533,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.4485,
+    "high": 1276.8185,
+    "low": 1275.2985,
+    "close": 1276.554
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T05:00:00Z",
+   "targetBarTime": "2017-10-04T06:00:00Z",
+   "pUp": 0.4537591338157654,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.57,
+    "high": 1278.592,
+    "low": 1275.4835,
+    "close": 1275.595
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T06:00:00Z",
+   "targetBarTime": "2017-10-04T07:00:00Z",
+   "pUp": 0.4694025218486786,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.5835,
+    "high": 1276.42,
+    "low": 1275.2745,
+    "close": 1276.032
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T07:00:00Z",
+   "targetBarTime": "2017-10-04T08:00:00Z",
+   "pUp": 0.459407776594162,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.0315,
+    "high": 1276.895,
+    "low": 1275.0235,
+    "close": 1275.649
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T08:00:00Z",
+   "targetBarTime": "2017-10-04T09:00:00Z",
+   "pUp": 0.4644177556037903,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.6585,
+    "high": 1276.6705,
+    "low": 1275.26,
+    "close": 1276.655
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T09:00:00Z",
+   "targetBarTime": "2017-10-04T10:00:00Z",
+   "pUp": 0.4505493938922882,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.66,
+    "high": 1280.382,
+    "low": 1276.5495,
+    "close": 1279.765
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T10:00:00Z",
+   "targetBarTime": "2017-10-04T11:00:00Z",
+   "pUp": 0.4268847405910492,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.76,
+    "high": 1281.683,
+    "low": 1278.61,
+    "close": 1281.085
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T11:00:00Z",
+   "targetBarTime": "2017-10-04T12:00:00Z",
+   "pUp": 0.4317473769187927,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.07,
+    "high": 1282.2815,
+    "low": 1276.392,
+    "close": 1277.353
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T12:00:00Z",
+   "targetBarTime": "2017-10-04T13:00:00Z",
+   "pUp": 0.49937373399734497,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.325,
+    "high": 1277.5435,
+    "low": 1274.4935,
+    "close": 1275.415
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T13:00:00Z",
+   "targetBarTime": "2017-10-04T14:00:00Z",
+   "pUp": 0.515669047832489,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.365,
+    "high": 1276.3395,
+    "low": 1270.695,
+    "close": 1275.15
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T14:00:00Z",
+   "targetBarTime": "2017-10-04T15:00:00Z",
+   "pUp": 0.5116453766822815,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.0885,
+    "high": 1275.53,
+    "low": 1273.076,
+    "close": 1273.5835
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T15:00:00Z",
+   "targetBarTime": "2017-10-04T16:00:00Z",
+   "pUp": 0.5243637561798096,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.58,
+    "high": 1274.167,
+    "low": 1271.9285,
+    "close": 1273.78
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T16:00:00Z",
+   "targetBarTime": "2017-10-04T17:00:00Z",
+   "pUp": 0.5112630128860474,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.78,
+    "high": 1275.3255,
+    "low": 1272.381,
+    "close": 1274.4515
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T17:00:00Z",
+   "targetBarTime": "2017-10-04T18:00:00Z",
+   "pUp": 0.49901217222213745,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.4465,
+    "high": 1275.047,
+    "low": 1274.206,
+    "close": 1274.605
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T18:00:00Z",
+   "targetBarTime": "2017-10-04T19:00:00Z",
+   "pUp": 0.4971778988838196,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.6215,
+    "high": 1276.3455,
+    "low": 1274.2795,
+    "close": 1275.3435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T19:00:00Z",
+   "targetBarTime": "2017-10-04T20:00:00Z",
+   "pUp": 0.4899381399154663,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.3235,
+    "high": 1275.6705,
+    "low": 1274.4515,
+    "close": 1274.755
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T20:00:00Z",
+   "targetBarTime": "2017-10-04T22:00:00Z",
+   "pUp": 0.5069790482521057,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.0165,
+    "high": 1275.7355,
+    "low": 1274.5095,
+    "close": 1274.955
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T22:00:00Z",
+   "targetBarTime": "2017-10-04T23:00:00Z",
+   "pUp": 0.5005610585212708,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.955,
+    "high": 1275.19,
+    "low": 1273.7255,
+    "close": 1274.0935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-04T23:00:00Z",
+   "targetBarTime": "2017-10-05T00:00:00Z",
+   "pUp": 0.5134078860282898,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.09,
+    "high": 1274.7155,
+    "low": 1273.115,
+    "close": 1274.705
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T00:00:00Z",
+   "targetBarTime": "2017-10-05T01:00:00Z",
+   "pUp": 0.49993425607681274,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.695,
+    "high": 1275.2755,
+    "low": 1273.731,
+    "close": 1273.776
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T01:00:00Z",
+   "targetBarTime": "2017-10-05T02:00:00Z",
+   "pUp": 0.5101259350776672,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.7765,
+    "high": 1274.889,
+    "low": 1273.1965,
+    "close": 1274.6665
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T02:00:00Z",
+   "targetBarTime": "2017-10-05T03:00:00Z",
+   "pUp": 0.48888102173805237,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.666,
+    "high": 1274.6855,
+    "low": 1274.2245,
+    "close": 1274.55
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T03:00:00Z",
+   "targetBarTime": "2017-10-05T04:00:00Z",
+   "pUp": 0.4868887960910797,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.55,
+    "high": 1275.177,
+    "low": 1274.3255,
+    "close": 1275.071
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T04:00:00Z",
+   "targetBarTime": "2017-10-05T05:00:00Z",
+   "pUp": 0.4757190942764282,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.0665,
+    "high": 1275.717,
+    "low": 1274.865,
+    "close": 1275.06
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T05:00:00Z",
+   "targetBarTime": "2017-10-05T06:00:00Z",
+   "pUp": 0.4725165367126465,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.07,
+    "high": 1275.11,
+    "low": 1273.365,
+    "close": 1274.99
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T06:00:00Z",
+   "targetBarTime": "2017-10-05T07:00:00Z",
+   "pUp": 0.4714798033237457,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.969,
+    "high": 1276.284,
+    "low": 1274.364,
+    "close": 1275.4285
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T07:00:00Z",
+   "targetBarTime": "2017-10-05T08:00:00Z",
+   "pUp": 0.4650295674800873,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.423,
+    "high": 1278.8615,
+    "low": 1275.3395,
+    "close": 1278.519
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T08:00:00Z",
+   "targetBarTime": "2017-10-05T09:00:00Z",
+   "pUp": 0.43606188893318176,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.539,
+    "high": 1279.06,
+    "low": 1277.766,
+    "close": 1277.852
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T09:00:00Z",
+   "targetBarTime": "2017-10-05T10:00:00Z",
+   "pUp": 0.45837193727493286,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.8415,
+    "high": 1278.697,
+    "low": 1277.693,
+    "close": 1278.6685
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T10:00:00Z",
+   "targetBarTime": "2017-10-05T11:00:00Z",
+   "pUp": 0.45508554577827454,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.668,
+    "high": 1278.9745,
+    "low": 1276.77,
+    "close": 1276.78
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T11:00:00Z",
+   "targetBarTime": "2017-10-05T12:00:00Z",
+   "pUp": 0.48880627751350403,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.785,
+    "high": 1278.982,
+    "low": 1275.8595,
+    "close": 1276.9085
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T12:00:00Z",
+   "targetBarTime": "2017-10-05T13:00:00Z",
+   "pUp": 0.48726704716682434,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.91,
+    "high": 1277.8215,
+    "low": 1273.4295,
+    "close": 1274.807
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T13:00:00Z",
+   "targetBarTime": "2017-10-05T14:00:00Z",
+   "pUp": 0.5184086561203003,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.811,
+    "high": 1276.19,
+    "low": 1273.1795,
+    "close": 1274.012
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T14:00:00Z",
+   "targetBarTime": "2017-10-05T15:00:00Z",
+   "pUp": 0.5180096626281738,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.04,
+    "high": 1274.235,
+    "low": 1272.5495,
+    "close": 1272.875
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T15:00:00Z",
+   "targetBarTime": "2017-10-05T16:00:00Z",
+   "pUp": 0.5256696939468384,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.87,
+    "high": 1273.8335,
+    "low": 1272.0045,
+    "close": 1272.515
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T16:00:00Z",
+   "targetBarTime": "2017-10-05T17:00:00Z",
+   "pUp": 0.5232478380203247,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.51,
+    "high": 1272.6155,
+    "low": 1270.4115,
+    "close": 1270.944
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T17:00:00Z",
+   "targetBarTime": "2017-10-05T18:00:00Z",
+   "pUp": 0.5383057594299316,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.9435,
+    "high": 1271.0755,
+    "low": 1269.03,
+    "close": 1269.13
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T18:00:00Z",
+   "targetBarTime": "2017-10-05T19:00:00Z",
+   "pUp": 0.5523862242698669,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.066,
+    "high": 1269.495,
+    "low": 1267.478,
+    "close": 1268.527
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T19:00:00Z",
+   "targetBarTime": "2017-10-05T20:00:00Z",
+   "pUp": 0.547351062297821,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1268.535,
+    "high": 1269.167,
+    "low": 1266.5535,
+    "close": 1268.23
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T20:00:00Z",
+   "targetBarTime": "2017-10-05T22:00:00Z",
+   "pUp": 0.5444028377532959,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.38,
+    "high": 1269.434,
+    "low": 1268.3685,
+    "close": 1268.935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T22:00:00Z",
+   "targetBarTime": "2017-10-05T23:00:00Z",
+   "pUp": 0.523502767086029,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.935,
+    "high": 1269.3605,
+    "low": 1267.745,
+    "close": 1269.165
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-05T23:00:00Z",
+   "targetBarTime": "2017-10-06T00:00:00Z",
+   "pUp": 0.5165470838546753,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.165,
+    "high": 1269.2505,
+    "low": 1267.8615,
+    "close": 1269.0065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T00:00:00Z",
+   "targetBarTime": "2017-10-06T01:00:00Z",
+   "pUp": 0.5142118334770203,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.9915,
+    "high": 1269.725,
+    "low": 1268.381,
+    "close": 1269.155
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T01:00:00Z",
+   "targetBarTime": "2017-10-06T02:00:00Z",
+   "pUp": 0.5085697174072266,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.126,
+    "high": 1269.6255,
+    "low": 1268.916,
+    "close": 1269.1735
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T02:00:00Z",
+   "targetBarTime": "2017-10-06T03:00:00Z",
+   "pUp": 0.5017684102058411,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.173,
+    "high": 1269.185,
+    "low": 1268.1945,
+    "close": 1268.403
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T03:00:00Z",
+   "targetBarTime": "2017-10-06T04:00:00Z",
+   "pUp": 0.5060518383979797,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1268.395,
+    "high": 1268.5205,
+    "low": 1267.1655,
+    "close": 1268.118
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T04:00:00Z",
+   "targetBarTime": "2017-10-06T05:00:00Z",
+   "pUp": 0.501075029373169,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.1185,
+    "high": 1268.4285,
+    "low": 1267.2435,
+    "close": 1268.17
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T05:00:00Z",
+   "targetBarTime": "2017-10-06T06:00:00Z",
+   "pUp": 0.49142470955848694,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.197,
+    "high": 1268.78,
+    "low": 1267.375,
+    "close": 1268.376
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T06:00:00Z",
+   "targetBarTime": "2017-10-06T07:00:00Z",
+   "pUp": 0.4837333559989929,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.3745,
+    "high": 1269.2605,
+    "low": 1267.5595,
+    "close": 1268.4215
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T07:00:00Z",
+   "targetBarTime": "2017-10-06T08:00:00Z",
+   "pUp": 0.4815414547920227,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1268.43,
+    "high": 1269.38,
+    "low": 1268.135,
+    "close": 1268.395
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T08:00:00Z",
+   "targetBarTime": "2017-10-06T09:00:00Z",
+   "pUp": 0.4793736934661865,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.415,
+    "high": 1269.3715,
+    "low": 1267.975,
+    "close": 1268.935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T09:00:00Z",
+   "targetBarTime": "2017-10-06T10:00:00Z",
+   "pUp": 0.4744524657726288,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1268.93,
+    "high": 1270.277,
+    "low": 1268.5395,
+    "close": 1269.4665
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T10:00:00Z",
+   "targetBarTime": "2017-10-06T11:00:00Z",
+   "pUp": 0.4728430211544037,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.4765,
+    "high": 1269.9255,
+    "low": 1268.4845,
+    "close": 1268.733
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T11:00:00Z",
+   "targetBarTime": "2017-10-06T12:00:00Z",
+   "pUp": 0.4895608723163605,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1268.6665,
+    "high": 1271.5935,
+    "low": 1263.498,
+    "close": 1264.78
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T12:00:00Z",
+   "targetBarTime": "2017-10-06T13:00:00Z",
+   "pUp": 0.5455580353736877,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1264.7615,
+    "high": 1266.465,
+    "low": 1260.6925,
+    "close": 1261.03
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T13:00:00Z",
+   "targetBarTime": "2017-10-06T14:00:00Z",
+   "pUp": 0.5716855525970459,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1261.039,
+    "high": 1274.064,
+    "low": 1260.8735,
+    "close": 1272.605
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T14:00:00Z",
+   "targetBarTime": "2017-10-06T15:00:00Z",
+   "pUp": 0.47524455189704895,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.615,
+    "high": 1275.76,
+    "low": 1270.768,
+    "close": 1274.515
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T15:00:00Z",
+   "targetBarTime": "2017-10-06T16:00:00Z",
+   "pUp": 0.4779214859008789,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.52,
+    "high": 1275.2635,
+    "low": 1272.73,
+    "close": 1273.534
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T16:00:00Z",
+   "targetBarTime": "2017-10-06T17:00:00Z",
+   "pUp": 0.5073330402374268,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.549,
+    "high": 1274.788,
+    "low": 1272.1285,
+    "close": 1274.045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T17:00:00Z",
+   "targetBarTime": "2017-10-06T18:00:00Z",
+   "pUp": 0.5070522427558899,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.1065,
+    "high": 1274.515,
+    "low": 1272.9195,
+    "close": 1273.875
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T18:00:00Z",
+   "targetBarTime": "2017-10-06T19:00:00Z",
+   "pUp": 0.5139808058738708,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.861,
+    "high": 1274.974,
+    "low": 1273.7385,
+    "close": 1274.7285
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T19:00:00Z",
+   "targetBarTime": "2017-10-06T20:00:00Z",
+   "pUp": 0.5063740611076355,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.724,
+    "high": 1276.725,
+    "low": 1274.62,
+    "close": 1276.455
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-06T20:00:00Z",
+   "targetBarTime": "2017-10-08T22:00:00Z",
+   "pUp": 0.49807554483413696,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.19,
+    "high": 1277.902,
+    "low": 1275.48,
+    "close": 1276.65
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-08T22:00:00Z",
+   "targetBarTime": "2017-10-08T23:00:00Z",
+   "pUp": 0.5102488994598389,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.57,
+    "high": 1277.514,
+    "low": 1276.5695,
+    "close": 1276.7115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-08T23:00:00Z",
+   "targetBarTime": "2017-10-09T00:00:00Z",
+   "pUp": 0.5114414095878601,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.712,
+    "high": 1276.712,
+    "low": 1275.3745,
+    "close": 1276.1615
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T00:00:00Z",
+   "targetBarTime": "2017-10-09T01:00:00Z",
+   "pUp": 0.5175949931144714,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.03,
+    "high": 1280.5695,
+    "low": 1276.03,
+    "close": 1280.3885
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T01:00:00Z",
+   "targetBarTime": "2017-10-09T02:00:00Z",
+   "pUp": 0.4665694534778595,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.389,
+    "high": 1285.045,
+    "low": 1280.3745,
+    "close": 1283.7505
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T02:00:00Z",
+   "targetBarTime": "2017-10-09T03:00:00Z",
+   "pUp": 0.44081300497055054,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.754,
+    "high": 1284.1465,
+    "low": 1282.2995,
+    "close": 1282.3985
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T03:00:00Z",
+   "targetBarTime": "2017-10-09T04:00:00Z",
+   "pUp": 0.46941155195236206,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.399,
+    "high": 1283.356,
+    "low": 1282.3845,
+    "close": 1282.7325
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T04:00:00Z",
+   "targetBarTime": "2017-10-09T05:00:00Z",
+   "pUp": 0.46486151218414307,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.73,
+    "high": 1284.334,
+    "low": 1282.5245,
+    "close": 1284.334
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T05:00:00Z",
+   "targetBarTime": "2017-10-09T06:00:00Z",
+   "pUp": 0.4495285749435425,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.349,
+    "high": 1285.5465,
+    "low": 1281.0185,
+    "close": 1281.6715
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T06:00:00Z",
+   "targetBarTime": "2017-10-09T07:00:00Z",
+   "pUp": 0.49018415808677673,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.7015,
+    "high": 1281.7015,
+    "low": 1279.701,
+    "close": 1280.015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T07:00:00Z",
+   "targetBarTime": "2017-10-09T08:00:00Z",
+   "pUp": 0.4980968236923218,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.01,
+    "high": 1283.4735,
+    "low": 1279.8745,
+    "close": 1282.435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T08:00:00Z",
+   "targetBarTime": "2017-10-09T09:00:00Z",
+   "pUp": 0.4630838930606842,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.43,
+    "high": 1283.169,
+    "low": 1281.7835,
+    "close": 1282.522
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T09:00:00Z",
+   "targetBarTime": "2017-10-09T10:00:00Z",
+   "pUp": 0.4634752869606018,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.5265,
+    "high": 1283.759,
+    "low": 1281.4885,
+    "close": 1282.98
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T10:00:00Z",
+   "targetBarTime": "2017-10-09T11:00:00Z",
+   "pUp": 0.4631997048854828,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.9815,
+    "high": 1284.215,
+    "low": 1281.971,
+    "close": 1283.0015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T11:00:00Z",
+   "targetBarTime": "2017-10-09T12:00:00Z",
+   "pUp": 0.46849462389945984,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1282.9965,
+    "high": 1283.3405,
+    "low": 1279.963,
+    "close": 1280.5485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T12:00:00Z",
+   "targetBarTime": "2017-10-09T13:00:00Z",
+   "pUp": 0.501990795135498,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.5665,
+    "high": 1282.252,
+    "low": 1279.9145,
+    "close": 1281.36
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T13:00:00Z",
+   "targetBarTime": "2017-10-09T14:00:00Z",
+   "pUp": 0.4871535003185272,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.365,
+    "high": 1282.009,
+    "low": 1279.498,
+    "close": 1281.73
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T14:00:00Z",
+   "targetBarTime": "2017-10-09T15:00:00Z",
+   "pUp": 0.4867075979709625,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.723,
+    "high": 1281.9655,
+    "low": 1280.611,
+    "close": 1281.015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T15:00:00Z",
+   "targetBarTime": "2017-10-09T16:00:00Z",
+   "pUp": 0.4992695450782776,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.028,
+    "high": 1281.912,
+    "low": 1280.3435,
+    "close": 1281.43
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T16:00:00Z",
+   "targetBarTime": "2017-10-09T17:00:00Z",
+   "pUp": 0.49492520093917847,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.425,
+    "high": 1283.3455,
+    "low": 1281.264,
+    "close": 1282.635
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T17:00:00Z",
+   "targetBarTime": "2017-10-09T18:00:00Z",
+   "pUp": 0.48589229583740234,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.638,
+    "high": 1283.6055,
+    "low": 1282.524,
+    "close": 1283.127
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T18:00:00Z",
+   "targetBarTime": "2017-10-09T19:00:00Z",
+   "pUp": 0.4879496097564697,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1283.1365,
+    "high": 1285.2735,
+    "low": 1283.1365,
+    "close": 1284.9035
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T19:00:00Z",
+   "targetBarTime": "2017-10-09T20:00:00Z",
+   "pUp": 0.47535431385040283,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.92,
+    "high": 1284.92,
+    "low": 1283.7195,
+    "close": 1284.075
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T20:00:00Z",
+   "targetBarTime": "2017-10-09T22:00:00Z",
+   "pUp": 0.507326066493988,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.15,
+    "high": 1284.307,
+    "low": 1283.2995,
+    "close": 1283.92
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T22:00:00Z",
+   "targetBarTime": "2017-10-09T23:00:00Z",
+   "pUp": 0.5137369632720947,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.92,
+    "high": 1284.309,
+    "low": 1283.205,
+    "close": 1283.2935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-09T23:00:00Z",
+   "targetBarTime": "2017-10-10T00:00:00Z",
+   "pUp": 0.5213484168052673,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.29,
+    "high": 1284.124,
+    "low": 1282.201,
+    "close": 1283.195
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T00:00:00Z",
+   "targetBarTime": "2017-10-10T01:00:00Z",
+   "pUp": 0.5158466696739197,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1283.205,
+    "high": 1288.265,
+    "low": 1282.7595,
+    "close": 1286.1045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T01:00:00Z",
+   "targetBarTime": "2017-10-10T02:00:00Z",
+   "pUp": 0.4746430516242981,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.0965,
+    "high": 1287.0685,
+    "low": 1285.2495,
+    "close": 1286.645
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T02:00:00Z",
+   "targetBarTime": "2017-10-10T03:00:00Z",
+   "pUp": 0.4693662226200104,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.663,
+    "high": 1287.2815,
+    "low": 1286.307,
+    "close": 1286.7435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T03:00:00Z",
+   "targetBarTime": "2017-10-10T04:00:00Z",
+   "pUp": 0.4686715006828308,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.7385,
+    "high": 1287.7085,
+    "low": 1286.738,
+    "close": 1287.341
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T04:00:00Z",
+   "targetBarTime": "2017-10-10T05:00:00Z",
+   "pUp": 0.4598427712917328,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1287.3465,
+    "high": 1287.622,
+    "low": 1285.71,
+    "close": 1286.769
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T05:00:00Z",
+   "targetBarTime": "2017-10-10T06:00:00Z",
+   "pUp": 0.4684928059577942,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.785,
+    "high": 1288.8285,
+    "low": 1286.258,
+    "close": 1287.5065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T06:00:00Z",
+   "targetBarTime": "2017-10-10T07:00:00Z",
+   "pUp": 0.45761796832084656,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1287.5015,
+    "high": 1288.0285,
+    "low": 1286.1905,
+    "close": 1287.047
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T07:00:00Z",
+   "targetBarTime": "2017-10-10T08:00:00Z",
+   "pUp": 0.4636397361755371,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1287.0415,
+    "high": 1289.5095,
+    "low": 1287.036,
+    "close": 1288.785
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T08:00:00Z",
+   "targetBarTime": "2017-10-10T09:00:00Z",
+   "pUp": 0.44407919049263,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.79,
+    "high": 1290.2085,
+    "low": 1288.59,
+    "close": 1290.015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T09:00:00Z",
+   "targetBarTime": "2017-10-10T10:00:00Z",
+   "pUp": 0.4377671480178833,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1290.004,
+    "high": 1291.9305,
+    "low": 1290.004,
+    "close": 1290.605
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T10:00:00Z",
+   "targetBarTime": "2017-10-10T11:00:00Z",
+   "pUp": 0.44217154383659363,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1290.6,
+    "high": 1292.4845,
+    "low": 1290.0115,
+    "close": 1292.186
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T11:00:00Z",
+   "targetBarTime": "2017-10-10T12:00:00Z",
+   "pUp": 0.4364334046840668,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1292.181,
+    "high": 1292.919,
+    "low": 1288.6045,
+    "close": 1289.2
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T12:00:00Z",
+   "targetBarTime": "2017-10-10T13:00:00Z",
+   "pUp": 0.4895172119140625,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.195,
+    "high": 1293.3015,
+    "low": 1288.2965,
+    "close": 1292.305
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T13:00:00Z",
+   "targetBarTime": "2017-10-10T14:00:00Z",
+   "pUp": 0.45537981390953064,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.325,
+    "high": 1294.292,
+    "low": 1291.5,
+    "close": 1294.148
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T14:00:00Z",
+   "targetBarTime": "2017-10-10T15:00:00Z",
+   "pUp": 0.44655945897102356,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1294.107,
+    "high": 1294.275,
+    "low": 1291.026,
+    "close": 1291.4015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T15:00:00Z",
+   "targetBarTime": "2017-10-10T16:00:00Z",
+   "pUp": 0.49837109446525574,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1291.449,
+    "high": 1291.596,
+    "low": 1290.22,
+    "close": 1290.3885
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T16:00:00Z",
+   "targetBarTime": "2017-10-10T17:00:00Z",
+   "pUp": 0.5064669251441956,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1290.3935,
+    "high": 1292.0755,
+    "low": 1289.2935,
+    "close": 1289.605
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T17:00:00Z",
+   "targetBarTime": "2017-10-10T18:00:00Z",
+   "pUp": 0.5133195519447327,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1289.6185,
+    "high": 1290.2465,
+    "low": 1288.4795,
+    "close": 1288.975
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T18:00:00Z",
+   "targetBarTime": "2017-10-10T19:00:00Z",
+   "pUp": 0.5159271359443665,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.99,
+    "high": 1289.0265,
+    "low": 1288.1685,
+    "close": 1288.445
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T19:00:00Z",
+   "targetBarTime": "2017-10-10T20:00:00Z",
+   "pUp": 0.5182216167449951,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.475,
+    "high": 1288.7615,
+    "low": 1287.67,
+    "close": 1287.755
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T20:00:00Z",
+   "targetBarTime": "2017-10-10T22:00:00Z",
+   "pUp": 0.5325551629066467,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.07,
+    "high": 1289.3305,
+    "low": 1287.858,
+    "close": 1289.33
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T22:00:00Z",
+   "targetBarTime": "2017-10-10T23:00:00Z",
+   "pUp": 0.5017845630645752,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.32,
+    "high": 1290.0555,
+    "low": 1289.1195,
+    "close": 1289.711
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-10T23:00:00Z",
+   "targetBarTime": "2017-10-11T00:00:00Z",
+   "pUp": 0.4984642565250397,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.707,
+    "high": 1291.3955,
+    "low": 1289.5705,
+    "close": 1290.24
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T00:00:00Z",
+   "targetBarTime": "2017-10-11T01:00:00Z",
+   "pUp": 0.49089717864990234,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1290.245,
+    "high": 1291.7355,
+    "low": 1288.326,
+    "close": 1288.817
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T01:00:00Z",
+   "targetBarTime": "2017-10-11T02:00:00Z",
+   "pUp": 0.5096172094345093,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.825,
+    "high": 1288.9305,
+    "low": 1286.784,
+    "close": 1288.255
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T02:00:00Z",
+   "targetBarTime": "2017-10-11T03:00:00Z",
+   "pUp": 0.5058900117874146,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.265,
+    "high": 1288.387,
+    "low": 1287.346,
+    "close": 1287.5515
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T03:00:00Z",
+   "targetBarTime": "2017-10-11T04:00:00Z",
+   "pUp": 0.5017944574356079,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1287.55,
+    "high": 1288.467,
+    "low": 1287.4395,
+    "close": 1287.541
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T04:00:00Z",
+   "targetBarTime": "2017-10-11T05:00:00Z",
+   "pUp": 0.488929808139801,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1287.54,
+    "high": 1288.6455,
+    "low": 1287.5295,
+    "close": 1288.43
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T05:00:00Z",
+   "targetBarTime": "2017-10-11T06:00:00Z",
+   "pUp": 0.4683384299278259,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.44,
+    "high": 1290.143,
+    "low": 1288.4245,
+    "close": 1288.626
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T06:00:00Z",
+   "targetBarTime": "2017-10-11T07:00:00Z",
+   "pUp": 0.46386104822158813,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.6595,
+    "high": 1289.8805,
+    "low": 1287.2265,
+    "close": 1289.3735
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T07:00:00Z",
+   "targetBarTime": "2017-10-11T08:00:00Z",
+   "pUp": 0.45356160402297974,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.3635,
+    "high": 1290.56,
+    "low": 1288.634,
+    "close": 1289.991
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T08:00:00Z",
+   "targetBarTime": "2017-10-11T09:00:00Z",
+   "pUp": 0.4492800235748291,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1289.9815,
+    "high": 1290.207,
+    "low": 1289.255,
+    "close": 1289.465
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T09:00:00Z",
+   "targetBarTime": "2017-10-11T10:00:00Z",
+   "pUp": 0.45992332696914673,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.465,
+    "high": 1290.107,
+    "low": 1289.286,
+    "close": 1289.8865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T10:00:00Z",
+   "targetBarTime": "2017-10-11T11:00:00Z",
+   "pUp": 0.4548543095588684,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.841,
+    "high": 1291.027,
+    "low": 1288.62,
+    "close": 1290.386
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T11:00:00Z",
+   "targetBarTime": "2017-10-11T12:00:00Z",
+   "pUp": 0.45676499605178833,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1290.39,
+    "high": 1291.3495,
+    "low": 1289.2115,
+    "close": 1291.135
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T12:00:00Z",
+   "targetBarTime": "2017-10-11T13:00:00Z",
+   "pUp": 0.45620957016944885,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1291.13,
+    "high": 1291.25,
+    "low": 1289.4745,
+    "close": 1289.587
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T13:00:00Z",
+   "targetBarTime": "2017-10-11T14:00:00Z",
+   "pUp": 0.4853206276893616,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1289.5865,
+    "high": 1290.4555,
+    "low": 1288.16,
+    "close": 1288.691
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T14:00:00Z",
+   "targetBarTime": "2017-10-11T15:00:00Z",
+   "pUp": 0.4963828921318054,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.686,
+    "high": 1288.9095,
+    "low": 1286.97,
+    "close": 1288.2745
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T15:00:00Z",
+   "targetBarTime": "2017-10-11T16:00:00Z",
+   "pUp": 0.4991331994533539,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.2815,
+    "high": 1288.639,
+    "low": 1284.765,
+    "close": 1286.1935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T16:00:00Z",
+   "targetBarTime": "2017-10-11T17:00:00Z",
+   "pUp": 0.5260946154594421,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1286.203,
+    "high": 1287.0355,
+    "low": 1284.648,
+    "close": 1285.0485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T17:00:00Z",
+   "targetBarTime": "2017-10-11T18:00:00Z",
+   "pUp": 0.533432126045227,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1285.0,
+    "high": 1290.9835,
+    "low": 1284.928,
+    "close": 1289.83
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T18:00:00Z",
+   "targetBarTime": "2017-10-11T19:00:00Z",
+   "pUp": 0.4715796709060669,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.84,
+    "high": 1293.6,
+    "low": 1288.9135,
+    "close": 1292.765
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T19:00:00Z",
+   "targetBarTime": "2017-10-11T20:00:00Z",
+   "pUp": 0.45433446764945984,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1292.77,
+    "high": 1293.36,
+    "low": 1290.793,
+    "close": 1291.85
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T20:00:00Z",
+   "targetBarTime": "2017-10-11T22:00:00Z",
+   "pUp": 0.48006489872932434,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.31,
+    "high": 1292.6455,
+    "low": 1291.618,
+    "close": 1292.43
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T22:00:00Z",
+   "targetBarTime": "2017-10-11T23:00:00Z",
+   "pUp": 0.495611310005188,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.43,
+    "high": 1292.9405,
+    "low": 1291.7395,
+    "close": 1292.505
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-11T23:00:00Z",
+   "targetBarTime": "2017-10-12T00:00:00Z",
+   "pUp": 0.4988819360733032,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.5215,
+    "high": 1294.177,
+    "low": 1292.505,
+    "close": 1293.535
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T00:00:00Z",
+   "targetBarTime": "2017-10-12T01:00:00Z",
+   "pUp": 0.48577120900154114,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.525,
+    "high": 1293.635,
+    "low": 1291.9535,
+    "close": 1292.7665
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T01:00:00Z",
+   "targetBarTime": "2017-10-12T02:00:00Z",
+   "pUp": 0.49926283955574036,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.781,
+    "high": 1293.714,
+    "low": 1292.5965,
+    "close": 1293.5835
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T02:00:00Z",
+   "targetBarTime": "2017-10-12T03:00:00Z",
+   "pUp": 0.4831872582435608,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1293.592,
+    "high": 1295.552,
+    "low": 1293.2835,
+    "close": 1295.0305
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T03:00:00Z",
+   "targetBarTime": "2017-10-12T04:00:00Z",
+   "pUp": 0.4649389088153839,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1295.04,
+    "high": 1295.405,
+    "low": 1294.4985,
+    "close": 1294.9235
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T04:00:00Z",
+   "targetBarTime": "2017-10-12T05:00:00Z",
+   "pUp": 0.46757230162620544,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.898,
+    "high": 1296.532,
+    "low": 1294.88,
+    "close": 1296.3115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T05:00:00Z",
+   "targetBarTime": "2017-10-12T06:00:00Z",
+   "pUp": 0.45260754227638245,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1296.3165,
+    "high": 1296.512,
+    "low": 1294.6095,
+    "close": 1294.75
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T06:00:00Z",
+   "targetBarTime": "2017-10-12T07:00:00Z",
+   "pUp": 0.47676214575767517,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.755,
+    "high": 1297.545,
+    "low": 1294.611,
+    "close": 1296.9
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T07:00:00Z",
+   "targetBarTime": "2017-10-12T08:00:00Z",
+   "pUp": 0.4499770998954773,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1296.895,
+    "high": 1297.165,
+    "low": 1295.9515,
+    "close": 1296.028
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T08:00:00Z",
+   "targetBarTime": "2017-10-12T09:00:00Z",
+   "pUp": 0.46722790598869324,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1296.0235,
+    "high": 1296.2905,
+    "low": 1293.8365,
+    "close": 1294.041
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T09:00:00Z",
+   "targetBarTime": "2017-10-12T10:00:00Z",
+   "pUp": 0.49310559034347534,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.051,
+    "high": 1295.3095,
+    "low": 1294.006,
+    "close": 1294.77
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T10:00:00Z",
+   "targetBarTime": "2017-10-12T11:00:00Z",
+   "pUp": 0.47652342915534973,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.775,
+    "high": 1296.365,
+    "low": 1294.763,
+    "close": 1295.13
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T11:00:00Z",
+   "targetBarTime": "2017-10-12T12:00:00Z",
+   "pUp": 0.4739980101585388,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1295.1285,
+    "high": 1295.9235,
+    "low": 1290.8435,
+    "close": 1292.305
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T12:00:00Z",
+   "targetBarTime": "2017-10-12T13:00:00Z",
+   "pUp": 0.517495334148407,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1292.3,
+    "high": 1293.965,
+    "low": 1291.0945,
+    "close": 1291.3265
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T13:00:00Z",
+   "targetBarTime": "2017-10-12T14:00:00Z",
+   "pUp": 0.5188712477684021,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1291.332,
+    "high": 1294.011,
+    "low": 1289.7415,
+    "close": 1293.915
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T14:00:00Z",
+   "targetBarTime": "2017-10-12T15:00:00Z",
+   "pUp": 0.4841357171535492,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.915,
+    "high": 1293.9655,
+    "low": 1292.356,
+    "close": 1292.3715
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T15:00:00Z",
+   "targetBarTime": "2017-10-12T16:00:00Z",
+   "pUp": 0.5114197731018066,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.37,
+    "high": 1293.745,
+    "low": 1292.21,
+    "close": 1293.3115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T16:00:00Z",
+   "targetBarTime": "2017-10-12T17:00:00Z",
+   "pUp": 0.4979307949542999,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1293.2735,
+    "high": 1295.284,
+    "low": 1292.791,
+    "close": 1294.774
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T17:00:00Z",
+   "targetBarTime": "2017-10-12T18:00:00Z",
+   "pUp": 0.486243337392807,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1294.755,
+    "high": 1295.0065,
+    "low": 1293.464,
+    "close": 1293.605
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T18:00:00Z",
+   "targetBarTime": "2017-10-12T19:00:00Z",
+   "pUp": 0.5127814412117004,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.63,
+    "high": 1294.1285,
+    "low": 1292.798,
+    "close": 1293.619
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T19:00:00Z",
+   "targetBarTime": "2017-10-12T20:00:00Z",
+   "pUp": 0.5124868154525757,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1293.62,
+    "high": 1294.144,
+    "low": 1292.905,
+    "close": 1293.76
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T20:00:00Z",
+   "targetBarTime": "2017-10-12T22:00:00Z",
+   "pUp": 0.5108335018157959,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1293.74,
+    "high": 1294.55,
+    "low": 1293.4535,
+    "close": 1294.485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T22:00:00Z",
+   "targetBarTime": "2017-10-12T23:00:00Z",
+   "pUp": 0.5210254788398743,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1294.514,
+    "high": 1294.514,
+    "low": 1293.366,
+    "close": 1294.044
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-12T23:00:00Z",
+   "targetBarTime": "2017-10-13T00:00:00Z",
+   "pUp": 0.5268815159797668,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.0475,
+    "high": 1294.782,
+    "low": 1293.5645,
+    "close": 1294.449
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T00:00:00Z",
+   "targetBarTime": "2017-10-13T01:00:00Z",
+   "pUp": 0.5148445963859558,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.4485,
+    "high": 1295.4,
+    "low": 1294.1285,
+    "close": 1295.0435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T01:00:00Z",
+   "targetBarTime": "2017-10-13T02:00:00Z",
+   "pUp": 0.5027051568031311,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1295.045,
+    "high": 1296.824,
+    "low": 1294.843,
+    "close": 1296.069
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T02:00:00Z",
+   "targetBarTime": "2017-10-13T03:00:00Z",
+   "pUp": 0.4883253872394562,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1296.068,
+    "high": 1296.77,
+    "low": 1295.7245,
+    "close": 1296.145
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T03:00:00Z",
+   "targetBarTime": "2017-10-13T04:00:00Z",
+   "pUp": 0.48782071471214294,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1296.145,
+    "high": 1296.6335,
+    "low": 1295.6795,
+    "close": 1295.8
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T04:00:00Z",
+   "targetBarTime": "2017-10-13T05:00:00Z",
+   "pUp": 0.4899570643901825,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1295.795,
+    "high": 1296.8055,
+    "low": 1295.7795,
+    "close": 1296.225
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T05:00:00Z",
+   "targetBarTime": "2017-10-13T06:00:00Z",
+   "pUp": 0.4813714623451233,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1296.2365,
+    "high": 1298.51,
+    "low": 1295.5495,
+    "close": 1297.0085
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T06:00:00Z",
+   "targetBarTime": "2017-10-13T07:00:00Z",
+   "pUp": 0.47244933247566223,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1297.013,
+    "high": 1297.9155,
+    "low": 1295.4745,
+    "close": 1295.814
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T07:00:00Z",
+   "targetBarTime": "2017-10-13T08:00:00Z",
+   "pUp": 0.4876028895378113,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1295.8255,
+    "high": 1296.387,
+    "low": 1293.73,
+    "close": 1294.589
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T08:00:00Z",
+   "targetBarTime": "2017-10-13T09:00:00Z",
+   "pUp": 0.4986545443534851,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1294.5935,
+    "high": 1294.62,
+    "low": 1292.803,
+    "close": 1293.88
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T09:00:00Z",
+   "targetBarTime": "2017-10-13T10:00:00Z",
+   "pUp": 0.49966689944267273,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.89,
+    "high": 1294.7305,
+    "low": 1293.133,
+    "close": 1293.52
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T10:00:00Z",
+   "targetBarTime": "2017-10-13T11:00:00Z",
+   "pUp": 0.4986293911933899,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.55,
+    "high": 1293.706,
+    "low": 1291.8415,
+    "close": 1292.555
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T11:00:00Z",
+   "targetBarTime": "2017-10-13T12:00:00Z",
+   "pUp": 0.5084932446479797,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.5185,
+    "high": 1302.568,
+    "low": 1291.063,
+    "close": 1300.488
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T12:00:00Z",
+   "targetBarTime": "2017-10-13T13:00:00Z",
+   "pUp": 0.45418164134025574,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1300.5235,
+    "high": 1302.7055,
+    "low": 1299.806,
+    "close": 1301.68
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T13:00:00Z",
+   "targetBarTime": "2017-10-13T14:00:00Z",
+   "pUp": 0.46481025218963623,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1301.685,
+    "high": 1301.84,
+    "low": 1298.4665,
+    "close": 1299.3135
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T14:00:00Z",
+   "targetBarTime": "2017-10-13T15:00:00Z",
+   "pUp": 0.513738751411438,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1299.3515,
+    "high": 1300.6415,
+    "low": 1298.8085,
+    "close": 1300.165
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T15:00:00Z",
+   "targetBarTime": "2017-10-13T16:00:00Z",
+   "pUp": 0.501614511013031,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1300.18,
+    "high": 1301.9535,
+    "low": 1300.0945,
+    "close": 1301.1915
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T16:00:00Z",
+   "targetBarTime": "2017-10-13T17:00:00Z",
+   "pUp": 0.4959341883659363,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1301.215,
+    "high": 1302.73,
+    "low": 1300.7535,
+    "close": 1302.5185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T17:00:00Z",
+   "targetBarTime": "2017-10-13T18:00:00Z",
+   "pUp": 0.48935770988464355,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1302.5435,
+    "high": 1302.554,
+    "low": 1301.3345,
+    "close": 1301.9485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T18:00:00Z",
+   "targetBarTime": "2017-10-13T19:00:00Z",
+   "pUp": 0.5089686512947083,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1301.955,
+    "high": 1303.8615,
+    "low": 1301.645,
+    "close": 1303.783
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T19:00:00Z",
+   "targetBarTime": "2017-10-13T20:00:00Z",
+   "pUp": 0.49134400486946106,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1303.7835,
+    "high": 1303.8885,
+    "low": 1302.76,
+    "close": 1303.72
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-13T20:00:00Z",
+   "targetBarTime": "2017-10-15T22:00:00Z",
+   "pUp": 0.5107498168945312,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1303.565,
+    "high": 1303.764,
+    "low": 1301.823,
+    "close": 1302.0
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-15T22:00:00Z",
+   "targetBarTime": "2017-10-15T23:00:00Z",
+   "pUp": 0.5394865274429321,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1302.0,
+    "high": 1304.3835,
+    "low": 1301.96,
+    "close": 1304.344
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-15T23:00:00Z",
+   "targetBarTime": "2017-10-16T00:00:00Z",
+   "pUp": 0.5035654902458191,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1304.288,
+    "high": 1304.6055,
+    "low": 1302.6025,
+    "close": 1302.603
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T00:00:00Z",
+   "targetBarTime": "2017-10-16T01:00:00Z",
+   "pUp": 0.5227476358413696,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1302.6025,
+    "high": 1303.117,
+    "low": 1301.1265,
+    "close": 1301.802
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T01:00:00Z",
+   "targetBarTime": "2017-10-16T02:00:00Z",
+   "pUp": 0.5219561457633972,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1301.812,
+    "high": 1302.6955,
+    "low": 1301.374,
+    "close": 1302.588
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T02:00:00Z",
+   "targetBarTime": "2017-10-16T03:00:00Z",
+   "pUp": 0.5002353191375732,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1302.5885,
+    "high": 1302.705,
+    "low": 1301.7845,
+    "close": 1302.5
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T03:00:00Z",
+   "targetBarTime": "2017-10-16T04:00:00Z",
+   "pUp": 0.4942552149295807,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1302.5,
+    "high": 1302.8055,
+    "low": 1302.0965,
+    "close": 1302.12
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T04:00:00Z",
+   "targetBarTime": "2017-10-16T05:00:00Z",
+   "pUp": 0.4915362596511841,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1302.152,
+    "high": 1303.71,
+    "low": 1301.996,
+    "close": 1302.58
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T05:00:00Z",
+   "targetBarTime": "2017-10-16T06:00:00Z",
+   "pUp": 0.47923412919044495,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1302.56,
+    "high": 1305.08,
+    "low": 1302.2745,
+    "close": 1303.793
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T06:00:00Z",
+   "targetBarTime": "2017-10-16T07:00:00Z",
+   "pUp": 0.46352794766426086,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1303.81,
+    "high": 1305.941,
+    "low": 1303.2215,
+    "close": 1305.3385
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T07:00:00Z",
+   "targetBarTime": "2017-10-16T08:00:00Z",
+   "pUp": 0.4485393464565277,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1305.3195,
+    "high": 1305.645,
+    "low": 1303.728,
+    "close": 1303.815
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T08:00:00Z",
+   "targetBarTime": "2017-10-16T09:00:00Z",
+   "pUp": 0.4722335636615753,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1303.7935,
+    "high": 1305.209,
+    "low": 1303.793,
+    "close": 1304.63
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T09:00:00Z",
+   "targetBarTime": "2017-10-16T10:00:00Z",
+   "pUp": 0.46097519993782043,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1304.635,
+    "high": 1305.62,
+    "low": 1304.498,
+    "close": 1305.3265
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T10:00:00Z",
+   "targetBarTime": "2017-10-16T11:00:00Z",
+   "pUp": 0.4567735493183136,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1305.322,
+    "high": 1306.1115,
+    "low": 1305.098,
+    "close": 1305.971
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T11:00:00Z",
+   "targetBarTime": "2017-10-16T12:00:00Z",
+   "pUp": 0.45623406767845154,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1305.9765,
+    "high": 1306.077,
+    "low": 1304.1035,
+    "close": 1305.626
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T12:00:00Z",
+   "targetBarTime": "2017-10-16T13:00:00Z",
+   "pUp": 0.47032418847084045,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1305.6265,
+    "high": 1305.7165,
+    "low": 1302.79,
+    "close": 1304.0565
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T13:00:00Z",
+   "targetBarTime": "2017-10-16T14:00:00Z",
+   "pUp": 0.49664556980133057,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1304.045,
+    "high": 1305.0955,
+    "low": 1303.2235,
+    "close": 1303.8245
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T14:00:00Z",
+   "targetBarTime": "2017-10-16T15:00:00Z",
+   "pUp": 0.4963594675064087,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1303.8415,
+    "high": 1304.679,
+    "low": 1302.8645,
+    "close": 1303.6315
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T15:00:00Z",
+   "targetBarTime": "2017-10-16T16:00:00Z",
+   "pUp": 0.4984131455421448,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1303.6215,
+    "high": 1303.9435,
+    "low": 1303.0245,
+    "close": 1303.62
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T16:00:00Z",
+   "targetBarTime": "2017-10-16T17:00:00Z",
+   "pUp": 0.49826663732528687,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1303.62,
+    "high": 1303.625,
+    "low": 1298.9265,
+    "close": 1300.689
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T17:00:00Z",
+   "targetBarTime": "2017-10-16T18:00:00Z",
+   "pUp": 0.5399100184440613,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1300.6905,
+    "high": 1301.372,
+    "low": 1295.33,
+    "close": 1295.4815
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T18:00:00Z",
+   "targetBarTime": "2017-10-16T19:00:00Z",
+   "pUp": 0.5879065990447998,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1295.43,
+    "high": 1295.43,
+    "low": 1290.597,
+    "close": 1294.725
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T19:00:00Z",
+   "targetBarTime": "2017-10-16T20:00:00Z",
+   "pUp": 0.5729681849479675,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1294.745,
+    "high": 1295.7065,
+    "low": 1294.116,
+    "close": 1295.21
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T20:00:00Z",
+   "targetBarTime": "2017-10-16T22:00:00Z",
+   "pUp": 0.5361299514770508,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1295.22,
+    "high": 1296.3635,
+    "low": 1295.149,
+    "close": 1295.775
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T22:00:00Z",
+   "targetBarTime": "2017-10-16T23:00:00Z",
+   "pUp": 0.5459914803504944,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1295.775,
+    "high": 1295.9155,
+    "low": 1294.235,
+    "close": 1295.1
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-16T23:00:00Z",
+   "targetBarTime": "2017-10-17T00:00:00Z",
+   "pUp": 0.5469427704811096,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1295.1085,
+    "high": 1295.1085,
+    "low": 1293.298,
+    "close": 1293.9235
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T00:00:00Z",
+   "targetBarTime": "2017-10-17T01:00:00Z",
+   "pUp": 0.5481172800064087,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.9185,
+    "high": 1295.334,
+    "low": 1292.455,
+    "close": 1292.875
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T01:00:00Z",
+   "targetBarTime": "2017-10-17T02:00:00Z",
+   "pUp": 0.5416429042816162,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1292.89,
+    "high": 1293.8115,
+    "low": 1292.7865,
+    "close": 1293.679
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T02:00:00Z",
+   "targetBarTime": "2017-10-17T03:00:00Z",
+   "pUp": 0.5098751783370972,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.685,
+    "high": 1293.9105,
+    "low": 1292.9365,
+    "close": 1293.205
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T03:00:00Z",
+   "targetBarTime": "2017-10-17T04:00:00Z",
+   "pUp": 0.5027816295623779,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1293.215,
+    "high": 1293.2305,
+    "low": 1292.1915,
+    "close": 1292.81
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T04:00:00Z",
+   "targetBarTime": "2017-10-17T05:00:00Z",
+   "pUp": 0.49345889687538147,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1292.815,
+    "high": 1293.0305,
+    "low": 1291.206,
+    "close": 1292.012
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T05:00:00Z",
+   "targetBarTime": "2017-10-17T06:00:00Z",
+   "pUp": 0.49278220534324646,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1292.022,
+    "high": 1292.122,
+    "low": 1288.045,
+    "close": 1289.6965
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T06:00:00Z",
+   "targetBarTime": "2017-10-17T07:00:00Z",
+   "pUp": 0.5107919573783875,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.695,
+    "high": 1290.9015,
+    "low": 1289.023,
+    "close": 1290.461
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T07:00:00Z",
+   "targetBarTime": "2017-10-17T08:00:00Z",
+   "pUp": 0.48268696665763855,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1290.4625,
+    "high": 1290.66,
+    "low": 1288.7645,
+    "close": 1289.489
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T08:00:00Z",
+   "targetBarTime": "2017-10-17T09:00:00Z",
+   "pUp": 0.4852342903614044,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1289.493,
+    "high": 1290.222,
+    "low": 1288.689,
+    "close": 1288.769
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T09:00:00Z",
+   "targetBarTime": "2017-10-17T10:00:00Z",
+   "pUp": 0.4842189848423004,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.7685,
+    "high": 1290.299,
+    "low": 1287.53,
+    "close": 1288.9565
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T10:00:00Z",
+   "targetBarTime": "2017-10-17T11:00:00Z",
+   "pUp": 0.4754064679145813,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.967,
+    "high": 1290.0835,
+    "low": 1287.6195,
+    "close": 1289.425
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T11:00:00Z",
+   "targetBarTime": "2017-10-17T12:00:00Z",
+   "pUp": 0.4685782492160797,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1289.421,
+    "high": 1289.525,
+    "low": 1283.97,
+    "close": 1284.28
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T12:00:00Z",
+   "targetBarTime": "2017-10-17T13:00:00Z",
+   "pUp": 0.535792887210846,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1284.285,
+    "high": 1286.3895,
+    "low": 1283.765,
+    "close": 1284.87
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T13:00:00Z",
+   "targetBarTime": "2017-10-17T14:00:00Z",
+   "pUp": 0.5072422027587891,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1284.859,
+    "high": 1286.4595,
+    "low": 1283.8755,
+    "close": 1284.9485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T14:00:00Z",
+   "targetBarTime": "2017-10-17T15:00:00Z",
+   "pUp": 0.49927374720573425,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.958,
+    "high": 1285.315,
+    "low": 1281.568,
+    "close": 1284.335
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T15:00:00Z",
+   "targetBarTime": "2017-10-17T16:00:00Z",
+   "pUp": 0.5052825808525085,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1284.34,
+    "high": 1286.1155,
+    "low": 1284.2145,
+    "close": 1285.1
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T16:00:00Z",
+   "targetBarTime": "2017-10-17T17:00:00Z",
+   "pUp": 0.491641640663147,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1285.09,
+    "high": 1285.594,
+    "low": 1284.08,
+    "close": 1285.1885
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T17:00:00Z",
+   "targetBarTime": "2017-10-17T18:00:00Z",
+   "pUp": 0.49217700958251953,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1285.215,
+    "high": 1287.5745,
+    "low": 1285.0595,
+    "close": 1286.795
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T18:00:00Z",
+   "targetBarTime": "2017-10-17T19:00:00Z",
+   "pUp": 0.47546762228012085,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1286.79,
+    "high": 1286.983,
+    "low": 1285.1,
+    "close": 1285.695
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T19:00:00Z",
+   "targetBarTime": "2017-10-17T20:00:00Z",
+   "pUp": 0.4997374713420868,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1285.71,
+    "high": 1286.632,
+    "low": 1284.956,
+    "close": 1285.215
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T20:00:00Z",
+   "targetBarTime": "2017-10-17T22:00:00Z",
+   "pUp": 0.5104514360427856,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1285.09,
+    "high": 1286.0805,
+    "low": 1284.94,
+    "close": 1285.655
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T22:00:00Z",
+   "targetBarTime": "2017-10-17T23:00:00Z",
+   "pUp": 0.5027858018875122,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1285.66,
+    "high": 1286.5015,
+    "low": 1285.5345,
+    "close": 1286.045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-17T23:00:00Z",
+   "targetBarTime": "2017-10-18T00:00:00Z",
+   "pUp": 0.49608200788497925,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.045,
+    "high": 1287.04,
+    "low": 1285.8695,
+    "close": 1286.741
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T00:00:00Z",
+   "targetBarTime": "2017-10-18T01:00:00Z",
+   "pUp": 0.48628145456314087,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.747,
+    "high": 1288.13,
+    "low": 1285.772,
+    "close": 1287.715
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T01:00:00Z",
+   "targetBarTime": "2017-10-18T02:00:00Z",
+   "pUp": 0.4738175868988037,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1287.6535,
+    "high": 1288.9615,
+    "low": 1287.638,
+    "close": 1287.905
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T02:00:00Z",
+   "targetBarTime": "2017-10-18T03:00:00Z",
+   "pUp": 0.4737181067466736,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1287.9,
+    "high": 1288.049,
+    "low": 1286.088,
+    "close": 1286.89
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T03:00:00Z",
+   "targetBarTime": "2017-10-18T04:00:00Z",
+   "pUp": 0.4854184091091156,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1286.92,
+    "high": 1287.0105,
+    "low": 1286.335,
+    "close": 1286.4565
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T04:00:00Z",
+   "targetBarTime": "2017-10-18T05:00:00Z",
+   "pUp": 0.4816518723964691,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1286.4415,
+    "high": 1286.695,
+    "low": 1283.182,
+    "close": 1284.2865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T05:00:00Z",
+   "targetBarTime": "2017-10-18T06:00:00Z",
+   "pUp": 0.5012974143028259,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.281,
+    "high": 1284.782,
+    "low": 1282.7395,
+    "close": 1283.0765
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T06:00:00Z",
+   "targetBarTime": "2017-10-18T07:00:00Z",
+   "pUp": 0.498148649930954,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1283.065,
+    "high": 1284.062,
+    "low": 1282.4645,
+    "close": 1283.12
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T07:00:00Z",
+   "targetBarTime": "2017-10-18T08:00:00Z",
+   "pUp": 0.48195111751556396,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.109,
+    "high": 1283.825,
+    "low": 1280.6095,
+    "close": 1281.2215
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T08:00:00Z",
+   "targetBarTime": "2017-10-18T09:00:00Z",
+   "pUp": 0.49858352541923523,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.2165,
+    "high": 1281.675,
+    "low": 1279.3995,
+    "close": 1280.4215
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T09:00:00Z",
+   "targetBarTime": "2017-10-18T10:00:00Z",
+   "pUp": 0.4939369857311249,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1280.421,
+    "high": 1281.2395,
+    "low": 1279.5515,
+    "close": 1279.555
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T10:00:00Z",
+   "targetBarTime": "2017-10-18T11:00:00Z",
+   "pUp": 0.49396130442619324,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.5665,
+    "high": 1280.56,
+    "low": 1278.9445,
+    "close": 1279.14
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T11:00:00Z",
+   "targetBarTime": "2017-10-18T12:00:00Z",
+   "pUp": 0.4902132749557495,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.143,
+    "high": 1280.2045,
+    "low": 1277.077,
+    "close": 1280.045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T12:00:00Z",
+   "targetBarTime": "2017-10-18T13:00:00Z",
+   "pUp": 0.47596117854118347,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.04,
+    "high": 1283.5865,
+    "low": 1279.695,
+    "close": 1280.115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T13:00:00Z",
+   "targetBarTime": "2017-10-18T14:00:00Z",
+   "pUp": 0.48034849762916565,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.11,
+    "high": 1282.005,
+    "low": 1279.615,
+    "close": 1280.876
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T14:00:00Z",
+   "targetBarTime": "2017-10-18T15:00:00Z",
+   "pUp": 0.4740874767303467,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.866,
+    "high": 1281.2145,
+    "low": 1279.96,
+    "close": 1281.145
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T15:00:00Z",
+   "targetBarTime": "2017-10-18T16:00:00Z",
+   "pUp": 0.47586050629615784,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.15,
+    "high": 1282.5565,
+    "low": 1280.87,
+    "close": 1281.175
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T16:00:00Z",
+   "targetBarTime": "2017-10-18T17:00:00Z",
+   "pUp": 0.4826861321926117,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.2,
+    "high": 1281.677,
+    "low": 1280.5895,
+    "close": 1281.305
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T17:00:00Z",
+   "targetBarTime": "2017-10-18T18:00:00Z",
+   "pUp": 0.486230731010437,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.305,
+    "high": 1282.1805,
+    "low": 1281.066,
+    "close": 1281.623
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T18:00:00Z",
+   "targetBarTime": "2017-10-18T19:00:00Z",
+   "pUp": 0.48677921295166016,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.605,
+    "high": 1281.7915,
+    "low": 1280.4395,
+    "close": 1280.849
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T19:00:00Z",
+   "targetBarTime": "2017-10-18T20:00:00Z",
+   "pUp": 0.5028093457221985,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.8435,
+    "high": 1281.195,
+    "low": 1280.69,
+    "close": 1280.955
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T20:00:00Z",
+   "targetBarTime": "2017-10-18T22:00:00Z",
+   "pUp": 0.5112974047660828,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.06,
+    "high": 1281.6285,
+    "low": 1280.23,
+    "close": 1280.235
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T22:00:00Z",
+   "targetBarTime": "2017-10-18T23:00:00Z",
+   "pUp": 0.5216755867004395,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.225,
+    "high": 1280.822,
+    "low": 1280.196,
+    "close": 1280.4165
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-18T23:00:00Z",
+   "targetBarTime": "2017-10-19T00:00:00Z",
+   "pUp": 0.5120265483856201,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.415,
+    "high": 1281.8035,
+    "low": 1280.348,
+    "close": 1281.3015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T00:00:00Z",
+   "targetBarTime": "2017-10-19T01:00:00Z",
+   "pUp": 0.49565500020980835,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.301,
+    "high": 1282.0435,
+    "low": 1278.445,
+    "close": 1278.49
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T01:00:00Z",
+   "targetBarTime": "2017-10-19T02:00:00Z",
+   "pUp": 0.5351102352142334,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.4865,
+    "high": 1278.905,
+    "low": 1276.7185,
+    "close": 1277.616
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T02:00:00Z",
+   "targetBarTime": "2017-10-19T03:00:00Z",
+   "pUp": 0.5275041460990906,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.685,
+    "high": 1278.7625,
+    "low": 1277.546,
+    "close": 1278.76
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T03:00:00Z",
+   "targetBarTime": "2017-10-19T04:00:00Z",
+   "pUp": 0.49433407187461853,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.755,
+    "high": 1279.247,
+    "low": 1277.546,
+    "close": 1277.8035
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T04:00:00Z",
+   "targetBarTime": "2017-10-19T05:00:00Z",
+   "pUp": 0.4988664984703064,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.805,
+    "high": 1278.0505,
+    "low": 1276.8115,
+    "close": 1277.914
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T05:00:00Z",
+   "targetBarTime": "2017-10-19T06:00:00Z",
+   "pUp": 0.48745718598365784,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.895,
+    "high": 1281.7055,
+    "low": 1277.5595,
+    "close": 1281.43
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T06:00:00Z",
+   "targetBarTime": "2017-10-19T07:00:00Z",
+   "pUp": 0.4440675675868988,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.4315,
+    "high": 1285.71,
+    "low": 1280.2285,
+    "close": 1285.2335
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T07:00:00Z",
+   "targetBarTime": "2017-10-19T08:00:00Z",
+   "pUp": 0.4222397804260254,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1285.2085,
+    "high": 1286.26,
+    "low": 1282.646,
+    "close": 1284.205
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T08:00:00Z",
+   "targetBarTime": "2017-10-19T09:00:00Z",
+   "pUp": 0.45729386806488037,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1284.2335,
+    "high": 1285.1035,
+    "low": 1283.1935,
+    "close": 1284.7935
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T09:00:00Z",
+   "targetBarTime": "2017-10-19T10:00:00Z",
+   "pUp": 0.4563688039779663,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1284.805,
+    "high": 1287.942,
+    "low": 1284.448,
+    "close": 1285.988
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T10:00:00Z",
+   "targetBarTime": "2017-10-19T11:00:00Z",
+   "pUp": 0.4542202055454254,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1285.9835,
+    "high": 1287.424,
+    "low": 1285.665,
+    "close": 1286.8
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T11:00:00Z",
+   "targetBarTime": "2017-10-19T12:00:00Z",
+   "pUp": 0.4561629295349121,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1286.8,
+    "high": 1289.758,
+    "low": 1284.25,
+    "close": 1284.72
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T12:00:00Z",
+   "targetBarTime": "2017-10-19T13:00:00Z",
+   "pUp": 0.4995296895503998,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1284.74,
+    "high": 1288.3235,
+    "low": 1284.535,
+    "close": 1287.362
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T13:00:00Z",
+   "targetBarTime": "2017-10-19T14:00:00Z",
+   "pUp": 0.46764111518859863,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1287.3215,
+    "high": 1289.8005,
+    "low": 1285.8585,
+    "close": 1287.795
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T14:00:00Z",
+   "targetBarTime": "2017-10-19T15:00:00Z",
+   "pUp": 0.4789312481880188,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1287.8,
+    "high": 1290.1255,
+    "low": 1287.46,
+    "close": 1287.73
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T15:00:00Z",
+   "targetBarTime": "2017-10-19T16:00:00Z",
+   "pUp": 0.4893518388271332,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1287.6945,
+    "high": 1288.5,
+    "low": 1286.65,
+    "close": 1287.7715
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T16:00:00Z",
+   "targetBarTime": "2017-10-19T17:00:00Z",
+   "pUp": 0.49585166573524475,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1287.793,
+    "high": 1288.7755,
+    "low": 1286.7065,
+    "close": 1288.118
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T17:00:00Z",
+   "targetBarTime": "2017-10-19T18:00:00Z",
+   "pUp": 0.49669358134269714,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1288.1185,
+    "high": 1288.2005,
+    "low": 1285.9325,
+    "close": 1286.3515
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T18:00:00Z",
+   "targetBarTime": "2017-10-19T19:00:00Z",
+   "pUp": 0.5268726944923401,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1286.3415,
+    "high": 1289.515,
+    "low": 1285.626,
+    "close": 1288.3635
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T19:00:00Z",
+   "targetBarTime": "2017-10-19T20:00:00Z",
+   "pUp": 0.4990353286266327,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1288.3535,
+    "high": 1290.8155,
+    "low": 1287.4835,
+    "close": 1290.13
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T20:00:00Z",
+   "targetBarTime": "2017-10-19T22:00:00Z",
+   "pUp": 0.4888553321361542,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1289.82,
+    "high": 1290.9155,
+    "low": 1289.4035,
+    "close": 1290.15
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T22:00:00Z",
+   "targetBarTime": "2017-10-19T23:00:00Z",
+   "pUp": 0.5198543071746826,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1290.1265,
+    "high": 1291.175,
+    "low": 1289.728,
+    "close": 1290.175
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-19T23:00:00Z",
+   "targetBarTime": "2017-10-20T00:00:00Z",
+   "pUp": 0.5193146467208862,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1290.16,
+    "high": 1290.6785,
+    "low": 1288.8205,
+    "close": 1289.455
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T00:00:00Z",
+   "targetBarTime": "2017-10-20T01:00:00Z",
+   "pUp": 0.5248744487762451,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1289.445,
+    "high": 1290.1555,
+    "low": 1284.4935,
+    "close": 1284.6265
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T01:00:00Z",
+   "targetBarTime": "2017-10-20T02:00:00Z",
+   "pUp": 0.5766571760177612,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.6315,
+    "high": 1285.884,
+    "low": 1282.725,
+    "close": 1283.7385
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T02:00:00Z",
+   "targetBarTime": "2017-10-20T03:00:00Z",
+   "pUp": 0.5574958920478821,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1283.747,
+    "high": 1284.829,
+    "low": 1283.3495,
+    "close": 1284.575
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T03:00:00Z",
+   "targetBarTime": "2017-10-20T04:00:00Z",
+   "pUp": 0.521787703037262,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.582,
+    "high": 1284.8415,
+    "low": 1283.3445,
+    "close": 1283.3665
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T04:00:00Z",
+   "targetBarTime": "2017-10-20T05:00:00Z",
+   "pUp": 0.5225123763084412,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1283.3765,
+    "high": 1284.187,
+    "low": 1282.945,
+    "close": 1283.875
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T05:00:00Z",
+   "targetBarTime": "2017-10-20T06:00:00Z",
+   "pUp": 0.5008608102798462,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1283.8435,
+    "high": 1284.4885,
+    "low": 1282.2605,
+    "close": 1284.056
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T06:00:00Z",
+   "targetBarTime": "2017-10-20T07:00:00Z",
+   "pUp": 0.4914342164993286,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1284.025,
+    "high": 1285.3305,
+    "low": 1280.175,
+    "close": 1281.138
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T07:00:00Z",
+   "targetBarTime": "2017-10-20T08:00:00Z",
+   "pUp": 0.5246122479438782,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.146,
+    "high": 1281.506,
+    "low": 1279.265,
+    "close": 1281.365
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T08:00:00Z",
+   "targetBarTime": "2017-10-20T09:00:00Z",
+   "pUp": 0.5029643177986145,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.37,
+    "high": 1281.42,
+    "low": 1280.0045,
+    "close": 1280.77
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T09:00:00Z",
+   "targetBarTime": "2017-10-20T10:00:00Z",
+   "pUp": 0.5024082660675049,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.7735,
+    "high": 1282.25,
+    "low": 1279.975,
+    "close": 1282.1485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T10:00:00Z",
+   "targetBarTime": "2017-10-20T11:00:00Z",
+   "pUp": 0.4821430444717407,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.16,
+    "high": 1284.742,
+    "low": 1281.8195,
+    "close": 1283.577
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T11:00:00Z",
+   "targetBarTime": "2017-10-20T12:00:00Z",
+   "pUp": 0.47304466366767883,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.586,
+    "high": 1284.494,
+    "low": 1282.6055,
+    "close": 1283.13
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T12:00:00Z",
+   "targetBarTime": "2017-10-20T13:00:00Z",
+   "pUp": 0.48922374844551086,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.135,
+    "high": 1283.702,
+    "low": 1280.483,
+    "close": 1282.02
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T13:00:00Z",
+   "targetBarTime": "2017-10-20T14:00:00Z",
+   "pUp": 0.5113058686256409,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.035,
+    "high": 1284.148,
+    "low": 1281.1545,
+    "close": 1282.41
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T14:00:00Z",
+   "targetBarTime": "2017-10-20T15:00:00Z",
+   "pUp": 0.5066611766815186,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1282.4,
+    "high": 1282.6905,
+    "low": 1278.4785,
+    "close": 1279.655
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T15:00:00Z",
+   "targetBarTime": "2017-10-20T16:00:00Z",
+   "pUp": 0.5456708669662476,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.6535,
+    "high": 1282.2055,
+    "low": 1278.9735,
+    "close": 1280.495
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T16:00:00Z",
+   "targetBarTime": "2017-10-20T17:00:00Z",
+   "pUp": 0.5253692865371704,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1280.585,
+    "high": 1280.6555,
+    "low": 1278.535,
+    "close": 1279.94
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T17:00:00Z",
+   "targetBarTime": "2017-10-20T18:00:00Z",
+   "pUp": 0.5308956503868103,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.955,
+    "high": 1280.5565,
+    "low": 1278.0315,
+    "close": 1279.42
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T18:00:00Z",
+   "targetBarTime": "2017-10-20T19:00:00Z",
+   "pUp": 0.536796510219574,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.425,
+    "high": 1281.8615,
+    "low": 1278.7345,
+    "close": 1280.2485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T19:00:00Z",
+   "targetBarTime": "2017-10-20T20:00:00Z",
+   "pUp": 0.5253515839576721,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1280.255,
+    "high": 1281.504,
+    "low": 1279.845,
+    "close": 1280.375
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-20T20:00:00Z",
+   "targetBarTime": "2017-10-22T22:00:00Z",
+   "pUp": 0.5357113480567932,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.5965,
+    "high": 1279.625,
+    "low": 1277.0785,
+    "close": 1277.825
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-22T22:00:00Z",
+   "targetBarTime": "2017-10-22T23:00:00Z",
+   "pUp": 0.5746082067489624,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.825,
+    "high": 1278.219,
+    "low": 1274.3865,
+    "close": 1275.102
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-22T23:00:00Z",
+   "targetBarTime": "2017-10-23T00:00:00Z",
+   "pUp": 0.5867929458618164,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.0635,
+    "high": 1276.172,
+    "low": 1274.371,
+    "close": 1276.125
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T00:00:00Z",
+   "targetBarTime": "2017-10-23T01:00:00Z",
+   "pUp": 0.5496515035629272,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.129,
+    "high": 1276.4245,
+    "low": 1274.63,
+    "close": 1276.09
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T01:00:00Z",
+   "targetBarTime": "2017-10-23T02:00:00Z",
+   "pUp": 0.5320908427238464,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.08,
+    "high": 1277.755,
+    "low": 1275.8995,
+    "close": 1276.192
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T02:00:00Z",
+   "targetBarTime": "2017-10-23T03:00:00Z",
+   "pUp": 0.5153835415840149,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.1315,
+    "high": 1276.9855,
+    "low": 1275.5915,
+    "close": 1276.5065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T03:00:00Z",
+   "targetBarTime": "2017-10-23T04:00:00Z",
+   "pUp": 0.5008805394172668,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.505,
+    "high": 1276.6155,
+    "low": 1275.915,
+    "close": 1276.524
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T04:00:00Z",
+   "targetBarTime": "2017-10-23T05:00:00Z",
+   "pUp": 0.49153101444244385,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.535,
+    "high": 1277.1205,
+    "low": 1275.5385,
+    "close": 1276.583
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T05:00:00Z",
+   "targetBarTime": "2017-10-23T06:00:00Z",
+   "pUp": 0.4845239520072937,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.57,
+    "high": 1277.223,
+    "low": 1275.5195,
+    "close": 1275.6035
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T06:00:00Z",
+   "targetBarTime": "2017-10-23T07:00:00Z",
+   "pUp": 0.4910120964050293,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.614,
+    "high": 1276.55,
+    "low": 1274.0845,
+    "close": 1275.49
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T07:00:00Z",
+   "targetBarTime": "2017-10-23T08:00:00Z",
+   "pUp": 0.4834055006504059,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.489,
+    "high": 1276.3185,
+    "low": 1274.611,
+    "close": 1275.412
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T08:00:00Z",
+   "targetBarTime": "2017-10-23T09:00:00Z",
+   "pUp": 0.47796374559402466,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.4115,
+    "high": 1276.7355,
+    "low": 1275.0,
+    "close": 1275.0435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T09:00:00Z",
+   "targetBarTime": "2017-10-23T10:00:00Z",
+   "pUp": 0.47878390550613403,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.0495,
+    "high": 1276.1505,
+    "low": 1274.948,
+    "close": 1275.744
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T10:00:00Z",
+   "targetBarTime": "2017-10-23T11:00:00Z",
+   "pUp": 0.46816152334213257,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.7385,
+    "high": 1276.444,
+    "low": 1275.083,
+    "close": 1275.42
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T11:00:00Z",
+   "targetBarTime": "2017-10-23T12:00:00Z",
+   "pUp": 0.4751858711242676,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.4285,
+    "high": 1275.759,
+    "low": 1272.915,
+    "close": 1273.195
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T12:00:00Z",
+   "targetBarTime": "2017-10-23T13:00:00Z",
+   "pUp": 0.505278468132019,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.2,
+    "high": 1274.9705,
+    "low": 1272.613,
+    "close": 1274.655
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T13:00:00Z",
+   "targetBarTime": "2017-10-23T14:00:00Z",
+   "pUp": 0.48282214999198914,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.69,
+    "high": 1275.3915,
+    "low": 1273.8995,
+    "close": 1274.3035
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T14:00:00Z",
+   "targetBarTime": "2017-10-23T15:00:00Z",
+   "pUp": 0.4906039834022522,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.39,
+    "high": 1281.207,
+    "low": 1273.5005,
+    "close": 1278.9135
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T15:00:00Z",
+   "targetBarTime": "2017-10-23T16:00:00Z",
+   "pUp": 0.45624586939811707,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1278.9185,
+    "high": 1283.0485,
+    "low": 1278.8645,
+    "close": 1281.04
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T16:00:00Z",
+   "targetBarTime": "2017-10-23T17:00:00Z",
+   "pUp": 0.4527018070220947,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.035,
+    "high": 1281.669,
+    "low": 1279.3095,
+    "close": 1279.735
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T17:00:00Z",
+   "targetBarTime": "2017-10-23T18:00:00Z",
+   "pUp": 0.4877581000328064,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.745,
+    "high": 1280.567,
+    "low": 1278.5585,
+    "close": 1279.884
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T18:00:00Z",
+   "targetBarTime": "2017-10-23T19:00:00Z",
+   "pUp": 0.49160292744636536,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.894,
+    "high": 1283.3465,
+    "low": 1279.578,
+    "close": 1282.387
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T19:00:00Z",
+   "targetBarTime": "2017-10-23T20:00:00Z",
+   "pUp": 0.47053655982017517,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1282.3715,
+    "high": 1282.837,
+    "low": 1281.268,
+    "close": 1282.02
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T20:00:00Z",
+   "targetBarTime": "2017-10-23T22:00:00Z",
+   "pUp": 0.4821229577064514,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.15,
+    "high": 1282.5085,
+    "low": 1281.3865,
+    "close": 1282.21
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T22:00:00Z",
+   "targetBarTime": "2017-10-23T23:00:00Z",
+   "pUp": 0.507630467414856,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.21,
+    "high": 1282.975,
+    "low": 1281.6845,
+    "close": 1282.7465
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-23T23:00:00Z",
+   "targetBarTime": "2017-10-24T00:00:00Z",
+   "pUp": 0.5038753151893616,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.755,
+    "high": 1283.7305,
+    "low": 1282.41,
+    "close": 1283.098
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T00:00:00Z",
+   "targetBarTime": "2017-10-24T01:00:00Z",
+   "pUp": 0.49692094326019287,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.09,
+    "high": 1283.5085,
+    "low": 1280.3335,
+    "close": 1281.35
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T01:00:00Z",
+   "targetBarTime": "2017-10-24T02:00:00Z",
+   "pUp": 0.518642783164978,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1281.355,
+    "high": 1282.9345,
+    "low": 1281.155,
+    "close": 1282.57
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T02:00:00Z",
+   "targetBarTime": "2017-10-24T03:00:00Z",
+   "pUp": 0.4889875054359436,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.5435,
+    "high": 1283.4585,
+    "low": 1282.3665,
+    "close": 1282.655
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T03:00:00Z",
+   "targetBarTime": "2017-10-24T04:00:00Z",
+   "pUp": 0.4822433590888977,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1282.655,
+    "high": 1283.22,
+    "low": 1282.2695,
+    "close": 1283.0465
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T04:00:00Z",
+   "targetBarTime": "2017-10-24T05:00:00Z",
+   "pUp": 0.4721736013889313,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1283.05,
+    "high": 1283.2305,
+    "low": 1280.9945,
+    "close": 1281.164
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T05:00:00Z",
+   "targetBarTime": "2017-10-24T06:00:00Z",
+   "pUp": 0.4938192367553711,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.174,
+    "high": 1281.99,
+    "low": 1280.566,
+    "close": 1280.9
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T06:00:00Z",
+   "targetBarTime": "2017-10-24T07:00:00Z",
+   "pUp": 0.483965128660202,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1280.865,
+    "high": 1280.935,
+    "low": 1278.895,
+    "close": 1279.42
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T07:00:00Z",
+   "targetBarTime": "2017-10-24T08:00:00Z",
+   "pUp": 0.4922715127468109,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.45,
+    "high": 1280.0815,
+    "low": 1277.2965,
+    "close": 1278.115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T08:00:00Z",
+   "targetBarTime": "2017-10-24T09:00:00Z",
+   "pUp": 0.4949767291545868,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1278.125,
+    "high": 1279.614,
+    "low": 1277.503,
+    "close": 1279.56
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T09:00:00Z",
+   "targetBarTime": "2017-10-24T10:00:00Z",
+   "pUp": 0.4643592834472656,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.5435,
+    "high": 1279.5485,
+    "low": 1278.203,
+    "close": 1278.4865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T10:00:00Z",
+   "targetBarTime": "2017-10-24T11:00:00Z",
+   "pUp": 0.4777318239212036,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.4965,
+    "high": 1279.638,
+    "low": 1276.335,
+    "close": 1276.715
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T11:00:00Z",
+   "targetBarTime": "2017-10-24T12:00:00Z",
+   "pUp": 0.4968251883983612,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.71,
+    "high": 1278.4905,
+    "low": 1275.8,
+    "close": 1277.46
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T12:00:00Z",
+   "targetBarTime": "2017-10-24T13:00:00Z",
+   "pUp": 0.4799899756908417,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.459,
+    "high": 1278.2555,
+    "low": 1275.63,
+    "close": 1276.691
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T13:00:00Z",
+   "targetBarTime": "2017-10-24T14:00:00Z",
+   "pUp": 0.491037517786026,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.6335,
+    "high": 1278.077,
+    "low": 1273.885,
+    "close": 1274.4235
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T14:00:00Z",
+   "targetBarTime": "2017-10-24T15:00:00Z",
+   "pUp": 0.5195228457450867,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.423,
+    "high": 1276.535,
+    "low": 1273.8045,
+    "close": 1276.12
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T15:00:00Z",
+   "targetBarTime": "2017-10-24T16:00:00Z",
+   "pUp": 0.48826485872268677,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.118,
+    "high": 1276.7635,
+    "low": 1275.5645,
+    "close": 1276.5065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T16:00:00Z",
+   "targetBarTime": "2017-10-24T17:00:00Z",
+   "pUp": 0.48586246371269226,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.5265,
+    "high": 1277.583,
+    "low": 1275.8745,
+    "close": 1276.785
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T17:00:00Z",
+   "targetBarTime": "2017-10-24T18:00:00Z",
+   "pUp": 0.4876194894313812,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.765,
+    "high": 1280.7935,
+    "low": 1276.483,
+    "close": 1280.279
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T18:00:00Z",
+   "targetBarTime": "2017-10-24T19:00:00Z",
+   "pUp": 0.4549403190612793,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1280.2,
+    "high": 1281.382,
+    "low": 1275.88,
+    "close": 1277.4185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T19:00:00Z",
+   "targetBarTime": "2017-10-24T20:00:00Z",
+   "pUp": 0.5162522792816162,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.43,
+    "high": 1277.8235,
+    "low": 1276.3745,
+    "close": 1276.755
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T20:00:00Z",
+   "targetBarTime": "2017-10-24T22:00:00Z",
+   "pUp": 0.5223308801651001,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.84,
+    "high": 1277.539,
+    "low": 1276.4495,
+    "close": 1276.695
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T22:00:00Z",
+   "targetBarTime": "2017-10-24T23:00:00Z",
+   "pUp": 0.5145521759986877,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.695,
+    "high": 1277.0655,
+    "low": 1275.562,
+    "close": 1275.8215
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-24T23:00:00Z",
+   "targetBarTime": "2017-10-25T00:00:00Z",
+   "pUp": 0.5222705602645874,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.816,
+    "high": 1276.709,
+    "low": 1275.1535,
+    "close": 1276.048
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T00:00:00Z",
+   "targetBarTime": "2017-10-25T01:00:00Z",
+   "pUp": 0.5088609457015991,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.0485,
+    "high": 1276.228,
+    "low": 1275.1095,
+    "close": 1275.2565
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T01:00:00Z",
+   "targetBarTime": "2017-10-25T02:00:00Z",
+   "pUp": 0.5115236639976501,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.2615,
+    "high": 1275.504,
+    "low": 1273.995,
+    "close": 1274.44
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T02:00:00Z",
+   "targetBarTime": "2017-10-25T03:00:00Z",
+   "pUp": 0.5112879872322083,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.435,
+    "high": 1274.6235,
+    "low": 1271.7085,
+    "close": 1273.0865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T03:00:00Z",
+   "targetBarTime": "2017-10-25T04:00:00Z",
+   "pUp": 0.5158949494361877,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.09,
+    "high": 1273.5455,
+    "low": 1272.921,
+    "close": 1273.125
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T04:00:00Z",
+   "targetBarTime": "2017-10-25T05:00:00Z",
+   "pUp": 0.49684959650039673,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.11,
+    "high": 1274.583,
+    "low": 1273.0315,
+    "close": 1274.2815
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T05:00:00Z",
+   "targetBarTime": "2017-10-25T06:00:00Z",
+   "pUp": 0.47037142515182495,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.277,
+    "high": 1274.485,
+    "low": 1272.7465,
+    "close": 1273.252
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T06:00:00Z",
+   "targetBarTime": "2017-10-25T07:00:00Z",
+   "pUp": 0.479689359664917,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.247,
+    "high": 1274.067,
+    "low": 1272.2685,
+    "close": 1272.9595
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T07:00:00Z",
+   "targetBarTime": "2017-10-25T08:00:00Z",
+   "pUp": 0.47576016187667847,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.966,
+    "high": 1273.96,
+    "low": 1271.372,
+    "close": 1271.999
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T08:00:00Z",
+   "targetBarTime": "2017-10-25T09:00:00Z",
+   "pUp": 0.4819137454032898,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1271.9985,
+    "high": 1272.9855,
+    "low": 1271.3735,
+    "close": 1272.3815
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T09:00:00Z",
+   "targetBarTime": "2017-10-25T10:00:00Z",
+   "pUp": 0.4691692292690277,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.387,
+    "high": 1273.7705,
+    "low": 1271.8155,
+    "close": 1273.28
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T10:00:00Z",
+   "targetBarTime": "2017-10-25T11:00:00Z",
+   "pUp": 0.4583542048931122,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.3015,
+    "high": 1274.1965,
+    "low": 1272.285,
+    "close": 1273.886
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T11:00:00Z",
+   "targetBarTime": "2017-10-25T12:00:00Z",
+   "pUp": 0.4566704034805298,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.8075,
+    "high": 1273.972,
+    "low": 1271.1005,
+    "close": 1272.488
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T12:00:00Z",
+   "targetBarTime": "2017-10-25T13:00:00Z",
+   "pUp": 0.4833090603351593,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.479,
+    "high": 1279.389,
+    "low": 1272.4785,
+    "close": 1275.975
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T13:00:00Z",
+   "targetBarTime": "2017-10-25T14:00:00Z",
+   "pUp": 0.45314374566078186,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.015,
+    "high": 1277.2,
+    "low": 1272.4045,
+    "close": 1276.0385
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T14:00:00Z",
+   "targetBarTime": "2017-10-25T15:00:00Z",
+   "pUp": 0.46957454085350037,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.994,
+    "high": 1277.527,
+    "low": 1275.451,
+    "close": 1276.26
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T15:00:00Z",
+   "targetBarTime": "2017-10-25T16:00:00Z",
+   "pUp": 0.4748281240463257,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.261,
+    "high": 1280.055,
+    "low": 1276.1445,
+    "close": 1278.298
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T16:00:00Z",
+   "targetBarTime": "2017-10-25T17:00:00Z",
+   "pUp": 0.46048903465270996,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.2985,
+    "high": 1278.614,
+    "low": 1275.753,
+    "close": 1276.585
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T17:00:00Z",
+   "targetBarTime": "2017-10-25T18:00:00Z",
+   "pUp": 0.4972812831401825,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.5935,
+    "high": 1278.2605,
+    "low": 1276.035,
+    "close": 1277.51
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T18:00:00Z",
+   "targetBarTime": "2017-10-25T19:00:00Z",
+   "pUp": 0.48585042357444763,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.52,
+    "high": 1278.594,
+    "low": 1277.52,
+    "close": 1277.5885
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T19:00:00Z",
+   "targetBarTime": "2017-10-25T20:00:00Z",
+   "pUp": 0.49019843339920044,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.615,
+    "high": 1277.7365,
+    "low": 1277.0945,
+    "close": 1277.395
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T20:00:00Z",
+   "targetBarTime": "2017-10-25T22:00:00Z",
+   "pUp": 0.5072115659713745,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.39,
+    "high": 1279.385,
+    "low": 1277.323,
+    "close": 1279.045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T22:00:00Z",
+   "targetBarTime": "2017-10-25T23:00:00Z",
+   "pUp": 0.4876198470592499,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.06,
+    "high": 1279.619,
+    "low": 1278.9195,
+    "close": 1279.359
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-25T23:00:00Z",
+   "targetBarTime": "2017-10-26T00:00:00Z",
+   "pUp": 0.48806390166282654,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1279.384,
+    "high": 1279.6335,
+    "low": 1278.49,
+    "close": 1279.3
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T00:00:00Z",
+   "targetBarTime": "2017-10-26T01:00:00Z",
+   "pUp": 0.49220114946365356,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.3,
+    "high": 1281.1565,
+    "low": 1278.7095,
+    "close": 1280.3965
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T01:00:00Z",
+   "targetBarTime": "2017-10-26T02:00:00Z",
+   "pUp": 0.47931867837905884,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1280.402,
+    "high": 1281.0185,
+    "low": 1279.206,
+    "close": 1279.4985
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T02:00:00Z",
+   "targetBarTime": "2017-10-26T03:00:00Z",
+   "pUp": 0.49377813935279846,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.5035,
+    "high": 1280.4255,
+    "low": 1279.4045,
+    "close": 1279.83
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T03:00:00Z",
+   "targetBarTime": "2017-10-26T04:00:00Z",
+   "pUp": 0.4838305711746216,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.84,
+    "high": 1280.2985,
+    "low": 1279.5985,
+    "close": 1279.9835
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T04:00:00Z",
+   "targetBarTime": "2017-10-26T05:00:00Z",
+   "pUp": 0.47772231698036194,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1279.98,
+    "high": 1282.604,
+    "low": 1279.588,
+    "close": 1281.445
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T05:00:00Z",
+   "targetBarTime": "2017-10-26T06:00:00Z",
+   "pUp": 0.4599300026893616,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1281.4465,
+    "high": 1281.5505,
+    "low": 1279.8465,
+    "close": 1280.363
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T06:00:00Z",
+   "targetBarTime": "2017-10-26T07:00:00Z",
+   "pUp": 0.4754592180252075,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1280.37,
+    "high": 1280.3855,
+    "low": 1276.6945,
+    "close": 1277.1
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T07:00:00Z",
+   "targetBarTime": "2017-10-26T08:00:00Z",
+   "pUp": 0.5128894448280334,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.117,
+    "high": 1278.5215,
+    "low": 1276.838,
+    "close": 1278.045
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T08:00:00Z",
+   "targetBarTime": "2017-10-26T09:00:00Z",
+   "pUp": 0.4828389286994934,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.03,
+    "high": 1278.232,
+    "low": 1277.136,
+    "close": 1277.9585
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T09:00:00Z",
+   "targetBarTime": "2017-10-26T10:00:00Z",
+   "pUp": 0.47944092750549316,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1277.9585,
+    "high": 1279.2965,
+    "low": 1277.835,
+    "close": 1278.306
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T10:00:00Z",
+   "targetBarTime": "2017-10-26T11:00:00Z",
+   "pUp": 0.47473278641700745,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.3115,
+    "high": 1278.504,
+    "low": 1275.41,
+    "close": 1275.755
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T11:00:00Z",
+   "targetBarTime": "2017-10-26T12:00:00Z",
+   "pUp": 0.5108884572982788,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.8155,
+    "high": 1278.016,
+    "low": 1272.65,
+    "close": 1277.9665
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T12:00:00Z",
+   "targetBarTime": "2017-10-26T13:00:00Z",
+   "pUp": 0.47995296120643616,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.0065,
+    "high": 1280.0555,
+    "low": 1273.8265,
+    "close": 1274.3
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T13:00:00Z",
+   "targetBarTime": "2017-10-26T14:00:00Z",
+   "pUp": 0.5354461669921875,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1274.29,
+    "high": 1275.747,
+    "low": 1273.5595,
+    "close": 1273.9415
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T14:00:00Z",
+   "targetBarTime": "2017-10-26T15:00:00Z",
+   "pUp": 0.5240430235862732,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.9215,
+    "high": 1274.2935,
+    "low": 1271.9785,
+    "close": 1273.763
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T15:00:00Z",
+   "targetBarTime": "2017-10-26T16:00:00Z",
+   "pUp": 0.5199417471885681,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.7725,
+    "high": 1273.945,
+    "low": 1268.8645,
+    "close": 1270.4715
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T16:00:00Z",
+   "targetBarTime": "2017-10-26T17:00:00Z",
+   "pUp": 0.5605125427246094,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.456,
+    "high": 1270.4715,
+    "low": 1266.6545,
+    "close": 1267.571
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T17:00:00Z",
+   "targetBarTime": "2017-10-26T18:00:00Z",
+   "pUp": 0.5778809189796448,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1267.5715,
+    "high": 1268.974,
+    "low": 1267.0915,
+    "close": 1268.675
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T18:00:00Z",
+   "targetBarTime": "2017-10-26T19:00:00Z",
+   "pUp": 0.5395474433898926,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1268.68,
+    "high": 1268.78,
+    "low": 1265.777,
+    "close": 1266.985
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T19:00:00Z",
+   "targetBarTime": "2017-10-26T20:00:00Z",
+   "pUp": 0.5564626455307007,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.0665,
+    "high": 1267.987,
+    "low": 1266.546,
+    "close": 1267.065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T20:00:00Z",
+   "targetBarTime": "2017-10-26T22:00:00Z",
+   "pUp": 0.5443931221961975,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.25,
+    "high": 1268.2065,
+    "low": 1266.7685,
+    "close": 1266.865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T22:00:00Z",
+   "targetBarTime": "2017-10-26T23:00:00Z",
+   "pUp": 0.5361373424530029,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1266.875,
+    "high": 1267.3605,
+    "low": 1266.15,
+    "close": 1267.2315
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-26T23:00:00Z",
+   "targetBarTime": "2017-10-27T00:00:00Z",
+   "pUp": 0.5239153504371643,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.23,
+    "high": 1268.04,
+    "low": 1266.56,
+    "close": 1266.9965
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T00:00:00Z",
+   "targetBarTime": "2017-10-27T01:00:00Z",
+   "pUp": 0.5223433375358582,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1267.002,
+    "high": 1267.3235,
+    "low": 1265.5045,
+    "close": 1267.1
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T01:00:00Z",
+   "targetBarTime": "2017-10-27T02:00:00Z",
+   "pUp": 0.5133569240570068,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1267.129,
+    "high": 1267.865,
+    "low": 1266.428,
+    "close": 1267.693
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T02:00:00Z",
+   "targetBarTime": "2017-10-27T03:00:00Z",
+   "pUp": 0.5003214478492737,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1267.6795,
+    "high": 1268.69,
+    "low": 1267.3045,
+    "close": 1268.12
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T03:00:00Z",
+   "targetBarTime": "2017-10-27T04:00:00Z",
+   "pUp": 0.49132177233695984,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1268.12,
+    "high": 1268.2285,
+    "low": 1267.4835,
+    "close": 1267.685
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T04:00:00Z",
+   "targetBarTime": "2017-10-27T05:00:00Z",
+   "pUp": 0.4932780861854553,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.685,
+    "high": 1267.9105,
+    "low": 1266.7195,
+    "close": 1267.499
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T05:00:00Z",
+   "targetBarTime": "2017-10-27T06:00:00Z",
+   "pUp": 0.4902382493019104,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.494,
+    "high": 1267.51,
+    "low": 1264.983,
+    "close": 1265.9785
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T06:00:00Z",
+   "targetBarTime": "2017-10-27T07:00:00Z",
+   "pUp": 0.5048812031745911,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1265.979,
+    "high": 1267.6435,
+    "low": 1264.855,
+    "close": 1267.44
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T07:00:00Z",
+   "targetBarTime": "2017-10-27T08:00:00Z",
+   "pUp": 0.47782284021377563,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.435,
+    "high": 1269.137,
+    "low": 1266.8235,
+    "close": 1267.114
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T08:00:00Z",
+   "targetBarTime": "2017-10-27T09:00:00Z",
+   "pUp": 0.4838482141494751,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1267.13,
+    "high": 1268.274,
+    "low": 1267.0,
+    "close": 1267.92
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T09:00:00Z",
+   "targetBarTime": "2017-10-27T10:00:00Z",
+   "pUp": 0.4728945791721344,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.835,
+    "high": 1268.5515,
+    "low": 1266.9695,
+    "close": 1267.38
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T10:00:00Z",
+   "targetBarTime": "2017-10-27T11:00:00Z",
+   "pUp": 0.48579370975494385,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1267.38,
+    "high": 1267.9315,
+    "low": 1265.8895,
+    "close": 1266.535
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T11:00:00Z",
+   "targetBarTime": "2017-10-27T12:00:00Z",
+   "pUp": 0.49754786491394043,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1266.54,
+    "high": 1267.5805,
+    "low": 1263.7135,
+    "close": 1265.5215
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T12:00:00Z",
+   "targetBarTime": "2017-10-27T13:00:00Z",
+   "pUp": 0.5117537379264832,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1265.522,
+    "high": 1268.644,
+    "low": 1265.22,
+    "close": 1266.065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T13:00:00Z",
+   "targetBarTime": "2017-10-27T14:00:00Z",
+   "pUp": 0.5052335262298584,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1266.025,
+    "high": 1273.0855,
+    "low": 1265.5945,
+    "close": 1269.5
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T14:00:00Z",
+   "targetBarTime": "2017-10-27T15:00:00Z",
+   "pUp": 0.4817829430103302,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.505,
+    "high": 1271.7965,
+    "low": 1268.8065,
+    "close": 1270.95
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T15:00:00Z",
+   "targetBarTime": "2017-10-27T16:00:00Z",
+   "pUp": 0.48114752769470215,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.945,
+    "high": 1272.03,
+    "low": 1269.8665,
+    "close": 1270.1485
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T16:00:00Z",
+   "targetBarTime": "2017-10-27T17:00:00Z",
+   "pUp": 0.5069753527641296,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.06,
+    "high": 1271.2555,
+    "low": 1270.0595,
+    "close": 1270.9015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T17:00:00Z",
+   "targetBarTime": "2017-10-27T18:00:00Z",
+   "pUp": 0.5038723945617676,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.8915,
+    "high": 1273.33,
+    "low": 1270.5135,
+    "close": 1272.72
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T18:00:00Z",
+   "targetBarTime": "2017-10-27T19:00:00Z",
+   "pUp": 0.49104762077331543,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.725,
+    "high": 1273.8705,
+    "low": 1272.2385,
+    "close": 1272.924
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T19:00:00Z",
+   "targetBarTime": "2017-10-27T20:00:00Z",
+   "pUp": 0.50071120262146,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1272.92,
+    "high": 1274.2025,
+    "low": 1272.238,
+    "close": 1274.06
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-27T20:00:00Z",
+   "targetBarTime": "2017-10-29T22:00:00Z",
+   "pUp": 0.5042524933815002,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.08,
+    "high": 1273.899,
+    "low": 1272.128,
+    "close": 1272.625
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-29T22:00:00Z",
+   "targetBarTime": "2017-10-29T23:00:00Z",
+   "pUp": 0.5413150191307068,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.67,
+    "high": 1274.04,
+    "low": 1272.0705,
+    "close": 1272.482
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-29T23:00:00Z",
+   "targetBarTime": "2017-10-30T00:00:00Z",
+   "pUp": 0.5341464281082153,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.4715,
+    "high": 1272.9515,
+    "low": 1270.7165,
+    "close": 1272.107
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T00:00:00Z",
+   "targetBarTime": "2017-10-30T01:00:00Z",
+   "pUp": 0.530402421951294,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.11,
+    "high": 1272.295,
+    "low": 1270.9695,
+    "close": 1271.466
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T01:00:00Z",
+   "targetBarTime": "2017-10-30T02:00:00Z",
+   "pUp": 0.5256471633911133,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.472,
+    "high": 1272.6645,
+    "low": 1270.8635,
+    "close": 1271.043
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T02:00:00Z",
+   "targetBarTime": "2017-10-30T03:00:00Z",
+   "pUp": 0.5182252526283264,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1271.01,
+    "high": 1271.905,
+    "low": 1270.8795,
+    "close": 1271.48
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T03:00:00Z",
+   "targetBarTime": "2017-10-30T04:00:00Z",
+   "pUp": 0.4991961419582367,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1271.48,
+    "high": 1271.914,
+    "low": 1271.305,
+    "close": 1271.8235
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T04:00:00Z",
+   "targetBarTime": "2017-10-30T05:00:00Z",
+   "pUp": 0.4851071238517761,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.8185,
+    "high": 1271.8755,
+    "low": 1271.198,
+    "close": 1271.2985
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T05:00:00Z",
+   "targetBarTime": "2017-10-30T06:00:00Z",
+   "pUp": 0.4862474203109741,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.289,
+    "high": 1271.3005,
+    "low": 1269.482,
+    "close": 1269.895
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T06:00:00Z",
+   "targetBarTime": "2017-10-30T07:00:00Z",
+   "pUp": 0.4977557063102722,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.895,
+    "high": 1270.0385,
+    "low": 1269.038,
+    "close": 1269.889
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T07:00:00Z",
+   "targetBarTime": "2017-10-30T08:00:00Z",
+   "pUp": 0.48492100834846497,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.869,
+    "high": 1271.055,
+    "low": 1269.2985,
+    "close": 1270.645
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T08:00:00Z",
+   "targetBarTime": "2017-10-30T09:00:00Z",
+   "pUp": 0.469818115234375,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.615,
+    "high": 1271.905,
+    "low": 1270.546,
+    "close": 1271.133
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T09:00:00Z",
+   "targetBarTime": "2017-10-30T10:00:00Z",
+   "pUp": 0.46483275294303894,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1271.1295,
+    "high": 1272.574,
+    "low": 1271.021,
+    "close": 1271.865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T10:00:00Z",
+   "targetBarTime": "2017-10-30T11:00:00Z",
+   "pUp": 0.4594994783401489,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.86,
+    "high": 1272.1755,
+    "low": 1270.7045,
+    "close": 1270.805
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T11:00:00Z",
+   "targetBarTime": "2017-10-30T12:00:00Z",
+   "pUp": 0.4782070219516754,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.78,
+    "high": 1271.9255,
+    "low": 1269.838,
+    "close": 1270.2585
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T12:00:00Z",
+   "targetBarTime": "2017-10-30T13:00:00Z",
+   "pUp": 0.48735156655311584,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.2605,
+    "high": 1274.8205,
+    "low": 1270.025,
+    "close": 1273.645
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T13:00:00Z",
+   "targetBarTime": "2017-10-30T14:00:00Z",
+   "pUp": 0.456808865070343,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.66,
+    "high": 1273.97,
+    "low": 1271.9095,
+    "close": 1273.2815
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T14:00:00Z",
+   "targetBarTime": "2017-10-30T15:00:00Z",
+   "pUp": 0.47439879179000854,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.3535,
+    "high": 1275.305,
+    "low": 1272.0315,
+    "close": 1274.47
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T15:00:00Z",
+   "targetBarTime": "2017-10-30T16:00:00Z",
+   "pUp": 0.47099122405052185,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1274.465,
+    "high": 1278.89,
+    "low": 1274.315,
+    "close": 1278.166
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T16:00:00Z",
+   "targetBarTime": "2017-10-30T17:00:00Z",
+   "pUp": 0.4470418393611908,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1278.1615,
+    "high": 1278.54,
+    "low": 1276.3,
+    "close": 1276.7435
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T17:00:00Z",
+   "targetBarTime": "2017-10-30T18:00:00Z",
+   "pUp": 0.48584097623825073,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.74,
+    "high": 1277.4505,
+    "low": 1275.32,
+    "close": 1276.06
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T18:00:00Z",
+   "targetBarTime": "2017-10-30T19:00:00Z",
+   "pUp": 0.5013015866279602,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.065,
+    "high": 1277.12,
+    "low": 1275.48,
+    "close": 1275.6385
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T19:00:00Z",
+   "targetBarTime": "2017-10-30T20:00:00Z",
+   "pUp": 0.5078736543655396,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.639,
+    "high": 1276.644,
+    "low": 1275.6145,
+    "close": 1276.305
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T20:00:00Z",
+   "targetBarTime": "2017-10-30T22:00:00Z",
+   "pUp": 0.5030068755149841,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.52,
+    "high": 1276.5765,
+    "low": 1275.601,
+    "close": 1276.205
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T22:00:00Z",
+   "targetBarTime": "2017-10-30T23:00:00Z",
+   "pUp": 0.5054423809051514,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.215,
+    "high": 1277.5585,
+    "low": 1275.602,
+    "close": 1277.243
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-30T23:00:00Z",
+   "targetBarTime": "2017-10-31T00:00:00Z",
+   "pUp": 0.4942711591720581,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.2435,
+    "high": 1277.564,
+    "low": 1276.035,
+    "close": 1276.25
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T00:00:00Z",
+   "targetBarTime": "2017-10-31T01:00:00Z",
+   "pUp": 0.5097327828407288,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.253,
+    "high": 1276.433,
+    "low": 1275.005,
+    "close": 1275.42
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T01:00:00Z",
+   "targetBarTime": "2017-10-31T02:00:00Z",
+   "pUp": 0.5130972862243652,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.43,
+    "high": 1276.2435,
+    "low": 1275.2995,
+    "close": 1276.115
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T02:00:00Z",
+   "targetBarTime": "2017-10-31T03:00:00Z",
+   "pUp": 0.49230068922042847,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.118,
+    "high": 1276.1185,
+    "low": 1275.056,
+    "close": 1275.78
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T03:00:00Z",
+   "targetBarTime": "2017-10-31T04:00:00Z",
+   "pUp": 0.49007925391197205,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.7985,
+    "high": 1275.8155,
+    "low": 1275.11,
+    "close": 1275.3185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T04:00:00Z",
+   "targetBarTime": "2017-10-31T05:00:00Z",
+   "pUp": 0.4860125780105591,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1275.314,
+    "high": 1276.95,
+    "low": 1275.2615,
+    "close": 1276.4465
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T05:00:00Z",
+   "targetBarTime": "2017-10-31T06:00:00Z",
+   "pUp": 0.46528369188308716,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1276.4665,
+    "high": 1278.2085,
+    "low": 1276.37,
+    "close": 1277.455
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T06:00:00Z",
+   "targetBarTime": "2017-10-31T07:00:00Z",
+   "pUp": 0.4514179527759552,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.45,
+    "high": 1277.457,
+    "low": 1275.855,
+    "close": 1277.0465
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T07:00:00Z",
+   "targetBarTime": "2017-10-31T08:00:00Z",
+   "pUp": 0.45983827114105225,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1277.05,
+    "high": 1277.64,
+    "low": 1275.928,
+    "close": 1276.365
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T08:00:00Z",
+   "targetBarTime": "2017-10-31T09:00:00Z",
+   "pUp": 0.4684455990791321,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1276.366,
+    "high": 1276.4855,
+    "low": 1275.045,
+    "close": 1275.6185
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T09:00:00Z",
+   "targetBarTime": "2017-10-31T10:00:00Z",
+   "pUp": 0.47410982847213745,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1275.605,
+    "high": 1275.79,
+    "low": 1272.5785,
+    "close": 1273.0015
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T10:00:00Z",
+   "targetBarTime": "2017-10-31T11:00:00Z",
+   "pUp": 0.5041008591651917,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1273.005,
+    "high": 1273.7705,
+    "low": 1272.305,
+    "close": 1273.759
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T11:00:00Z",
+   "targetBarTime": "2017-10-31T12:00:00Z",
+   "pUp": 0.4796908497810364,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1273.7635,
+    "high": 1274.594,
+    "low": 1271.46,
+    "close": 1272.48
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T12:00:00Z",
+   "targetBarTime": "2017-10-31T13:00:00Z",
+   "pUp": 0.4952000677585602,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1272.4735,
+    "high": 1272.9265,
+    "low": 1271.153,
+    "close": 1271.7
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T13:00:00Z",
+   "targetBarTime": "2017-10-31T14:00:00Z",
+   "pUp": 0.5000498294830322,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.72,
+    "high": 1271.756,
+    "low": 1267.7645,
+    "close": 1269.2865
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T14:00:00Z",
+   "targetBarTime": "2017-10-31T15:00:00Z",
+   "pUp": 0.5263111591339111,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.291,
+    "high": 1271.0565,
+    "low": 1269.291,
+    "close": 1269.8415
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T15:00:00Z",
+   "targetBarTime": "2017-10-31T16:00:00Z",
+   "pUp": 0.5052686333656311,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1269.841,
+    "high": 1270.0755,
+    "low": 1269.098,
+    "close": 1269.475
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T16:00:00Z",
+   "targetBarTime": "2017-10-31T17:00:00Z",
+   "pUp": 0.5056895613670349,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1269.47,
+    "high": 1270.7465,
+    "low": 1268.5595,
+    "close": 1270.285
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T17:00:00Z",
+   "targetBarTime": "2017-10-31T18:00:00Z",
+   "pUp": 0.4934651851654053,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.3415,
+    "high": 1271.2265,
+    "low": 1270.2285,
+    "close": 1270.59
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T18:00:00Z",
+   "targetBarTime": "2017-10-31T19:00:00Z",
+   "pUp": 0.49157804250717163,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.592,
+    "high": 1272.162,
+    "low": 1270.055,
+    "close": 1270.765
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T19:00:00Z",
+   "targetBarTime": "2017-10-31T20:00:00Z",
+   "pUp": 0.4948340654373169,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1270.7685,
+    "high": 1271.3985,
+    "low": 1270.7285,
+    "close": 1271.065
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T20:00:00Z",
+   "targetBarTime": "2017-10-31T22:00:00Z",
+   "pUp": 0.49574822187423706,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1271.145,
+    "high": 1271.2755,
+    "low": 1270.5035,
+    "close": 1270.54
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  },
+  {
+   "barTime": "2017-10-31T22:00:00Z",
+   "targetBarTime": "2017-10-31T23:00:00Z",
+   "pUp": 0.5066206455230713,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1270.54,
+    "high": 1270.758,
+    "low": 1269.8215,
+    "close": 1270.0655
+   },
+   "scored": true,
+   "model": "XAU_USD-1h-test2017"
+  }
+ ]
+}

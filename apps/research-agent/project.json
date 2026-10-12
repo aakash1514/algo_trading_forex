@@ -1,0 +1,63 @@
+{
+  "name": "research-agent",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/research-agent/src",
+  "projectType": "application",
+  "tags": ["lang:python"],
+  "targets": {
+    "setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/research-agent",
+        "commands": [
+          "py -3.12 -m venv .venv",
+          ".venv\\Scripts\\python.exe -m pip install --require-hashes --no-deps -r requirements.lock -r requirements-dev.lock"
+        ],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "cwd": "apps/research-agent",
+        "commands": [".venv\\Scripts\\python.exe -m ruff check .", ".venv\\Scripts\\python.exe -m ruff format --check ."],
+        "parallel": false
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default"],
+      "options": {
+        "cwd": "apps/research-agent",
+        "command": ".venv\\Scripts\\python.exe -m mypy"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", { "env": "RUN_DB_TESTS" }, { "env": "RUN_LIVE_ML" }, { "env": "EXPECT_NO_LLM_KEY" }],
+      "options": {
+        "cwd": "apps/research-agent",
+        "command": ".venv\\Scripts\\python.exe -m pytest"
+      }
+    },
+    "eval": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/research-agent",
+        "env": { "PYTHONPATH": "src" },
+        "command": ".venv\\Scripts\\python.exe -m research_agent.live_eval"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/research-agent",
+        "command": ".venv\\Scripts\\python.exe -m uvicorn research_agent.main:create_app --factory --app-dir src --port 3007"
+      }
+    }
+  }
+}
