@@ -140,7 +140,7 @@ runDb('OfficialCalendarService against the real schema (RUN_DB_TESTS)', () => {
     expect(Number(allDay[0].n)).toBe(0);
 
     // The calendar API lists an all-day event for the whole of its day (here: the FOMC decision day)
-    const calendar = new EconomicCalendarService(ds.getRepository(EconomicEventEntity), {} as never, {} as never);
+    const calendar = new EconomicCalendarService(ds.getRepository(EconomicEventEntity), {} as never);
     const listed = await calendar.getUpcomingEvents('USD', new Date('2026-10-28T18:30:00Z'));
     expect(listed[0]).toMatchObject({ title: 'FOMC meeting, October 27-28', allDay: true, source: 'FOMC', impact: 'HIGH' });
     expect(listed[0].forecast).toBeNull();

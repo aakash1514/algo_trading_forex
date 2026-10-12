@@ -14,8 +14,9 @@
 // (*) The producer only publishes when a stored event is about to start. The
 //     calendar page doesn't use Kafka: it calls domain-service's REST endpoint
 //     GET /api/domain/calendar, which reads the economic_events table (filled
-//     from ForexFactory every 6 h). No event has ever been close enough, so the
-//     topic has never been created; the message type below is the producer's.
+//     daily from the official FOMC and ECB calendars). Those events are date-only
+//     (all-day), and only timed events are published, so the topic has never been
+//     created; the message type below is the producer's.
 import { checkRules, parseContract } from './contract';
 import type { AccountUpdatedMessage, PositionsUpdatedMessage } from '../interfaces/realtime.interface';
 

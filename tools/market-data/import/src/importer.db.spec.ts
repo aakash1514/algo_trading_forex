@@ -211,8 +211,17 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('RemovePreOfficialCalendarEvents1792200000000');
+
+    // RemovePreOfficialCalendarEvents: source is required; down() makes it optional again
+    const sourceNullable = async () => (await client.query(
+      `SELECT is_nullable FROM information_schema.columns WHERE table_name = 'economic_events' AND column_name = 'source'`,
+    )).rows[0]?.is_nullable;
+    expect(await sourceNullable()).toBe('NO');
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await sourceNullable()).toBe('YES');
     expect(await last()).toBe('EconomicEventSource1792100000000');
 
     // EconomicEventSource: economic_events.source and all_day, and the per-source unique index

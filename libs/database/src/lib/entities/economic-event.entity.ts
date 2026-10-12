@@ -26,9 +26,9 @@ export class EconomicEventEntity {
   @Column({ type: 'varchar', length: 50, nullable: true })
   actual!: string | null;
 
-  // Official calendar the event comes from (FOMC, ECB); null only for rows from before step 6a
-  @Column({ type: 'varchar', length: 20, nullable: true })
-  source!: string | null;
+  // Official calendar the event comes from (FOMC, ECB)
+  @Column({ type: 'varchar', length: 20 })
+  source!: string;
 
   // The source gives a date without a time: scheduledAt is 00:00 UTC of that date
   @Column({ name: 'all_day', type: 'boolean', default: false })

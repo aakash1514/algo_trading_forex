@@ -181,7 +181,7 @@ export interface CalendarEvent {
   impact: 'HIGH' | 'MEDIUM' | 'LOW'; // ForexEdge classification, not source data
   scheduledAt: string;    // 00:00 UTC of the date when allDay
   allDay: boolean;
-  source: string | null;  // 'FOMC' | 'ECB'
+  source: string;         // 'FOMC' | 'ECB'
   forecast: string | null;
   previous: string | null;
   actual: string | null;
