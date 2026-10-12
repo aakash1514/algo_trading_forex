@@ -5,6 +5,7 @@ export const API_BASE = {
   ORDER:  'http://localhost:3004/api',
   WS:     'http://localhost:3005/api',
   ML:     'http://localhost:3006/api',
+  RESEARCH: 'http://localhost:3007/api',
 } as const;
 
 export const WS_URL = 'http://localhost:3005';

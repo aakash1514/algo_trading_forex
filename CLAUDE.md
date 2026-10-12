@@ -59,12 +59,16 @@ npx nx serve research-agent                     # :3007, POST /api/research/ask
 npx nx run research-agent:eval                  # opt-in live eval (free-tier LLM quota, ml-service running)
 npx ts-node --transpile-only tools/ops/create-research-db-user.ts   # login from RESEARCH_DB_USER/RESEARCH_DB_PASS
 npx ts-node --transpile-only tools/ops/research-demo-data.ts        # demo users + verified runs (auth + ws-gateway up)
+# (in apps/research-agent, auth-service + research-agent [+ frontend] running; each question spends LLM quota)
+.venv/Scripts/python.exe scripts/record_ask_fixtures.py answer refusal not-in-data too-long   # Research page fixtures
+.venv/Scripts/python.exe scripts/e2e_research_page.py          # HTTP e2e -> docs/validation/research-page-e2e.md
 ```
 
 ## Architecture
 
 ### Services and ports
-All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`.
+All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`,
+except research-agent, which allows only `localhost:4200`.
 
 | Service | Port | Responsibility |
 |---|---|---|
@@ -109,6 +113,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - State uses Redux Toolkit. RTK Query APIs in `src/store/api/*.api.ts` all extend `baseApi`, which attaches the bearer token from the store. The access token is **in memory only** (never localStorage); on app load `SessionRestorer` restores the session from the httpOnly refresh cookie, and `AuthGuard` waits for it. On a 401, `baseApi` awaits `refreshSession()` (`src/lib/session.ts`), stores the new token, then retries.
 - Backend URLs are hardcoded in `src/lib/constants.ts` (`API_BASE`, `WS_URL`). Live data comes through `hooks/useForexSocket.ts`.
 - Instrument symbols use OANDA format (`EUR_USD`).
+- **Research page (`/research`, step 5b):** `askResearch` is a mutation with a 100 s timeout and no retry wrapper
+  (every call spends free LLM quota); one request in flight; the question limit (3-500 code points) mirrors
+  research-agent's `MAX_QUESTION_CHARS`. Report text renders only as React text nodes (no
+  `dangerouslySetInnerHTML`, no markdown), values exactly as returned (the verifier checked those strings), and
+  `could_not_verify` shows a fixed warning only, never `answer`, `claims` or `verification.failures` (a failure
+  message can quote the rejected number). Component tests use real recorded `/ask` bodies
+  (`components/research/__fixtures__`, sha256 in its manifest).
 
 
 ## Environment
@@ -237,6 +248,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   cached "skipped" result. Run DB suites with `--skip-nx-cache` (the Python targets list it as an input).
 - **On Windows an empty env var is unset**, so `VAR= npx nx ...` doesn't override a value in `.env` (Nx loads it into
   every task). To run without a key (e.g. the clean matrix without `GROQ_API_KEY`), comment the line out and restore it.
+- **jsdom has no `fetch`/`Request`/`Response`.** A component test that goes through RTK Query's real
+  `fetchBaseQuery` uses `/** @jest-environment ./test/jsdom-with-fetch.cjs */` (Node's fetch classes, including
+  Node's AbortSignal). fetchBaseQuery's `timeout` leaves a timer running after a fast response, so those specs use
+  fake timers and `jest.clearAllTimers()`, or Jest reports a worker that failed to exit.
+- **`nx run <p>:<t> --args='...'` turns commas inside the args into spaces** (seen with the eval's `--note`).
+  Avoid commas in such arguments, or run the module directly.
 - **Every check fails on empty input.** A data check, validation or test assertion that compared zero rows must
   fail, never pass (an empty comparison once read as "equal"). Assert the count compared is > 0.
 - **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
@@ -257,8 +274,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-3-backtest-verification.md`.
 - **Roadmap step 4 (ML service, LSTM only) is done** (2026-10-12), merged into main (PR #3).
   Write-up: `docs/phase-summaries/step-4-ml-service.md`.
-- **Roadmap step 5 (research agent) is done** (2026-10-12) on branch `step-5-research-agent` (PR into main,
-  not merged). Write-up: `docs/phase-summaries/step-5-research-agent.md`.
+- **Roadmap step 5 (research agent) is done** (2026-10-12), merged into main (PR #4).
+  Write-up: `docs/phase-summaries/step-5-research-agent.md`.
+- **Step 5b (Research page) is done** (2026-10-12) on branch `step-5b-research-page` (not merged). The manual
+  browser check is pending (`docs/validation/research-page-e2e.md`). Write-up: §13 of the step-5 summary.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -294,6 +313,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    server per request) answering questions about ForexEdge's own data only (history, the caller's backtest runs,
    ML evaluation), with a deterministic verifier, per-request budgets and a free-tier Groq model. News, web search,
    sentiment and the economic calendar were out of scope. Live eval: `docs/validation/research-agent-eval.md`.
+   Step 5b: the frontend Research page (`/research`), CORS for :4200 only, prompt rule 6 (returns from
+   get_market_stats), eval run 3 9/10.
 6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
    realign the live views to the NY close here.
@@ -309,6 +330,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    research-agent: a Linux image and a Linux lock (mcp pulls in `pywin32`, Windows only), the role
    `forexedge_research_reader` the same way, and a non-free LLM tier or rate limits for real traffic (free Groq
    is about one question per minute).
+   CORS: other services also allow 3001 with credentials — narrow before deployment.
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
 8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar

@@ -61,6 +61,16 @@ def test_a_buy_or_sell_question_is_refused() -> None:
     assert stats.model_calls == 1 and stats.stop_reason == "verified"
 
 
+def test_the_model_is_told_to_answer_returns_from_get_market_stats() -> None:
+    model = replay("buy-sell")
+    ask(model, transcript("buy-sell")["question"])
+    assert len(model.seen) == 1
+    system = model.seen[0][0]
+    assert system.type == "system"
+    rule = "6. For questions about a return or % change, use get_market_stats and report return_pct."
+    assert rule in str(system.content)
+
+
 @pytest.mark.parametrize("name", ["out-of-range", "other-pair"])
 def test_a_question_outside_the_data_is_not_in_data(name: str) -> None:
     report, _, t = run_transcript(name)

@@ -10,7 +10,7 @@ from fastapi.testclient import TestClient
 
 from research_agent.agent import ResearchAgent
 from research_agent.config import REPO_ROOT, load_env_file
-from research_agent.main import create_app
+from research_agent.main import MAX_QUESTION_CHARS, create_app
 from tests.replay import replay, transcript
 from tests.tokens import auth, invalid_auth_headers, token
 
@@ -33,6 +33,25 @@ def test_ask_refuses_missing_or_invalid_tokens(headers: dict[str, str]) -> None:
 )
 def test_ask_validates_the_request(body: dict[str, object]) -> None:
     assert client().post(ASK, json=body, headers=auth()).status_code == 422
+
+
+@pytest.mark.parametrize("char", ["x", "🌐"])
+def test_ask_caps_the_question_length_before_the_model_runs(char: str) -> None:
+    assert MAX_QUESTION_CHARS == 500
+    at_limit, over = replay("buy-sell"), replay("buy-sell")
+    ok = TestClient(create_app(ResearchAgent(llm=at_limit))).post(
+        ASK, json={"question": char * MAX_QUESTION_CHARS}, headers=auth()
+    )
+    assert ok.status_code == 200
+    assert at_limit.position == 1  # the limit itself is accepted and answered
+    r = TestClient(create_app(ResearchAgent(llm=over))).post(
+        ASK, json={"question": char * (MAX_QUESTION_CHARS + 1)}, headers=auth()
+    )
+    assert r.status_code == 422
+    errors = r.json()["detail"]
+    assert len(errors) == 1 and errors[0]["type"] == "string_too_long"
+    assert errors[0]["ctx"]["max_length"] == MAX_QUESTION_CHARS
+    assert over.position == 0  # rejected before any model call
 
 
 def test_ask_returns_the_structured_report_and_no_secret() -> None:

@@ -9,6 +9,7 @@ const links = [
   { href: '/backtest',   label: 'Backtest',  icon: '◈' },
   { href: '/calendar',   label: 'Calendar',  icon: '◷' },
   { href: '/model-evaluation', label: 'Model evaluation', icon: '◬' },
+  { href: '/research', label: 'Research', icon: '⌕' },
 ];
 
 export function Sidenav() {

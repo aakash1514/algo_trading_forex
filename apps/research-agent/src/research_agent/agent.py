@@ -91,6 +91,7 @@ RULES = (
     fundamentals, live prices, economic events): call submit_report with type "not_in_data", no numbers and no
     claims. If a tool returns OUT_OF_DATA, do the same.""",
     """5. Ranges longer than 50 bars: use get_market_stats, not get_bars. Use as few tool calls as you can.""",
+    """6. For questions about a return or % change, use get_market_stats and report return_pct.""",
 )
 SYSTEM_PROMPT = _squash(INTRO) + "\n\nRules:\n" + "\n".join(_squash(r) for r in RULES)
 

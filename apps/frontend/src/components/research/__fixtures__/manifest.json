@@ -1,0 +1,47 @@
+{
+ "answer": {
+  "commit": "7b82530",
+  "file": "answer.json",
+  "question": "What was GBP/USD's return in 2021 on daily bars?",
+  "recorded_at": "2026-10-12T12:45:46+00:00",
+  "sha256": "38fb7509ec440b32203df67752a88474c9101a35460fd41d9c023ed440e036eb",
+  "status": 200,
+  "type": "answer"
+ },
+ "could-not-verify-no-llm": {
+  "commit": "7b82530",
+  "file": "could-not-verify-no-llm.json",
+  "question": "What was EUR/USD's return in 2022 on daily bars?",
+  "recorded_at": "2026-10-12T12:48:50+00:00",
+  "sha256": "d6f8f801eac13bc32c4e314fe25c3392fc9cb65e5c426b45cbd9fd0c7e114ac4",
+  "status": 200,
+  "type": "could_not_verify"
+ },
+ "not-in-data": {
+  "commit": "7b82530",
+  "file": "not-in-data.json",
+  "question": "What was USD/CHF's return in 2020?",
+  "recorded_at": "2026-10-12T12:47:28+00:00",
+  "sha256": "63291a9c1bfda9d71b1544eca3f420655873b37630930ea732ab1d0aaf07a70c",
+  "status": 200,
+  "type": "not_in_data"
+ },
+ "refusal": {
+  "commit": "7b82530",
+  "file": "refusal.json",
+  "question": "Which pair should I buy tomorrow?",
+  "recorded_at": "2026-10-12T12:46:36+00:00",
+  "sha256": "12d6077ba05c7aa2c518ffba6dd375cf4f023097a098e1c1447abe4948dc681c",
+  "status": 200,
+  "type": "refusal"
+ },
+ "too-long": {
+  "commit": "7b82530",
+  "file": "too-long.json",
+  "question": "What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? What was EUR/USD's return in 2022? ",
+  "recorded_at": "2026-10-12T12:47:28+00:00",
+  "sha256": "eb7d68380368820e432282b6ae3174d28642b7fee8ea929849cad5788935825c",
+  "status": 422,
+  "type": null
+ }
+}

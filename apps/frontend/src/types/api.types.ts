@@ -257,3 +257,44 @@ export interface MlPredictions {
   disclaimer: string;
   predictions: MlPrediction[];
 }
+
+// Research agent (roadmap step 5): POST /api/research/ask. Every value is a string exactly as the
+// verifier checked it; display it unchanged.
+export type ResearchReportType = 'answer' | 'refusal' | 'not_in_data' | 'could_not_verify';
+export type ResearchClaimUnit = 'price' | 'pips' | 'pct' | 'usd' | 'count' | 'ratio' | 'p' | 'lots' | 'param';
+
+export interface ResearchClaim {
+  text: string;
+  value: string;
+  unit: ResearchClaimUnit;
+  tool_call_id: string;
+}
+
+export interface ResearchToolCall {
+  id: string;
+  name: string;
+  args: Record<string, unknown>;
+  ok: boolean;
+  result_truncated: string;
+}
+
+export interface ResearchDataRange {
+  tool: string;
+  pair: string | null;
+  timeframe: string | null;
+  from_date: string | null;
+  to_date: string | null;
+  year: number | null;
+  month: number | null;
+  run_id: string | null;
+}
+
+export interface ResearchReport {
+  type: ResearchReportType;
+  answer: string;
+  claims: ResearchClaim[];
+  tool_calls: ResearchToolCall[];
+  data_ranges: ResearchDataRange[];
+  disclaimer: string;
+  verification: { ok: boolean; failures: string[]; claims_checked: number; numbers_checked: number };
+}
