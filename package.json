@@ -1,7 +1,7 @@
 {
   "name": "@forexedge/source",
   "version": "0.0.0",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "scripts": {
     "migration:generate": "typeorm-ts-node-commonjs -d data-source.ts migration:generate",
     "migration:run": "typeorm-ts-node-commonjs -d data-source.ts migration:run",
