@@ -14,6 +14,20 @@ npx nx test research-agent         # pytest (RUN_DB_TESTS=true adds the database
 npx nx serve research-agent        # uvicorn on :3007
 ```
 
+## Recreate research demo data
+
+Two permanent dev users (`research_demo`, `research_demo_2`, role TRADER) own real backtest runs made
+through the real API, each checked against the SQL reproduction (reports in
+`docs/validation/research-demo-backtests.md` and `research-demo-2-backtests.md`). Passwords:
+`RESEARCH_DEMO_PASS` and `RESEARCH_DEMO_2_PASS` in `.env`. Re-running skips a user that already has runs.
+
+```sh
+npx nx run-many -t build -p auth-service ws-gateway
+node dist/apps/auth-service/main.js &       # MinIO, Redis, Kafka and TimescaleDB up (infra/docker-compose.yml)
+node dist/apps/ws-gateway/main.js &
+npx ts-node --transpile-only tools/ops/research-demo-data.ts
+```
+
 ## Dependencies
 
 Exact pins in `requirements.in` / `requirements-dev.in`, locked with the sha256 of every file.
