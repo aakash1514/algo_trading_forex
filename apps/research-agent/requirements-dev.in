@@ -1,0 +1,12 @@
+# Development tools, constrained to the runtime lock.
+# Lock: see README (pip-compile, then scripts/add_hashes.py).
+-c requirements.lock
+pytest==9.1.1
+ruff==0.16.9
+mypy==2.3.1
+pip-tools==7.6.1
+
+# Transitive dependencies held back: their newest releases were younger than 14 days
+ast-serialize==0.11.2
+iniconfig==2.3.0
+librt==0.15.0
