@@ -267,3 +267,5 @@ ForexEdge is a portfolio project for paper trading and research. It places no re
 investment, financial or trading advice. Past performance in backtests or model evaluations does not indicate
 future results. The historical data comes from Dukascopy; check Dukascopy's terms of use before redistributing
 it or serving it publicly.
+
+All rights reserved — no license is granted to use, copy or modify this code.
