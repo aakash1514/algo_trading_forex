@@ -1,0 +1,7255 @@
+{
+ "instrument": "GBP_USD",
+ "timeframe": "1h",
+ "from": "2019-06-01",
+ "to": "2019-06-30",
+ "target": "direction of the next H1 bar, mid open to close",
+ "disclaimer": "historical walk-forward test, not live signals",
+ "predictions": [
+  {
+   "barTime": "2019-05-31T20:00:00Z",
+   "targetBarTime": "2019-06-02T21:00:00Z",
+   "pUp": 0.5033144950866699,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26314,
+    "high": 1.26395,
+    "low": 1.262375,
+    "close": 1.2635
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-02T21:00:00Z",
+   "targetBarTime": "2019-06-02T22:00:00Z",
+   "pUp": 0.4856266677379608,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.263495,
+    "high": 1.26401,
+    "low": 1.263215,
+    "close": 1.2635
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-02T22:00:00Z",
+   "targetBarTime": "2019-06-02T23:00:00Z",
+   "pUp": 0.504124641418457,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2635,
+    "high": 1.263935,
+    "low": 1.26339,
+    "close": 1.263915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-02T23:00:00Z",
+   "targetBarTime": "2019-06-03T00:00:00Z",
+   "pUp": 0.5004755258560181,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26389,
+    "high": 1.264805,
+    "low": 1.26383,
+    "close": 1.26472
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T00:00:00Z",
+   "targetBarTime": "2019-06-03T01:00:00Z",
+   "pUp": 0.487127423286438,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26472,
+    "high": 1.265345,
+    "low": 1.264475,
+    "close": 1.26509
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T01:00:00Z",
+   "targetBarTime": "2019-06-03T02:00:00Z",
+   "pUp": 0.4865664541721344,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26509,
+    "high": 1.265535,
+    "low": 1.26472,
+    "close": 1.265425
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T02:00:00Z",
+   "targetBarTime": "2019-06-03T03:00:00Z",
+   "pUp": 0.4853469133377075,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26543,
+    "high": 1.265545,
+    "low": 1.26511,
+    "close": 1.26528
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T03:00:00Z",
+   "targetBarTime": "2019-06-03T04:00:00Z",
+   "pUp": 0.49336376786231995,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26528,
+    "high": 1.26534,
+    "low": 1.26416,
+    "close": 1.264175
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T04:00:00Z",
+   "targetBarTime": "2019-06-03T05:00:00Z",
+   "pUp": 0.518901526927948,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26419,
+    "high": 1.264555,
+    "low": 1.263805,
+    "close": 1.26381
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T05:00:00Z",
+   "targetBarTime": "2019-06-03T06:00:00Z",
+   "pUp": 0.5149729251861572,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26378,
+    "high": 1.26391,
+    "low": 1.262675,
+    "close": 1.26357
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T06:00:00Z",
+   "targetBarTime": "2019-06-03T07:00:00Z",
+   "pUp": 0.5103722214698792,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26357,
+    "high": 1.26569,
+    "low": 1.26315,
+    "close": 1.26538
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T07:00:00Z",
+   "targetBarTime": "2019-06-03T08:00:00Z",
+   "pUp": 0.47346389293670654,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26539,
+    "high": 1.266075,
+    "low": 1.26417,
+    "close": 1.26425
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T08:00:00Z",
+   "targetBarTime": "2019-06-03T09:00:00Z",
+   "pUp": 0.5004785656929016,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26426,
+    "high": 1.264595,
+    "low": 1.26368,
+    "close": 1.264295
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T09:00:00Z",
+   "targetBarTime": "2019-06-03T10:00:00Z",
+   "pUp": 0.4923211634159088,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.264285,
+    "high": 1.26538,
+    "low": 1.264285,
+    "close": 1.264735
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T10:00:00Z",
+   "targetBarTime": "2019-06-03T11:00:00Z",
+   "pUp": 0.48079878091812134,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.264745,
+    "high": 1.26477,
+    "low": 1.26105,
+    "close": 1.26149
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T11:00:00Z",
+   "targetBarTime": "2019-06-03T12:00:00Z",
+   "pUp": 0.5431904792785645,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.261495,
+    "high": 1.26339,
+    "low": 1.26132,
+    "close": 1.263075
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T12:00:00Z",
+   "targetBarTime": "2019-06-03T13:00:00Z",
+   "pUp": 0.4960458278656006,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.263075,
+    "high": 1.264425,
+    "low": 1.26183,
+    "close": 1.26376
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T13:00:00Z",
+   "targetBarTime": "2019-06-03T14:00:00Z",
+   "pUp": 0.47566160559654236,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26374,
+    "high": 1.26501,
+    "low": 1.26259,
+    "close": 1.262975
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T14:00:00Z",
+   "targetBarTime": "2019-06-03T15:00:00Z",
+   "pUp": 0.49958550930023193,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.262955,
+    "high": 1.263865,
+    "low": 1.261665,
+    "close": 1.2619
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T15:00:00Z",
+   "targetBarTime": "2019-06-03T16:00:00Z",
+   "pUp": 0.5182637572288513,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26192,
+    "high": 1.264245,
+    "low": 1.261695,
+    "close": 1.263545
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T16:00:00Z",
+   "targetBarTime": "2019-06-03T17:00:00Z",
+   "pUp": 0.47696366906166077,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26355,
+    "high": 1.26669,
+    "low": 1.26335,
+    "close": 1.266535
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T17:00:00Z",
+   "targetBarTime": "2019-06-03T18:00:00Z",
+   "pUp": 0.4301782250404358,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26652,
+    "high": 1.2669,
+    "low": 1.26583,
+    "close": 1.266805
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T18:00:00Z",
+   "targetBarTime": "2019-06-03T19:00:00Z",
+   "pUp": 0.4409346878528595,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266805,
+    "high": 1.267425,
+    "low": 1.26638,
+    "close": 1.26686
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T19:00:00Z",
+   "targetBarTime": "2019-06-03T20:00:00Z",
+   "pUp": 0.4543822109699249,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26686,
+    "high": 1.266895,
+    "low": 1.266355,
+    "close": 1.2664
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T20:00:00Z",
+   "targetBarTime": "2019-06-03T21:00:00Z",
+   "pUp": 0.4748614430427551,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266405,
+    "high": 1.266805,
+    "low": 1.265735,
+    "close": 1.26656
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T21:00:00Z",
+   "targetBarTime": "2019-06-03T22:00:00Z",
+   "pUp": 0.47627171874046326,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26661,
+    "high": 1.266815,
+    "low": 1.266285,
+    "close": 1.266675
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T22:00:00Z",
+   "targetBarTime": "2019-06-03T23:00:00Z",
+   "pUp": 0.4850870966911316,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26667,
+    "high": 1.266745,
+    "low": 1.266245,
+    "close": 1.26637
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-03T23:00:00Z",
+   "targetBarTime": "2019-06-04T00:00:00Z",
+   "pUp": 0.5030965209007263,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266355,
+    "high": 1.26686,
+    "low": 1.26617,
+    "close": 1.266675
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T00:00:00Z",
+   "targetBarTime": "2019-06-04T01:00:00Z",
+   "pUp": 0.499162882566452,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.266675,
+    "high": 1.26668,
+    "low": 1.26594,
+    "close": 1.26637
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T01:00:00Z",
+   "targetBarTime": "2019-06-04T02:00:00Z",
+   "pUp": 0.5102906823158264,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266375,
+    "high": 1.266855,
+    "low": 1.266125,
+    "close": 1.266765
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T02:00:00Z",
+   "targetBarTime": "2019-06-04T03:00:00Z",
+   "pUp": 0.4986827075481415,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26677,
+    "high": 1.266785,
+    "low": 1.266365,
+    "close": 1.266545
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T03:00:00Z",
+   "targetBarTime": "2019-06-04T04:00:00Z",
+   "pUp": 0.503902792930603,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26654,
+    "high": 1.267085,
+    "low": 1.26617,
+    "close": 1.266235
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T04:00:00Z",
+   "targetBarTime": "2019-06-04T05:00:00Z",
+   "pUp": 0.5075046420097351,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26623,
+    "high": 1.26746,
+    "low": 1.266125,
+    "close": 1.267255
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T05:00:00Z",
+   "targetBarTime": "2019-06-04T06:00:00Z",
+   "pUp": 0.48080992698669434,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267255,
+    "high": 1.26863,
+    "low": 1.266635,
+    "close": 1.267925
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T06:00:00Z",
+   "targetBarTime": "2019-06-04T07:00:00Z",
+   "pUp": 0.4730592370033264,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26792,
+    "high": 1.268685,
+    "low": 1.26534,
+    "close": 1.265755
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T07:00:00Z",
+   "targetBarTime": "2019-06-04T08:00:00Z",
+   "pUp": 0.522844672203064,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26576,
+    "high": 1.266455,
+    "low": 1.264225,
+    "close": 1.265125
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T08:00:00Z",
+   "targetBarTime": "2019-06-04T09:00:00Z",
+   "pUp": 0.5184485912322998,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26513,
+    "high": 1.26724,
+    "low": 1.26499,
+    "close": 1.2667
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T09:00:00Z",
+   "targetBarTime": "2019-06-04T10:00:00Z",
+   "pUp": 0.48012039065361023,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2667,
+    "high": 1.26919,
+    "low": 1.265965,
+    "close": 1.26896
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T10:00:00Z",
+   "targetBarTime": "2019-06-04T11:00:00Z",
+   "pUp": 0.4490847587585449,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26896,
+    "high": 1.269445,
+    "low": 1.26788,
+    "close": 1.268055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T11:00:00Z",
+   "targetBarTime": "2019-06-04T12:00:00Z",
+   "pUp": 0.47838133573532104,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268095,
+    "high": 1.26842,
+    "low": 1.266305,
+    "close": 1.2683
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T12:00:00Z",
+   "targetBarTime": "2019-06-04T13:00:00Z",
+   "pUp": 0.47935670614242554,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268295,
+    "high": 1.270855,
+    "low": 1.267335,
+    "close": 1.26899
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T13:00:00Z",
+   "targetBarTime": "2019-06-04T14:00:00Z",
+   "pUp": 0.4695037305355072,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268975,
+    "high": 1.269965,
+    "low": 1.266765,
+    "close": 1.267565
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T14:00:00Z",
+   "targetBarTime": "2019-06-04T15:00:00Z",
+   "pUp": 0.5091023445129395,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267575,
+    "high": 1.268105,
+    "low": 1.2666,
+    "close": 1.26743
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T15:00:00Z",
+   "targetBarTime": "2019-06-04T16:00:00Z",
+   "pUp": 0.5022911429405212,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26744,
+    "high": 1.26899,
+    "low": 1.26697,
+    "close": 1.26875
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T16:00:00Z",
+   "targetBarTime": "2019-06-04T17:00:00Z",
+   "pUp": 0.47053492069244385,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26876,
+    "high": 1.27006,
+    "low": 1.26814,
+    "close": 1.26999
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T17:00:00Z",
+   "targetBarTime": "2019-06-04T18:00:00Z",
+   "pUp": 0.4517097473144531,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269995,
+    "high": 1.27143,
+    "low": 1.26997,
+    "close": 1.27046
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T18:00:00Z",
+   "targetBarTime": "2019-06-04T19:00:00Z",
+   "pUp": 0.4517638087272644,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27049,
+    "high": 1.27145,
+    "low": 1.270085,
+    "close": 1.27083
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T19:00:00Z",
+   "targetBarTime": "2019-06-04T20:00:00Z",
+   "pUp": 0.45744797587394714,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.2708,
+    "high": 1.270805,
+    "low": 1.2697,
+    "close": 1.26981
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T20:00:00Z",
+   "targetBarTime": "2019-06-04T21:00:00Z",
+   "pUp": 0.4858017563819885,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26983,
+    "high": 1.27022,
+    "low": 1.26932,
+    "close": 1.26994
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T21:00:00Z",
+   "targetBarTime": "2019-06-04T22:00:00Z",
+   "pUp": 0.4894595146179199,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269915,
+    "high": 1.27007,
+    "low": 1.26975,
+    "close": 1.26993
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T22:00:00Z",
+   "targetBarTime": "2019-06-04T23:00:00Z",
+   "pUp": 0.49999260902404785,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269915,
+    "high": 1.27038,
+    "low": 1.269915,
+    "close": 1.270335
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-04T23:00:00Z",
+   "targetBarTime": "2019-06-05T00:00:00Z",
+   "pUp": 0.4939765930175781,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27034,
+    "high": 1.27064,
+    "low": 1.27002,
+    "close": 1.27036
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T00:00:00Z",
+   "targetBarTime": "2019-06-05T01:00:00Z",
+   "pUp": 0.5011429786682129,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27035,
+    "high": 1.27081,
+    "low": 1.269995,
+    "close": 1.27063
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T01:00:00Z",
+   "targetBarTime": "2019-06-05T02:00:00Z",
+   "pUp": 0.4982048571109772,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270645,
+    "high": 1.27121,
+    "low": 1.27039,
+    "close": 1.270405
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T02:00:00Z",
+   "targetBarTime": "2019-06-05T03:00:00Z",
+   "pUp": 0.5070363879203796,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270395,
+    "high": 1.270565,
+    "low": 1.270185,
+    "close": 1.270555
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T03:00:00Z",
+   "targetBarTime": "2019-06-05T04:00:00Z",
+   "pUp": 0.5006469488143921,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27055,
+    "high": 1.27078,
+    "low": 1.27039,
+    "close": 1.27054
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T04:00:00Z",
+   "targetBarTime": "2019-06-05T05:00:00Z",
+   "pUp": 0.49894699454307556,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270555,
+    "high": 1.27181,
+    "low": 1.27054,
+    "close": 1.271415
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T05:00:00Z",
+   "targetBarTime": "2019-06-05T06:00:00Z",
+   "pUp": 0.4778541326522827,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27141,
+    "high": 1.27237,
+    "low": 1.269965,
+    "close": 1.270215
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T06:00:00Z",
+   "targetBarTime": "2019-06-05T07:00:00Z",
+   "pUp": 0.5111632943153381,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27022,
+    "high": 1.27064,
+    "low": 1.2691,
+    "close": 1.27014
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T07:00:00Z",
+   "targetBarTime": "2019-06-05T08:00:00Z",
+   "pUp": 0.502088725566864,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2701,
+    "high": 1.27242,
+    "low": 1.26999,
+    "close": 1.27143
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T08:00:00Z",
+   "targetBarTime": "2019-06-05T09:00:00Z",
+   "pUp": 0.4724668860435486,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.271415,
+    "high": 1.272165,
+    "low": 1.270925,
+    "close": 1.27142
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T09:00:00Z",
+   "targetBarTime": "2019-06-05T10:00:00Z",
+   "pUp": 0.47674551606178284,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27142,
+    "high": 1.271845,
+    "low": 1.27066,
+    "close": 1.270855
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T10:00:00Z",
+   "targetBarTime": "2019-06-05T11:00:00Z",
+   "pUp": 0.4910047650337219,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270885,
+    "high": 1.27136,
+    "low": 1.26981,
+    "close": 1.27011
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T11:00:00Z",
+   "targetBarTime": "2019-06-05T12:00:00Z",
+   "pUp": 0.5041005611419678,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27012,
+    "high": 1.274395,
+    "low": 1.2696,
+    "close": 1.27335
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T12:00:00Z",
+   "targetBarTime": "2019-06-05T13:00:00Z",
+   "pUp": 0.45581719279289246,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.273335,
+    "high": 1.274345,
+    "low": 1.272185,
+    "close": 1.272715
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T13:00:00Z",
+   "targetBarTime": "2019-06-05T14:00:00Z",
+   "pUp": 0.4767884910106659,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2727,
+    "high": 1.27382,
+    "low": 1.2709,
+    "close": 1.273235
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T14:00:00Z",
+   "targetBarTime": "2019-06-05T15:00:00Z",
+   "pUp": 0.47596922516822815,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.273245,
+    "high": 1.273345,
+    "low": 1.269955,
+    "close": 1.27052
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T15:00:00Z",
+   "targetBarTime": "2019-06-05T16:00:00Z",
+   "pUp": 0.5399173498153687,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27052,
+    "high": 1.27052,
+    "low": 1.26834,
+    "close": 1.2691
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T16:00:00Z",
+   "targetBarTime": "2019-06-05T17:00:00Z",
+   "pUp": 0.548988938331604,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269105,
+    "high": 1.26993,
+    "low": 1.2689,
+    "close": 1.26992
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T17:00:00Z",
+   "targetBarTime": "2019-06-05T18:00:00Z",
+   "pUp": 0.5065701603889465,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269925,
+    "high": 1.270425,
+    "low": 1.268695,
+    "close": 1.269255
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T18:00:00Z",
+   "targetBarTime": "2019-06-05T19:00:00Z",
+   "pUp": 0.51861971616745,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269245,
+    "high": 1.26965,
+    "low": 1.268655,
+    "close": 1.268705
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T19:00:00Z",
+   "targetBarTime": "2019-06-05T20:00:00Z",
+   "pUp": 0.524009108543396,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26871,
+    "high": 1.26885,
+    "low": 1.268065,
+    "close": 1.268465
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T20:00:00Z",
+   "targetBarTime": "2019-06-05T21:00:00Z",
+   "pUp": 0.5166349411010742,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26846,
+    "high": 1.26934,
+    "low": 1.268075,
+    "close": 1.269
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T21:00:00Z",
+   "targetBarTime": "2019-06-05T22:00:00Z",
+   "pUp": 0.49527135491371155,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268885,
+    "high": 1.269225,
+    "low": 1.268745,
+    "close": 1.26902
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T22:00:00Z",
+   "targetBarTime": "2019-06-05T23:00:00Z",
+   "pUp": 0.5068156719207764,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26902,
+    "high": 1.269295,
+    "low": 1.268775,
+    "close": 1.26878
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-05T23:00:00Z",
+   "targetBarTime": "2019-06-06T00:00:00Z",
+   "pUp": 0.5162645578384399,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26879,
+    "high": 1.26911,
+    "low": 1.268405,
+    "close": 1.26848
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T00:00:00Z",
+   "targetBarTime": "2019-06-06T01:00:00Z",
+   "pUp": 0.5227223038673401,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268485,
+    "high": 1.26863,
+    "low": 1.268205,
+    "close": 1.26841
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T01:00:00Z",
+   "targetBarTime": "2019-06-06T02:00:00Z",
+   "pUp": 0.5198779106140137,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26843,
+    "high": 1.26883,
+    "low": 1.26831,
+    "close": 1.26882
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T02:00:00Z",
+   "targetBarTime": "2019-06-06T03:00:00Z",
+   "pUp": 0.5057554841041565,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268815,
+    "high": 1.269115,
+    "low": 1.2684,
+    "close": 1.268795
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T03:00:00Z",
+   "targetBarTime": "2019-06-06T04:00:00Z",
+   "pUp": 0.5060709714889526,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268795,
+    "high": 1.2689,
+    "low": 1.268485,
+    "close": 1.26884
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T04:00:00Z",
+   "targetBarTime": "2019-06-06T05:00:00Z",
+   "pUp": 0.5013057589530945,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26884,
+    "high": 1.269025,
+    "low": 1.268495,
+    "close": 1.26865
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T05:00:00Z",
+   "targetBarTime": "2019-06-06T06:00:00Z",
+   "pUp": 0.5022339224815369,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26868,
+    "high": 1.26879,
+    "low": 1.267215,
+    "close": 1.26747
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T06:00:00Z",
+   "targetBarTime": "2019-06-06T07:00:00Z",
+   "pUp": 0.5243605375289917,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26747,
+    "high": 1.26849,
+    "low": 1.266895,
+    "close": 1.268395
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T07:00:00Z",
+   "targetBarTime": "2019-06-06T08:00:00Z",
+   "pUp": 0.49059033393859863,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268385,
+    "high": 1.26964,
+    "low": 1.267385,
+    "close": 1.2682
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T08:00:00Z",
+   "targetBarTime": "2019-06-06T09:00:00Z",
+   "pUp": 0.4953826665878296,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268195,
+    "high": 1.26984,
+    "low": 1.26766,
+    "close": 1.26958
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T09:00:00Z",
+   "targetBarTime": "2019-06-06T10:00:00Z",
+   "pUp": 0.46672260761260986,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26956,
+    "high": 1.26986,
+    "low": 1.268825,
+    "close": 1.26896
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T10:00:00Z",
+   "targetBarTime": "2019-06-06T11:00:00Z",
+   "pUp": 0.4863269031047821,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26893,
+    "high": 1.27277,
+    "low": 1.2686,
+    "close": 1.27239
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T11:00:00Z",
+   "targetBarTime": "2019-06-06T12:00:00Z",
+   "pUp": 0.4390401244163513,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27243,
+    "high": 1.274225,
+    "low": 1.27168,
+    "close": 1.27201
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T12:00:00Z",
+   "targetBarTime": "2019-06-06T13:00:00Z",
+   "pUp": 0.46758130192756653,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271995,
+    "high": 1.27294,
+    "low": 1.269235,
+    "close": 1.270055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T13:00:00Z",
+   "targetBarTime": "2019-06-06T14:00:00Z",
+   "pUp": 0.5207511782646179,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27004,
+    "high": 1.27294,
+    "low": 1.269895,
+    "close": 1.271485
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T14:00:00Z",
+   "targetBarTime": "2019-06-06T15:00:00Z",
+   "pUp": 0.48418131470680237,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271415,
+    "high": 1.27249,
+    "low": 1.27066,
+    "close": 1.27134
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T15:00:00Z",
+   "targetBarTime": "2019-06-06T16:00:00Z",
+   "pUp": 0.49055659770965576,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27133,
+    "high": 1.271615,
+    "low": 1.26995,
+    "close": 1.271025
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T16:00:00Z",
+   "targetBarTime": "2019-06-06T17:00:00Z",
+   "pUp": 0.49917352199554443,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27097,
+    "high": 1.27111,
+    "low": 1.2701,
+    "close": 1.270425
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T17:00:00Z",
+   "targetBarTime": "2019-06-06T18:00:00Z",
+   "pUp": 0.5114604830741882,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270425,
+    "high": 1.27052,
+    "low": 1.268615,
+    "close": 1.268935
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T18:00:00Z",
+   "targetBarTime": "2019-06-06T19:00:00Z",
+   "pUp": 0.5426039099693298,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26894,
+    "high": 1.27016,
+    "low": 1.26894,
+    "close": 1.26931
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T19:00:00Z",
+   "targetBarTime": "2019-06-06T20:00:00Z",
+   "pUp": 0.5167242884635925,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269315,
+    "high": 1.26965,
+    "low": 1.268695,
+    "close": 1.269475
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T20:00:00Z",
+   "targetBarTime": "2019-06-06T21:00:00Z",
+   "pUp": 0.4980110824108124,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269505,
+    "high": 1.270355,
+    "low": 1.26906,
+    "close": 1.269515
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T21:00:00Z",
+   "targetBarTime": "2019-06-06T22:00:00Z",
+   "pUp": 0.5123637318611145,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26948,
+    "high": 1.26996,
+    "low": 1.26937,
+    "close": 1.269785
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T22:00:00Z",
+   "targetBarTime": "2019-06-06T23:00:00Z",
+   "pUp": 0.5173638463020325,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26978,
+    "high": 1.270015,
+    "low": 1.269435,
+    "close": 1.269475
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-06T23:00:00Z",
+   "targetBarTime": "2019-06-07T00:00:00Z",
+   "pUp": 0.5306511521339417,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269475,
+    "high": 1.26958,
+    "low": 1.26897,
+    "close": 1.269215
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T00:00:00Z",
+   "targetBarTime": "2019-06-07T01:00:00Z",
+   "pUp": 0.5311079025268555,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26921,
+    "high": 1.26965,
+    "low": 1.26887,
+    "close": 1.269545
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T01:00:00Z",
+   "targetBarTime": "2019-06-07T02:00:00Z",
+   "pUp": 0.5149770379066467,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269545,
+    "high": 1.269695,
+    "low": 1.26921,
+    "close": 1.26947
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T02:00:00Z",
+   "targetBarTime": "2019-06-07T03:00:00Z",
+   "pUp": 0.5137118697166443,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269455,
+    "high": 1.26968,
+    "low": 1.26928,
+    "close": 1.26949
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T03:00:00Z",
+   "targetBarTime": "2019-06-07T04:00:00Z",
+   "pUp": 0.5081364512443542,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269475,
+    "high": 1.26971,
+    "low": 1.26938,
+    "close": 1.269605
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T04:00:00Z",
+   "targetBarTime": "2019-06-07T05:00:00Z",
+   "pUp": 0.5015044212341309,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26959,
+    "high": 1.269725,
+    "low": 1.26938,
+    "close": 1.26958
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T05:00:00Z",
+   "targetBarTime": "2019-06-07T06:00:00Z",
+   "pUp": 0.49854612350463867,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269575,
+    "high": 1.270815,
+    "low": 1.26935,
+    "close": 1.270285
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T06:00:00Z",
+   "targetBarTime": "2019-06-07T07:00:00Z",
+   "pUp": 0.48085787892341614,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27029,
+    "high": 1.272195,
+    "low": 1.26985,
+    "close": 1.27095
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T07:00:00Z",
+   "targetBarTime": "2019-06-07T08:00:00Z",
+   "pUp": 0.4734112024307251,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27097,
+    "high": 1.271765,
+    "low": 1.27035,
+    "close": 1.27167
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T08:00:00Z",
+   "targetBarTime": "2019-06-07T09:00:00Z",
+   "pUp": 0.4642689824104309,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271685,
+    "high": 1.272765,
+    "low": 1.271265,
+    "close": 1.27147
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T09:00:00Z",
+   "targetBarTime": "2019-06-07T10:00:00Z",
+   "pUp": 0.47876325249671936,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.271445,
+    "high": 1.27199,
+    "low": 1.270745,
+    "close": 1.271635
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T10:00:00Z",
+   "targetBarTime": "2019-06-07T11:00:00Z",
+   "pUp": 0.47888725996017456,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271635,
+    "high": 1.27191,
+    "low": 1.2702,
+    "close": 1.27087
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T11:00:00Z",
+   "targetBarTime": "2019-06-07T12:00:00Z",
+   "pUp": 0.49999380111694336,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27089,
+    "high": 1.27569,
+    "low": 1.27064,
+    "close": 1.274355
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T12:00:00Z",
+   "targetBarTime": "2019-06-07T13:00:00Z",
+   "pUp": 0.4483672082424164,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27434,
+    "high": 1.274775,
+    "low": 1.272845,
+    "close": 1.27386
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T13:00:00Z",
+   "targetBarTime": "2019-06-07T14:00:00Z",
+   "pUp": 0.4755801558494568,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273855,
+    "high": 1.27613,
+    "low": 1.27357,
+    "close": 1.27587
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T14:00:00Z",
+   "targetBarTime": "2019-06-07T15:00:00Z",
+   "pUp": 0.4467988908290863,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.275885,
+    "high": 1.276305,
+    "low": 1.273735,
+    "close": 1.273945
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T15:00:00Z",
+   "targetBarTime": "2019-06-07T16:00:00Z",
+   "pUp": 0.5105873942375183,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273925,
+    "high": 1.27507,
+    "low": 1.273625,
+    "close": 1.27471
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T16:00:00Z",
+   "targetBarTime": "2019-06-07T17:00:00Z",
+   "pUp": 0.4860156178474426,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274735,
+    "high": 1.275455,
+    "low": 1.27393,
+    "close": 1.274885
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T17:00:00Z",
+   "targetBarTime": "2019-06-07T18:00:00Z",
+   "pUp": 0.4874241054058075,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27489,
+    "high": 1.274985,
+    "low": 1.273345,
+    "close": 1.27407
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T18:00:00Z",
+   "targetBarTime": "2019-06-07T19:00:00Z",
+   "pUp": 0.5136646032333374,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27408,
+    "high": 1.2741,
+    "low": 1.27322,
+    "close": 1.27344
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T19:00:00Z",
+   "targetBarTime": "2019-06-07T20:00:00Z",
+   "pUp": 0.5246998071670532,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2734,
+    "high": 1.273925,
+    "low": 1.273385,
+    "close": 1.27377
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-07T20:00:00Z",
+   "targetBarTime": "2019-06-09T21:00:00Z",
+   "pUp": 0.5036642551422119,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.273905,
+    "high": 1.27478,
+    "low": 1.272495,
+    "close": 1.27327
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-09T21:00:00Z",
+   "targetBarTime": "2019-06-09T22:00:00Z",
+   "pUp": 0.5279204845428467,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27328,
+    "high": 1.273645,
+    "low": 1.2721,
+    "close": 1.272195
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-09T22:00:00Z",
+   "targetBarTime": "2019-06-09T23:00:00Z",
+   "pUp": 0.5544237494468689,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27219,
+    "high": 1.27246,
+    "low": 1.272065,
+    "close": 1.27221
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-09T23:00:00Z",
+   "targetBarTime": "2019-06-10T00:00:00Z",
+   "pUp": 0.5404036641120911,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272225,
+    "high": 1.27275,
+    "low": 1.27192,
+    "close": 1.272015
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T00:00:00Z",
+   "targetBarTime": "2019-06-10T01:00:00Z",
+   "pUp": 0.5361111760139465,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272005,
+    "high": 1.272015,
+    "low": 1.271045,
+    "close": 1.27184
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T01:00:00Z",
+   "targetBarTime": "2019-06-10T02:00:00Z",
+   "pUp": 0.5296408534049988,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27182,
+    "high": 1.27233,
+    "low": 1.27147,
+    "close": 1.27233
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T02:00:00Z",
+   "targetBarTime": "2019-06-10T03:00:00Z",
+   "pUp": 0.5086237192153931,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272325,
+    "high": 1.27266,
+    "low": 1.271395,
+    "close": 1.271425
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T03:00:00Z",
+   "targetBarTime": "2019-06-10T04:00:00Z",
+   "pUp": 0.5259250998497009,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27143,
+    "high": 1.27146,
+    "low": 1.27079,
+    "close": 1.27098
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T04:00:00Z",
+   "targetBarTime": "2019-06-10T05:00:00Z",
+   "pUp": 0.5228879451751709,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270985,
+    "high": 1.271165,
+    "low": 1.27014,
+    "close": 1.27041
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T05:00:00Z",
+   "targetBarTime": "2019-06-10T06:00:00Z",
+   "pUp": 0.5222498774528503,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27041,
+    "high": 1.271165,
+    "low": 1.2702,
+    "close": 1.271135
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T06:00:00Z",
+   "targetBarTime": "2019-06-10T07:00:00Z",
+   "pUp": 0.49485746026039124,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27114,
+    "high": 1.271295,
+    "low": 1.2701,
+    "close": 1.2708
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T07:00:00Z",
+   "targetBarTime": "2019-06-10T08:00:00Z",
+   "pUp": 0.5000836253166199,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270795,
+    "high": 1.27245,
+    "low": 1.268465,
+    "close": 1.268865
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T08:00:00Z",
+   "targetBarTime": "2019-06-10T09:00:00Z",
+   "pUp": 0.5337339639663696,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268865,
+    "high": 1.26986,
+    "low": 1.26839,
+    "close": 1.269045
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T09:00:00Z",
+   "targetBarTime": "2019-06-10T10:00:00Z",
+   "pUp": 0.5113798379898071,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269045,
+    "high": 1.26956,
+    "low": 1.267455,
+    "close": 1.26754
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T10:00:00Z",
+   "targetBarTime": "2019-06-10T11:00:00Z",
+   "pUp": 0.528901994228363,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26754,
+    "high": 1.26778,
+    "low": 1.265435,
+    "close": 1.26553
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T11:00:00Z",
+   "targetBarTime": "2019-06-10T12:00:00Z",
+   "pUp": 0.5474985241889954,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.265525,
+    "high": 1.267975,
+    "low": 1.26531,
+    "close": 1.267555
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T12:00:00Z",
+   "targetBarTime": "2019-06-10T13:00:00Z",
+   "pUp": 0.49477142095565796,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26754,
+    "high": 1.268585,
+    "low": 1.26683,
+    "close": 1.26711
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T13:00:00Z",
+   "targetBarTime": "2019-06-10T14:00:00Z",
+   "pUp": 0.4977363646030426,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2671,
+    "high": 1.269425,
+    "low": 1.26631,
+    "close": 1.268965
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T14:00:00Z",
+   "targetBarTime": "2019-06-10T15:00:00Z",
+   "pUp": 0.4656105935573578,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268955,
+    "high": 1.2694,
+    "low": 1.26776,
+    "close": 1.268385
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T15:00:00Z",
+   "targetBarTime": "2019-06-10T16:00:00Z",
+   "pUp": 0.4833371341228485,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268385,
+    "high": 1.26938,
+    "low": 1.2681,
+    "close": 1.268895
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T16:00:00Z",
+   "targetBarTime": "2019-06-10T17:00:00Z",
+   "pUp": 0.47178080677986145,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268895,
+    "high": 1.269775,
+    "low": 1.26826,
+    "close": 1.268905
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T17:00:00Z",
+   "targetBarTime": "2019-06-10T18:00:00Z",
+   "pUp": 0.47693702578544617,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268905,
+    "high": 1.27051,
+    "low": 1.268575,
+    "close": 1.268915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T18:00:00Z",
+   "targetBarTime": "2019-06-10T19:00:00Z",
+   "pUp": 0.4807576835155487,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268915,
+    "high": 1.26952,
+    "low": 1.26887,
+    "close": 1.269485
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T19:00:00Z",
+   "targetBarTime": "2019-06-10T20:00:00Z",
+   "pUp": 0.47084876894950867,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26949,
+    "high": 1.26959,
+    "low": 1.26839,
+    "close": 1.26842
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T20:00:00Z",
+   "targetBarTime": "2019-06-10T21:00:00Z",
+   "pUp": 0.5005303621292114,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268405,
+    "high": 1.26907,
+    "low": 1.268065,
+    "close": 1.26839
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T21:00:00Z",
+   "targetBarTime": "2019-06-10T22:00:00Z",
+   "pUp": 0.4955337345600128,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26842,
+    "high": 1.268845,
+    "low": 1.268355,
+    "close": 1.268845
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T22:00:00Z",
+   "targetBarTime": "2019-06-10T23:00:00Z",
+   "pUp": 0.4919317960739136,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26884,
+    "high": 1.26912,
+    "low": 1.26875,
+    "close": 1.26907
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-10T23:00:00Z",
+   "targetBarTime": "2019-06-11T00:00:00Z",
+   "pUp": 0.493265837430954,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26907,
+    "high": 1.269265,
+    "low": 1.268365,
+    "close": 1.268745
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T00:00:00Z",
+   "targetBarTime": "2019-06-11T01:00:00Z",
+   "pUp": 0.510127604007721,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26874,
+    "high": 1.268875,
+    "low": 1.268025,
+    "close": 1.26825
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T01:00:00Z",
+   "targetBarTime": "2019-06-11T02:00:00Z",
+   "pUp": 0.5211014747619629,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26825,
+    "high": 1.268365,
+    "low": 1.26772,
+    "close": 1.26836
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T02:00:00Z",
+   "targetBarTime": "2019-06-11T03:00:00Z",
+   "pUp": 0.5114128589630127,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26836,
+    "high": 1.268385,
+    "low": 1.268045,
+    "close": 1.26817
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T03:00:00Z",
+   "targetBarTime": "2019-06-11T04:00:00Z",
+   "pUp": 0.5106574296951294,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26818,
+    "high": 1.26834,
+    "low": 1.267875,
+    "close": 1.26825
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T04:00:00Z",
+   "targetBarTime": "2019-06-11T05:00:00Z",
+   "pUp": 0.5021564364433289,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268245,
+    "high": 1.268345,
+    "low": 1.267725,
+    "close": 1.268085
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T05:00:00Z",
+   "targetBarTime": "2019-06-11T06:00:00Z",
+   "pUp": 0.5015791654586792,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268035,
+    "high": 1.26871,
+    "low": 1.26702,
+    "close": 1.26736
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T06:00:00Z",
+   "targetBarTime": "2019-06-11T07:00:00Z",
+   "pUp": 0.5130802989006042,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26737,
+    "high": 1.270315,
+    "low": 1.267295,
+    "close": 1.269755
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T07:00:00Z",
+   "targetBarTime": "2019-06-11T08:00:00Z",
+   "pUp": 0.4648512005805969,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269755,
+    "high": 1.2711,
+    "low": 1.26841,
+    "close": 1.270815
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T08:00:00Z",
+   "targetBarTime": "2019-06-11T09:00:00Z",
+   "pUp": 0.455911785364151,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270815,
+    "high": 1.272445,
+    "low": 1.27073,
+    "close": 1.270965
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T09:00:00Z",
+   "targetBarTime": "2019-06-11T10:00:00Z",
+   "pUp": 0.46350130438804626,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270965,
+    "high": 1.27281,
+    "low": 1.270025,
+    "close": 1.270145
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T10:00:00Z",
+   "targetBarTime": "2019-06-11T11:00:00Z",
+   "pUp": 0.49013203382492065,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270155,
+    "high": 1.270695,
+    "low": 1.26934,
+    "close": 1.26958
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T11:00:00Z",
+   "targetBarTime": "2019-06-11T12:00:00Z",
+   "pUp": 0.49769267439842224,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26961,
+    "high": 1.271705,
+    "low": 1.269225,
+    "close": 1.27156
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T12:00:00Z",
+   "targetBarTime": "2019-06-11T13:00:00Z",
+   "pUp": 0.4600744843482971,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27156,
+    "high": 1.2719,
+    "low": 1.270595,
+    "close": 1.27145
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T13:00:00Z",
+   "targetBarTime": "2019-06-11T14:00:00Z",
+   "pUp": 0.4700350761413574,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.271425,
+    "high": 1.27228,
+    "low": 1.27037,
+    "close": 1.271875
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T14:00:00Z",
+   "targetBarTime": "2019-06-11T15:00:00Z",
+   "pUp": 0.4674813151359558,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27186,
+    "high": 1.272555,
+    "low": 1.271365,
+    "close": 1.27233
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T15:00:00Z",
+   "targetBarTime": "2019-06-11T16:00:00Z",
+   "pUp": 0.46290382742881775,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27233,
+    "high": 1.2729,
+    "low": 1.271755,
+    "close": 1.27274
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T16:00:00Z",
+   "targetBarTime": "2019-06-11T17:00:00Z",
+   "pUp": 0.46013590693473816,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272745,
+    "high": 1.272955,
+    "low": 1.27169,
+    "close": 1.27261
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T17:00:00Z",
+   "targetBarTime": "2019-06-11T18:00:00Z",
+   "pUp": 0.47216999530792236,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27259,
+    "high": 1.273235,
+    "low": 1.27207,
+    "close": 1.27218
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T18:00:00Z",
+   "targetBarTime": "2019-06-11T19:00:00Z",
+   "pUp": 0.487571656703949,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272195,
+    "high": 1.27249,
+    "low": 1.271655,
+    "close": 1.27231
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T19:00:00Z",
+   "targetBarTime": "2019-06-11T20:00:00Z",
+   "pUp": 0.48537078499794006,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272305,
+    "high": 1.272695,
+    "low": 1.27205,
+    "close": 1.27246
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T20:00:00Z",
+   "targetBarTime": "2019-06-11T21:00:00Z",
+   "pUp": 0.46798643469810486,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27245,
+    "high": 1.27287,
+    "low": 1.271515,
+    "close": 1.27222
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T21:00:00Z",
+   "targetBarTime": "2019-06-11T22:00:00Z",
+   "pUp": 0.4956318140029907,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27227,
+    "high": 1.27239,
+    "low": 1.27213,
+    "close": 1.2723
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T22:00:00Z",
+   "targetBarTime": "2019-06-11T23:00:00Z",
+   "pUp": 0.5042222738265991,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272295,
+    "high": 1.27248,
+    "low": 1.272055,
+    "close": 1.272435
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-11T23:00:00Z",
+   "targetBarTime": "2019-06-12T00:00:00Z",
+   "pUp": 0.5070329308509827,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27244,
+    "high": 1.27262,
+    "low": 1.27198,
+    "close": 1.272255
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T00:00:00Z",
+   "targetBarTime": "2019-06-12T01:00:00Z",
+   "pUp": 0.517296314239502,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27226,
+    "high": 1.27275,
+    "low": 1.27166,
+    "close": 1.27203
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T01:00:00Z",
+   "targetBarTime": "2019-06-12T02:00:00Z",
+   "pUp": 0.5219312906265259,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27201,
+    "high": 1.272075,
+    "low": 1.27157,
+    "close": 1.271645
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T02:00:00Z",
+   "targetBarTime": "2019-06-12T03:00:00Z",
+   "pUp": 0.5241923332214355,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.271655,
+    "high": 1.27202,
+    "low": 1.27153,
+    "close": 1.27186
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T03:00:00Z",
+   "targetBarTime": "2019-06-12T04:00:00Z",
+   "pUp": 0.5092871189117432,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27186,
+    "high": 1.27212,
+    "low": 1.271615,
+    "close": 1.2721
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T04:00:00Z",
+   "targetBarTime": "2019-06-12T05:00:00Z",
+   "pUp": 0.4991859495639801,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272095,
+    "high": 1.272385,
+    "low": 1.27184,
+    "close": 1.27233
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T05:00:00Z",
+   "targetBarTime": "2019-06-12T06:00:00Z",
+   "pUp": 0.4914659857749939,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27233,
+    "high": 1.273025,
+    "low": 1.272135,
+    "close": 1.27256
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T06:00:00Z",
+   "targetBarTime": "2019-06-12T07:00:00Z",
+   "pUp": 0.4861745834350586,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27255,
+    "high": 1.273985,
+    "low": 1.27195,
+    "close": 1.273775
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T07:00:00Z",
+   "targetBarTime": "2019-06-12T08:00:00Z",
+   "pUp": 0.4641628861427307,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273765,
+    "high": 1.274775,
+    "low": 1.2734,
+    "close": 1.274355
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T08:00:00Z",
+   "targetBarTime": "2019-06-12T09:00:00Z",
+   "pUp": 0.46097296476364136,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27435,
+    "high": 1.274465,
+    "low": 1.27352,
+    "close": 1.273935
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T09:00:00Z",
+   "targetBarTime": "2019-06-12T10:00:00Z",
+   "pUp": 0.4779001474380493,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27393,
+    "high": 1.27581,
+    "low": 1.273195,
+    "close": 1.27381
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T10:00:00Z",
+   "targetBarTime": "2019-06-12T11:00:00Z",
+   "pUp": 0.48560282588005066,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273795,
+    "high": 1.27469,
+    "low": 1.27256,
+    "close": 1.27455
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T11:00:00Z",
+   "targetBarTime": "2019-06-12T12:00:00Z",
+   "pUp": 0.4725949764251709,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27454,
+    "high": 1.275875,
+    "low": 1.27381,
+    "close": 1.274085
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T12:00:00Z",
+   "targetBarTime": "2019-06-12T13:00:00Z",
+   "pUp": 0.488660603761673,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27405,
+    "high": 1.27447,
+    "low": 1.27296,
+    "close": 1.273425
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T13:00:00Z",
+   "targetBarTime": "2019-06-12T14:00:00Z",
+   "pUp": 0.5011827945709229,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27343,
+    "high": 1.27459,
+    "low": 1.27157,
+    "close": 1.27244
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T14:00:00Z",
+   "targetBarTime": "2019-06-12T15:00:00Z",
+   "pUp": 0.5193711519241333,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27245,
+    "high": 1.273255,
+    "low": 1.268715,
+    "close": 1.26915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T15:00:00Z",
+   "targetBarTime": "2019-06-12T16:00:00Z",
+   "pUp": 0.5710892081260681,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269165,
+    "high": 1.27005,
+    "low": 1.26816,
+    "close": 1.268945
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T16:00:00Z",
+   "targetBarTime": "2019-06-12T17:00:00Z",
+   "pUp": 0.542804479598999,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268945,
+    "high": 1.269565,
+    "low": 1.268425,
+    "close": 1.269255
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T17:00:00Z",
+   "targetBarTime": "2019-06-12T18:00:00Z",
+   "pUp": 0.5154985189437866,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26922,
+    "high": 1.269435,
+    "low": 1.268415,
+    "close": 1.268835
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T18:00:00Z",
+   "targetBarTime": "2019-06-12T19:00:00Z",
+   "pUp": 0.5176646113395691,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26883,
+    "high": 1.26912,
+    "low": 1.26848,
+    "close": 1.26855
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T19:00:00Z",
+   "targetBarTime": "2019-06-12T20:00:00Z",
+   "pUp": 0.5166459679603577,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268555,
+    "high": 1.26894,
+    "low": 1.26841,
+    "close": 1.26886
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T20:00:00Z",
+   "targetBarTime": "2019-06-12T21:00:00Z",
+   "pUp": 0.49735015630722046,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268845,
+    "high": 1.269435,
+    "low": 1.2685,
+    "close": 1.26916
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T21:00:00Z",
+   "targetBarTime": "2019-06-12T22:00:00Z",
+   "pUp": 0.49186959862709045,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26915,
+    "high": 1.269275,
+    "low": 1.26898,
+    "close": 1.269165
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T22:00:00Z",
+   "targetBarTime": "2019-06-12T23:00:00Z",
+   "pUp": 0.5035552978515625,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26918,
+    "high": 1.26942,
+    "low": 1.26906,
+    "close": 1.26927
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-12T23:00:00Z",
+   "targetBarTime": "2019-06-13T00:00:00Z",
+   "pUp": 0.5081266760826111,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26927,
+    "high": 1.26958,
+    "low": 1.269065,
+    "close": 1.26931
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T00:00:00Z",
+   "targetBarTime": "2019-06-13T01:00:00Z",
+   "pUp": 0.5109787583351135,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269315,
+    "high": 1.27006,
+    "low": 1.268905,
+    "close": 1.269825
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T01:00:00Z",
+   "targetBarTime": "2019-06-13T02:00:00Z",
+   "pUp": 0.5001112222671509,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269825,
+    "high": 1.269905,
+    "low": 1.26902,
+    "close": 1.269185
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T02:00:00Z",
+   "targetBarTime": "2019-06-13T03:00:00Z",
+   "pUp": 0.519717276096344,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269165,
+    "high": 1.269475,
+    "low": 1.268625,
+    "close": 1.26874
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T03:00:00Z",
+   "targetBarTime": "2019-06-13T04:00:00Z",
+   "pUp": 0.5228180289268494,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268755,
+    "high": 1.26914,
+    "low": 1.26836,
+    "close": 1.26912
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T04:00:00Z",
+   "targetBarTime": "2019-06-13T05:00:00Z",
+   "pUp": 0.5030132532119751,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269085,
+    "high": 1.26926,
+    "low": 1.26883,
+    "close": 1.269055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T05:00:00Z",
+   "targetBarTime": "2019-06-13T06:00:00Z",
+   "pUp": 0.500813364982605,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269055,
+    "high": 1.269655,
+    "low": 1.267795,
+    "close": 1.267845
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T06:00:00Z",
+   "targetBarTime": "2019-06-13T07:00:00Z",
+   "pUp": 0.5242974162101746,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267835,
+    "high": 1.2683,
+    "low": 1.26623,
+    "close": 1.267935
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T07:00:00Z",
+   "targetBarTime": "2019-06-13T08:00:00Z",
+   "pUp": 0.5076274871826172,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267935,
+    "high": 1.26829,
+    "low": 1.266545,
+    "close": 1.267035
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T08:00:00Z",
+   "targetBarTime": "2019-06-13T09:00:00Z",
+   "pUp": 0.5174141526222229,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26704,
+    "high": 1.267665,
+    "low": 1.26695,
+    "close": 1.267205
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T09:00:00Z",
+   "targetBarTime": "2019-06-13T10:00:00Z",
+   "pUp": 0.4996107220649719,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267255,
+    "high": 1.267845,
+    "low": 1.26661,
+    "close": 1.267125
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T10:00:00Z",
+   "targetBarTime": "2019-06-13T11:00:00Z",
+   "pUp": 0.4957280457019806,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267125,
+    "high": 1.268775,
+    "low": 1.266535,
+    "close": 1.268725
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T11:00:00Z",
+   "targetBarTime": "2019-06-13T12:00:00Z",
+   "pUp": 0.46370741724967957,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268745,
+    "high": 1.270815,
+    "low": 1.267375,
+    "close": 1.269245
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T12:00:00Z",
+   "targetBarTime": "2019-06-13T13:00:00Z",
+   "pUp": 0.47031912207603455,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269255,
+    "high": 1.2701,
+    "low": 1.26818,
+    "close": 1.26893
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T13:00:00Z",
+   "targetBarTime": "2019-06-13T14:00:00Z",
+   "pUp": 0.4854665696620941,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26893,
+    "high": 1.26981,
+    "low": 1.267875,
+    "close": 1.268515
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T14:00:00Z",
+   "targetBarTime": "2019-06-13T15:00:00Z",
+   "pUp": 0.49759313464164734,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26851,
+    "high": 1.26923,
+    "low": 1.267275,
+    "close": 1.26769
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T15:00:00Z",
+   "targetBarTime": "2019-06-13T16:00:00Z",
+   "pUp": 0.5154295563697815,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26769,
+    "high": 1.26828,
+    "low": 1.267315,
+    "close": 1.26795
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T16:00:00Z",
+   "targetBarTime": "2019-06-13T17:00:00Z",
+   "pUp": 0.4992321729660034,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26795,
+    "high": 1.268955,
+    "low": 1.267925,
+    "close": 1.26849
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T17:00:00Z",
+   "targetBarTime": "2019-06-13T18:00:00Z",
+   "pUp": 0.48495253920555115,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268495,
+    "high": 1.269,
+    "low": 1.268125,
+    "close": 1.26821
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T18:00:00Z",
+   "targetBarTime": "2019-06-13T19:00:00Z",
+   "pUp": 0.4981018006801605,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26821,
+    "high": 1.26835,
+    "low": 1.267555,
+    "close": 1.26774
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T19:00:00Z",
+   "targetBarTime": "2019-06-13T20:00:00Z",
+   "pUp": 0.5125249624252319,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267735,
+    "high": 1.26774,
+    "low": 1.267295,
+    "close": 1.267435
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T20:00:00Z",
+   "targetBarTime": "2019-06-13T21:00:00Z",
+   "pUp": 0.5142913460731506,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267435,
+    "high": 1.267975,
+    "low": 1.26739,
+    "close": 1.2676
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T21:00:00Z",
+   "targetBarTime": "2019-06-13T22:00:00Z",
+   "pUp": 0.5162500739097595,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267605,
+    "high": 1.2681,
+    "low": 1.267455,
+    "close": 1.267975
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T22:00:00Z",
+   "targetBarTime": "2019-06-13T23:00:00Z",
+   "pUp": 0.5145435929298401,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267945,
+    "high": 1.268045,
+    "low": 1.267795,
+    "close": 1.267935
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-13T23:00:00Z",
+   "targetBarTime": "2019-06-14T00:00:00Z",
+   "pUp": 0.5230087637901306,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267905,
+    "high": 1.26823,
+    "low": 1.26761,
+    "close": 1.267745
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T00:00:00Z",
+   "targetBarTime": "2019-06-14T01:00:00Z",
+   "pUp": 0.5250425934791565,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26774,
+    "high": 1.26776,
+    "low": 1.267115,
+    "close": 1.26725
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T01:00:00Z",
+   "targetBarTime": "2019-06-14T02:00:00Z",
+   "pUp": 0.5314568281173706,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267245,
+    "high": 1.26764,
+    "low": 1.267225,
+    "close": 1.267375
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T02:00:00Z",
+   "targetBarTime": "2019-06-14T03:00:00Z",
+   "pUp": 0.5177280902862549,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26739,
+    "high": 1.26754,
+    "low": 1.267055,
+    "close": 1.26724
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T03:00:00Z",
+   "targetBarTime": "2019-06-14T04:00:00Z",
+   "pUp": 0.5146816372871399,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26724,
+    "high": 1.26763,
+    "low": 1.26721,
+    "close": 1.2675
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T04:00:00Z",
+   "targetBarTime": "2019-06-14T05:00:00Z",
+   "pUp": 0.5015244483947754,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26748,
+    "high": 1.267625,
+    "low": 1.267205,
+    "close": 1.26743
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T05:00:00Z",
+   "targetBarTime": "2019-06-14T06:00:00Z",
+   "pUp": 0.5021272301673889,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26743,
+    "high": 1.268055,
+    "low": 1.266715,
+    "close": 1.26695
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T06:00:00Z",
+   "targetBarTime": "2019-06-14T07:00:00Z",
+   "pUp": 0.5094175934791565,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.266965,
+    "high": 1.267495,
+    "low": 1.266135,
+    "close": 1.266635
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T07:00:00Z",
+   "targetBarTime": "2019-06-14T08:00:00Z",
+   "pUp": 0.5070146918296814,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.266645,
+    "high": 1.267155,
+    "low": 1.26534,
+    "close": 1.26618
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T08:00:00Z",
+   "targetBarTime": "2019-06-14T09:00:00Z",
+   "pUp": 0.5097500681877136,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26618,
+    "high": 1.266205,
+    "low": 1.263345,
+    "close": 1.26532
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T09:00:00Z",
+   "targetBarTime": "2019-06-14T10:00:00Z",
+   "pUp": 0.5200827121734619,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.265315,
+    "high": 1.26601,
+    "low": 1.26406,
+    "close": 1.26412
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T10:00:00Z",
+   "targetBarTime": "2019-06-14T11:00:00Z",
+   "pUp": 0.530448853969574,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.264135,
+    "high": 1.264575,
+    "low": 1.262625,
+    "close": 1.26408
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T11:00:00Z",
+   "targetBarTime": "2019-06-14T12:00:00Z",
+   "pUp": 0.5153059959411621,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.264085,
+    "high": 1.265325,
+    "low": 1.261685,
+    "close": 1.26205
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T12:00:00Z",
+   "targetBarTime": "2019-06-14T13:00:00Z",
+   "pUp": 0.5475372672080994,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.262035,
+    "high": 1.26277,
+    "low": 1.26153,
+    "close": 1.262205
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T13:00:00Z",
+   "targetBarTime": "2019-06-14T14:00:00Z",
+   "pUp": 0.5190492272377014,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26222,
+    "high": 1.262905,
+    "low": 1.26013,
+    "close": 1.260765
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T14:00:00Z",
+   "targetBarTime": "2019-06-14T15:00:00Z",
+   "pUp": 0.5419632196426392,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26076,
+    "high": 1.261095,
+    "low": 1.25885,
+    "close": 1.26003
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T15:00:00Z",
+   "targetBarTime": "2019-06-14T16:00:00Z",
+   "pUp": 0.5394774675369263,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26003,
+    "high": 1.26102,
+    "low": 1.259465,
+    "close": 1.259635
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T16:00:00Z",
+   "targetBarTime": "2019-06-14T17:00:00Z",
+   "pUp": 0.5310185551643372,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25963,
+    "high": 1.259905,
+    "low": 1.259,
+    "close": 1.25923
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T17:00:00Z",
+   "targetBarTime": "2019-06-14T18:00:00Z",
+   "pUp": 0.52727872133255,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.259225,
+    "high": 1.259405,
+    "low": 1.25816,
+    "close": 1.25843
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T18:00:00Z",
+   "targetBarTime": "2019-06-14T19:00:00Z",
+   "pUp": 0.5367106795310974,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.258405,
+    "high": 1.25922,
+    "low": 1.258205,
+    "close": 1.25822
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T19:00:00Z",
+   "targetBarTime": "2019-06-14T20:00:00Z",
+   "pUp": 0.5288752317428589,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25816,
+    "high": 1.259315,
+    "low": 1.257995,
+    "close": 1.25903
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-14T20:00:00Z",
+   "targetBarTime": "2019-06-16T21:00:00Z",
+   "pUp": 0.4980996549129486,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.258195,
+    "high": 1.260295,
+    "low": 1.25774,
+    "close": 1.25878
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-16T21:00:00Z",
+   "targetBarTime": "2019-06-16T22:00:00Z",
+   "pUp": 0.5041800141334534,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.258905,
+    "high": 1.25951,
+    "low": 1.25886,
+    "close": 1.259185
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-16T22:00:00Z",
+   "targetBarTime": "2019-06-16T23:00:00Z",
+   "pUp": 0.48769429326057434,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.259195,
+    "high": 1.259475,
+    "low": 1.259155,
+    "close": 1.25939
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-16T23:00:00Z",
+   "targetBarTime": "2019-06-17T00:00:00Z",
+   "pUp": 0.4888184070587158,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.259385,
+    "high": 1.25978,
+    "low": 1.258915,
+    "close": 1.25937
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T00:00:00Z",
+   "targetBarTime": "2019-06-17T01:00:00Z",
+   "pUp": 0.4980219006538391,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.259355,
+    "high": 1.25966,
+    "low": 1.259075,
+    "close": 1.259635
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T01:00:00Z",
+   "targetBarTime": "2019-06-17T02:00:00Z",
+   "pUp": 0.49399423599243164,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.259645,
+    "high": 1.259805,
+    "low": 1.25937,
+    "close": 1.259685
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T02:00:00Z",
+   "targetBarTime": "2019-06-17T03:00:00Z",
+   "pUp": 0.4966173470020294,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25969,
+    "high": 1.25982,
+    "low": 1.259465,
+    "close": 1.25967
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T03:00:00Z",
+   "targetBarTime": "2019-06-17T04:00:00Z",
+   "pUp": 0.4977625906467438,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25966,
+    "high": 1.259735,
+    "low": 1.259055,
+    "close": 1.259405
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T04:00:00Z",
+   "targetBarTime": "2019-06-17T05:00:00Z",
+   "pUp": 0.5033945441246033,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25941,
+    "high": 1.259565,
+    "low": 1.25913,
+    "close": 1.25947
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T05:00:00Z",
+   "targetBarTime": "2019-06-17T06:00:00Z",
+   "pUp": 0.49656862020492554,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.259465,
+    "high": 1.259555,
+    "low": 1.25788,
+    "close": 1.25818
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T06:00:00Z",
+   "targetBarTime": "2019-06-17T07:00:00Z",
+   "pUp": 0.5211475491523743,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.258185,
+    "high": 1.258485,
+    "low": 1.25716,
+    "close": 1.25778
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T07:00:00Z",
+   "targetBarTime": "2019-06-17T08:00:00Z",
+   "pUp": 0.515912652015686,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25783,
+    "high": 1.25889,
+    "low": 1.25783,
+    "close": 1.258845
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T08:00:00Z",
+   "targetBarTime": "2019-06-17T09:00:00Z",
+   "pUp": 0.4831666052341461,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25885,
+    "high": 1.259235,
+    "low": 1.25822,
+    "close": 1.258915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T09:00:00Z",
+   "targetBarTime": "2019-06-17T10:00:00Z",
+   "pUp": 0.48261258006095886,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.258935,
+    "high": 1.259705,
+    "low": 1.2586,
+    "close": 1.259685
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T10:00:00Z",
+   "targetBarTime": "2019-06-17T11:00:00Z",
+   "pUp": 0.46780097484588623,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.259675,
+    "high": 1.259935,
+    "low": 1.258125,
+    "close": 1.25876
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T11:00:00Z",
+   "targetBarTime": "2019-06-17T12:00:00Z",
+   "pUp": 0.49389714002609253,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.258805,
+    "high": 1.26057,
+    "low": 1.258785,
+    "close": 1.26016
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T12:00:00Z",
+   "targetBarTime": "2019-06-17T13:00:00Z",
+   "pUp": 0.4647787809371948,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26015,
+    "high": 1.26019,
+    "low": 1.258625,
+    "close": 1.258725
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T13:00:00Z",
+   "targetBarTime": "2019-06-17T14:00:00Z",
+   "pUp": 0.5017642378807068,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.258735,
+    "high": 1.259265,
+    "low": 1.25543,
+    "close": 1.25559
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T14:00:00Z",
+   "targetBarTime": "2019-06-17T15:00:00Z",
+   "pUp": 0.5570000410079956,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2556,
+    "high": 1.256675,
+    "low": 1.255365,
+    "close": 1.25663
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T15:00:00Z",
+   "targetBarTime": "2019-06-17T16:00:00Z",
+   "pUp": 0.5115931034088135,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.256645,
+    "high": 1.256945,
+    "low": 1.255595,
+    "close": 1.255835
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T16:00:00Z",
+   "targetBarTime": "2019-06-17T17:00:00Z",
+   "pUp": 0.5174979567527771,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25582,
+    "high": 1.25598,
+    "low": 1.254175,
+    "close": 1.25492
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T17:00:00Z",
+   "targetBarTime": "2019-06-17T18:00:00Z",
+   "pUp": 0.5262390375137329,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.254895,
+    "high": 1.25517,
+    "low": 1.253425,
+    "close": 1.253825
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T18:00:00Z",
+   "targetBarTime": "2019-06-17T19:00:00Z",
+   "pUp": 0.5368452668190002,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25383,
+    "high": 1.254165,
+    "low": 1.253585,
+    "close": 1.253675
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T19:00:00Z",
+   "targetBarTime": "2019-06-17T20:00:00Z",
+   "pUp": 0.5219863057136536,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.253695,
+    "high": 1.253715,
+    "low": 1.25323,
+    "close": 1.25344
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T20:00:00Z",
+   "targetBarTime": "2019-06-17T21:00:00Z",
+   "pUp": 0.5106288194656372,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25343,
+    "high": 1.253815,
+    "low": 1.25308,
+    "close": 1.25368
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T21:00:00Z",
+   "targetBarTime": "2019-06-17T22:00:00Z",
+   "pUp": 0.5012291669845581,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25371,
+    "high": 1.25401,
+    "low": 1.253675,
+    "close": 1.253855
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T22:00:00Z",
+   "targetBarTime": "2019-06-17T23:00:00Z",
+   "pUp": 0.5023682117462158,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.253845,
+    "high": 1.25424,
+    "low": 1.25373,
+    "close": 1.254135
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-17T23:00:00Z",
+   "targetBarTime": "2019-06-18T00:00:00Z",
+   "pUp": 0.4987093210220337,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25414,
+    "high": 1.25416,
+    "low": 1.253695,
+    "close": 1.2539
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T00:00:00Z",
+   "targetBarTime": "2019-06-18T01:00:00Z",
+   "pUp": 0.510502815246582,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.253895,
+    "high": 1.254425,
+    "low": 1.25119,
+    "close": 1.252325
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T01:00:00Z",
+   "targetBarTime": "2019-06-18T02:00:00Z",
+   "pUp": 0.5485897660255432,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25232,
+    "high": 1.2534,
+    "low": 1.252265,
+    "close": 1.252315
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T02:00:00Z",
+   "targetBarTime": "2019-06-18T03:00:00Z",
+   "pUp": 0.5296062231063843,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.252315,
+    "high": 1.252705,
+    "low": 1.25208,
+    "close": 1.252105
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T03:00:00Z",
+   "targetBarTime": "2019-06-18T04:00:00Z",
+   "pUp": 0.5209181308746338,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.252105,
+    "high": 1.253745,
+    "low": 1.252075,
+    "close": 1.253525
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T04:00:00Z",
+   "targetBarTime": "2019-06-18T05:00:00Z",
+   "pUp": 0.4820046126842499,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25353,
+    "high": 1.25377,
+    "low": 1.253215,
+    "close": 1.25341
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T05:00:00Z",
+   "targetBarTime": "2019-06-18T06:00:00Z",
+   "pUp": 0.4873238205909729,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.253405,
+    "high": 1.254235,
+    "low": 1.25278,
+    "close": 1.254055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T06:00:00Z",
+   "targetBarTime": "2019-06-18T07:00:00Z",
+   "pUp": 0.4755473732948303,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25408,
+    "high": 1.254505,
+    "low": 1.2532,
+    "close": 1.253625
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T07:00:00Z",
+   "targetBarTime": "2019-06-18T08:00:00Z",
+   "pUp": 0.4888235032558441,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.253625,
+    "high": 1.253845,
+    "low": 1.252115,
+    "close": 1.253275
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T08:00:00Z",
+   "targetBarTime": "2019-06-18T09:00:00Z",
+   "pUp": 0.4947361648082733,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.253275,
+    "high": 1.2538,
+    "low": 1.25246,
+    "close": 1.2527
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T09:00:00Z",
+   "targetBarTime": "2019-06-18T10:00:00Z",
+   "pUp": 0.5019574165344238,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.252695,
+    "high": 1.25398,
+    "low": 1.25229,
+    "close": 1.253565
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T10:00:00Z",
+   "targetBarTime": "2019-06-18T11:00:00Z",
+   "pUp": 0.47932377457618713,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.253555,
+    "high": 1.253665,
+    "low": 1.251525,
+    "close": 1.25197
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T11:00:00Z",
+   "targetBarTime": "2019-06-18T12:00:00Z",
+   "pUp": 0.5137386322021484,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.251985,
+    "high": 1.25256,
+    "low": 1.250625,
+    "close": 1.252305
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T12:00:00Z",
+   "targetBarTime": "2019-06-18T13:00:00Z",
+   "pUp": 0.49730628728866577,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25231,
+    "high": 1.253525,
+    "low": 1.25176,
+    "close": 1.252935
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T13:00:00Z",
+   "targetBarTime": "2019-06-18T14:00:00Z",
+   "pUp": 0.48078909516334534,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.252925,
+    "high": 1.25433,
+    "low": 1.25109,
+    "close": 1.254225
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T14:00:00Z",
+   "targetBarTime": "2019-06-18T15:00:00Z",
+   "pUp": 0.46362027525901794,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25421,
+    "high": 1.2561,
+    "low": 1.25368,
+    "close": 1.25461
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T15:00:00Z",
+   "targetBarTime": "2019-06-18T16:00:00Z",
+   "pUp": 0.46410658955574036,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.254625,
+    "high": 1.25536,
+    "low": 1.25379,
+    "close": 1.255265
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T16:00:00Z",
+   "targetBarTime": "2019-06-18T17:00:00Z",
+   "pUp": 0.4568048119544983,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.255255,
+    "high": 1.255825,
+    "low": 1.254525,
+    "close": 1.254805
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T17:00:00Z",
+   "targetBarTime": "2019-06-18T18:00:00Z",
+   "pUp": 0.47720351815223694,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2548,
+    "high": 1.25632,
+    "low": 1.25445,
+    "close": 1.256045
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T18:00:00Z",
+   "targetBarTime": "2019-06-18T19:00:00Z",
+   "pUp": 0.45392948389053345,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25606,
+    "high": 1.25648,
+    "low": 1.2558,
+    "close": 1.25595
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T19:00:00Z",
+   "targetBarTime": "2019-06-18T20:00:00Z",
+   "pUp": 0.46783584356307983,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.255895,
+    "high": 1.25637,
+    "low": 1.25553,
+    "close": 1.255795
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T20:00:00Z",
+   "targetBarTime": "2019-06-18T21:00:00Z",
+   "pUp": 0.4752078354358673,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25575,
+    "high": 1.255955,
+    "low": 1.255325,
+    "close": 1.25564
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T21:00:00Z",
+   "targetBarTime": "2019-06-18T22:00:00Z",
+   "pUp": 0.4831552505493164,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25563,
+    "high": 1.255935,
+    "low": 1.25552,
+    "close": 1.25569
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T22:00:00Z",
+   "targetBarTime": "2019-06-18T23:00:00Z",
+   "pUp": 0.4948035180568695,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25569,
+    "high": 1.256915,
+    "low": 1.25569,
+    "close": 1.256605
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-18T23:00:00Z",
+   "targetBarTime": "2019-06-19T00:00:00Z",
+   "pUp": 0.4795706868171692,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.256615,
+    "high": 1.257015,
+    "low": 1.25596,
+    "close": 1.256395
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T00:00:00Z",
+   "targetBarTime": "2019-06-19T01:00:00Z",
+   "pUp": 0.4999411106109619,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25639,
+    "high": 1.25654,
+    "low": 1.255685,
+    "close": 1.25594
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T01:00:00Z",
+   "targetBarTime": "2019-06-19T02:00:00Z",
+   "pUp": 0.515228271484375,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25592,
+    "high": 1.256915,
+    "low": 1.25579,
+    "close": 1.256265
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T02:00:00Z",
+   "targetBarTime": "2019-06-19T03:00:00Z",
+   "pUp": 0.5037978887557983,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.256265,
+    "high": 1.25632,
+    "low": 1.25604,
+    "close": 1.25621
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T03:00:00Z",
+   "targetBarTime": "2019-06-19T04:00:00Z",
+   "pUp": 0.5037099719047546,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.25621,
+    "high": 1.25632,
+    "low": 1.255575,
+    "close": 1.25578
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T04:00:00Z",
+   "targetBarTime": "2019-06-19T05:00:00Z",
+   "pUp": 0.5105839371681213,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25579,
+    "high": 1.256415,
+    "low": 1.255395,
+    "close": 1.256025
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T05:00:00Z",
+   "targetBarTime": "2019-06-19T06:00:00Z",
+   "pUp": 0.497918963432312,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.256035,
+    "high": 1.25604,
+    "low": 1.254665,
+    "close": 1.25484
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T06:00:00Z",
+   "targetBarTime": "2019-06-19T07:00:00Z",
+   "pUp": 0.5207576751708984,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25484,
+    "high": 1.255925,
+    "low": 1.254275,
+    "close": 1.25571
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T07:00:00Z",
+   "targetBarTime": "2019-06-19T08:00:00Z",
+   "pUp": 0.49031367897987366,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25572,
+    "high": 1.25805,
+    "low": 1.25546,
+    "close": 1.256915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T08:00:00Z",
+   "targetBarTime": "2019-06-19T09:00:00Z",
+   "pUp": 0.4679120182991028,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25689,
+    "high": 1.25872,
+    "low": 1.256705,
+    "close": 1.257515
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T09:00:00Z",
+   "targetBarTime": "2019-06-19T10:00:00Z",
+   "pUp": 0.4649460017681122,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.25753,
+    "high": 1.25885,
+    "low": 1.25715,
+    "close": 1.25871
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T10:00:00Z",
+   "targetBarTime": "2019-06-19T11:00:00Z",
+   "pUp": 0.44900596141815186,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.258705,
+    "high": 1.25871,
+    "low": 1.25788,
+    "close": 1.258285
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T11:00:00Z",
+   "targetBarTime": "2019-06-19T12:00:00Z",
+   "pUp": 0.4712747633457184,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.258275,
+    "high": 1.26005,
+    "low": 1.25809,
+    "close": 1.259355
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T12:00:00Z",
+   "targetBarTime": "2019-06-19T13:00:00Z",
+   "pUp": 0.4576825499534607,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.259355,
+    "high": 1.26059,
+    "low": 1.259265,
+    "close": 1.25997
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T13:00:00Z",
+   "targetBarTime": "2019-06-19T14:00:00Z",
+   "pUp": 0.4552457332611084,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.259965,
+    "high": 1.263505,
+    "low": 1.2595,
+    "close": 1.26313
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T14:00:00Z",
+   "targetBarTime": "2019-06-19T15:00:00Z",
+   "pUp": 0.41855987906455994,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26313,
+    "high": 1.26389,
+    "low": 1.262405,
+    "close": 1.262525
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T15:00:00Z",
+   "targetBarTime": "2019-06-19T16:00:00Z",
+   "pUp": 0.4557555913925171,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.262515,
+    "high": 1.26341,
+    "low": 1.262155,
+    "close": 1.26338
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T16:00:00Z",
+   "targetBarTime": "2019-06-19T17:00:00Z",
+   "pUp": 0.4478563964366913,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26338,
+    "high": 1.263955,
+    "low": 1.26276,
+    "close": 1.26379
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T17:00:00Z",
+   "targetBarTime": "2019-06-19T18:00:00Z",
+   "pUp": 0.4480597972869873,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26377,
+    "high": 1.2674,
+    "low": 1.263525,
+    "close": 1.266765
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T18:00:00Z",
+   "targetBarTime": "2019-06-19T19:00:00Z",
+   "pUp": 0.41041573882102966,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26679,
+    "high": 1.266835,
+    "low": 1.264085,
+    "close": 1.26513
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T19:00:00Z",
+   "targetBarTime": "2019-06-19T20:00:00Z",
+   "pUp": 0.48685336112976074,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.265085,
+    "high": 1.265305,
+    "low": 1.26388,
+    "close": 1.26398
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T20:00:00Z",
+   "targetBarTime": "2019-06-19T21:00:00Z",
+   "pUp": 0.5115519165992737,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.263935,
+    "high": 1.26483,
+    "low": 1.263465,
+    "close": 1.26433
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T21:00:00Z",
+   "targetBarTime": "2019-06-19T22:00:00Z",
+   "pUp": 0.5006224513053894,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.264365,
+    "high": 1.265215,
+    "low": 1.26431,
+    "close": 1.265185
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T22:00:00Z",
+   "targetBarTime": "2019-06-19T23:00:00Z",
+   "pUp": 0.4842684268951416,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26518,
+    "high": 1.26562,
+    "low": 1.26507,
+    "close": 1.26532
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-19T23:00:00Z",
+   "targetBarTime": "2019-06-20T00:00:00Z",
+   "pUp": 0.4942875802516937,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26532,
+    "high": 1.26768,
+    "low": 1.26522,
+    "close": 1.267535
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T00:00:00Z",
+   "targetBarTime": "2019-06-20T01:00:00Z",
+   "pUp": 0.4521101415157318,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26756,
+    "high": 1.26873,
+    "low": 1.267475,
+    "close": 1.268075
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T01:00:00Z",
+   "targetBarTime": "2019-06-20T02:00:00Z",
+   "pUp": 0.4626317322254181,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26808,
+    "high": 1.2686,
+    "low": 1.267405,
+    "close": 1.268115
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T02:00:00Z",
+   "targetBarTime": "2019-06-20T03:00:00Z",
+   "pUp": 0.4796362519264221,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2681,
+    "high": 1.26893,
+    "low": 1.267985,
+    "close": 1.268685
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T03:00:00Z",
+   "targetBarTime": "2019-06-20T04:00:00Z",
+   "pUp": 0.4759296774864197,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268675,
+    "high": 1.268745,
+    "low": 1.267775,
+    "close": 1.267915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T04:00:00Z",
+   "targetBarTime": "2019-06-20T05:00:00Z",
+   "pUp": 0.5021426677703857,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267915,
+    "high": 1.2697,
+    "low": 1.26771,
+    "close": 1.269645
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T05:00:00Z",
+   "targetBarTime": "2019-06-20T06:00:00Z",
+   "pUp": 0.4627683758735657,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26965,
+    "high": 1.270985,
+    "low": 1.26892,
+    "close": 1.269855
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T06:00:00Z",
+   "targetBarTime": "2019-06-20T07:00:00Z",
+   "pUp": 0.4711414873600006,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269895,
+    "high": 1.27262,
+    "low": 1.268935,
+    "close": 1.272315
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T07:00:00Z",
+   "targetBarTime": "2019-06-20T08:00:00Z",
+   "pUp": 0.4382844865322113,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272315,
+    "high": 1.27269,
+    "low": 1.270735,
+    "close": 1.27114
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T08:00:00Z",
+   "targetBarTime": "2019-06-20T09:00:00Z",
+   "pUp": 0.483479768037796,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.271145,
+    "high": 1.272275,
+    "low": 1.27058,
+    "close": 1.27201
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T09:00:00Z",
+   "targetBarTime": "2019-06-20T10:00:00Z",
+   "pUp": 0.46850839257240295,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27201,
+    "high": 1.272725,
+    "low": 1.27059,
+    "close": 1.272545
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T10:00:00Z",
+   "targetBarTime": "2019-06-20T11:00:00Z",
+   "pUp": 0.46427735686302185,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272505,
+    "high": 1.27268,
+    "low": 1.268015,
+    "close": 1.26894
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T11:00:00Z",
+   "targetBarTime": "2019-06-20T12:00:00Z",
+   "pUp": 0.5482728481292725,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268935,
+    "high": 1.26953,
+    "low": 1.26715,
+    "close": 1.268355
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T12:00:00Z",
+   "targetBarTime": "2019-06-20T13:00:00Z",
+   "pUp": 0.5343548059463501,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26836,
+    "high": 1.269655,
+    "low": 1.26768,
+    "close": 1.26884
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T13:00:00Z",
+   "targetBarTime": "2019-06-20T14:00:00Z",
+   "pUp": 0.5067647695541382,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268855,
+    "high": 1.270765,
+    "low": 1.26795,
+    "close": 1.270075
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T14:00:00Z",
+   "targetBarTime": "2019-06-20T15:00:00Z",
+   "pUp": 0.4796646237373352,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.2701,
+    "high": 1.270285,
+    "low": 1.268935,
+    "close": 1.26997
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T15:00:00Z",
+   "targetBarTime": "2019-06-20T16:00:00Z",
+   "pUp": 0.4872129261493683,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26996,
+    "high": 1.270995,
+    "low": 1.26904,
+    "close": 1.27041
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T16:00:00Z",
+   "targetBarTime": "2019-06-20T17:00:00Z",
+   "pUp": 0.4813336730003357,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270425,
+    "high": 1.270955,
+    "low": 1.269725,
+    "close": 1.27074
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T17:00:00Z",
+   "targetBarTime": "2019-06-20T18:00:00Z",
+   "pUp": 0.47927799820899963,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270745,
+    "high": 1.271165,
+    "low": 1.2698,
+    "close": 1.27004
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T18:00:00Z",
+   "targetBarTime": "2019-06-20T19:00:00Z",
+   "pUp": 0.505547046661377,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270045,
+    "high": 1.27085,
+    "low": 1.26994,
+    "close": 1.27055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T19:00:00Z",
+   "targetBarTime": "2019-06-20T20:00:00Z",
+   "pUp": 0.4910304546356201,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27054,
+    "high": 1.27069,
+    "low": 1.26997,
+    "close": 1.27038
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T20:00:00Z",
+   "targetBarTime": "2019-06-20T21:00:00Z",
+   "pUp": 0.4931366741657257,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27015,
+    "high": 1.271,
+    "low": 1.26997,
+    "close": 1.27057
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T21:00:00Z",
+   "targetBarTime": "2019-06-20T22:00:00Z",
+   "pUp": 0.503173828125,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27065,
+    "high": 1.270685,
+    "low": 1.27038,
+    "close": 1.27049
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T22:00:00Z",
+   "targetBarTime": "2019-06-20T23:00:00Z",
+   "pUp": 0.5131790637969971,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270525,
+    "high": 1.27084,
+    "low": 1.2703,
+    "close": 1.270755
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-20T23:00:00Z",
+   "targetBarTime": "2019-06-21T00:00:00Z",
+   "pUp": 0.5099645853042603,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27076,
+    "high": 1.271195,
+    "low": 1.270445,
+    "close": 1.27098
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T00:00:00Z",
+   "targetBarTime": "2019-06-21T01:00:00Z",
+   "pUp": 0.5057963132858276,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270975,
+    "high": 1.27231,
+    "low": 1.27077,
+    "close": 1.272155
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T01:00:00Z",
+   "targetBarTime": "2019-06-21T02:00:00Z",
+   "pUp": 0.48020559549331665,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272155,
+    "high": 1.272475,
+    "low": 1.271335,
+    "close": 1.271345
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T02:00:00Z",
+   "targetBarTime": "2019-06-21T03:00:00Z",
+   "pUp": 0.512507438659668,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27133,
+    "high": 1.2717,
+    "low": 1.271045,
+    "close": 1.27127
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T03:00:00Z",
+   "targetBarTime": "2019-06-21T04:00:00Z",
+   "pUp": 0.5108339786529541,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271295,
+    "high": 1.27137,
+    "low": 1.26988,
+    "close": 1.270065
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T04:00:00Z",
+   "targetBarTime": "2019-06-21T05:00:00Z",
+   "pUp": 0.5335917472839355,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27009,
+    "high": 1.270985,
+    "low": 1.269585,
+    "close": 1.26965
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T05:00:00Z",
+   "targetBarTime": "2019-06-21T06:00:00Z",
+   "pUp": 0.525724470615387,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26965,
+    "high": 1.269815,
+    "low": 1.26826,
+    "close": 1.269325
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T06:00:00Z",
+   "targetBarTime": "2019-06-21T07:00:00Z",
+   "pUp": 0.5187700390815735,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26931,
+    "high": 1.270835,
+    "low": 1.269155,
+    "close": 1.2701
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T07:00:00Z",
+   "targetBarTime": "2019-06-21T08:00:00Z",
+   "pUp": 0.4917304515838623,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27009,
+    "high": 1.27009,
+    "low": 1.26722,
+    "close": 1.26758
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T08:00:00Z",
+   "targetBarTime": "2019-06-21T09:00:00Z",
+   "pUp": 0.5425326824188232,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26758,
+    "high": 1.26808,
+    "low": 1.26574,
+    "close": 1.26589
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T09:00:00Z",
+   "targetBarTime": "2019-06-21T10:00:00Z",
+   "pUp": 0.5505768656730652,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2659,
+    "high": 1.26736,
+    "low": 1.26525,
+    "close": 1.26621
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T10:00:00Z",
+   "targetBarTime": "2019-06-21T11:00:00Z",
+   "pUp": 0.5187909007072449,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.266205,
+    "high": 1.26643,
+    "low": 1.264245,
+    "close": 1.26617
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T11:00:00Z",
+   "targetBarTime": "2019-06-21T12:00:00Z",
+   "pUp": 0.5095171332359314,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266165,
+    "high": 1.266995,
+    "low": 1.26532,
+    "close": 1.26643
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T12:00:00Z",
+   "targetBarTime": "2019-06-21T13:00:00Z",
+   "pUp": 0.4970455467700958,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266445,
+    "high": 1.269055,
+    "low": 1.265875,
+    "close": 1.26765
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T13:00:00Z",
+   "targetBarTime": "2019-06-21T14:00:00Z",
+   "pUp": 0.4745122492313385,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26766,
+    "high": 1.269845,
+    "low": 1.265865,
+    "close": 1.269545
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T14:00:00Z",
+   "targetBarTime": "2019-06-21T15:00:00Z",
+   "pUp": 0.45538970828056335,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269555,
+    "high": 1.2708,
+    "low": 1.26874,
+    "close": 1.270255
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T15:00:00Z",
+   "targetBarTime": "2019-06-21T16:00:00Z",
+   "pUp": 0.45642051100730896,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27024,
+    "high": 1.271645,
+    "low": 1.27006,
+    "close": 1.27064
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T16:00:00Z",
+   "targetBarTime": "2019-06-21T17:00:00Z",
+   "pUp": 0.4628312885761261,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270645,
+    "high": 1.272855,
+    "low": 1.270525,
+    "close": 1.27274
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T17:00:00Z",
+   "targetBarTime": "2019-06-21T18:00:00Z",
+   "pUp": 0.43181902170181274,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272705,
+    "high": 1.27397,
+    "low": 1.27244,
+    "close": 1.27365
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T18:00:00Z",
+   "targetBarTime": "2019-06-21T19:00:00Z",
+   "pUp": 0.436153382062912,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273645,
+    "high": 1.274625,
+    "low": 1.27332,
+    "close": 1.27449
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T19:00:00Z",
+   "targetBarTime": "2019-06-21T20:00:00Z",
+   "pUp": 0.44007307291030884,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.274495,
+    "high": 1.274785,
+    "low": 1.273765,
+    "close": 1.274485
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-21T20:00:00Z",
+   "targetBarTime": "2019-06-23T21:00:00Z",
+   "pUp": 0.45406144857406616,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273075,
+    "high": 1.274575,
+    "low": 1.27307,
+    "close": 1.273785
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-23T21:00:00Z",
+   "targetBarTime": "2019-06-23T22:00:00Z",
+   "pUp": 0.4826207458972931,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273785,
+    "high": 1.27458,
+    "low": 1.27375,
+    "close": 1.2745
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-23T22:00:00Z",
+   "targetBarTime": "2019-06-23T23:00:00Z",
+   "pUp": 0.4635511040687561,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2745,
+    "high": 1.27519,
+    "low": 1.274075,
+    "close": 1.275185
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-23T23:00:00Z",
+   "targetBarTime": "2019-06-24T00:00:00Z",
+   "pUp": 0.46192583441734314,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27518,
+    "high": 1.27521,
+    "low": 1.274525,
+    "close": 1.274615
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T00:00:00Z",
+   "targetBarTime": "2019-06-24T01:00:00Z",
+   "pUp": 0.4941544532775879,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.274635,
+    "high": 1.27494,
+    "low": 1.274415,
+    "close": 1.274505
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T01:00:00Z",
+   "targetBarTime": "2019-06-24T02:00:00Z",
+   "pUp": 0.5000766515731812,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274505,
+    "high": 1.275665,
+    "low": 1.274335,
+    "close": 1.2755
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T02:00:00Z",
+   "targetBarTime": "2019-06-24T03:00:00Z",
+   "pUp": 0.4807297885417938,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.275495,
+    "high": 1.27552,
+    "low": 1.274625,
+    "close": 1.27504
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T03:00:00Z",
+   "targetBarTime": "2019-06-24T04:00:00Z",
+   "pUp": 0.4976671636104584,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27504,
+    "high": 1.27516,
+    "low": 1.27485,
+    "close": 1.27503
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T04:00:00Z",
+   "targetBarTime": "2019-06-24T05:00:00Z",
+   "pUp": 0.49571171402931213,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27502,
+    "high": 1.275145,
+    "low": 1.274715,
+    "close": 1.27488
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T05:00:00Z",
+   "targetBarTime": "2019-06-24T06:00:00Z",
+   "pUp": 0.4966346323490143,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27488,
+    "high": 1.27669,
+    "low": 1.274785,
+    "close": 1.27484
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T06:00:00Z",
+   "targetBarTime": "2019-06-24T07:00:00Z",
+   "pUp": 0.4969028830528259,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.274865,
+    "high": 1.274885,
+    "low": 1.272305,
+    "close": 1.27279
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T07:00:00Z",
+   "targetBarTime": "2019-06-24T08:00:00Z",
+   "pUp": 0.5331237316131592,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272785,
+    "high": 1.274115,
+    "low": 1.272355,
+    "close": 1.27291
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T08:00:00Z",
+   "targetBarTime": "2019-06-24T09:00:00Z",
+   "pUp": 0.5134310722351074,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2729,
+    "high": 1.276055,
+    "low": 1.272895,
+    "close": 1.27604
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T09:00:00Z",
+   "targetBarTime": "2019-06-24T10:00:00Z",
+   "pUp": 0.45986101031303406,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.276045,
+    "high": 1.27612,
+    "low": 1.27374,
+    "close": 1.274045
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T10:00:00Z",
+   "targetBarTime": "2019-06-24T11:00:00Z",
+   "pUp": 0.5066078901290894,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274085,
+    "high": 1.276085,
+    "low": 1.2738,
+    "close": 1.27519
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T11:00:00Z",
+   "targetBarTime": "2019-06-24T12:00:00Z",
+   "pUp": 0.4804644286632538,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27519,
+    "high": 1.27579,
+    "low": 1.27234,
+    "close": 1.27257
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T12:00:00Z",
+   "targetBarTime": "2019-06-24T13:00:00Z",
+   "pUp": 0.5329407453536987,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27255,
+    "high": 1.272595,
+    "low": 1.270815,
+    "close": 1.271605
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T13:00:00Z",
+   "targetBarTime": "2019-06-24T14:00:00Z",
+   "pUp": 0.533374547958374,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27162,
+    "high": 1.27306,
+    "low": 1.271075,
+    "close": 1.27248
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T14:00:00Z",
+   "targetBarTime": "2019-06-24T15:00:00Z",
+   "pUp": 0.49914488196372986,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27251,
+    "high": 1.273865,
+    "low": 1.27147,
+    "close": 1.272655
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T15:00:00Z",
+   "targetBarTime": "2019-06-24T16:00:00Z",
+   "pUp": 0.49322307109832764,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27265,
+    "high": 1.27405,
+    "low": 1.272065,
+    "close": 1.2737
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T16:00:00Z",
+   "targetBarTime": "2019-06-24T17:00:00Z",
+   "pUp": 0.46983569860458374,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2737,
+    "high": 1.27415,
+    "low": 1.27334,
+    "close": 1.274105
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T17:00:00Z",
+   "targetBarTime": "2019-06-24T18:00:00Z",
+   "pUp": 0.4637223184108734,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274115,
+    "high": 1.27466,
+    "low": 1.27374,
+    "close": 1.274245
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T18:00:00Z",
+   "targetBarTime": "2019-06-24T19:00:00Z",
+   "pUp": 0.4685525596141815,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27424,
+    "high": 1.274465,
+    "low": 1.27367,
+    "close": 1.27419
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T19:00:00Z",
+   "targetBarTime": "2019-06-24T20:00:00Z",
+   "pUp": 0.47834891080856323,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.274175,
+    "high": 1.27449,
+    "low": 1.27362,
+    "close": 1.27397
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T20:00:00Z",
+   "targetBarTime": "2019-06-24T21:00:00Z",
+   "pUp": 0.4826124906539917,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27415,
+    "high": 1.274155,
+    "low": 1.273,
+    "close": 1.27337
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T21:00:00Z",
+   "targetBarTime": "2019-06-24T22:00:00Z",
+   "pUp": 0.5033347606658936,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27338,
+    "high": 1.27386,
+    "low": 1.27328,
+    "close": 1.27348
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T22:00:00Z",
+   "targetBarTime": "2019-06-24T23:00:00Z",
+   "pUp": 0.5076526999473572,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.273475,
+    "high": 1.27398,
+    "low": 1.273425,
+    "close": 1.27388
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-24T23:00:00Z",
+   "targetBarTime": "2019-06-25T00:00:00Z",
+   "pUp": 0.5005143880844116,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27389,
+    "high": 1.27448,
+    "low": 1.27356,
+    "close": 1.274305
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T00:00:00Z",
+   "targetBarTime": "2019-06-25T01:00:00Z",
+   "pUp": 0.49659842252731323,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274305,
+    "high": 1.275265,
+    "low": 1.27404,
+    "close": 1.275185
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T01:00:00Z",
+   "targetBarTime": "2019-06-25T02:00:00Z",
+   "pUp": 0.48083627223968506,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.275185,
+    "high": 1.275325,
+    "low": 1.274565,
+    "close": 1.274575
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T02:00:00Z",
+   "targetBarTime": "2019-06-25T03:00:00Z",
+   "pUp": 0.5044259428977966,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274575,
+    "high": 1.27495,
+    "low": 1.27428,
+    "close": 1.274705
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T03:00:00Z",
+   "targetBarTime": "2019-06-25T04:00:00Z",
+   "pUp": 0.4989060163497925,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274695,
+    "high": 1.275415,
+    "low": 1.27447,
+    "close": 1.275005
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T04:00:00Z",
+   "targetBarTime": "2019-06-25T05:00:00Z",
+   "pUp": 0.49059802293777466,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.275005,
+    "high": 1.27551,
+    "low": 1.274105,
+    "close": 1.27419
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T05:00:00Z",
+   "targetBarTime": "2019-06-25T06:00:00Z",
+   "pUp": 0.5089128613471985,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.274195,
+    "high": 1.27839,
+    "low": 1.274025,
+    "close": 1.27834
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T06:00:00Z",
+   "targetBarTime": "2019-06-25T07:00:00Z",
+   "pUp": 0.44471898674964905,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.278325,
+    "high": 1.278335,
+    "low": 1.275245,
+    "close": 1.275875
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T07:00:00Z",
+   "targetBarTime": "2019-06-25T08:00:00Z",
+   "pUp": 0.5083683133125305,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.275895,
+    "high": 1.27674,
+    "low": 1.27546,
+    "close": 1.276295
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T08:00:00Z",
+   "targetBarTime": "2019-06-25T09:00:00Z",
+   "pUp": 0.4901425242424011,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.276295,
+    "high": 1.276755,
+    "low": 1.274595,
+    "close": 1.27563
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T09:00:00Z",
+   "targetBarTime": "2019-06-25T10:00:00Z",
+   "pUp": 0.5011991262435913,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27562,
+    "high": 1.27634,
+    "low": 1.275305,
+    "close": 1.27549
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T10:00:00Z",
+   "targetBarTime": "2019-06-25T11:00:00Z",
+   "pUp": 0.495900422334671,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.275485,
+    "high": 1.27549,
+    "low": 1.27255,
+    "close": 1.27295
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T11:00:00Z",
+   "targetBarTime": "2019-06-25T12:00:00Z",
+   "pUp": 0.5394471883773804,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272925,
+    "high": 1.274245,
+    "low": 1.27185,
+    "close": 1.27261
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T12:00:00Z",
+   "targetBarTime": "2019-06-25T13:00:00Z",
+   "pUp": 0.5249053835868835,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.272645,
+    "high": 1.273065,
+    "low": 1.271195,
+    "close": 1.27283
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T13:00:00Z",
+   "targetBarTime": "2019-06-25T14:00:00Z",
+   "pUp": 0.5035226345062256,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272835,
+    "high": 1.27347,
+    "low": 1.270985,
+    "close": 1.27195
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T14:00:00Z",
+   "targetBarTime": "2019-06-25T15:00:00Z",
+   "pUp": 0.5174672603607178,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27195,
+    "high": 1.272585,
+    "low": 1.27143,
+    "close": 1.272035
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T15:00:00Z",
+   "targetBarTime": "2019-06-25T16:00:00Z",
+   "pUp": 0.5036457777023315,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272015,
+    "high": 1.272055,
+    "low": 1.268695,
+    "close": 1.269345
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T16:00:00Z",
+   "targetBarTime": "2019-06-25T17:00:00Z",
+   "pUp": 0.553644597530365,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269345,
+    "high": 1.27115,
+    "low": 1.267195,
+    "close": 1.27054
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T17:00:00Z",
+   "targetBarTime": "2019-06-25T18:00:00Z",
+   "pUp": 0.5096532106399536,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270505,
+    "high": 1.270915,
+    "low": 1.269345,
+    "close": 1.26944
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T18:00:00Z",
+   "targetBarTime": "2019-06-25T19:00:00Z",
+   "pUp": 0.5253924131393433,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269455,
+    "high": 1.27007,
+    "low": 1.268375,
+    "close": 1.26876
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T19:00:00Z",
+   "targetBarTime": "2019-06-25T20:00:00Z",
+   "pUp": 0.5284155607223511,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26877,
+    "high": 1.26938,
+    "low": 1.2687,
+    "close": 1.26878
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T20:00:00Z",
+   "targetBarTime": "2019-06-25T21:00:00Z",
+   "pUp": 0.5080475807189941,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268875,
+    "high": 1.26938,
+    "low": 1.26797,
+    "close": 1.268925
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T21:00:00Z",
+   "targetBarTime": "2019-06-25T22:00:00Z",
+   "pUp": 0.5036569237709045,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26887,
+    "high": 1.269285,
+    "low": 1.268335,
+    "close": 1.268805
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T22:00:00Z",
+   "targetBarTime": "2019-06-25T23:00:00Z",
+   "pUp": 0.5124298334121704,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268835,
+    "high": 1.269275,
+    "low": 1.26879,
+    "close": 1.26905
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-25T23:00:00Z",
+   "targetBarTime": "2019-06-26T00:00:00Z",
+   "pUp": 0.50557541847229,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26902,
+    "high": 1.269415,
+    "low": 1.268445,
+    "close": 1.26851
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T00:00:00Z",
+   "targetBarTime": "2019-06-26T01:00:00Z",
+   "pUp": 0.5228450894355774,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268495,
+    "high": 1.268525,
+    "low": 1.267805,
+    "close": 1.268235
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T01:00:00Z",
+   "targetBarTime": "2019-06-26T02:00:00Z",
+   "pUp": 0.5241552591323853,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26823,
+    "high": 1.26898,
+    "low": 1.267545,
+    "close": 1.268625
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T02:00:00Z",
+   "targetBarTime": "2019-06-26T03:00:00Z",
+   "pUp": 0.5073414444923401,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268615,
+    "high": 1.268815,
+    "low": 1.26831,
+    "close": 1.26837
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T03:00:00Z",
+   "targetBarTime": "2019-06-26T04:00:00Z",
+   "pUp": 0.510755717754364,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26837,
+    "high": 1.26849,
+    "low": 1.2673,
+    "close": 1.267505
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T04:00:00Z",
+   "targetBarTime": "2019-06-26T05:00:00Z",
+   "pUp": 0.5246637463569641,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26751,
+    "high": 1.26769,
+    "low": 1.26654,
+    "close": 1.267105
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T05:00:00Z",
+   "targetBarTime": "2019-06-26T06:00:00Z",
+   "pUp": 0.5191795825958252,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267105,
+    "high": 1.268005,
+    "low": 1.266575,
+    "close": 1.266725
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T06:00:00Z",
+   "targetBarTime": "2019-06-26T07:00:00Z",
+   "pUp": 0.5148807168006897,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266745,
+    "high": 1.26803,
+    "low": 1.266265,
+    "close": 1.26715
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T07:00:00Z",
+   "targetBarTime": "2019-06-26T08:00:00Z",
+   "pUp": 0.49624642729759216,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26714,
+    "high": 1.26845,
+    "low": 1.26694,
+    "close": 1.267315
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T08:00:00Z",
+   "targetBarTime": "2019-06-26T09:00:00Z",
+   "pUp": 0.4893472492694855,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26736,
+    "high": 1.26924,
+    "low": 1.267085,
+    "close": 1.268485
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T09:00:00Z",
+   "targetBarTime": "2019-06-26T10:00:00Z",
+   "pUp": 0.4671696126461029,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26851,
+    "high": 1.27075,
+    "low": 1.268375,
+    "close": 1.26897
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T10:00:00Z",
+   "targetBarTime": "2019-06-26T11:00:00Z",
+   "pUp": 0.46764320135116577,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26898,
+    "high": 1.269,
+    "low": 1.267785,
+    "close": 1.26816
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T11:00:00Z",
+   "targetBarTime": "2019-06-26T12:00:00Z",
+   "pUp": 0.49035000801086426,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26816,
+    "high": 1.26891,
+    "low": 1.266385,
+    "close": 1.26695
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T12:00:00Z",
+   "targetBarTime": "2019-06-26T13:00:00Z",
+   "pUp": 0.5151793956756592,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26695,
+    "high": 1.26854,
+    "low": 1.266425,
+    "close": 1.267845
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T13:00:00Z",
+   "targetBarTime": "2019-06-26T14:00:00Z",
+   "pUp": 0.48745471239089966,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267845,
+    "high": 1.26975,
+    "low": 1.26761,
+    "close": 1.267905
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T14:00:00Z",
+   "targetBarTime": "2019-06-26T15:00:00Z",
+   "pUp": 0.4882105886936188,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26789,
+    "high": 1.269775,
+    "low": 1.26741,
+    "close": 1.26961
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T15:00:00Z",
+   "targetBarTime": "2019-06-26T16:00:00Z",
+   "pUp": 0.4552992284297943,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269605,
+    "high": 1.270045,
+    "low": 1.26917,
+    "close": 1.269805
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T16:00:00Z",
+   "targetBarTime": "2019-06-26T17:00:00Z",
+   "pUp": 0.4611504077911377,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269805,
+    "high": 1.270115,
+    "low": 1.26856,
+    "close": 1.269295
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T17:00:00Z",
+   "targetBarTime": "2019-06-26T18:00:00Z",
+   "pUp": 0.4862881004810333,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.2693,
+    "high": 1.26986,
+    "low": 1.268715,
+    "close": 1.26874
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T18:00:00Z",
+   "targetBarTime": "2019-06-26T19:00:00Z",
+   "pUp": 0.5024341344833374,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.268735,
+    "high": 1.26947,
+    "low": 1.26872,
+    "close": 1.268995
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T19:00:00Z",
+   "targetBarTime": "2019-06-26T20:00:00Z",
+   "pUp": 0.4930862486362457,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26899,
+    "high": 1.269245,
+    "low": 1.26843,
+    "close": 1.269025
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T20:00:00Z",
+   "targetBarTime": "2019-06-26T21:00:00Z",
+   "pUp": 0.4800490736961365,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26903,
+    "high": 1.269675,
+    "low": 1.268675,
+    "close": 1.269355
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T21:00:00Z",
+   "targetBarTime": "2019-06-26T22:00:00Z",
+   "pUp": 0.4862199127674103,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26929,
+    "high": 1.26954,
+    "low": 1.268905,
+    "close": 1.26931
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T22:00:00Z",
+   "targetBarTime": "2019-06-26T23:00:00Z",
+   "pUp": 0.5101267099380493,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26931,
+    "high": 1.2696,
+    "low": 1.26924,
+    "close": 1.26952
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-26T23:00:00Z",
+   "targetBarTime": "2019-06-27T00:00:00Z",
+   "pUp": 0.5109033584594727,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26952,
+    "high": 1.26974,
+    "low": 1.269095,
+    "close": 1.26974
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T00:00:00Z",
+   "targetBarTime": "2019-06-27T01:00:00Z",
+   "pUp": 0.5093777775764465,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26974,
+    "high": 1.26981,
+    "low": 1.269115,
+    "close": 1.2694
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T01:00:00Z",
+   "targetBarTime": "2019-06-27T02:00:00Z",
+   "pUp": 0.520226240158081,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269355,
+    "high": 1.2694,
+    "low": 1.268205,
+    "close": 1.268445
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T02:00:00Z",
+   "targetBarTime": "2019-06-27T03:00:00Z",
+   "pUp": 0.5389381647109985,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26844,
+    "high": 1.26873,
+    "low": 1.268265,
+    "close": 1.26832
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T03:00:00Z",
+   "targetBarTime": "2019-06-27T04:00:00Z",
+   "pUp": 0.5251873731613159,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26832,
+    "high": 1.268445,
+    "low": 1.267425,
+    "close": 1.26844
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T04:00:00Z",
+   "targetBarTime": "2019-06-27T05:00:00Z",
+   "pUp": 0.5113101005554199,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.268435,
+    "high": 1.26844,
+    "low": 1.26781,
+    "close": 1.267935
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T05:00:00Z",
+   "targetBarTime": "2019-06-27T06:00:00Z",
+   "pUp": 0.515151858329773,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267935,
+    "high": 1.268795,
+    "low": 1.266905,
+    "close": 1.268725
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T06:00:00Z",
+   "targetBarTime": "2019-06-27T07:00:00Z",
+   "pUp": 0.4892606735229492,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26875,
+    "high": 1.27073,
+    "low": 1.2682,
+    "close": 1.26847
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T07:00:00Z",
+   "targetBarTime": "2019-06-27T08:00:00Z",
+   "pUp": 0.49676844477653503,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26849,
+    "high": 1.269805,
+    "low": 1.267625,
+    "close": 1.269715
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T08:00:00Z",
+   "targetBarTime": "2019-06-27T09:00:00Z",
+   "pUp": 0.46986764669418335,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26972,
+    "high": 1.272045,
+    "low": 1.269435,
+    "close": 1.2713
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T09:00:00Z",
+   "targetBarTime": "2019-06-27T10:00:00Z",
+   "pUp": 0.4497496485710144,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27129,
+    "high": 1.272495,
+    "low": 1.27023,
+    "close": 1.271585
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T10:00:00Z",
+   "targetBarTime": "2019-06-27T11:00:00Z",
+   "pUp": 0.46119269728660583,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271585,
+    "high": 1.27159,
+    "low": 1.26962,
+    "close": 1.27038
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T11:00:00Z",
+   "targetBarTime": "2019-06-27T12:00:00Z",
+   "pUp": 0.49781423807144165,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27038,
+    "high": 1.2715,
+    "low": 1.27014,
+    "close": 1.271055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T12:00:00Z",
+   "targetBarTime": "2019-06-27T13:00:00Z",
+   "pUp": 0.47965535521507263,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.271055,
+    "high": 1.271755,
+    "low": 1.267965,
+    "close": 1.268275
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T13:00:00Z",
+   "targetBarTime": "2019-06-27T14:00:00Z",
+   "pUp": 0.5441543459892273,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26828,
+    "high": 1.269255,
+    "low": 1.26714,
+    "close": 1.26753
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T14:00:00Z",
+   "targetBarTime": "2019-06-27T15:00:00Z",
+   "pUp": 0.5375330448150635,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26753,
+    "high": 1.26806,
+    "low": 1.26644,
+    "close": 1.26735
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T15:00:00Z",
+   "targetBarTime": "2019-06-27T16:00:00Z",
+   "pUp": 0.5233762860298157,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26734,
+    "high": 1.26848,
+    "low": 1.26643,
+    "close": 1.267835
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T16:00:00Z",
+   "targetBarTime": "2019-06-27T17:00:00Z",
+   "pUp": 0.5024089217185974,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26784,
+    "high": 1.268275,
+    "low": 1.26702,
+    "close": 1.26723
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T17:00:00Z",
+   "targetBarTime": "2019-06-27T18:00:00Z",
+   "pUp": 0.5152082443237305,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267215,
+    "high": 1.267675,
+    "low": 1.266175,
+    "close": 1.26642
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T18:00:00Z",
+   "targetBarTime": "2019-06-27T19:00:00Z",
+   "pUp": 0.5296549797058105,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26642,
+    "high": 1.2674,
+    "low": 1.26642,
+    "close": 1.26722
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T19:00:00Z",
+   "targetBarTime": "2019-06-27T20:00:00Z",
+   "pUp": 0.4983709156513214,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267215,
+    "high": 1.267335,
+    "low": 1.26678,
+    "close": 1.26712
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T20:00:00Z",
+   "targetBarTime": "2019-06-27T21:00:00Z",
+   "pUp": 0.5005561113357544,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26739,
+    "high": 1.267985,
+    "low": 1.26626,
+    "close": 1.26688
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T21:00:00Z",
+   "targetBarTime": "2019-06-27T22:00:00Z",
+   "pUp": 0.5167623162269592,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266865,
+    "high": 1.267315,
+    "low": 1.266575,
+    "close": 1.266995
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T22:00:00Z",
+   "targetBarTime": "2019-06-27T23:00:00Z",
+   "pUp": 0.5191357135772705,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.266995,
+    "high": 1.26755,
+    "low": 1.26693,
+    "close": 1.26737
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-27T23:00:00Z",
+   "targetBarTime": "2019-06-28T00:00:00Z",
+   "pUp": 0.5103201270103455,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267375,
+    "high": 1.26786,
+    "low": 1.26695,
+    "close": 1.267625
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T00:00:00Z",
+   "targetBarTime": "2019-06-28T01:00:00Z",
+   "pUp": 0.5050646066665649,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26762,
+    "high": 1.267855,
+    "low": 1.266825,
+    "close": 1.266835
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T01:00:00Z",
+   "targetBarTime": "2019-06-28T02:00:00Z",
+   "pUp": 0.5275956392288208,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26684,
+    "high": 1.26717,
+    "low": 1.26675,
+    "close": 1.26712
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T02:00:00Z",
+   "targetBarTime": "2019-06-28T03:00:00Z",
+   "pUp": 0.5108082890510559,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26713,
+    "high": 1.26733,
+    "low": 1.266855,
+    "close": 1.267245
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T03:00:00Z",
+   "targetBarTime": "2019-06-28T04:00:00Z",
+   "pUp": 0.5048972368240356,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26725,
+    "high": 1.267465,
+    "low": 1.266715,
+    "close": 1.267115
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T04:00:00Z",
+   "targetBarTime": "2019-06-28T05:00:00Z",
+   "pUp": 0.5080192685127258,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26712,
+    "high": 1.26728,
+    "low": 1.266825,
+    "close": 1.267055
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T05:00:00Z",
+   "targetBarTime": "2019-06-28T06:00:00Z",
+   "pUp": 0.503675103187561,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26706,
+    "high": 1.267885,
+    "low": 1.266535,
+    "close": 1.26744
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T06:00:00Z",
+   "targetBarTime": "2019-06-28T07:00:00Z",
+   "pUp": 0.49049463868141174,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26744,
+    "high": 1.26846,
+    "low": 1.266845,
+    "close": 1.26762
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T07:00:00Z",
+   "targetBarTime": "2019-06-28T08:00:00Z",
+   "pUp": 0.48739999532699585,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.267615,
+    "high": 1.268755,
+    "low": 1.266555,
+    "close": 1.26779
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T08:00:00Z",
+   "targetBarTime": "2019-06-28T09:00:00Z",
+   "pUp": 0.4853755533695221,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.267805,
+    "high": 1.268625,
+    "low": 1.26738,
+    "close": 1.267675
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T09:00:00Z",
+   "targetBarTime": "2019-06-28T10:00:00Z",
+   "pUp": 0.4885534942150116,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26767,
+    "high": 1.268735,
+    "low": 1.26702,
+    "close": 1.268715
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T10:00:00Z",
+   "targetBarTime": "2019-06-28T11:00:00Z",
+   "pUp": 0.46855077147483826,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.26872,
+    "high": 1.26986,
+    "low": 1.26826,
+    "close": 1.269095
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T11:00:00Z",
+   "targetBarTime": "2019-06-28T12:00:00Z",
+   "pUp": 0.4699205458164215,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269105,
+    "high": 1.27072,
+    "low": 1.268745,
+    "close": 1.27051
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T12:00:00Z",
+   "targetBarTime": "2019-06-28T13:00:00Z",
+   "pUp": 0.45335161685943604,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270525,
+    "high": 1.271485,
+    "low": 1.26974,
+    "close": 1.27128
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T13:00:00Z",
+   "targetBarTime": "2019-06-28T14:00:00Z",
+   "pUp": 0.45105260610580444,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.27127,
+    "high": 1.27349,
+    "low": 1.270865,
+    "close": 1.272735
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T14:00:00Z",
+   "targetBarTime": "2019-06-28T15:00:00Z",
+   "pUp": 0.4418071508407593,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.272705,
+    "high": 1.27309,
+    "low": 1.269565,
+    "close": 1.270315
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T15:00:00Z",
+   "targetBarTime": "2019-06-28T16:00:00Z",
+   "pUp": 0.520601212978363,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.270305,
+    "high": 1.27061,
+    "low": 1.268725,
+    "close": 1.26949
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T16:00:00Z",
+   "targetBarTime": "2019-06-28T17:00:00Z",
+   "pUp": 0.5283113121986389,
+   "predicted": "UP",
+   "actual": "UP",
+   "bar": {
+    "open": 1.2695,
+    "high": 1.270185,
+    "low": 1.26928,
+    "close": 1.270155
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T17:00:00Z",
+   "targetBarTime": "2019-06-28T18:00:00Z",
+   "pUp": 0.49883222579956055,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.270125,
+    "high": 1.27065,
+    "low": 1.26954,
+    "close": 1.27043
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T18:00:00Z",
+   "targetBarTime": "2019-06-28T19:00:00Z",
+   "pUp": 0.49298202991485596,
+   "predicted": "DOWN",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27038,
+    "high": 1.270395,
+    "low": 1.2693,
+    "close": 1.269915
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T19:00:00Z",
+   "targetBarTime": "2019-06-28T20:00:00Z",
+   "pUp": 0.5114549398422241,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.26991,
+    "high": 1.270115,
+    "low": 1.268945,
+    "close": 1.26969
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-28T20:00:00Z",
+   "targetBarTime": "2019-06-30T21:00:00Z",
+   "pUp": 0.5010509490966797,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.27016,
+    "high": 1.270445,
+    "low": 1.26929,
+    "close": 1.26978
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-30T21:00:00Z",
+   "targetBarTime": "2019-06-30T22:00:00Z",
+   "pUp": 0.49742335081100464,
+   "predicted": "DOWN",
+   "actual": "UP",
+   "bar": {
+    "open": 1.269885,
+    "high": 1.2703,
+    "low": 1.269055,
+    "close": 1.269925
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  },
+  {
+   "barTime": "2019-06-30T22:00:00Z",
+   "targetBarTime": "2019-06-30T23:00:00Z",
+   "pUp": 0.5155683755874634,
+   "predicted": "UP",
+   "actual": "DOWN",
+   "bar": {
+    "open": 1.269915,
+    "high": 1.27024,
+    "low": 1.26929,
+    "close": 1.269355
+   },
+   "scored": true,
+   "model": "GBP_USD-1h-test2019"
+  }
+ ]
+}
