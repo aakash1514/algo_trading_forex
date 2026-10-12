@@ -23,7 +23,7 @@ TABLES: dict[str, str] = {"1h": "historical_candles_1h", "4h": "historical_candl
 BAR: dict[str, timedelta] = {"1h": timedelta(hours=1), "4h": timedelta(hours=4), "1d": timedelta(days=1)}
 
 # Unit suffixes (the text after the last "_"); a field without one carries no unit
-UNITS = ("price", "pips", "pct", "usd", "count", "ratio", "p", "utc", "date")
+UNITS = ("price", "pips", "pct", "usd", "count", "ratio", "p", "lots", "param", "utc", "date")
 
 DISCLAIMER = (
     "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a "
