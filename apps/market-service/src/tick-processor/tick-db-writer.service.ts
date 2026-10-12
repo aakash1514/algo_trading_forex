@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { KafkaConsumerService, KAFKA_TOPICS, parseTickMessage } from '@forexedge/kafka';
+import { insertLiveTick } from '@forexedge/database';
 
 @Injectable()
 export class TickDbWriterService implements OnModuleInit {
@@ -29,21 +30,7 @@ export class TickDbWriterService implements OnModuleInit {
   ): Promise<void> {
     const tick = parseTickMessage(message);
 
-    // Raw SQL INSERT — no TypeORM overhead
-    // $1, $2... are parameterized to prevent SQL injection
-    await this.dataSource.query(
-      `INSERT INTO ticks (time, instrument, pair, bid, ask, mid, spread, source)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [
-        new Date(tick.timestamp),   // Kafka serializes Date as string, parse it back
-        tick.instrument,
-        tick.pair,
-        tick.bid,
-        tick.ask,
-        tick.mid,
-        tick.spread,
-        tick.source,
-      ],
-    );
+    // Live ticks go to the ticks hypertable only, never historical_* (see insertLiveTick).
+    await insertLiveTick(this.dataSource, tick);
   }
 }
