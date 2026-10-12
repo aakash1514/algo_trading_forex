@@ -1,4 +1,5 @@
 import { MAX_QUESTION_CHARS, askErrorKind, questionLength, questionProblem } from './research';
+import tooLong from '../components/research/__fixtures__/too-long.json';
 
 describe('research question limits', () => {
   it('counts code points like the backend, not UTF-16 units', () => {
@@ -34,5 +35,13 @@ describe('askErrorKind', () => {
     expect(askErrorKind({ status: 500, data: {} })).toBe('server');
     expect(askErrorKind({ status: 'PARSING_ERROR', originalStatus: 200, data: '', error: 'x' })).toBe('server');
     expect(askErrorKind({ message: 'boom' })).toBe('server');
+  });
+});
+
+describe('askErrorKind with the real 422 body', () => {
+  it('tells the user the question is too long', () => {
+    expect(tooLong.detail.length).toBeGreaterThan(0);
+    expect(askErrorKind({ status: 422, data: tooLong })).toBe('too_long');
+    expect(askErrorKind({ status: 422, data: {} })).toBe('invalid');
   });
 });
