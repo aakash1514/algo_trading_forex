@@ -17,6 +17,7 @@ import { PricingService } from '../pricing/pricing.service';
 import { OpenPairsIndex } from '../position/open-pairs.index';
 import { MarketHoursPolicy } from '../market/market-hours.policy';
 import { PriceFeedPolicy } from '../market/price-feed.policy';
+import { parseMarketFeed } from '@forexedge/common';
 import { StopOutService } from '../account/stop-out.service';
 import { AccountInvariantMonitor } from '../account/account-invariant.monitor';
 
@@ -39,8 +40,11 @@ import { AccountInvariantMonitor } from '../account/account-invariant.monitor';
     PricingService,
     OpenPairsIndex,
     MarketHoursPolicy,
-    // A factory: the policy's optional clock argument is for tests, not for injection.
-    { provide: PriceFeedPolicy, useFactory: (config: ConfigService) => new PriceFeedPolicy(config), inject: [ConfigService] },
+    {
+      provide: PriceFeedPolicy,
+      useFactory: (config: ConfigService) => new PriceFeedPolicy(parseMarketFeed(config.get<string>('MARKET_FEED'))),
+      inject: [ConfigService],
+    },
     StopOutService,
     AccountInvariantMonitor,
     {

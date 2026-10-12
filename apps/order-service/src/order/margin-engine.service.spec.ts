@@ -1,6 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
 import { MarginEngineService } from './margin-engine.service';
-import { ConfigService } from '@nestjs/config';
 import { PricingService } from '../pricing/pricing.service';
 import { PriceFeedPolicy } from '../market/price-feed.policy';
 
@@ -25,7 +24,7 @@ function makeEngine(row: ReturnType<typeof account> | null) {
     })[where.pair] ?? null),
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pricing = new PricingService(redis as any, instrumentRepo as any, new PriceFeedPolicy(new ConfigService({ MARKET_FEED: 'mock' })));
+  const pricing = new PricingService(redis as any, instrumentRepo as any, new PriceFeedPolicy('mock'));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new MarginEngineService(accounts as any, pricing);
 }

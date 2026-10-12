@@ -1,4 +1,4 @@
-import { ConfigService } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
 import type { KafkaMessage } from 'kafkajs';
 import { TickConsumer } from './tick.consumer';
 import type { PositionService } from '../position/position.service';
@@ -21,7 +21,7 @@ describe('TickConsumer.handleBatch', () => {
   const processTicks = jest.fn();
   const check = jest.fn();
   const config = { get: jest.fn((_k: string, d: string) => d) } as unknown as ConfigService;
-  const policy = new PriceFeedPolicy(new ConfigService({ MARKET_FEED: 'mock' }), () => now);
+  const policy = new PriceFeedPolicy('mock', () => now);
   const consumer = new TickConsumer(
     config,
     { processTicks } as unknown as PositionService,
@@ -83,7 +83,7 @@ describe('TickConsumer.handleBatch', () => {
     processTicks.mockResolvedValue(new Set());
     const none = new TickConsumer(
       config, { processTicks } as unknown as PositionService, { check } as unknown as StopOutService,
-      new PriceFeedPolicy(new ConfigService({}), () => now),
+      new PriceFeedPolicy('none', () => now),
     );
     const messages = [message(60, 'EUR/USD', 1.081), message(61, 'XAU/USD', 1823.5)];
     await none.handleBatch({ batch: { messages, highWatermark: '62' } as never, heartbeat });

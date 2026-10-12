@@ -1,4 +1,4 @@
-import { ConfigService } from '@nestjs/config';
+import type { MarketFeed } from '@forexedge/common';
 import { PricingService, PriceUnavailableError, StalePriceError } from './pricing.service';
 import { PriceFeedPolicy } from '../market/price-feed.policy';
 
@@ -34,7 +34,7 @@ function stamped(key: string, p: { bid: number; ask: number; mid: number }, sour
 function makeService(prices = PRICES, { feed = 'mock', now = NOW }: { feed?: string; now?: number } = {}) {
   const redis = { get: jest.fn(async (key: string) => (prices[key] ? stamped(key, prices[key]) : null)) };
   const instrumentRepo = { findOne: jest.fn(async ({ where }: { where: { pair: string } }) => INSTRUMENTS[where.pair] ?? null) };
-  const policy = new PriceFeedPolicy(new ConfigService({ MARKET_FEED: feed }), () => now);
+  const policy = new PriceFeedPolicy(feed as MarketFeed, () => now);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const service = new PricingService(redis as any, instrumentRepo as any, policy);
   return { service, redis, instrumentRepo };

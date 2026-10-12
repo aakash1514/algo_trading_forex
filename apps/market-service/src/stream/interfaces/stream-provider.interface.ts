@@ -20,3 +20,6 @@ export interface IForexStreamProvider {
 // Injection token — used instead of the interface name
 // because TypeScript interfaces don't exist at runtime
 export const STREAM_PROVIDER = 'STREAM_PROVIDER';
+
+// The configured MARKET_FEED (libs/common market-feed.ts), injected next to the provider.
+export const MARKET_FEED_SETTING = 'MARKET_FEED_SETTING';
