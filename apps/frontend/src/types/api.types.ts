@@ -170,6 +170,19 @@ export interface TickEvent {
   ask: number;
   spread: number;
   timestamp: string;
+  source: string; // 'MOCK' (simulated) | 'TWELVE_DATA' | 'OANDA'
+}
+
+// GET /api/market/feed/status (market-service stream/feed-status.ts)
+export type FeedState = 'off' | 'connected' | 'degraded' | 'down';
+export interface FeedStatus {
+  feed: 'none' | 'mock';
+  source: string | null;
+  simulated: boolean;
+  state: FeedState;
+  since: string;
+  lastTickAt: string | null;
+  lastError: string | null;
 }
 
 // Socket payloads (see SOCKET_EVENTS in lib/constants.ts)

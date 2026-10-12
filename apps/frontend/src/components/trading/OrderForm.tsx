@@ -7,6 +7,9 @@ import { z } from 'zod';
 import { useAppSelector } from '../../store';
 import { useCreateOrderMutation } from '../../store/api/order.api';
 import { useGetPipValueQuery } from '../../store/api/domain.api';
+import { useGetFeedStatusQuery } from '../../store/api/market.api';
+import { orderEntry } from '../../lib/feed';
+import { useNow } from '../../hooks/useNow';
 import { PAIR_DISPLAY } from '../../lib/constants';
 import { getPriceStep } from '../../lib/pip';
 
@@ -38,6 +41,10 @@ export function OrderForm() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const activePair = useAppSelector((s) => s.market.activePair);
+  const activePrice = useAppSelector((s) => s.market.prices[s.market.activePair]);
+  const { data: feedStatus, isError: feedStatusError } = useGetFeedStatusQuery();
+  const now = useNow();
+  const entry = orderEntry(feedStatus, feedStatusError, PAIR_DISPLAY[activePair] ?? activePair, activePrice, now);
   const [createOrder, { isLoading }] = useCreateOrderMutation();
 
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<OrderFormData>({
@@ -184,6 +191,12 @@ export function OrderForm() {
           </div>
         )}
 
+        {entry.reason && (
+          <p data-testid="order-entry-disabled" className="text-[11px] text-terminal-muted bg-terminal-elevated rounded px-2.5 py-1.5">
+            Order entry disabled: {entry.reason}
+          </p>
+        )}
+
         {submitError && (
           <p className="text-[11px] text-accent-red bg-accent-red/10 rounded px-2.5 py-1.5">
             {submitError}
@@ -192,7 +205,7 @@ export function OrderForm() {
 
         <button
           type="submit"
-          disabled={isLoading || submitSuccess}
+          disabled={!entry.enabled || isLoading || submitSuccess}
           className={cn(
             'w-full py-2 rounded text-[12px] font-medium transition-all',
             submitSuccess
@@ -203,7 +216,11 @@ export function OrderForm() {
             'disabled:opacity-50 disabled:cursor-not-allowed'
           )}
         >
-          {submitSuccess ? '✓ Order placed' : isLoading ? 'Placing...' : `Place ${direction === 'LONG' ? 'buy' : 'sell'} order`}
+          {submitSuccess
+            ? '✓ Order placed'
+            : isLoading
+            ? 'Placing...'
+            : `${entry.label}: ${direction === 'LONG' ? 'buy' : 'sell'}`}
         </button>
       </form>
     </div>

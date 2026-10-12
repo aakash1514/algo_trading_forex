@@ -13,6 +13,7 @@ export interface MarketState {
     ask: number;
     spread: number;
     timestamp: string;
+    source: string;
   }>;
   activePair: string;
 }
