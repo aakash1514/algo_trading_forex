@@ -29,8 +29,13 @@ def load_env_file(path: Path) -> None:
 @dataclass(frozen=True)
 class Settings:
     port: int
+    cors_origins: tuple[str, ...]
 
 
 def get_settings() -> Settings:
     load_env_file(REPO_ROOT / ".env")
-    return Settings(port=int(os.environ.get("RESEARCH_AGENT_PORT", "3007")))
+    return Settings(
+        port=int(os.environ.get("RESEARCH_AGENT_PORT", "3007")),
+        # the frontend only (not Grafana's 3001); the browser sends the access token as a bearer header
+        cors_origins=("http://localhost:4200",),
+    )

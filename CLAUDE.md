@@ -64,7 +64,8 @@ npx ts-node --transpile-only tools/ops/research-demo-data.ts        # demo users
 ## Architecture
 
 ### Services and ports
-All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`.
+All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`,
+except research-agent, which allows only `localhost:4200`.
 
 | Service | Port | Responsibility |
 |---|---|---|
@@ -309,6 +310,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    research-agent: a Linux image and a Linux lock (mcp pulls in `pywin32`, Windows only), the role
    `forexedge_research_reader` the same way, and a non-free LLM tier or rate limits for real traffic (free Groq
    is about one question per minute).
+   CORS: other services also allow 3001 with credentials — narrow before deployment.
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
 8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar
