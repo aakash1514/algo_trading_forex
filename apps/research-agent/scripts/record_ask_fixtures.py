@@ -90,7 +90,7 @@ def main(names: list[str]) -> None:
                 "sha256": hashlib.sha256(body).hexdigest(),
             }
             print(f"{name}: HTTP {r.status_code} {report_type or ''}")
-    manifest_path.write_text(json.dumps(manifest, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    manifest_path.write_text(json.dumps(manifest, indent=1, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
     write_readme(manifest)
 
 
@@ -116,7 +116,7 @@ def write_readme(manifest: dict[str, dict[str, object]]) -> None:
             f"| {m['file']} | {q} | {m['status']} | {m['type'] or '—'} | {m['recorded_at']} | `{m['commit']}` | "
             f"`{m['sha256']}` |"
         )
-    (OUT / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (OUT / "README.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":

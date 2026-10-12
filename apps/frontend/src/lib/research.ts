@@ -6,6 +6,10 @@ import type { SerializedError } from '@reduxjs/toolkit';
 export const MIN_QUESTION_CHARS = 3;
 export const MAX_QUESTION_CHARS = 500;
 
+// Same text as research-agent's DISCLAIMER (research_agent/domain.py); every report also carries it.
+export const RESEARCH_DISCLAIMER =
+  "Historical analysis of ForexEdge's own data only; not financial advice, and nothing here is a signal to buy or sell.";
+
 // The agent's wall-clock budget is 90 s; the client waits a little longer.
 export const ASK_TIMEOUT_MS = 100_000;
 
