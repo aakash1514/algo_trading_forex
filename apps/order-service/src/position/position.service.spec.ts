@@ -172,7 +172,7 @@ describe('PositionService', () => {
     it('a pair failing does not skip the other pairs in the batch', async () => {
       openPositions({ 'EUR/GBP': [makePosition({ id: 'cross', pair: 'EUR/GBP' })], 'EUR/USD': [makePosition()] });
       pricing.quoteToUsd.mockImplementation(async (pair: string) => {
-        if (pair === 'EUR/GBP') throw new PriceUnavailableError('No live price for USD/GBP. Is market-service running?');
+        if (pair === 'EUR/GBP') throw new PriceUnavailableError('No live price for USD/GBP');
         return 1;
       });
       manager([makePosition()]);
@@ -231,7 +231,7 @@ describe('PositionService', () => {
     it('a booking failure keeps the exit held in the DB; the next batch books it at the trigger price', async () => {
       openPositions({ 'EUR/USD': [makePosition({ stopLoss: 1.0795 })] });
       const close = jest.spyOn(service, 'closePosition')
-        .mockRejectedValueOnce(new PriceUnavailableError('No live price for USD/GBP. Is market-service running?'));
+        .mockRejectedValueOnce(new PriceUnavailableError('No live price for USD/GBP'));
 
       await expect(service.processTicks([tickAt(1.0790)])).resolves.toEqual(new Set(['user-1']));
       expect(close).toHaveBeenCalledWith('pos-1', 'STOP_LOSS', 1.079, expect.any(Map));

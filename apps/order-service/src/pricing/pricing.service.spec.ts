@@ -1,4 +1,6 @@
-import { PricingService, PriceUnavailableError } from './pricing.service';
+import { ConfigService } from '@nestjs/config';
+import { PricingService, PriceUnavailableError, StalePriceError } from './pricing.service';
+import { PriceFeedPolicy } from '../market/price-feed.policy';
 
 // Instruments rows as stored in the DB (slash pair format, NUMERIC as numbers).
 const INSTRUMENTS: Record<string, { pair: string; lotSize: number; pipSize: number; maxLeverage: number | null }> = {
@@ -18,11 +20,23 @@ const PRICES: Record<string, { bid: number; ask: number; mid: number }> = {
   'price:XAU_USD': { bid: 2399.9, ask: 2400.1, mid: 2400 },
 };
 
-function makeService(prices = PRICES) {
-  const redis = { get: jest.fn(async (key: string) => (prices[key] ? JSON.stringify(prices[key]) : null)) };
+// Stamp and source as market-service writes them (the full forex.ticks message is the Redis value).
+const STAMPED_AT = '2026-10-10T17:54:09.191Z';
+const NOW = Date.parse(STAMPED_AT) + 500;
+
+function stamped(key: string, p: { bid: number; ask: number; mid: number }, source = 'MOCK') {
+  const instrument = key.replace(/^price:(last:)?/, '');
+  return JSON.stringify({
+    pair: instrument.replace('_', '/'), instrument, ...p, spread: p.ask - p.bid, timestamp: STAMPED_AT, source,
+  });
+}
+
+function makeService(prices = PRICES, { feed = 'mock', now = NOW }: { feed?: string; now?: number } = {}) {
+  const redis = { get: jest.fn(async (key: string) => (prices[key] ? stamped(key, prices[key]) : null)) };
   const instrumentRepo = { findOne: jest.fn(async ({ where }: { where: { pair: string } }) => INSTRUMENTS[where.pair] ?? null) };
+  const policy = new PriceFeedPolicy(new ConfigService({ MARKET_FEED: feed }), () => now);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const service = new PricingService(redis as any, instrumentRepo as any);
+  const service = new PricingService(redis as any, instrumentRepo as any, policy);
   return { service, redis, instrumentRepo };
 }
 
@@ -85,6 +99,32 @@ describe('PricingService.getQuote', () => {
 
   it('throws PriceUnavailableError when there is no live price', async () => {
     const { service } = makeService({});
-    await expect(service.getQuote('EUR/USD')).rejects.toBeInstanceOf(PriceUnavailableError);
+    await expect(service.getQuote('EUR/USD')).rejects.toThrow(new PriceUnavailableError('No live price for EUR/USD'));
+  });
+
+  it('trades a fresh price from the configured feed', async () => {
+    const { service } = makeService(PRICES, { now: Date.parse(STAMPED_AT) + 2_000 });
+    await expect(service.getQuote('EUR/USD')).resolves.toEqual({ bid: 1.0849, ask: 1.0851, mid: 1.085 });
+  });
+
+  it('rejects a stale price with its age, the limit and the source', async () => {
+    const { service } = makeService(PRICES, { now: Date.parse(STAMPED_AT) + 7_000 });
+    const err = await service.getQuote('EUR/USD').catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(StalePriceError);
+    expect(err).toBeInstanceOf(PriceUnavailableError); // callers that skip a missing price skip it too
+    expect((err as Error).message).toBe('Price for EUR/USD is stale: last quote 7 s old (max 2 s, source MOCK)');
+  });
+
+  it('never trades a simulated price unless the mock feed is configured', async () => {
+    const { service } = makeService(PRICES, { feed: 'none' });
+    await expect(service.getQuote('EUR/USD')).rejects.toThrow(
+      'Price for EUR/USD comes from source MOCK, which the configured market feed (none) does not trade on',
+    );
+  });
+
+  it('still returns a stale price as the last known reference (SL/TP validation only)', async () => {
+    const prices = { ...PRICES, 'price:last:EUR_USD': PRICES['price:EUR_USD'] };
+    const { service } = makeService(prices, { now: Date.parse(STAMPED_AT) + 60_000 });
+    await expect(service.getLastQuote('EUR/USD')).resolves.toEqual({ bid: 1.0849, ask: 1.0851, mid: 1.085 });
   });
 });

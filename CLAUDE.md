@@ -169,7 +169,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Clients send `instrument` (`EUR_USD`) only; order-service derives `pair` with `instrumentToPair()`.
 - Refresh tokens rotate on every use: never fire two refreshes concurrently (use `refreshSession()`).
 - order-service: PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService,
-  OpenPairsIndex, MarketHoursPolicy, StopOutService and AccountInvariantMonitor are provided once, by
+  OpenPairsIndex, MarketHoursPolicy, PriceFeedPolicy, StopOutService and AccountInvariantMonitor are provided once, by
   `KafkaConsumerModule`. Don't also list them in AppModule (duplicate instances have separate state).
 - Market hours come from the shared clock `libs/common/src/lib/market-hours.ts` (FX Sun 17:00 to Fri 17:00 New York;
   metals open Sun 18:00 and pause 17:00-18:00 Mon-Thu). Orders and manual closes are rejected while closed; SL/TP

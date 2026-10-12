@@ -16,6 +16,7 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { PricingService } from '../pricing/pricing.service';
 import { OpenPairsIndex } from '../position/open-pairs.index';
 import { MarketHoursPolicy } from '../market/market-hours.policy';
+import { PriceFeedPolicy } from '../market/price-feed.policy';
 import { StopOutService } from '../account/stop-out.service';
 import { AccountInvariantMonitor } from '../account/account-invariant.monitor';
 
@@ -38,6 +39,8 @@ import { AccountInvariantMonitor } from '../account/account-invariant.monitor';
     PricingService,
     OpenPairsIndex,
     MarketHoursPolicy,
+    // A factory: the policy's optional clock argument is for tests, not for injection.
+    { provide: PriceFeedPolicy, useFactory: (config: ConfigService) => new PriceFeedPolicy(config), inject: [ConfigService] },
     StopOutService,
     AccountInvariantMonitor,
     {
@@ -50,6 +53,6 @@ import { AccountInvariantMonitor } from '../account/account-invariant.monitor';
     },
   ],
   // Single instances shared with AppModule (controllers, OrderService).
-  exports: [PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService, OpenPairsIndex, MarketHoursPolicy],
+  exports: [PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService, OpenPairsIndex, MarketHoursPolicy, PriceFeedPolicy],
 })
 export class KafkaConsumerModule {}

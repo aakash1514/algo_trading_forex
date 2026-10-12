@@ -1,6 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
 import { MarginEngineService } from './margin-engine.service';
+import { ConfigService } from '@nestjs/config';
 import { PricingService } from '../pricing/pricing.service';
+import { PriceFeedPolicy } from '../market/price-feed.policy';
 
 const account = (overrides: Partial<{ balance: number; unrealizedPnl: number; marginUsed: number; leverage: number }> = {}) => ({
   balance: 10_000, unrealizedPnl: 0, marginUsed: 0, leverage: 100, ...overrides,
@@ -23,7 +25,7 @@ function makeEngine(row: ReturnType<typeof account> | null) {
     })[where.pair] ?? null),
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pricing = new PricingService(redis as any, instrumentRepo as any);
+  const pricing = new PricingService(redis as any, instrumentRepo as any, new PriceFeedPolicy(new ConfigService({ MARKET_FEED: 'mock' })));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new MarginEngineService(accounts as any, pricing);
 }
