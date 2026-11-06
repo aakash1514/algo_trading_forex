@@ -322,7 +322,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-5-research-agent.md`.
 - **Step 5b (Research page) is done** (2026-10-12), merged into main (PR #5). The manual browser check is pending
   (`docs/validation/research-page-e2e.md`). Write-up: §13 of the step-5 summary.
-- **Step 6a (price safety + official calendar) is done** (2026-10-12) on branch `step-6-live-data` (not merged).
+- **Step 6a (price safety + calendar) is done** (2026-10-12, follow-up 2026-11-06) on branch `step-6-live-data`
+  (not merged): exact UTC event times, Forex Factory for non-FOMC/ECB events, BLS parked on `step-6a-bls-wip` (403).
   Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
 
 ### Deferred from the health check
@@ -365,7 +366,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    Data's free plan has no bid/ask, ~1 price per 5-7 min on 800 credits/day, XAU/USD only on paid plans, and
    personal, non-display, non-commercial terms); price age/source checks, feed status, no feed by default
    (`MARKET_FEED`), SIMULATED/STALE terminal states, historical-table protection tests, and an events-only
-   calendar from the FOMC and ECB official calendars (BLS blocked: docs/OVERNIGHT-QUESTIONS.md #5).
+   calendar with exact UTC times: FOMC (expected 14:00 New York) and ECB (14:15 Frankfurt) from official sources,
+   all other events via Forex Factory (owner exception, portfolio use only); direct BLS access is blocked (HTTP 403,
+   2026-11-06, docs/OVERNIGHT-QUESTIONS.md #5).
    Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`. Next: 6b, historical Replay mode.
    A licensed live provider needs bid/ask and display rights; before enabling it, follow the mixed-candles rule.
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;

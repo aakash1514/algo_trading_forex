@@ -8,11 +8,12 @@
 - **Every traded price is checked.** order-service checks each price's source and age, so a stale, missing or
   wrongly sourced price never fills an order or triggers an exit.
 - **The history is protected.** Live ticks provably can't reach the imported history.
-- **An official, events-only calendar.** The economic calendar comes from the Federal Reserve's FOMC calendar and the
-  ECB's meeting schedule, and the third-party weekly feed is gone.
+- **An events-only calendar with exact UTC times.** FOMC and ECB decisions come from their official calendars; all
+  other events come via Forex Factory's own weekly export, approved by the owner for portfolio use only. Direct BLS
+  access is blocked (HTTP 403, 2026-11-06).
 
-There is no live price provider. Twelve Data's free plan doesn't fit (§2). Branch `step-6-live-data` (2026-10-12),
-not merged.
+There is no live price provider. Twelve Data's free plan doesn't fit (§2). Branch `step-6-live-data` (2026-10-12,
+follow-up 2026-11-06), not merged.
 
 ## 1. What was built
 
@@ -24,7 +25,14 @@ not merged.
 | `b2af2fd` | Terminal states: no feed, SIMULATED, STALE; order entry gated |
 | `9380251` | Events-only calendar from the FOMC and ECB official calendars |
 | `9278a9e` | The third-party weekly calendar fetcher removed, its 20 rows deleted, grep test |
-| close-out | Offline guard for domain-service tests, docs, clean matrix (this commit) |
+| `43e70e2` | Offline guard for domain-service tests, docs, clean matrix (first close-out) |
+| `fc1c8fc` | Exact UTC release times: ECB `official`, FOMC `expected`; migration `CalendarEventTimes` |
+| `6b7666a` | Calendar warning window (±30 min, inclusive) on exact UTC times, with DB boundary and DST tests |
+| `ba4a09a` | The old feed flag removed; a test checks the `MARKET_FEED` docs |
+| `7bfc829` | Forex Factory weekly export for all non-FOMC/ECB events; migration `CalendarThirdPartyEvents` |
+| `247383e` | Calendar warning matches the event currency to the order's pair (tests on the real export) |
+| `1a9fc4f` | No personal data in outbound requests or the repository (rule and tests) |
+| close-out 2 | Phase summary, validation reruns (this commit) |
 
 ## 2. Why no live provider: the Twelve Data research
 
@@ -56,7 +64,9 @@ Checked 2026-10-12 on twelvedata.com (pricing, docs, terms, support articles):
 
 **Config: `MARKET_FEED`** (libs/common `market-feed.ts`, read by market-service and order-service)
 - `none` (the default, also when unset) or `mock`. Any other value fails startup.
-- `USE_MOCK_DATA` is no longer read. An old `.env` gets a warning instead of a silently re-enabled simulator.
+- `USE_MOCK_DATA` (the old flag) is no longer read. The follow-up also removed its startup warning: an old `.env`
+  line is simply ignored, which is safe because the default is no feed. A test fails if the old name appears
+  anywhere outside `docs/` (this summary explains the rename).
 
 **order-service** (`PriceFeedPolicy`, provided once by `KafkaConsumerModule`)
 - `PricingService.getQuote` rejects a price if:
@@ -105,50 +115,92 @@ Checked 2026-10-12 on twelvedata.com (pricing, docs, terms, support articles):
 
 ## 5. Economic calendar
 
-**Sources** (`economic-calendar/official-sources.ts`)
+**Sources** (domain-service `economic-calendar/`)
 
-| Source | Page | Terms | robots.txt (2026-10-12) |
-|---|---|---|---|
-| Federal Reserve Board | FOMC meeting calendar | Public domain, "Please cite to the Board as the source" | None (404 page: no rules) |
-| ECB | Governing Council meeting schedule | Free use, citing the ECB, with modifications stated | Doesn't disallow `/press/calendars/`; crawl delay 5 s |
-| BLS | Release calendar | Public domain | Doesn't disallow it, but the feed answered **403** to our User-Agent: skipped (OVERNIGHT-QUESTIONS #5) |
+| Source | What | Time | `time_source` | Terms | robots.txt |
+|---|---|---|---|---|---|
+| Federal Reserve Board, FOMC calendar | Scheduled meetings (decision on the final day); notation votes and unscheduled meetings skipped | 14:00 New York, **expected** (below) | `expected` | Public domain, cite the Board | None (404) |
+| ECB, Governing Council schedule | Monetary policy decisions only ("Day 2, followed by press conference"); Day 1, non-monetary, General Council and standalone press conference entries skipped | 14:15 Frankfurt, from the ECB's monetary policy decisions page ("published in a press release at 14:15 CET") | `official` | Free use, cite the ECB | `/press/calendars/` allowed, 5 s delay |
+| Forex Factory weekly export (`ff_calendar_thisweek.json`, linked from the "Weekly Export" panel of forexfactory.com/calendar) | Every other timed event, all currencies and impact levels | The time with the UTC offset the export gives | `third_party` | **Approved by the owner on 2026-11-06 for portfolio use; terms not confirmed for commercial use; must be re-checked or replaced before any client/commercial use** | Both hosts allow it |
+| BLS (CPI, Employment Situation) | Not included: **HTTP 403** even with the owner-approved contact email in the User-Agent (one request, 2026-11-06). Not worked around; the work is parked on branch `step-6a-bls-wip` | | | Public domain | `/schedule/news_release/` allowed |
+
+**Why the FOMC time is "expected".** The Fed publishes no standing release time for the statement. The statements of
+the 8 most recent scheduled meetings (Dec 2025 to Oct 2026), recorded once as fixtures, all say "For release at
+2:00 p.m." (EST for two, EDT for six). `fomc-statement-evidence.spec.ts` checks every one. The UI shows the time as
+"(expected)" with the note "Fed publishes no standard release time; based on recent statements." Statement pages
+are never fetched at runtime.
+
+**Times**
+- Every event is stored at its release moment in UTC (`scheduled_at`).
+- FOMC/ECB local times are converted with IANA zones (`zoned-time.ts`, `Intl`, DST from the time zone database). A
+  local time skipped or repeated by a DST change throws instead of being guessed.
+- Forex Factory times use the export's own offset; a date without an offset throws (no zone is ever assumed).
+- **DST on real dates:**
+  - FOMC 18 Mar 2026 is 18:00 UTC (New York on EDT since 8 Mar, Europe not until 29 Mar).
+  - ECB 29 Oct 2026 is 13:15 UTC (Frankfurt on CET since 25 Oct, New York not until 1 Nov).
+  - The Forex Factory fixture's week contains the US change, but every timed entry comes after it.
 
 **Fetching**
-- At most once per UTC day per source, through a Redis `SET NX` claim per source and date (kept 48 h) made before
-  the request, so restarts and failures don't refetch; the 06:15 UTC cron is each day's first attempt.
-- User-Agent: `ForexEdge/0.1 (economic calendar; +https://github.com/aakash1514/algo_trading_forex)`.
+- **User-Agent** `ForexEdge (+https://github.com/aakash1514/algo_trading_forex)` for every source, with no email and
+  no other headers.
+- **Limits:** FOMC and ECB at most once per UTC day; Forex Factory at most twice. The Redis `SET NX` claim per source
+  and slot (half days for Forex Factory) is made before the request.
+- **Crons:** 06:15 UTC (all sources) and 18:15 UTC (Forex Factory).
+- **Failures:** any non-200 (403, 429), a non-JSON or challenge answer, or a page that doesn't parse gives one log
+  line. The last good events are kept, with no retry and no workaround.
 
-**Parsers**
-- Strict: they throw `CalendarParseError` on any unexpected markup, an empty list, or no monetary policy meeting (ECB).
-- On a fetch or parse failure the stored events are kept and the failure is logged, including Node fetch's hidden
-  network error code.
-- On success the source's events from today on are replaced, so a cancelled meeting disappears.
+**Parsing and storing**
+- **Strict parsers** throw `CalendarParseError` on unexpected markup or an empty result.
+- **What's skipped:** Forex Factory Holiday, Non-Economic and local-midnight entries (possibly All Day/Tentative; their
+  titles are logged) are skipped and counted. Its rows for the FOMC/ECB decisions are dropped by exact title:
+  - USD: `Federal Funds Rate`, `FOMC Statement`, `FOMC Press Conference`, `FOMC Economic Projections`;
+  - EUR: `Main Refinancing Rate`, `Monetary Policy Statement`, `ECB Press Conference`.
+- **Replacing:**
+  - FOMC/ECB replace their events from today on.
+  - Forex Factory replaces exactly its export's week (earliest to latest entry) in one transaction. This is tested by
+    failing the 50th insert: the stored week is untouched.
+  - Earlier weeks stay.
+- **The resync key** is `(source, scheduled_at, currency, title)`. The export lists e.g. the CAD and USD
+  "Unemployment Rate" at the same moment; without the currency one of them would have been dropped.
+- **Events only:** forecast, previous and actual stay null.
 
-**Data**
-- **Dates only, so events are all-day.** `economic_events.all_day` is set and the date is stored at 00:00 UTC, so no
-  time is invented. The frontend reads those dates in UTC, so they never show as the day before west of UTC.
-- **Titles** are the sources' own wording.
-- **Forecast, previous and actual** stay null and show as "—".
-- **Impact** is a fixed ForexEdge classification (`impact.ts`), labelled in the UI:
-  - HIGH: FOMC meetings; ECB monetary policy meetings, Day 2 (the decision).
-  - MEDIUM: ECB press conferences listed separately.
-  - LOW: everything else.
+**Impact**
+- FOMC/ECB: a fixed ForexEdge classification (`impact.ts`). Every stored FOMC/ECB event is a policy decision, so
+  all are HIGH.
+- Forex Factory: its own level (High/Medium/Low → HIGH/MEDIUM/LOW), labelled "ForexFactory impact" in the UI.
+
+**Migrations**
+- **`CalendarEventTimes`:**
+  - Deleted the date-only rows. The dev DB had ECB 55 and FOMC 0 (the 2026-10-12 FOMC fetch had failed); the log
+    reads "deleted all-day events per source: ECB 55; rows left 0".
+  - Replaced `all_day` with `time_source`.
+  - Refuses timed rows of unknown origin.
+- **`CalendarThirdPartyEvents`:** allows `third_party` and widens the column for it. `down()` refuses while
+  third-party rows exist.
+- The 20 rows deleted earlier in 6a are not restored.
 
 **UI**
-- Each event links to its source.
-- A footer cites the Board of Governors of the Federal Reserve System and the ECB.
-- A note says GBP and JPY events and US data releases (BLS) aren't available.
-- Currency filters are limited to USD and EUR.
+- Times in UTC, labelled, e.g. "Wed 9 Dec 2026 · 19:00 UTC (expected)".
+- Forex Factory rows say "via ForexFactory".
+- The footer cites the Federal Reserve Board, the ECB and Forex Factory.
+- Coverage: "FOMC and ECB from official sources; all other events via Forex Factory. Direct BLS access is blocked
+  (HTTP 403, 2026-11-06)."
+- Currency filters cover the export's currencies.
 
 **Consumers**
-- Gate 5 (order-service, warning only) also warns on all-day events on today's date.
-- `forex.calendar-events` (no consumer) is kept; it publishes only timed events.
+- **Gate 5** (order-service, warning only, order of gates unchanged): it warns on events of impact HIGH or MEDIUM
+  (so Forex Factory High and Medium), in the base or quote currency of the order's pair, from 30:00 before to 30:00
+  after the order (both inclusive).
+  - **Boundaries:** tested in Postgres at −30:00/−30:01/+30:00/+30:01.
+  - **Currency matching:** tested on the real export. USD news warns for EUR/USD, GBP/USD, USD/JPY and XAU/USD; JPY
+    for USD/JPY only; AUD and CNY for none.
+- `forex.calendar-events` (no consumer) now publishes approaching events from every source.
 
-**Removed**
-- The third-party weekly feed's fetcher, its cron, its HTTP client and its comment.
-- Migration `RemovePreOfficialCalendarEvents` deleted its rows (logged on the dev DB: "rows without a source 20 -> 0;
-  official events kept: 55") and made `source` required.
-- A test fails on any reference to that feed in any tracked or untracked file (checked with a deliberate file).
+**Guards**
+- A test fails on the Forex Factory name outside its adapter, the places that wire it in or show it, and docs. It
+  failed on a planted file.
+- `no-personal-data.spec.ts` checks that no calendar User-Agent carries an email and that no tracked file contains
+  the owner's addresses (matched by sha256). It failed on a planted, staged file.
 
 ## 6. Errors hit, root cause, fix
 
@@ -170,20 +222,57 @@ Checked 2026-10-12 on twelvedata.com (pricing, docs, terms, support articles):
   committed blobs' sha256 values match.
 - **My mistake: my email in a User-Agent.** While checking robots.txt I put the user's email in the User-Agent of three
   robots.txt requests. The service and all later requests use the repository URL.
+- **Follow-up (2026-11-06):**
+  - **BLS 403 again.** Even with the approved contact email in the User-Agent, one request answered 403. Not worked
+    around; parked on `step-6a-bls-wip`.
+  - **No FOMC release time is published.** The Fed documents no standing time. Fix: an `expected` time backed by 8
+    recorded statements, labelled in the UI.
+  - **Same release, two currencies.** The old unique key `(source, scheduled_at, title)` would have dropped the CAD
+    or the USD "Unemployment Rate". Fix: the key includes the currency.
+  - **`time_source` too short.** `third_party` is 11 characters in a `VARCHAR(10)` column. Fix: the migration widens it.
+  - **A test relied on row order.** Two CAD events at 13:30 have no defined order. Fix: select by title.
+  - **My test titles tripped the name scan.** Fix: neutral wording outside the allowed files.
+  - **`backtest:verify` defaults to two pairs.** A default run would have dropped USD/JPY from the committed report.
+    Fix: rerun with `--pairs EUR_USD,XAU_USD,USD_JPY`, as in step 3.
+  - **ts-node cold start (~45 s)** made a one-off script look hung. I killed it and used grep.
+  - **My mistake:** to stop domain-service I first ran a command that would have stopped every Node process. The
+    permission check refused it; I stopped only the process on port 3003.
 - **Jest "worker failed to exit".** Seen for order-service (pre-existing, also in step 5b's matrix) and occasionally for
   ws-gateway and domain-service under parallel load. Both are clean in isolation.
 
 ## 7. Results
 
 - **Default config** (current `.env`: no `MARKET_FEED`, an old `USE_MOCK_DATA` line), checked over HTTP with every
-  service running in compiled mode:
+  service running in compiled mode on 2026-10-12:
   - `GET /api/market/feed/status`: `{"feed":"none","source":null,"simulated":false,"state":"off",...}`;
   - a market order as research_demo: `REJECTED | No live price for EUR/USD`;
-  - market-service warns that `USE_MOCK_DATA` is no longer read and that no feed runs;
+  - market-service warned that `USE_MOCK_DATA` was no longer read and that no feed ran (the follow-up removed that
+    warning);
   - order-service skipped 1,932 leftover simulated ticks;
-  - `/dashboard` and `/calendar` return 200; the calendar API returns the ECB's 18 HIGH events, all-day.
+  - `/dashboard` and `/calendar` returned 200.
 - **Mock mode** (`MARKET_FEED=mock`): feed status connected, simulated true, ticks published.
-- **Clean matrix and opt-in suites:** see §9.
+- **Real calendar sync, dev database, 2026-11-06.** All requests used the plain ForexEdge User-Agent, and every one
+  answered HTTP 200:
+  - FOMC and ECB at 08:48 UTC, right after `CalendarEventTimes`;
+  - Forex Factory at 10:34 UTC, right after `CalendarThirdPartyEvents` (the morning slot).
+
+  | Source | `time_source` | Impact | Rows | First (UTC) | Last (UTC) |
+  |---|---|---|---|---|---|
+  | FOMC | expected | HIGH | 56 | 2021-01-27 19:00 | 2027-12-08 19:00 |
+  | ECB | official | HIGH | 17 | 2026-12-17 13:15 | 2028-12-07 13:15 |
+  | Forex Factory | third_party | HIGH | 19 | 2026-11-03 03:30 | 2026-11-06 21:45 |
+  | Forex Factory | third_party | MEDIUM | 15 | 2026-11-02 15:00 | 2026-11-06 15:00 |
+  | Forex Factory | third_party | LOW | 78 | 2026-11-02 00:00 | 2026-11-06 20:00 |
+
+  - **Forex Factory, week of 1-6 Nov 2026:** 115 entries, 112 stored. Skipped: holiday 3, Non-Economic 0, midnight 0.
+    Duplicates of FOMC/ECB: 0 (no FOMC or ECB decision that week).
+  - **BLS:** one request (`cpi.htm`) with the approved contact email answered **HTTP 403**, before BLS was parked.
+- **Requests to official/third-party hosts on 2026-11-06:**
+  - federalreserve.gov: robots.txt 404, 8 statement pages 200, calendar 200;
+  - ECB: calendar 200;
+  - bls.gov: 1 request, 403;
+  - forexfactory.com: robots.txt 200, calendar page 200;
+  - nfs.faireconomy.media: robots.txt 200, export 200 twice (the fixture, then the service's sync).
 
 ## 8. Commands
 
@@ -193,22 +282,28 @@ curl http://localhost:3002/api/market/feed/status
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=live-isolation.db.spec.ts --skip-nx-cache
 RUN_DB_TESTS=true npx nx test domain-service --skip-nx-cache        # calendar sync into the _test database
 npx ts-node --transpile-only tools/ops/record-calendar-fixtures.ts  # opt-in: re-record the official pages
-npm run migration:run                                                # EconomicEventSource, RemovePreOfficialCalendarEvents
+npx ts-node --transpile-only tools/ops/record-fomc-statement-fixtures.ts  # run once: the FOMC statement evidence
+RUN_DB_TESTS=true npx nx test order-service --skip-nx-cache         # calendar gate: boundaries, DST, currencies
+npm run migration:run                    # EconomicEventSource ... CalendarEventTimes, CalendarThirdPartyEvents
+npm run backtest:verify -- --pairs EUR_USD,XAU_USD,USD_JPY          # keep all three pairs in the report
 ```
 
 ## 9. Close-out
 
-**Clean matrix**
+**Clean matrix (follow-up, 2026-11-06, commit `1a9fc4f`)**
 - Steps: `npx nx reset`, `dist/` deleted, then `npx nx run-many -t lint typecheck test build --parallel=2`.
-- **All 18 projects pass** (678 s).
-- ESLint: 0 errors, 48 warning lines (51 before; the calendar no longer uses `any`). None is on a line step 6a wrote;
-  three are pre-existing lines in files it touched.
-- Jest: 651 passed (590 before, plus 61 new), 26 skipped.
-- pytest: research-agent 150 passed, 80 skipped; ml-service 47 passed. Neither changed in step 6a.
-- No "worker failed to exit" warning in this run.
-- One change came after the matrix: the calendar's fetch claim became one per UTC day (it was 24 h from the first
-  attempt, which could skip the next day's cron). The affected checks after it pass for 15 projects, and the
-  domain-service DB suite passes 38/38.
+- **All 18 projects pass** (791 s).
+- ESLint: 0 errors, 48 warning lines (as before). None is on a line this step wrote.
+- Jest: 684 passed (651 at the first close-out, plus 33), 38 skipped (the DB suites).
+- pytest: research-agent 150 passed, 80 skipped; ml-service 47 passed, 30 skipped. Neither changed.
+- Jest printed "worker failed to exit" once each for domain-service, market-service and order-service, with every
+  test passing. This was already seen in 6a and step 5b.
+- The first close-out's matrix (2026-10-12) also passed all 18 projects (678 s, Jest 651).
+
+**Validation reruns (2026-11-06)**
+- `npm run data:validate`: all checks pass. Only the report's date line changed.
+- `npm run backtest:verify -- --pairs EUR_USD,XAU_USD,USD_JPY`: EUR/USD 257 trades, XAU/USD 217 and USD/JPY 215, each
+  **MATCH** against the independent SQL reproduction. Only the report's date, commit and run ids changed.
 
 **Offline proof**
 - domain-service, the only service here with outbound HTTP, runs its tests with `jest.setup.cjs` replacing `fetch` by
@@ -216,13 +311,13 @@ npm run migration:run                                                # EconomicE
 - Market-service has no networked provider (the simulator is local), and the frontend tests mock `fetch` explicitly.
 - No Twelve Data key exists anywhere.
 
-**Opt-in suites** (`RUN_DB_TESTS=true`, `--skip-nx-cache`)
+**Opt-in suites** (`RUN_DB_TESTS=true`, `--skip-nx-cache`, follow-up runs)
 
 | Suite | Result |
 |---|---|
-| market-data-import (includes the live-isolation test and the migration walk-down) | 67/67 |
-| order-service | 204/204 |
-| domain-service (includes the calendar sync into the _test database) | 38/38 |
+| market-data-import (includes the live-isolation test and the migration walk-down through `CalendarThirdPartyEvents`) | 67/67 |
+| order-service (includes the calendar gate's boundary, DST and currency tests) | 216/216 |
+| domain-service (calendar sync into the _test database, atomic weekly replace, both calendar migrations) | 65/65 |
 
 Not rerun: the ml-service and research-agent DB suites (no change in step 6a).
 
@@ -238,9 +333,18 @@ Not rerun: the ml-service and research-agent DB suites (no change in step 6a).
 - **How do you prove live data can't corrupt the backtest history?** There's a single write path, a static scan of all
   service and library code for writes to `historical_*` (with a positive control), and a DB test that fingerprints
   every historical relation around real tick writes. Each was shown to fail on a deliberate violation.
-- **How do you build a calendar without inventing data?** Use only official sources whose terms permit reuse, keep
-  their wording, store date-only events as all-day instead of guessing times, label the impact classification as
-  ours, and keep the last good data when a page changes.
+- **How do you build a calendar without inventing data?** Use sources whose terms permit the use, keep their
+  wording, store only events with a known release time, label the impact classification as ours, and keep the last
+  good data when a page changes.
+- **The Fed publishes no release time. How do you time FOMC events?** As an `expected` time, labelled as such: the
+  time the 8 most recent statements carried, recorded and checked by a test. The UI says it's expected, and the
+  warning gate treats it like any other time.
+- **How do you handle time zones?** Store UTC instants. Convert official local times with IANA zones (never fixed
+  offsets), throw on a local time that doesn't exist or is ambiguous, and take third-party times only with an
+  explicit offset. Test real dates between the US and EU DST switches.
+- **Why accept a third-party calendar?** It's an explicit, written owner decision with a scope (portfolio only),
+  a re-check before any commercial use, and hard rules: one plain request at most twice a day, and never a
+  workaround for a block. A test keeps the name confined to its adapter.
 
 ## 11. Keywords
 
@@ -250,8 +354,11 @@ TimescaleDB continuous aggregates, Nx module boundaries.
 
 ## 12. Open items
 
-- **docs/OVERNIGHT-QUESTIONS.md #5:** BLS needs a contact email in the User-Agent (not confirmed officially). Should we
-  send one?
+- **Forex Factory before any client/commercial use.** Its terms aren't confirmed for commercial use, so the source
+  must be re-checked or replaced first (CLAUDE.md exception).
+- **A positive duplicate test.** Record the week of 7–11 Dec 2026 (FOMC 9 Dec) and add a positive duplicate test;
+  also the ECB week of 17 Dec.
+- **BLS** stays blocked (HTTP 403). The work is on branch `step-6a-bls-wip` (OVERNIGHT-QUESTIONS #5, resolved).
 - **Replay mode** (step 6b).
 - **A licensed live provider** with bid/ask and display rights; before enabling it, follow the mixed-candles rule.
 - **The market-service DB login** with INSERT on `ticks` only (step 7).
@@ -262,18 +369,18 @@ TimescaleDB continuous aggregates, Nx module boundaries.
 
 Not opened (as instructed). Compare: https://github.com/aakash1514/algo_trading_forex/compare/main...step-6-live-data?expand=1
 
-**Title:** `Step 6a: price safety, no feed by default, and an official events calendar`
+**Title:** `Step 6a: price safety, no feed by default, and an economic calendar with exact UTC times`
 
 **Description:**
 
 ````markdown
 ## Summary
-ForexEdge no longer shows or trades on prices it can't stand behind, and the economic calendar now comes from official central-bank calendars.
+ForexEdge no longer shows or trades on prices it can't stand behind. The economic calendar now gives every event an exact UTC time: FOMC and ECB from official sources, all other events via Forex Factory.
 
 **No live provider.** Twelve Data's free plan has no bid/ask and about one price every 5–7 minutes on 800 credits/day. Gold is on paid plans only, and the terms allow personal, non-display, non-commercial use. Research and quotes are in `docs/phase-summaries/step-6a-price-safety-calendar.md` §2.
 
 ### Price safety
-- **`MARKET_FEED`** (`none` by default, or `mock`) replaces `USE_MOCK_DATA`. With `none`, market-service starts no stream. Any other value fails startup.
+- **`MARKET_FEED=none|mock`** replaces the old flag. `none` is the default; any other value fails startup. A test fails if the old name reappears outside `docs/`, and checks the docs.
 - **order-service checks every quote and tick** for its source and age (`MAX_PRICE_AGE_MS`, MOCK 2 s), with clear rejection reasons ("No live price for EUR/USD", "Price for EUR/USD is stale: last quote N s old (max M s, source X)"). Stop-out and SL/TP skip stale prices. A post-restart backlog no longer triggers exits at old prices.
 - **Feed status** (`GET /api/market/feed/status`): off, connected, degraded or down, with reconnect backoff. A failing provider publishes nothing and is never replaced by the simulator.
 
@@ -288,23 +395,32 @@ ForexEdge no longer shows or trades on prices it can't stand behind, and the eco
 - **Hard rule recorded:** delete MOCK ticks/candles or add `source` to the live aggregates before any live provider is enabled.
 
 ### Economic calendar
-- **Events only,** from the Federal Reserve's FOMC calendar (public domain) and the ECB's meeting schedule (free use with attribution).
-- **Fetching:** robots.txt checked, each page fetched at most once a day with a ForexEdge User-Agent.
-- **Parsing:** strict parsers keep the last good events on failure.
-- **Data:** dates only, so events are all-day (no invented times). Titles are the sources' wording. Impact is a labelled ForexEdge classification. Forecast/previous/actual show "—".
-- **UI:** per-event source links, a footer citing the Federal Reserve Board and the ECB, and a note that GBP/JPY events and US data releases aren't available.
-- **BLS:** its feed refused our requests (403), so it's skipped pending a decision.
-- **Third-party weekly feed removed** (code, cron, config). Its 20 rows were deleted by a logged migration, and a test fails on any reference to it.
+- **Exact UTC times** for every event, with `time_source`:
+  - **ECB** monetary policy decisions: 14:15 Frankfurt, from the ECB's own decisions page (`official`).
+  - **FOMC** scheduled meetings: 14:00 New York on the final day (`expected`). The Fed publishes no standard release time; the last 8 statements, recorded and checked by a test, all say "For release at 2:00 p.m.". The UI shows "(expected)" with that note.
+  - Local times are converted with IANA zones (DST included, never fixed offsets) and tested on real dates between the US and EU switches.
+- **Forex Factory weekly export** (`third_party`) for all other events. Approved by the owner on 2026-11-06 for portfolio use; terms not confirmed for commercial use; must be re-checked or replaced before any client/commercial use. Never work around their bot protection.
+  - **Fetching:** one plain request at most twice a day. A 403, 429, challenge page or non-JSON answer is logged and skipped, and the last good data is kept.
+  - **Data:** times use the export's own UTC offset. Holiday, Non-Economic and local-midnight entries are skipped and counted, and its FOMC/ECB decision rows are dropped as duplicates.
+  - **Storage:** each sync replaces its week in one transaction. The impact is shown as "ForexFactory impact" and rows say "via ForexFactory".
+- **BLS:** direct access is blocked (HTTP 403 on 2026-11-06, even with an approved contact email in the User-Agent). Not worked around; the work is parked on branch `step-6a-bls-wip`.
+- **Order warning (gate 5, never blocks):** HIGH/MEDIUM events in the order pair's base or quote currency, from 30:00 before to 30:00 after the order (both inclusive). Boundaries, DST and currency matching are tested in Postgres on real events.
+- **Personal data:** no outbound request carries personal data (tested), and a sha256 scan keeps the owner's addresses out of the repository.
+- **The old third-party fetcher** from before 6a is gone. Its 20 rows were deleted and are not restored. A test confines the Forex Factory name to its adapter, the places that wire it in or show it, and docs.
 
 ## Verification
-- **Tests on real recorded data:** the official pages (sha256 pinned), the market-service feed-status responses, a recorded tick and a recorded calendar API response.
-- **Default config over HTTP:** feed `off`; an order is rejected with "No live price for EUR/USD"; 1,932 leftover simulated ticks were skipped.
+- **Tests on real recorded data:**
+  - the official pages and the 8 FOMC statements, sha256 pinned;
+  - one Forex Factory export, sha256 pinned;
+  - market-service feed-status responses, a recorded tick, and recorded calendar API responses.
+- **Real sync (dev DB, 2026-11-06, all HTTP 200):** FOMC 56 (`expected`), ECB 17 (`official`), Forex Factory 112 (High 19, Medium 15, Low 78; holiday 3 skipped; 0 duplicates).
 - **Offline:** the default suite makes no external calls; domain-service tests fail on any real `fetch`.
-- **Clean matrix:** `nx reset`, empty `dist/`: lint, typecheck, test and build pass for all 18 projects. Jest 651 (+61), pytest 150 + 47.
-- **Opt-in DB suites:** market-data-import 67/67, order-service 204/204, domain-service 38/38.
+- **Clean matrix:** `nx reset`, empty `dist/`. Lint, typecheck, test and build pass for all 18 projects. Jest 684, pytest 150 + 47.
+- **Opt-in DB suites:** market-data-import 67/67, order-service 216/216, domain-service 65/65.
+- **Validation reruns:** `data:validate` all pass; `backtest:verify` EUR/USD 257, XAU/USD 217, USD/JPY 215 trades, all MATCH.
 
 ## Not in scope
-A live provider (none fits), Replay mode (step 6b), research-agent changes, deployment, new pairs.
+A live provider (none fits), Replay mode (step 6b), research-agent changes, deployment, new pairs, BLS (blocked).
 
 Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
 ````
