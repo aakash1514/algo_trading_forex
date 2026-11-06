@@ -6,4 +6,6 @@ export * from './lib/entities/economic-event.entity';
 export * from './lib/entities/order.entity';
 export * from './lib/entities/position.entity';
 export * from './lib/entities/account-summary.entity';
-export * from './lib/entities/backtest-run.entity';export * from './lib/historical-candles';
+export * from './lib/entities/backtest-run.entity';
+export * from './lib/historical-candles';
+export * from './lib/live-ticks';

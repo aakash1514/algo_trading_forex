@@ -8,6 +8,7 @@ import {
   type InstrumentKind,
 } from '@forexedge/common';
 import { REDIS_CLIENT } from '../redis/redis.module';
+import { PriceFeedPolicy } from '../market/price-feed.policy';
 
 export interface LiveQuote {
   bid: number;
@@ -24,6 +25,16 @@ export interface PositionValuation {
 
 export class PriceUnavailableError extends Error {}
 
+// A price exists but may not be traded: too old, or from a source the configured feed doesn't trade on.
+// Callers that skip a missing price skip this one too.
+export class StalePriceError extends PriceUnavailableError {}
+
+// The Redis value market-service writes (the forex.ticks message).
+interface CachedPrice extends LiveQuote {
+  timestamp: string;
+  source: string;
+}
+
 // Live prices (Redis, written by market-service) and contract specs (DB).
 @Injectable()
 export class PricingService {
@@ -35,6 +46,7 @@ export class PricingService {
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
     @InjectRepository(InstrumentEntity)
     private readonly instrumentRepo: Repository<InstrumentEntity>,
+    private readonly feedPolicy: PriceFeedPolicy,
   ) {}
 
   async getSpec(pair: string): Promise<ContractSpec> {
@@ -58,13 +70,16 @@ export class PricingService {
   }
 
   // pair in slash format (EUR/USD); Redis keys use the underscore format.
-  // Live price: the key expires 2 s after the last tick, so nothing fills on a
-  // stale price (e.g. while the market is closed and the feed is silent).
+  // Live price to trade at. The key also expires 2 s after the last tick, but the age and source are
+  // checked explicitly (PriceFeedPolicy): nothing fills on a stale price, or on a simulated one unless
+  // the mock feed is configured.
   async getQuote(pair: string): Promise<LiveQuote> {
     const raw = await this.redis.get(`price:${pair.replace('/', '_')}`);
-    if (!raw) throw new PriceUnavailableError(`No live price for ${pair}. Is market-service running?`);
-    const { bid, ask, mid } = JSON.parse(raw) as LiveQuote;
-    return { bid: Number(bid), ask: Number(ask), mid: Number(mid) };
+    if (!raw) throw new PriceUnavailableError(`No live price for ${pair}`);
+    const price = JSON.parse(raw) as CachedPrice;
+    const problem = this.feedPolicy.problem(pair, price);
+    if (problem) throw new StalePriceError(problem);
+    return { bid: Number(price.bid), ask: Number(price.ask), mid: Number(price.mid) };
   }
 
   // Last known price, kept without expiry. Only a reference (validating SL/TP

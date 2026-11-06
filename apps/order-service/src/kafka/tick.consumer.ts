@@ -1,15 +1,19 @@
 import { Injectable, Logger, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Kafka, Consumer, EachBatchPayload } from 'kafkajs';
-import { FOREX_TICKS_TOPIC, parseTickMessage } from '@forexedge/kafka';
+import { FOREX_TICKS_TOPIC, parseTickMessage, type TickMessage } from '@forexedge/kafka';
 import { PositionService, NormalizedTick } from '../position/position.service';
 import { StopOutService } from '../account/stop-out.service';
+import { PriceFeedPolicy } from '../market/price-feed.policy';
 
 // Consumes forex.ticks in batches. Per batch: stop-loss/take-profit see every
 // tick, P&L is marked once per pair from the latest tick, and each affected
 // user gets one margin-call check (PositionService.processTicks). Pairs with no
 // open positions cost nothing, so the consumer keeps up with the feed instead
-// of falling minutes behind it.
+// of falling minutes behind it. Ticks the PriceFeedPolicy rejects (stale, e.g. a backlog after a
+// restart, or from a source the configured feed doesn't trade on) are skipped: they never trigger a
+// stop-loss/take-profit or mark P&L. A level crossed while order-service was down triggers on the next
+// fresh tick, at that tick's price.
 @Injectable()
 export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdown {
   // Lag (messages behind the partition end) above which a warning is logged,
@@ -20,11 +24,13 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
   private readonly logger = new Logger(TickConsumer.name);
   private consumer: Consumer;
   private lastLagLog = 0;
+  private lastSkipLog = 0;
 
   constructor(
     private readonly config: ConfigService,
     private readonly positionService: PositionService,
     private readonly stopOut: StopOutService,
+    private readonly feedPolicy: PriceFeedPolicy,
   ) {
     const kafka = new Kafka({
       clientId: 'order-service-tick-processor',
@@ -63,7 +69,7 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
   }
 
   async handleBatch({ batch, heartbeat }: Pick<EachBatchPayload, 'batch' | 'heartbeat'>): Promise<void> {
-    const ticks: NormalizedTick[] = [];
+    const ticks: TickMessage[] = [];
     for (const message of batch.messages) {
       const raw = message.value?.toString();
       if (!raw) continue;
@@ -74,8 +80,9 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
       }
     }
 
+    const fresh = this.tradableTicks(ticks);
     try {
-      const users = await this.positionService.processTicks(ticks);
+      const users = await this.positionService.processTicks(fresh);
       for (const userId of users) {
         await this.stopOut.check(userId);
       }
@@ -85,6 +92,25 @@ export class TickConsumer implements OnApplicationBootstrap, OnApplicationShutdo
 
     await heartbeat();
     this.logLag(batch.highWatermark, batch.messages.at(-1)?.offset);
+  }
+
+  private tradableTicks(ticks: TickMessage[]): NormalizedTick[] {
+    let skipped = 0;
+    let example: string | null = null;
+    const fresh = ticks.filter((t) => {
+      const problem = this.feedPolicy.problem(t.pair, t);
+      if (problem) {
+        skipped++;
+        example ??= problem;
+      }
+      return !problem;
+    });
+    const now = Date.now();
+    if (skipped > 0 && now - this.lastSkipLog > TickConsumer.LAG_LOG_INTERVAL_MS) {
+      this.lastSkipLog = now;
+      this.logger.warn(`Skipped ${skipped} of ${ticks.length} ticks (not tradable), e.g. ${example}`);
+    }
+    return fresh;
   }
 
   private logLag(highWatermark: string, lastOffset: string | undefined): void {

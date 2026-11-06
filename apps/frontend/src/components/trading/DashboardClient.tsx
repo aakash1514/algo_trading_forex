@@ -14,6 +14,7 @@ import { OrderForm } from './OrderForm';
 import { PositionsTable } from './PositionsTable';
 import { AccountPanel } from './AccountPanel';
 import { PairTabs } from './PairTabs';
+import { FeedBanner } from './FeedBanner';
 import { API_BASE } from '../../lib/constants';
 
 export function DashboardClient() {
@@ -61,6 +62,7 @@ export function DashboardClient() {
 
   return (
     <div className="h-full flex flex-col">
+      <FeedBanner />
       <PairTabs />
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 flex flex-col min-w-0 border-r border-terminal-border">

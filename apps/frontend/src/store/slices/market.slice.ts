@@ -17,6 +17,7 @@ export const marketSlice = createSlice({
         ask: action.payload.tick.ask,
         spread: action.payload.tick.spread,
         timestamp: action.payload.tick.timestamp,
+        source: action.payload.tick.source,
       };
     },
     setActivePair(state, action: PayloadAction<string>) {

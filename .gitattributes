@@ -7,3 +7,9 @@
 # Model artifacts: never touch their bytes (models/manifest.json pins their sha256)
 *.pt binary
 *.npz binary
+
+# Recorded official calendar pages: byte for byte as served (their sha256 is in the fixtures README)
+apps/domain-service/src/economic-calendar/__fixtures__/*.htm -text
+apps/domain-service/src/economic-calendar/__fixtures__/*.html -text
+apps/domain-service/src/economic-calendar/__fixtures__/*/*.htm -text
+apps/domain-service/src/economic-calendar/forexfactory/__fixtures__/*.json -text

@@ -3,6 +3,10 @@
 import { useState } from 'react';
 import { useGetCalendarEventsQuery } from '../../store/api/domain.api';
 import { cn } from '../../lib/cn';
+import {
+  CALENDAR_CURRENCIES, CALENDAR_SOURCES, COVERAGE_NOTE, EXPECTED_TIME_NOTE, IMPACT_NOTE, THIRD_PARTY_IMPACT_LABEL,
+  THIRD_PARTY_LABEL, THIRD_PARTY_SOURCE, eventWhen,
+} from '../../lib/calendar';
 
 const IMPACT_COLORS: Record<string, string> = {
   HIGH:   'text-accent-red bg-accent-red/10 border-accent-red/20',
@@ -16,8 +20,9 @@ const IMPACT_DOT: Record<string, string> = {
   LOW:    'bg-terminal-muted',
 };
 
-const CURRENCIES = ['ALL', 'USD', 'EUR', 'GBP', 'JPY', 'CHF', 'AUD', 'CAD', 'NZD'];
+const CURRENCIES = ['ALL', ...CALENDAR_CURRENCIES];
 const IMPACTS    = ['ALL', 'HIGH', 'MEDIUM', 'LOW'];
+const COLUMNS = ['Date (UTC)', 'Currency', 'Event', 'Impact*', 'Source', 'Forecast', 'Previous', 'Actual'];
 
 export function CalendarClient() {
   const [currency, setCurrency] = useState('ALL');
@@ -27,13 +32,6 @@ export function CalendarClient() {
     currency: currency === 'ALL' ? undefined : currency,
     impact:   impact   === 'ALL' ? undefined : impact,
   });
-
-  const now = new Date();
-
-  function isUpcoming(dateStr: string) {
-    const diff = new Date(dateStr).getTime() - now.getTime();
-    return diff > 0 && diff < 2 * 60 * 60 * 1000; // within next 2 hours
-  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -85,6 +83,10 @@ export function CalendarClient() {
         </span>
       </div>
 
+      <p className="px-4 py-2 border-b border-terminal-border text-[11px] text-terminal-muted shrink-0" data-testid="calendar-coverage">
+        {COVERAGE_NOTE}
+      </p>
+
       {/* Events table */}
       <div className="flex-1 overflow-auto">
         {isLoading ? (
@@ -99,7 +101,7 @@ export function CalendarClient() {
           <table className="w-full text-[11px]">
             <thead className="sticky top-0 bg-terminal-surface z-10">
               <tr className="border-b border-terminal-border">
-                {['Time', 'Currency', 'Event', 'Impact', 'Forecast', 'Previous', 'Actual'].map((h) => (
+                {COLUMNS.map((h) => (
                   <th key={h} className="text-left px-4 py-2.5 text-[10px] text-terminal-muted uppercase tracking-wider font-medium whitespace-nowrap">
                     {h}
                   </th>
@@ -107,61 +109,52 @@ export function CalendarClient() {
               </tr>
             </thead>
             <tbody>
-              {events.map((event: any) => {
-                const upcoming = isUpcoming(event.scheduledAt);
+              {events.map((event) => {
+                const when = eventWhen(event);
+                const source = event.source ? CALENDAR_SOURCES[event.source] : undefined;
+                const thirdParty = event.source === THIRD_PARTY_SOURCE;
                 return (
-                  <tr
-                    key={event.id}
-                    className={cn(
-                      'border-b border-terminal-border/50 transition-colors',
-                      upcoming ? 'bg-accent-blue/5' : 'hover:bg-terminal-elevated/40'
-                    )}
-                  >
+                  <tr key={event.id} data-testid="calendar-event" className="border-b border-terminal-border/50 hover:bg-terminal-elevated/40 transition-colors">
                     <td className="px-4 py-2.5 tabular-nums text-terminal-muted whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        {upcoming && (
-                          <div className="w-1.5 h-1.5 rounded-full bg-accent-blue animate-pulse shrink-0" />
-                        )}
-                        {new Date(event.scheduledAt).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                        <span className="text-[9px] text-terminal-muted/60">
-                          {new Date(event.scheduledAt).toLocaleDateString([], {
-                            month: 'short',
-                            day: 'numeric',
-                          })}
+                      {when.date}
+                      <span className="ml-2 text-[9px] text-terminal-muted/60">· {when.time}</span>
+                      {event.timeSource === 'expected' && (
+                        <span className="block text-[9px] text-terminal-muted/60" data-testid="calendar-expected-note">
+                          {EXPECTED_TIME_NOTE}
                         </span>
-                      </div>
+                      )}
                     </td>
                     <td className="px-4 py-2.5">
                       <span className="text-[11px] font-medium text-[#e2e4e9]">{event.currency}</span>
                     </td>
-                    <td className="px-4 py-2.5 text-[#e2e4e9] max-w-xs">
-                      <span className="line-clamp-1">{event.title}</span>
+                    <td className="px-4 py-2.5 text-[#e2e4e9] max-w-md">
+                      <span className="line-clamp-2">{event.title}</span>
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className={cn(
-                        'inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded border',
-                        IMPACT_COLORS[event.impact] ?? IMPACT_COLORS.LOW
-                      )}>
+                      <span
+                        title={thirdParty ? THIRD_PARTY_IMPACT_LABEL : 'ForexEdge classification, not source data'}
+                        className={cn(
+                          'inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded border',
+                          IMPACT_COLORS[event.impact] ?? IMPACT_COLORS.LOW
+                        )}
+                      >
                         <span className={cn('w-1 h-1 rounded-full shrink-0', IMPACT_DOT[event.impact] ?? IMPACT_DOT.LOW)} />
                         {event.impact}
                       </span>
-                    </td>
-                    <td className="px-4 py-2.5 tabular-nums text-terminal-muted">
-                      {event.forecast ?? '—'}
-                    </td>
-                    <td className="px-4 py-2.5 tabular-nums text-terminal-muted">
-                      {event.previous ?? '—'}
-                    </td>
-                    <td className="px-4 py-2.5 tabular-nums font-medium">
-                      {event.actual ? (
-                        <span className="text-accent-green">{event.actual}</span>
-                      ) : (
-                        <span className="text-terminal-muted">Pending</span>
+                      {thirdParty && (
+                        <span className="block text-[9px] text-terminal-muted/60">{THIRD_PARTY_IMPACT_LABEL}</span>
                       )}
                     </td>
+                    <td className="px-4 py-2.5 text-terminal-muted whitespace-nowrap">
+                      {source ? (
+                        <a href={source.url} target="_blank" rel="noreferrer" className="hover:text-[#e2e4e9] underline-offset-2 hover:underline">
+                          {thirdParty ? THIRD_PARTY_LABEL : source.attribution}
+                        </a>
+                      ) : '—'}
+                    </td>
+                    <td className="px-4 py-2.5 tabular-nums text-terminal-muted">{event.forecast ?? '—'}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-terminal-muted">{event.previous ?? '—'}</td>
+                    <td className="px-4 py-2.5 tabular-nums text-terminal-muted">{event.actual ?? '—'}</td>
                   </tr>
                 );
               })}
@@ -169,6 +162,11 @@ export function CalendarClient() {
           </table>
         )}
       </div>
+
+      <footer className="px-4 py-2 border-t border-terminal-border text-[10px] text-terminal-muted shrink-0" data-testid="calendar-footer">
+        Sources: the Board of Governors of the Federal Reserve System (federalreserve.gov), the European Central Bank
+        (ecb.europa.eu) and Forex Factory (forexfactory.com); times in UTC. * {IMPACT_NOTE}
+      </footer>
     </div>
   );
 }

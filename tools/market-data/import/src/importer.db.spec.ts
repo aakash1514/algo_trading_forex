@@ -211,8 +211,52 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts CalendarThirdPartyEvents (refusing while third-party rows exist), CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('CalendarThirdPartyEvents1792400000000');
+
+    // CalendarThirdPartyEvents: 'third_party' allowed and the resync key includes the currency; down() refuses
+    // while a third-party row exists (the row is a real Forex Factory event, 2026-11-06 export)
+    const ffRow = `INSERT INTO economic_events (title, currency, impact, scheduled_at, source, time_source)
+       VALUES ('Unemployment Rate', $1, 'HIGH', '2026-11-06T13:30:00Z', 'FOREXFACTORY', 'third_party')`;
+    await client.query(ffRow, ['CAD']);
+    await client.query(ffRow, ['USD']);
+    await expect(testDb.dataSource.undoLastMigration({ transaction: 'each' })).rejects.toThrow(/2 third-party row\(s\) exist/);
+    await client.query(`DELETE FROM economic_events WHERE time_source = 'third_party'`);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await last()).toBe('CalendarEventTimes1792300000000');
+
+    // CalendarEventTimes: time_source (official/expected) replaces all_day; down() restores all_day
+    const timeColumns = async () => (await client.query(
+      `SELECT column_name FROM information_schema.columns
+       WHERE table_name = 'economic_events' AND column_name IN ('time_source', 'all_day') ORDER BY column_name`,
+    )).rows.map((r: { column_name: string }) => r.column_name);
+    expect(await timeColumns()).toEqual(['time_source']);
+    await expect(client.query(
+      `INSERT INTO economic_events (title, currency, impact, scheduled_at, source, time_source)
+       VALUES ('x', 'USD', 'HIGH', now(), 'FOMC', 'guessed')`,
+    )).rejects.toThrow(/economic_events_time_source/);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await timeColumns()).toEqual(['all_day']);
+    expect(await last()).toBe('RemovePreOfficialCalendarEvents1792200000000');
+
+    // RemovePreOfficialCalendarEvents: source is required; down() makes it optional again
+    const sourceNullable = async () => (await client.query(
+      `SELECT is_nullable FROM information_schema.columns WHERE table_name = 'economic_events' AND column_name = 'source'`,
+    )).rows[0]?.is_nullable;
+    expect(await sourceNullable()).toBe('NO');
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await sourceNullable()).toBe('YES');
+    expect(await last()).toBe('EconomicEventSource1792100000000');
+
+    // EconomicEventSource: economic_events.source and all_day, and the per-source unique index
+    const eventColumns = async () => (await client.query(
+      `SELECT column_name FROM information_schema.columns
+       WHERE table_name = 'economic_events' AND column_name IN ('source', 'all_day') ORDER BY column_name`,
+    )).rows.map((r: { column_name: string }) => r.column_name);
+    expect(await eventColumns()).toEqual(['all_day', 'source']);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await eventColumns()).toEqual([]);
     expect(await last()).toBe('ResearchReadRole1792000000000');
 
     // ResearchReadRole: column-level SELECT on backtest_runs only (never minio_object_key

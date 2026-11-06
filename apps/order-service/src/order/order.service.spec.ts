@@ -8,7 +8,7 @@ import { RealtimePublisher } from '../realtime/realtime-publisher.service';
 import { OrderValidationService } from './order-validation.service';
 import { MarginEngineService } from './margin-engine.service';
 import { BadRequestException } from '@nestjs/common';
-import { PricingService, PriceUnavailableError } from '../pricing/pricing.service';
+import { PricingService, PriceUnavailableError, StalePriceError } from '../pricing/pricing.service';
 import { OpenPairsIndex } from '../position/open-pairs.index';
 import { MarketHoursPolicy } from '../market/market-hours.policy';
 
@@ -354,13 +354,26 @@ describe('OrderService — pricing and margin', () => {
   });
 
   it('rejects instead of validating at price 0 when no live price exists', async () => {
-    pricing.getQuote.mockRejectedValue(new PriceUnavailableError('No live price for EUR/USD. Is market-service running?'));
-    const rejected = { ...draft, status: 'REJECTED', rejectionReason: 'No live price for EUR/USD. Is market-service running?' };
+    pricing.getQuote.mockRejectedValue(new PriceUnavailableError('No live price for EUR/USD'));
+    const rejected = { ...draft, status: 'REJECTED', rejectionReason: 'No live price for EUR/USD' };
     dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) =>
       cb({ update: jest.fn(), findOne: jest.fn().mockResolvedValue(rejected) }));
 
     const result = await submit('LONG');
     expect(result.status).toBe('REJECTED');
+    expect(marginEngine.canOpenPosition).not.toHaveBeenCalled();
+  });
+
+  it('rejects with the reason when the live price is stale, and never validates at it', async () => {
+    const reason = 'Price for EUR/USD is stale: last quote 412 s old (max 2 s, source MOCK)';
+    pricing.getQuote.mockRejectedValue(new StalePriceError(reason));
+    const update = jest.fn();
+    dataSource.transaction.mockImplementation(async (cb: (m: unknown) => Promise<unknown>) =>
+      cb({ update, findOne: jest.fn().mockResolvedValue({ ...draft, status: 'REJECTED', rejectionReason: reason }) }));
+
+    const result = await submit('LONG');
+    expect(result.status).toBe('REJECTED');
+    expect(update).toHaveBeenCalledWith(OrderEntity, draft.id, expect.objectContaining({ status: 'REJECTED', rejectionReason: reason }));
     expect(marginEngine.canOpenPosition).not.toHaveBeenCalled();
   });
 

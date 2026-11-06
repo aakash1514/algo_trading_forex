@@ -170,6 +170,35 @@ export interface TickEvent {
   ask: number;
   spread: number;
   timestamp: string;
+  source: string; // 'MOCK' (simulated) | 'TWELVE_DATA' | 'OANDA'
+}
+
+// GET /api/domain/calendar: events from official calendars (domain-service economic-calendar)
+export interface CalendarEvent {
+  id: string;
+  title: string;          // the source's own wording
+  currency: string;
+  impact: 'HIGH' | 'MEDIUM' | 'LOW'; // ForexEdge classification, not source data
+  scheduledAt: string;    // the release moment, UTC
+  // expected: the source publishes no time (FOMC); third_party: published by a third-party export
+  timeSource: 'official' | 'expected' | 'third_party';
+  source: string;         // a key of CALENDAR_SOURCES (lib/calendar.ts)
+  forecast: string | null;
+  previous: string | null;
+  actual: string | null;
+  createdAt: string;
+}
+
+// GET /api/market/feed/status (market-service stream/feed-status.ts)
+export type FeedState = 'off' | 'connected' | 'degraded' | 'down';
+export interface FeedStatus {
+  feed: 'none' | 'mock';
+  source: string | null;
+  simulated: boolean;
+  state: FeedState;
+  since: string;
+  lastTickAt: string | null;
+  lastError: string | null;
 }
 
 // Socket payloads (see SOCKET_EVENTS in lib/constants.ts)

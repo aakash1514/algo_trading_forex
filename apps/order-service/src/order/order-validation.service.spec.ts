@@ -44,6 +44,7 @@ describe('OrderValidationService', () => {
   let instrumentRepo: ReturnType<typeof mockInstrumentRepo>;
   let orderRepo: ReturnType<typeof mockOrderRepo>;
   let positionRepo: ReturnType<typeof mockPositionRepo>;
+  let calendarQb: { where: jest.Mock; andWhere: jest.Mock; getMany: jest.Mock };
   let orderQb: { select: jest.Mock; innerJoin: jest.Mock; where: jest.Mock; andWhere: jest.Mock; getRawOne: jest.Mock };
 
   beforeEach(async () => {
@@ -68,13 +69,13 @@ describe('OrderValidationService', () => {
     positionRepo.createQueryBuilder.mockReturnValue(exposureQb('0'));
 
     // Mock Gate 5 (economic calendar) — returns no events by default
-    const qb = {
+    calendarQb = {
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
       getMany: jest.fn().mockResolvedValue([]),
     };
     module.get(getRepositoryToken(EconomicEventEntity))
-      .createQueryBuilder.mockReturnValue(qb);
+      .createQueryBuilder.mockReturnValue(calendarQb);
 
     // Mock Gate 4 daily loss query — returns no loss by default
     orderQb = {
@@ -85,6 +86,29 @@ describe('OrderValidationService', () => {
       getRawOne: jest.fn().mockResolvedValue({ totalPnl: '0' }),
     };
     orderRepo.createQueryBuilder.mockReturnValue(orderQb);
+  });
+
+  // ── Gate 5 ─────────────────────────────────────────────────────────────────
+  describe('Gate 5 — economic calendar warning', () => {
+    it('looks for events within ±30 min of the order, never blocking', async () => {
+      jest.useFakeTimers({ now: new Date('2026-10-28T18:05:00Z'), doNotFake: ['nextTick', 'setImmediate', 'queueMicrotask'] });
+      try {
+        instrumentRepo.findOne.mockResolvedValue(eurUsdRow);
+        const qb = calendarQb;
+        qb.getMany.mockResolvedValue([{ currency: 'USD', title: 'FOMC meeting, October 27-28', impact: 'HIGH', timeSource: 'expected' }]);
+        const result = await service.validate('user-1', baseDto, eurUsdQuote, marginOk);
+        expect(result.valid).toBe(true);
+        const call = qb.andWhere.mock.calls.find(([sql]: [string]) => sql.includes('scheduled_at'));
+        expect(call?.[0]).toBe('e.scheduled_at BETWEEN :windowStart AND :windowEnd');
+        expect(call?.[1]).toEqual({
+          windowStart: new Date('2026-10-28T17:35:00Z'),
+          windowEnd: new Date('2026-10-28T18:35:00Z'),
+        });
+        expect(qb.where).toHaveBeenCalledWith('e.currency IN (:...currencies)', { currencies: ['EUR', 'USD'] });
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 
   // ── Gate 1 ─────────────────────────────────────────────────────────────────

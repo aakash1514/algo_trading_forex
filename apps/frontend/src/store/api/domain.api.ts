@@ -1,5 +1,5 @@
 import { baseApi } from './base.api';
-import type { SessionInfo, PipValueResponse, MarginResponse } from '../../types/api.types';
+import type { SessionInfo, PipValueResponse, MarginResponse, CalendarEvent } from '../../types/api.types';
 import { API_BASE } from '../../lib/constants';
 
 export const domainApi = baseApi.injectEndpoints({
@@ -18,7 +18,7 @@ export const domainApi = baseApi.injectEndpoints({
         body,
       }),
     }),
-    getCalendarEvents: build.query<any[], { currency?: string; impact?: string }>({
+    getCalendarEvents: build.query<CalendarEvent[], { currency?: string; impact?: string }>({
       query: ({ currency, impact } = {}) => {
         const params = new URLSearchParams();
         if (currency) params.set('currency', currency);

@@ -73,8 +73,8 @@ except research-agent, which allows only `localhost:4200`.
 | Service | Port | Responsibility |
 |---|---|---|
 | auth-service | 3000 | Register/login and JWT access + refresh tokens (refresh token in a cookie). Argon2 password hashing. **Owns all DB migrations and seeds** for the whole system. |
-| market-service | 3002 | Tick stream ingestion (`StreamModule` picks `MockStreamProvider` or `OandaStreamProvider` based on `USE_MOCK_DATA`, default `true`). Publishes `forex.ticks`. Consumes its own ticks to write them to TimescaleDB and Redis. Serves candle and instrument queries. |
-| domain-service | 3003 | Forex domain logic: pip calc, margin, swaps, session clock, spread monitor, economic calendar. Scheduled jobs publish `forex.sessions`, `forex.spread-alerts`, `forex.calendar-events`. |
+| market-service | 3002 | Live feed per `MARKET_FEED` (libs/common `market-feed.ts`): `none` (default) starts no stream; `mock` = `MockStreamProvider`, simulated prices for development only. No licensed live provider yet. Publishes `forex.ticks`; feed state (off/connected/degraded/down, reconnect with backoff, never a fallback) at `GET /api/market/feed/status`. Consumes its own ticks to write them to TimescaleDB (`ticks` only) and Redis. Serves candle and instrument queries. |
+| domain-service | 3003 | Forex domain logic: pip calc, margin, swaps, session clock, spread monitor, economic calendar (events only, from the official FOMC and ECB calendars, synced once a day). Scheduled jobs publish `forex.sessions`, `forex.spread-alerts`, `forex.calendar-events`. |
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ml-service (Python) | 3006 | FastAPI, inference only: LSTM next-H1-direction models trained offline walk-forward (`models/`, manifest + sha256). `GET /api/ml/{health,models,evaluation,predictions/{instrument}}`, JWT on all but health. Reads the history as the read-only login `forexedge_ml` (role `forexedge_readonly`). Results are a **historical walk-forward test, not live signals**. |
 | research-agent (Python) | 3007 | FastAPI + LangGraph agent over a FastMCP stdio server (7 read-only tools: available data, bars, market stats, the caller's backtest runs, ML evaluation/predictions). `POST /api/research/ask` (JWT) returns a structured report whose every number is checked by a deterministic verifier. LLM from env (`RESEARCH_LLM_MODEL`, default `groq:openai/gpt-oss-120b`, free tier). DB login `forexedge_research` (roles `forexedge_readonly` + `forexedge_research_reader`); calls ml-service with the caller's own token. |
@@ -169,15 +169,57 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Clients send `instrument` (`EUR_USD`) only; order-service derives `pair` with `instrumentToPair()`.
 - Refresh tokens rotate on every use: never fire two refreshes concurrently (use `refreshSession()`).
 - order-service: PositionService, AccountService, OrderValidationService, RealtimePublisher, PricingService,
-  OpenPairsIndex, MarketHoursPolicy, StopOutService and AccountInvariantMonitor are provided once, by
+  OpenPairsIndex, MarketHoursPolicy, PriceFeedPolicy, StopOutService and AccountInvariantMonitor are provided once, by
   `KafkaConsumerModule`. Don't also list them in AppModule (duplicate instances have separate state).
 - Market hours come from the shared clock `libs/common/src/lib/market-hours.ts` (FX Sun 17:00 to Fri 17:00 New York;
   metals open Sun 18:00 and pause 17:00-18:00 Mon-Thu). Orders and manual closes are rejected while closed; SL/TP
   changes and cancels are allowed. order-service's tick consumer ignores ticks stamped while closed. Dev-only flags,
   both strictly `true`/`false`: `MARKET_HOURS_GATE=false` (order-service) and `MOCK_STREAM_WHEN_CLOSED=true`
   (market-service), used together to trade on weekends. Sessions on orders come from the same clock.
-- Redis `price:<INSTRUMENT>` expires 2 s after the last tick, so nothing fills on a stale price.
+- **Price safety (step 6a):** order-service trades only prices from the configured `MARKET_FEED`'s sources, no older
+  than their maximum age (`MAX_PRICE_AGE_MS`, MOCK 2 s), checked explicitly in `PricingService.getQuote`
+  (`PriceFeedPolicy`, reasons "No live price for EUR/USD" / "Price for EUR/USD is stale: last quote N s old (max M s,
+  source X)"). The tick consumer drops untradable ticks before SL/TP and P&L (a backlog after a restart no longer
+  triggers exits at old prices). With no feed (the default) every order is rejected. A provider error publishes
+  nothing (prices age out); there is never a fallback to the simulator. `MARKET_FEED` must be exactly `none` (the
+  default, also when unset) or `mock`; anything else fails startup. Tests that need the
+  feed pass it as a value, never through `ConfigService` (Nx loads the root `.env` into `process.env`, which wins).
+- Redis `price:<INSTRUMENT>` also expires 2 s after the last tick.
   `price:last:<INSTRUMENT>` has no expiry and is only a reference (validating SL/TP while the market is closed).
+- **Live ticks never touch `historical_*`**: the only live write path is `insertLiveTick` (`libs/database`
+  `live-ticks.ts`, into `ticks`); a static test (market-service `historical-isolation.spec.ts`) and a DB test
+  (market-data-import `live-isolation.db.spec.ts`) enforce it. Only `tools/market-data/import` writes the history.
+- **Mixed candles (hard rule):** the live `candles_*` aggregates don't separate ticks by source, and `ticks` holds
+  MOCK ticks. Before any live provider is enabled, either delete the MOCK ticks and their candles or add `source`
+  to the live aggregates; never show simulated history as market data.
+- **Economic calendar (step 6a):** events only (domain-service `economic-calendar/`). FOMC and ECB from official
+  sources: FOMC (federalreserve.gov, public domain) and ECB (ecb.europa.eu, free use with attribution). All other
+  events via Forex Factory (`forexfactory/`, see the data-licensing exception). Direct BLS access is blocked (HTTP 403,
+  2026-11-06; branch `step-6a-bls-wip`). Each official page is fetched at most once per UTC day, and the Forex
+  Factory export at most twice (06:15 and 18:15; a Redis claim per source and slot), with the
+  `CALENDAR_USER_AGENT`; strict parsers throw on unexpected
+  markup and the service keeps the last good events. Every event is stored at its release moment in UTC
+  (`scheduled_at`), converted from the source's local time with IANA zones (`zoned-time.ts`, DST included, never a
+  fixed offset), and `time_source` says where the time comes from: `official` (ECB decisions, 14:15 Frankfurt, from
+  the ECB's monetary policy decisions page) or `expected` (FOMC: the Fed publishes no standing time; 14:00 New York
+  on a meeting's final day, the time on the last 8 recorded statements, `__fixtures__/fomc-statements/`, never
+  fetched at runtime), or `third_party` (Forex Factory: the time with the UTC offset its export gives; no zone is
+  ever assumed). Only events with such a time are stored (no Day 1, notation votes, non-monetary meetings; Forex
+  Factory holidays, Non-Economic and local-midnight entries are skipped and counted, and its rows for the FOMC/ECB
+  decisions are dropped as duplicates). A Forex Factory sync replaces exactly its export's week in one transaction.
+  Titles are the sources' wording; impact is a fixed ForexEdge classification (`impact.ts`) for FOMC/ECB and
+  ForexFactory's own level for its rows, labelled as such; the UI cites the sources and marks "via ForexFactory".
+  Forecast/previous/actual are null. A test fails on the Forex Factory name outside its adapter, the places that wire
+  it in or show it, and docs. Recording new fixtures is opt-in (`tools/ops/record-calendar-fixtures.ts`).
+- **Data licensing exception:** ForexFactory calendar export — approved by the owner on 2026-11-06 for portfolio use;
+  terms not confirmed for commercial use; must be re-checked or replaced before any client/commercial use. Never work
+  around their bot protection (no browser-like or changed headers, headless browsers or proxies; a 403/429/challenge
+  is logged and skipped).
+- **Personal data in outbound requests:** never put the owner's personal data (email etc.) in outbound requests
+  (User-Agent, headers, query strings) without explicit approval. The ONLY approved case: CALENDAR_CONTACT_EMAIL in the
+  official-calendar User-Agent, read from .env. Currently no outbound request carries personal data. A project contact
+  email for BLS is approved but unused (branch step-6a-bls-wip). Tests: no calendar User-Agent carries an email, and no
+  tracked file contains the owner's addresses (matched by sha256, `no-personal-data.spec.ts`).
 - A triggered stop-loss/take-profit is committed on the position (`pending_exit_*`) before it is booked and is retried
   from the DB, so a restart can't lose it. It books at the triggering tick's price, never the SL/TP level.
 - Stop-out (margin level < 50%) closes the biggest loser first until the level is back above 50%; close_reason
@@ -252,6 +294,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   `fetchBaseQuery` uses `/** @jest-environment ./test/jsdom-with-fetch.cjs */` (Node's fetch classes, including
   Node's AbortSignal). fetchBaseQuery's `timeout` leaves a timer running after a fast response, so those specs use
   fake timers and `jest.clearAllTimers()`, or Jest reports a worker that failed to exit.
+- **Frontend component specs share the singleton store**: reset the RTK Query cache in `beforeEach`
+  (`store.dispatch(baseApi.util.resetApiState())`), or a later test is served an earlier test's response.
 - **`nx run <p>:<t> --args='...'` turns commas inside the args into spaces** (seen with the eval's `--note`).
   Avoid commas in such arguments, or run the module directly.
 - **Every check fails on empty input.** A data check, validation or test assertion that compared zero rows must
@@ -276,8 +320,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-4-ml-service.md`.
 - **Roadmap step 5 (research agent) is done** (2026-10-12), merged into main (PR #4).
   Write-up: `docs/phase-summaries/step-5-research-agent.md`.
-- **Step 5b (Research page) is done** (2026-10-12) on branch `step-5b-research-page` (not merged). The manual
-  browser check is pending (`docs/validation/research-page-e2e.md`). Write-up: §13 of the step-5 summary.
+- **Step 5b (Research page) is done** (2026-10-12), merged into main (PR #5). The manual browser check is pending
+  (`docs/validation/research-page-e2e.md`). Write-up: §13 of the step-5 summary.
+- **Step 6a (price safety + calendar) is done** (2026-10-12, follow-up 2026-11-06) on branch `step-6-live-data`
+  (not merged): exact UTC event times, Forex Factory for non-FOMC/ECB events, BLS parked on `step-6a-bls-wip` (403).
+  Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -315,12 +362,17 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    sentiment and the economic calendar were out of scope. Live eval: `docs/validation/research-agent-eval.md`.
    Step 5b: the frontend Research page (`/research`), CORS for :4200 only, prompt rule 6 (returns from
    get_market_stats), eval run 3 9/10.
-6. Real market data: Twelve Data API behind `USE_MOCK_DATA` (OANDA unavailable in India).
+6. Real market data. **6a done (2026-10-12)** on branch `step-6-live-data` (not merged): no live provider (Twelve
+   Data's free plan has no bid/ask, ~1 price per 5-7 min on 800 credits/day, XAU/USD only on paid plans, and
+   personal, non-display, non-commercial terms); price age/source checks, feed status, no feed by default
+   (`MARKET_FEED`), SIMULATED/STALE terminal states, historical-table protection tests, and an events-only
+   calendar with exact UTC times: FOMC (expected 14:00 New York) and ECB (14:15 Frankfurt) from official sources,
+   all other events via Forex Factory (owner exception, portfolio use only); direct BLS access is blocked (HTTP 403,
+   2026-11-06, docs/OVERNIGHT-QUESTIONS.md #5).
+   Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`. Next: 6b, historical Replay mode.
+   A licensed live provider needs bid/ask and display rights; before enabling it, follow the mixed-candles rule.
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
-   realign the live views to the NY close here.
-   Known gap: the economic-calendar scraper has produced nothing since 2026-06-13 (it runs only at
-   00/06/12/18 UTC and not on startup, so it misses whenever the services are down then); fix it with the
-   real data feeds.
+   realign the live views to the NY close when a live provider is added.
 7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
    Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
    MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
@@ -331,10 +383,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    `forexedge_research_reader` the same way, and a non-free LLM tier or rate limits for real traffic (free Groq
    is about one question per minute).
    CORS: other services also allow 3001 with credentials — narrow before deployment.
+   market-service: its own DB login with INSERT on `ticks` only (and SELECT where needed), so the database itself
+   blocks writes to `historical_*` (step 6a enforces it with tests only).
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
-8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The economic calendar
-   is scraped every 6 h only at 00/06/12/18 UTC, so it is stale whenever the services weren't running then.
+8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The calendar covers USD (FOMC) and EUR (ECB) policy meetings
+   from official sources; everything else comes from Forex Factory, a third party approved for portfolio use only (no
+   direct BLS: HTTP 403). No forecasts or actuals.
 
 ## How to work with me
 - This is a portfolio and client project. Keep it production quality, with no shortcuts or simplified "demo" code.
@@ -345,7 +400,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - At the end of each phase, give a summary: what changed, errors hit with root cause and fix, key decisions, commands used, and interview Q&A.
 - **No synthetic data, ever.** Historical data must be real market data (Dukascopy).
   Never generate, interpolate, or fabricate prices to make a test or backtest pass.
-  The mock live feed (`USE_MOCK_DATA`) stays only until Twelve Data is integrated in roadmap step 6.
+  The simulated feed (`MARKET_FEED=mock`) is for development only and is always labelled SIMULATED; the default is
+  no feed.
 
 ## Verification policy (keep it fast)
 - While working on a change: run only the affected project's tests, and a single test file

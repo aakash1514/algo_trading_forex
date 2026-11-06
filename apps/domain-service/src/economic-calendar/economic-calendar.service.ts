@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThanOrEqual } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Cron } from '@nestjs/schedule';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { CALENDAR_EVENTS_TOPIC, KafkaProducerService, type CalendarEventMessage } from '@forexedge/kafka';
 import { EconomicEventEntity } from '@forexedge/database';
 
@@ -19,59 +17,18 @@ export enum ImpactLevel {
   LOW    = 'LOW',
 }
 
-interface ParsedEvent {
-  title: string;
-  currency: string;
-  impact: ImpactLevel;
-  scheduledAt: Date;
-  forecast: string | null;
-  previous: string | null;
-}
-
+// Reads the economic calendar (filled from the official calendars by OfficialCalendarService) and
+// publishes forex.calendar-events when an event approaches.
 @Injectable()
 export class EconomicCalendarService {
   private readonly logger = new Logger(EconomicCalendarService.name);
-  private readonly FOREXFACTORY_URL = 'https://nfs.faireconomy.media/ff_calendar_thisweek.json';
   private readonly APPROACHING_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
   constructor(
     @InjectRepository(EconomicEventEntity)
     private readonly eventRepo: Repository<EconomicEventEntity>,
-    private readonly httpService: HttpService,
     private readonly kafkaProducer: KafkaProducerService,
   ) {}
-
-  // Fetch and store calendar every 6 hours
-  @Cron('0 */6 * * *', { timeZone: 'UTC' })
-  async fetchCalendar() {
-    this.logger.log('Fetching economic calendar...');
-    try {
-      const events = await this.scrapeForexFactory();
-      let saved = 0;
-
-      for (const event of events) {
-        if (event.impact !== ImpactLevel.HIGH) continue; // only store HIGH impact
-
-        const exists = await this.eventRepo.findOne({
-          where: {
-            title: event.title,
-            currency: event.currency,
-            scheduledAt: event.scheduledAt,
-          },
-        });
-
-        if (!exists) {
-          await this.eventRepo.save(this.eventRepo.create(event));
-          saved++;
-        }
-      }
-
-      this.logger.log(`Calendar sync complete. ${saved} new HIGH impact events saved.`);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      this.logger.error(`Failed to fetch calendar: ${message}`);
-    }
-  }
 
   // Check every minute if any event is approaching
   @Cron('* * * * *', { timeZone: 'UTC' })
@@ -122,28 +79,6 @@ export class EconomicCalendarService {
     return !!active;
   }
 
-  private async scrapeForexFactory(): Promise<ParsedEvent[]> {
-    // ForexFactory provides a public JSON endpoint (no scraping needed)
-    const response = await firstValueFrom(
-        this.httpService.get<ForexFactoryEvent[]>(this.FOREXFACTORY_URL, {
-         responseType: 'json',
-         }),
-    );
-
-    const data = response.data as ForexFactoryEvent[];
-
-    return data
-      .filter(e => e.impact === 'High')
-      .map(e => ({
-        title:       e.title,
-        currency:    e.country,
-        impact:      ImpactLevel.HIGH,
-        scheduledAt: new Date(e.date),
-        forecast:    e.forecast   || null,
-        previous:    e.previous   || null,
-      }));
-  }
-
   private async publishCalendarEvent(
     type: CalendarEventType,
     event: EconomicEventEntity,
@@ -174,14 +109,4 @@ export class EconomicCalendarService {
 
     this.logger.log(`${type}: ${event.title} (${event.currency}) at ${event.scheduledAt}`);
   }
-}
-
-// ForexFactory JSON shape
-interface ForexFactoryEvent {
-  title:    string;
-  country:  string;
-  date:     string;
-  impact:   'High' | 'Medium' | 'Low' | 'Holiday';
-  forecast: string;
-  previous: string;
 }

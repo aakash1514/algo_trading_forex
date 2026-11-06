@@ -69,8 +69,8 @@ All backend services use the global prefix `/api` and run from the repo root, wh
 | Service | Port | Responsibility |
 |---|---|---|
 | auth-service | 3000 | Register/login, JWT access and refresh tokens (refresh token in an httpOnly cookie), Argon2 hashing. Owns every DB migration and seed. |
-| market-service | 3002 | Tick ingestion (mock stream for now), publishes `forex.ticks`, writes ticks to TimescaleDB and Redis, serves candles and instruments (live and `?source=historical`). |
-| domain-service | 3003 | Forex domain logic: pip value, margin, swaps, session clock, spread monitor, economic calendar. |
+| market-service | 3002 | Live feed per `MARKET_FEED` (no feed by default; `mock` = simulated prices for development, always labelled), publishes `forex.ticks`, reports the feed's state, writes ticks to TimescaleDB and Redis, serves candles and instruments (live and `?source=historical`). |
+| domain-service | 3003 | Forex domain logic: pip value, margin, swaps, session clock, spread monitor, and an events-only economic calendar from the official FOMC and ECB calendars. |
 | order-service | 3004 | Orders, positions and account on a paper broker; validates orders against live ticks, spread and market hours; stop-loss/take-profit and stop-out; publishes order, position and account events. |
 | ws-gateway | 3005 | Socket.IO gateway relaying ticks and per-user order/position/account events. Also hosts the backtest engine (BullMQ queue and worker, results in MinIO). |
 | ml-service | 3006 | Python FastAPI, inference only: walk-forward LSTM next-hour direction models; evaluation and historical test predictions over a JWT API. Read-only DB login. |
@@ -255,11 +255,14 @@ The default test suites never call an LLM: agent tests replay recorded real tran
 | 4. ML service: walk-forward LSTM evaluation, read-only API and page | Done |
 | 5. Research agent: LangGraph + MCP, deterministic verifier, live eval | Done |
 | 5b. Research page in the frontend | Done (manual browser check pending) |
-| 6. Real market data: a live feed behind `USE_MOCK_DATA` | Next |
+| 6a. Price safety (price age/source checks, no feed by default, SIMULATED/STALE states) and an official events calendar | Done |
+| 6b. Historical Replay mode | Next |
 | 7. Deployment on free tiers | Planned |
 
-Until step 6, the live feed is a mock stream (`USE_MOCK_DATA=true`). The backtester, the ML evaluation and the
-research agent use only the real imported history.
+There is no licensed live price feed. The feed is set by `MARKET_FEED=none|mock`: `none` is the default (no
+prices are published and the terminal disables order entry), and `mock` is a simulated feed for development,
+marked "SIMULATED PRICES — not market data" everywhere it appears. Any other value fails startup. The backtester, the ML evaluation and the research agent use only the real imported
+history.
 
 ## Disclaimer
 
