@@ -215,6 +215,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   terms not confirmed for commercial use; must be re-checked or replaced before any client/commercial use. Never work
   around their bot protection (no browser-like or changed headers, headless browsers or proxies; a 403/429/challenge
   is logged and skipped).
+- **Personal data in outbound requests:** never put the owner's personal data (email etc.) in outbound requests
+  (User-Agent, headers, query strings) without explicit approval. The ONLY approved case: CALENDAR_CONTACT_EMAIL in the
+  official-calendar User-Agent, read from .env. Currently no outbound request carries personal data. A project contact
+  email for BLS is approved but unused (branch step-6a-bls-wip). Tests: no calendar User-Agent carries an email, and no
+  tracked file contains the owner's addresses (matched by sha256, `no-personal-data.spec.ts`).
 - A triggered stop-loss/take-profit is committed on the position (`pending_exit_*`) before it is booked and is retried
   from the DB, so a restart can't lose it. It books at the triggering tick's price, never the SL/TP level.
 - Stop-out (margin level < 50%) closes the biggest loser first until the level is back above 50%; close_reason
