@@ -90,22 +90,19 @@ describe('OrderValidationService', () => {
 
   // ── Gate 5 ─────────────────────────────────────────────────────────────────
   describe('Gate 5 — economic calendar warning', () => {
-    it('looks for timed events within ±30 min and date-only events on today’s date, never blocking', async () => {
-      jest.useFakeTimers({ now: new Date('2026-10-28T19:05:00Z'), doNotFake: ['nextTick', 'setImmediate', 'queueMicrotask'] });
+    it('looks for events within ±30 min of the order, never blocking', async () => {
+      jest.useFakeTimers({ now: new Date('2026-10-28T18:05:00Z'), doNotFake: ['nextTick', 'setImmediate', 'queueMicrotask'] });
       try {
         instrumentRepo.findOne.mockResolvedValue(eurUsdRow);
         const qb = calendarQb;
-        qb.getMany.mockResolvedValue([{ currency: 'USD', title: 'FOMC meeting, October 27-28', impact: 'HIGH', allDay: true }]);
+        qb.getMany.mockResolvedValue([{ currency: 'USD', title: 'FOMC meeting, October 27-28', impact: 'HIGH', timeSource: 'expected' }]);
         const result = await service.validate('user-1', baseDto, eurUsdQuote, marginOk);
         expect(result.valid).toBe(true);
-        const call = qb.andWhere.mock.calls.find(([sql]: [string]) => sql.includes('all_day'));
-        expect(call?.[0]).toBe(
-          '((NOT e.all_day AND e.scheduled_at BETWEEN :windowStart AND :windowEnd) OR (e.all_day AND e.scheduled_at = :today))',
-        );
+        const call = qb.andWhere.mock.calls.find(([sql]: [string]) => sql.includes('scheduled_at'));
+        expect(call?.[0]).toBe('e.scheduled_at BETWEEN :windowStart AND :windowEnd');
         expect(call?.[1]).toEqual({
-          windowStart: new Date('2026-10-28T18:35:00Z'),
-          windowEnd: new Date('2026-10-28T19:35:00Z'),
-          today: new Date('2026-10-28T00:00:00Z'),
+          windowStart: new Date('2026-10-28T17:35:00Z'),
+          windowEnd: new Date('2026-10-28T18:35:00Z'),
         });
       } finally {
         jest.useRealTimers();

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useGetCalendarEventsQuery } from '../../store/api/domain.api';
 import { cn } from '../../lib/cn';
-import { CALENDAR_CURRENCIES, CALENDAR_SOURCES, COVERAGE_NOTE, IMPACT_NOTE, eventWhen } from '../../lib/calendar';
+import { CALENDAR_CURRENCIES, CALENDAR_SOURCES, COVERAGE_NOTE, EXPECTED_TIME_NOTE, IMPACT_NOTE, eventWhen } from '../../lib/calendar';
 
 const IMPACT_COLORS: Record<string, string> = {
   HIGH:   'text-accent-red bg-accent-red/10 border-accent-red/20',
@@ -19,7 +19,7 @@ const IMPACT_DOT: Record<string, string> = {
 
 const CURRENCIES = ['ALL', ...CALENDAR_CURRENCIES];
 const IMPACTS    = ['ALL', 'HIGH', 'MEDIUM', 'LOW'];
-const COLUMNS = ['Date', 'Currency', 'Event', 'Impact*', 'Source', 'Forecast', 'Previous', 'Actual'];
+const COLUMNS = ['Date (UTC)', 'Currency', 'Event', 'Impact*', 'Source', 'Forecast', 'Previous', 'Actual'];
 
 export function CalendarClient() {
   const [currency, setCurrency] = useState('ALL');
@@ -113,7 +113,12 @@ export function CalendarClient() {
                   <tr key={event.id} data-testid="calendar-event" className="border-b border-terminal-border/50 hover:bg-terminal-elevated/40 transition-colors">
                     <td className="px-4 py-2.5 tabular-nums text-terminal-muted whitespace-nowrap">
                       {when.date}
-                      <span className="ml-2 text-[9px] text-terminal-muted/60">{when.time}</span>
+                      <span className="ml-2 text-[9px] text-terminal-muted/60">· {when.time}</span>
+                      {event.timeSource === 'expected' && (
+                        <span className="block text-[9px] text-terminal-muted/60" data-testid="calendar-expected-note">
+                          {EXPECTED_TIME_NOTE}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-2.5">
                       <span className="text-[11px] font-medium text-[#e2e4e9]">{event.currency}</span>
@@ -153,7 +158,7 @@ export function CalendarClient() {
 
       <footer className="px-4 py-2 border-t border-terminal-border text-[10px] text-terminal-muted shrink-0" data-testid="calendar-footer">
         Sources: the Board of Governors of the Federal Reserve System (federalreserve.gov) and the European Central Bank
-        (ecb.europa.eu); dates as they publish them. * {IMPACT_NOTE}
+        (ecb.europa.eu); dates as they publish them, times in UTC. * {IMPACT_NOTE}
       </footer>
     </div>
   );

@@ -1,5 +1,5 @@
-// Official central-bank calendars the economic calendar is built from. Events only: these pages publish
-// dates, not consensus forecasts, previous values or actuals (those stay null and show as "—").
+// Official calendars the economic calendar is built from. Events only: these pages publish dates and
+// times, not consensus forecasts, previous values or actuals (those stay null and show as "—").
 //
 // Terms (checked 2026-10-12):
 // - Federal Reserve Board: "Unless otherwise indicated, information on Board's website is in the public
@@ -9,10 +9,13 @@
 //   stating any modification (https://www.ecb.europa.eu/services/disclaimer/html/index.en.html).
 //   robots.txt does not disallow /press/calendars/ and asks for a 5 s crawl delay.
 // Each page is fetched at most once a day with a User-Agent that identifies ForexEdge.
-// The BLS release calendar (US data releases) is not included: bls.gov refuses automated requests that
-// don't follow its usage policy (docs/OVERNIGHT-QUESTIONS.md #5).
 
 export type CalendarSource = 'FOMC' | 'ECB';
+
+// Where an event's time comes from: 'official' when the source publishes it (a time per row, or a documented
+// standard time for every event of that kind); 'expected' when the source publishes none and the time is the
+// one its recent releases used (FOMC_EXPECTED_TIME).
+export type TimeSource = 'official' | 'expected';
 
 export interface OfficialSource {
   source: CalendarSource;
@@ -20,8 +23,7 @@ export interface OfficialSource {
   attribution: string;
 }
 
-export const CALENDAR_USER_AGENT =
-  'ForexEdge/0.1 (economic calendar; +https://github.com/aakash1514/algo_trading_forex)';
+export const CALENDAR_USER_AGENT = 'ForexEdge (+https://github.com/aakash1514/algo_trading_forex)';
 
 export const OFFICIAL_SOURCES: Readonly<Record<CalendarSource, OfficialSource>> = {
   FOMC: {
@@ -36,16 +38,47 @@ export const OFFICIAL_SOURCES: Readonly<Record<CalendarSource, OfficialSource>> 
   },
 };
 
+// A local release time in an IANA zone (converted to UTC per date, DST included, by zoned-time.ts)
+export interface ReleaseTime {
+  time: string;   // HH:mm, local
+  zone: string;   // IANA zone
+  timeSource: TimeSource;
+  basis: string;  // where the time comes from
+}
+
+// FOMC: the meeting calendar lists dates only, and the Fed publishes no standing release time for the
+// statement. The EXPECTED time is the one the 8 most recent scheduled meetings' statements carried: each
+// press release says "For release at 2:00 p.m." Eastern (recorded in
+// __fixtures__/fomc-statements/, checked by fomc-statement-evidence.spec.ts). Shown as "(expected)".
+export const FOMC_EXPECTED_TIME: ReleaseTime = {
+  time: '14:00',
+  zone: 'America/New_York',
+  timeSource: 'expected',
+  basis: 'Expected: the Fed publishes no standard release time; the last 8 scheduled FOMC statements were '
+    + 'released at 2:00 p.m. Eastern (__fixtures__/fomc-statements/)',
+};
+
+// ECB: "The monetary policy decisions [...] are published in a press release at 14:15 CET on the day of the
+// Governing Council monetary policy meeting." (https://www.ecb.europa.eu/press/govcdec/mopo/html/index.en.html,
+// checked 2026-11-06). The ECB writes CET all year for Frankfurt local time, so the zone is Europe/Berlin
+// (CEST in summer).
+export const ECB_DECISION_TIME: ReleaseTime = {
+  time: '14:15',
+  zone: 'Europe/Berlin',
+  timeSource: 'official',
+  basis: 'https://www.ecb.europa.eu/press/govcdec/mopo/html/index.en.html',
+};
+
 export type Impact = 'HIGH' | 'MEDIUM' | 'LOW';
 
-// One event as the source publishes it. Both sources give a date without a time, so every event is
-// all-day (stored at 00:00 UTC of its date with all_day = true); no time is invented.
+// One event as the source publishes it, at its release moment in UTC.
 export interface OfficialEvent {
   source: CalendarSource;
-  title: string;      // the source's own wording
+  title: string;          // the source's own wording
   currency: 'USD' | 'EUR';
-  date: string;       // YYYY-MM-DD
-  impact: Impact;     // ForexEdge classification (impact.ts), not source data
+  scheduledAt: string;    // ISO 8601, UTC
+  timeSource: TimeSource;
+  impact: Impact;         // ForexEdge classification (impact.ts), not source data
 }
 
 export class CalendarParseError extends Error {}

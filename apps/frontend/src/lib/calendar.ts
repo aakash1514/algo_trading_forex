@@ -21,18 +21,17 @@ export const COVERAGE_NOTE =
   'GBP and JPY events are not available. US data releases (BLS) are not included yet. '
   + 'Events only: the official calendars publish no forecasts, previous values or actuals.';
 
-// An all-day event is stored at 00:00 UTC of its date, so its date is read in UTC (in a local time zone
-// west of UTC it would show as the day before). A timed event shows in local time.
-export function eventWhen(event: Pick<CalendarEvent, 'scheduledAt' | 'allDay'>): { date: string; time: string } {
-  const at = new Date(event.scheduledAt);
-  if (event.allDay) {
-    return {
-      date: at.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }),
-      time: 'All day',
-    };
-  }
+export const EXPECTED_TIME_NOTE = 'Fed publishes no standard release time; based on recent statements.';
+
+// Every event shows in UTC, labelled, so the time is the same for every viewer. An 'expected' time (FOMC)
+// says so.
+export function eventWhen(event: Pick<CalendarEvent, 'scheduledAt' | 'timeSource'>): { date: string; time: string } {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    hourCycle: 'h23', timeZone: 'UTC',
+  }).formatToParts(new Date(event.scheduledAt)).map((p) => [p.type, p.value]));
   return {
-    date: at.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }),
-    time: at.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date: `${parts.weekday} ${parts.day} ${parts.month} ${parts.year}`,
+    time: `${parts.hour}:${parts.minute} UTC${event.timeSource === 'expected' ? ' (expected)' : ''}`,
   };
 }

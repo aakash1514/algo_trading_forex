@@ -195,7 +195,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Economic calendar (step 6a):** events only, from official calendars (domain-service `economic-calendar/`):
   FOMC (federalreserve.gov, public domain) and ECB (ecb.europa.eu, free use with attribution). Each page is fetched
   at most once per UTC day (a Redis claim per source and date) with the `CALENDAR_USER_AGENT`; strict parsers throw on unexpected
-  markup and the service keeps the last good events. Dates only, so events are all-day (00:00 UTC, `all_day`);
+  markup and the service keeps the last good events. Every event is stored at its release moment in UTC
+  (`scheduled_at`), converted from the source's local time with IANA zones (`zoned-time.ts`, DST included, never a
+  fixed offset), and `time_source` says where the time comes from: `official` (ECB decisions, 14:15 Frankfurt, from
+  the ECB's monetary policy decisions page) or `expected` (FOMC: the Fed publishes no standing time; 14:00 New York
+  on a meeting's final day, the time on the last 8 recorded statements, `__fixtures__/fomc-statements/`, never
+  fetched at runtime). Only events with such a time are stored (no Day 1, notation votes, non-monetary meetings);
   titles are the sources' wording; impact is a fixed ForexEdge classification (`impact.ts`), labelled as such; the
   UI cites the sources. Forecast/previous/actual are null. A test fails on any reference to the removed
   third-party weekly feed. Recording new fixtures is opt-in (`tools/ops/record-calendar-fixtures.ts`).
@@ -363,8 +368,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    blocks writes to `historical_*` (step 6a enforces it with tests only).
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
-8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired; the official events are
-   all-day, and only timed events are published). The calendar covers USD (FOMC) and EUR (ECB) policy meetings
+8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The calendar covers USD (FOMC) and EUR (ECB) policy meetings
    only: no GBP/JPY, no US data releases (BLS), no forecasts or actuals.
 
 ## How to work with me

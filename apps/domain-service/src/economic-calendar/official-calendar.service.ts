@@ -100,10 +100,10 @@ export class OfficialCalendarService implements OnApplicationBootstrap {
       await manager.query(`DELETE FROM economic_events WHERE source = $1 AND scheduled_at >= $2`, [source, today]);
       for (const e of events) {
         await manager.query(
-          `INSERT INTO economic_events (title, currency, impact, scheduled_at, all_day, source)
-           VALUES ($1, $2, $3, $4, true, $5)
-           ON CONFLICT (source, scheduled_at, title) WHERE source IS NOT NULL DO NOTHING`,
-          [e.title, e.currency, e.impact, `${e.date}T00:00:00Z`, e.source],
+          `INSERT INTO economic_events (title, currency, impact, scheduled_at, time_source, source)
+           VALUES ($1, $2, $3, $4, $5, $6)
+           ON CONFLICT (source, scheduled_at, title) DO NOTHING`,
+          [e.title, e.currency, e.impact, e.scheduledAt, e.timeSource, e.source],
         );
       }
     });

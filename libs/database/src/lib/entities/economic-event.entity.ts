@@ -30,9 +30,10 @@ export class EconomicEventEntity {
   @Column({ type: 'varchar', length: 20 })
   source!: string;
 
-  // The source gives a date without a time: scheduledAt is 00:00 UTC of that date
-  @Column({ name: 'all_day', type: 'boolean', default: false })
-  allDay!: boolean;
+  // Where scheduledAt's time comes from: 'official' (published by the source) or 'expected' (FOMC: the
+  // source publishes no release time; the time its recent statements used)
+  @Column({ name: 'time_source', type: 'varchar', length: 10 })
+  timeSource!: 'official' | 'expected';
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;

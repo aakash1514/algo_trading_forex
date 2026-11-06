@@ -1,11 +1,14 @@
-import { CalendarParseError, type OfficialEvent } from './official-sources';
+import { CalendarParseError, FOMC_EXPECTED_TIME, type OfficialEvent } from './official-sources';
 import { classifyImpact } from './impact';
+import { zonedToUtc } from './zoned-time';
 
 // Parses the Federal Reserve's FOMC meeting calendar page (fomccalendars.htm): one panel per year
 // ("2026 FOMC Meetings"), each with month/date rows such as "January" / "27-28", "March" / "17-18*",
-// "Apr/May" / "30-1" or "August" / "22 (notation vote)". One event per row, on the meeting's final day
-// (when the decision is announced). Throws CalendarParseError on anything unexpected, so a changed page
-// never produces wrong events (the service keeps the last good ones).
+// "Apr/May" / "30-1" or "August" / "22 (notation vote)". One event per scheduled meeting, at the EXPECTED
+// statement time (FOMC_EXPECTED_TIME, 2:00 p.m. New York) on its final day, when the decision is announced.
+// Notation votes and unscheduled meetings are skipped (no release time to expect). Throws
+// CalendarParseError on anything unexpected, so a changed page never produces wrong events (the service
+// keeps the last good ones).
 
 const MONTHS: Record<string, number> = {
   jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3, apr: 4, april: 4, may: 5, jun: 6, june: 6,
@@ -18,6 +21,9 @@ const ROW = /fomc-meeting__month[^>]*>\s*<strong>([^<]+)<\/strong>\s*<\/div>\s*<
 const DATE_TEXT = /^(\d{1,2})(?:-(\d{1,2}))?(\*)?(?:\s*\(([^)]+)\))?$/;
 
 const pad = (n: number) => String(n).padStart(2, '0');
+
+// Notes on rows that aren't scheduled meetings; any other note is unexpected
+const SKIPPED_NOTES = new Set(['notation vote', 'unscheduled']);
 
 function monthNumber(name: string): number {
   const n = MONTHS[name.trim().toLowerCase()];
@@ -48,6 +54,10 @@ export function parseFomcCalendar(html: string): OfficialEvent[] {
       const m = DATE_TEXT.exec(dateText);
       if (!m) throw new CalendarParseError(`FOMC: unexpected date "${dateText}" in ${panel.year} ${monthText}`);
       const [, startDay, endDay, sep, note] = m;
+      if (note) {
+        if (SKIPPED_NOTES.has(note.trim().toLowerCase())) continue;
+        throw new CalendarParseError(`FOMC: unexpected note "${note}" in ${panel.year} ${monthText}`);
+      }
       const months = monthText.split('/').map(monthNumber);
       if (months.length > 2) throw new CalendarParseError(`FOMC: unexpected month "${monthText}"`);
       const finalMonth = months[months.length - 1];
@@ -55,10 +65,14 @@ export function parseFomcCalendar(html: string): OfficialEvent[] {
       const finalYear = months.length === 2 && finalMonth < months[0] ? panel.year + 1 : panel.year;
       const date = validDate(finalYear, finalMonth, Number(endDay ?? startDay));
       const days = endDay ? `${startDay}-${endDay}` : startDay;
-      const title = `FOMC meeting, ${monthText.trim()} ${days}${note ? ` (${note.trim()})` : ''}`
-        + (sep ? ', with Summary of Economic Projections' : '');
-      events.push({ source: 'FOMC', title, currency: 'USD', date, impact: classifyImpact('FOMC', title) });
+      const title = `FOMC meeting, ${monthText.trim()} ${days}` + (sep ? ', with Summary of Economic Projections' : '');
+      const { time, zone, timeSource } = FOMC_EXPECTED_TIME;
+      events.push({
+        source: 'FOMC', title, currency: 'USD', scheduledAt: zonedToUtc(date, time, zone).toISOString(), timeSource,
+        impact: classifyImpact('FOMC'),
+      });
     }
   });
+  if (events.length === 0) throw new CalendarParseError('FOMC: no scheduled meeting found');
   return events;
 }

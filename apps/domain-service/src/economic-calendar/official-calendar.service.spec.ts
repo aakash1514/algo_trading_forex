@@ -54,7 +54,7 @@ describe('OfficialCalendarService (recorded pages, no network)', () => {
     return { service, queries, redis, dataSource };
   }
 
-  it('fetches each source once with the ForexEdge User-Agent and stores every parsed event as all-day', async () => {
+  it('fetches each source once with the ForexEdge User-Agent and stores every parsed event at its UTC time', async () => {
     const { service, queries } = setup();
     const outcomes = await service.syncAll(NOW);
     const fomc = parseFomcCalendar(PAGES[OFFICIAL_SOURCES.FOMC.url]).length;
@@ -67,15 +67,19 @@ describe('OfficialCalendarService (recorded pages, no network)', () => {
     ]);
     expect(service.fetcher).toHaveBeenCalledTimes(2);
     for (const call of (service.fetcher as jest.Mock).mock.calls) expect(call[1]).toBe(CALENDAR_USER_AGENT);
-    expect(CALENDAR_USER_AGENT).toMatch(/^ForexEdge\//);
+    expect(CALENDAR_USER_AGENT).toBe('ForexEdge (+https://github.com/aakash1514/algo_trading_forex)');
 
     const deletes = queries.filter(([sql]) => sql.startsWith('DELETE'));
     expect(deletes.map(([, p]) => p)).toEqual([['FOMC', '2026-10-12T00:00:00Z'], ['ECB', '2026-10-12T00:00:00Z']]);
     const inserts = queries.filter(([sql]) => sql.startsWith('INSERT'));
     expect(inserts).toHaveLength(fomc + ecb);
-    expect(inserts[0][0]).toContain('VALUES ($1, $2, $3, $4, true, $5)');
+    expect(inserts[0][0]).toContain('(title, currency, impact, scheduled_at, time_source, source) VALUES ($1, $2, $3, $4, $5, $6)');
     expect(inserts.find(([, p]) => p[0] === 'FOMC meeting, October 27-28')?.[1])
-      .toEqual(['FOMC meeting, October 27-28', 'USD', 'HIGH', '2026-10-28T00:00:00Z', 'FOMC']);
+      .toEqual(['FOMC meeting, October 27-28', 'USD', 'HIGH', '2026-10-28T18:00:00.000Z', 'expected', 'FOMC']);
+    expect(inserts.find(([, p]) => p[5] === 'ECB')?.[1]).toEqual([
+      'Governing Council of the ECB: monetary policy meeting in Frankfurt (Day 2), followed by press conference',
+      'EUR', 'HIGH', '2026-10-29T13:15:00.000Z', 'official', 'ECB',
+    ]);
   });
 
   it('fetches at most once per UTC day per source, even across restarts, and again the next day', async () => {
@@ -124,7 +128,7 @@ runDb('OfficialCalendarService against the real schema (RUN_DB_TESTS)', () => {
     await testDb?.drop();
   });
 
-  it('stores the recorded calendars, resyncs idempotently, keeps them on a failure, and lists today’s all-day events', async () => {
+  it('stores the recorded calendars at their UTC times, resyncs idempotently, keeps them on a failure', async () => {
     const ds = testDb.dataSource;
     const count = async () => Number((await ds.query(`SELECT count(*) AS n FROM economic_events WHERE source IS NOT NULL`))[0].n);
     const sync = async (fetcher: PageFetcher) => {
@@ -137,7 +141,6 @@ runDb('OfficialCalendarService against the real schema (RUN_DB_TESTS)', () => {
     const stored = await count();
     const parsed = parseFomcCalendar(PAGES[OFFICIAL_SOURCES.FOMC.url]).length + parseEcbCalendar(PAGES[OFFICIAL_SOURCES.ECB.url]).length;
     expect(stored).toBeGreaterThan(0);
-    // Same-day duplicates (e.g. the ECB lists Day 2 and its press conference separately) have different titles
     expect(stored).toBe(parsed);
 
     await sync(recordedFetcher());
@@ -146,13 +149,20 @@ runDb('OfficialCalendarService against the real schema (RUN_DB_TESTS)', () => {
     await sync(jest.fn(async () => ({ status: 503, body: '' })));
     expect(await count()).toBe(stored);
 
-    const allDay = await ds.query(`SELECT count(*) AS n FROM economic_events WHERE source IS NOT NULL AND NOT all_day`);
-    expect(Number(allDay[0].n)).toBe(0);
+    const bySource = await ds.query(
+      `SELECT source, time_source, count(*)::int AS n FROM economic_events GROUP BY 1, 2 ORDER BY 1, 2`);
+    expect(bySource).toEqual([
+      { source: 'ECB', time_source: 'official', n: parseEcbCalendar(PAGES[OFFICIAL_SOURCES.ECB.url]).length },
+      { source: 'FOMC', time_source: 'expected', n: parseFomcCalendar(PAGES[OFFICIAL_SOURCES.FOMC.url]).length },
+    ]);
 
-    // The calendar API lists an all-day event for the whole of its day (here: the FOMC decision day)
+    // The calendar API lists events from the given instant on, with their UTC time and its source
     const calendar = new EconomicCalendarService(ds.getRepository(EconomicEventEntity), {} as never);
-    const listed = await calendar.getUpcomingEvents('USD', new Date('2026-10-28T18:30:00Z'));
-    expect(listed[0]).toMatchObject({ title: 'FOMC meeting, October 27-28', allDay: true, source: 'FOMC', impact: 'HIGH' });
+    const listed = await calendar.getUpcomingEvents('USD', new Date('2026-10-28T18:00:00Z'));
+    expect(listed[0]).toMatchObject({ title: 'FOMC meeting, October 27-28', timeSource: 'expected', source: 'FOMC', impact: 'HIGH' });
+    expect(new Date(listed[0].scheduledAt).toISOString()).toBe('2026-10-28T18:00:00.000Z');
     expect(listed[0].forecast).toBeNull();
+    const after = await calendar.getUpcomingEvents('USD', new Date('2026-10-28T18:00:00.001Z'));
+    expect(after[0].title).toBe('FOMC meeting, December 8-9, with Summary of Economic Projections');
   });
 });

@@ -199,11 +199,8 @@ export class OrderValidationService {
     const events = await this.economicEventRepo
       .createQueryBuilder('e')
       .where('e.currency IN (:...currencies)', { currencies })
-      // Timed events within the window; date-only (all-day) events on today's date (00:00 UTC)
-      .andWhere(
-        '((NOT e.all_day AND e.scheduled_at BETWEEN :windowStart AND :windowEnd) OR (e.all_day AND e.scheduled_at = :today))',
-        { windowStart, windowEnd, today: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())) },
-      )
+      // Every event has a UTC time ('official' or, for the FOMC, 'expected'); both count the same
+      .andWhere('e.scheduled_at BETWEEN :windowStart AND :windowEnd', { windowStart, windowEnd })
       .andWhere('e.impact IN (:...impacts)', { impacts: ['HIGH', 'MEDIUM'] })
       .getMany();
 

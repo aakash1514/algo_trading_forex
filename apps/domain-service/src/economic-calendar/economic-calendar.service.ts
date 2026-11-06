@@ -18,7 +18,7 @@ export enum ImpactLevel {
 }
 
 // Reads the economic calendar (filled from the official calendars by OfficialCalendarService) and
-// publishes forex.calendar-events when a timed event approaches.
+// publishes forex.calendar-events when an event approaches.
 @Injectable()
 export class EconomicCalendarService {
   private readonly logger = new Logger(EconomicCalendarService.name);
@@ -41,7 +41,6 @@ export class EconomicCalendarService {
     .where('event.scheduled_at > :now', { now })
     .andWhere('event.scheduled_at <= :windowEnd', { windowEnd })
     .andWhere('event.actual IS NULL')
-    .andWhere('NOT event.all_day') // date-only events have no time to approach
     .getMany();
 
   for (const event of upcoming) {
@@ -54,12 +53,9 @@ export class EconomicCalendarService {
     from?: Date,
     impact?: ImpactLevel,
   ): Promise<EconomicEventEntity[]> {
-    // An all-day event (stored at 00:00 UTC of its date) stays listed for the whole of its day
-    const start = from ?? new Date();
-    const startOfDay = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
     const qb = this.eventRepo
       .createQueryBuilder('event')
-      .where('(event.scheduled_at >= :from OR (event.all_day AND event.scheduled_at >= :startOfDay))', { from: start, startOfDay })
+      .where('event.scheduled_at >= :from', { from: from ?? new Date() })
       .orderBy('event.scheduled_at', 'ASC');
 
     if (currency) qb.andWhere('event.currency = :currency', { currency });
@@ -78,7 +74,6 @@ export class EconomicCalendarService {
       .andWhere('event.scheduled_at >= :windowStart', { windowStart })
       .andWhere('event.scheduled_at <= :now', { now })
       .andWhere('event.impact = :impact', { impact: ImpactLevel.HIGH })
-      .andWhere('NOT event.all_day')
       .getOne();
 
     return !!active;

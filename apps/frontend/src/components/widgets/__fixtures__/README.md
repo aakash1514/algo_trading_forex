@@ -4,8 +4,8 @@ Real responses, saved byte for byte. Nothing here is written or edited by hand.
 
 | File | What | Recorded | sha256 |
 |---|---|---|---|
-| calendar-2026-10-12.json | `GET /api/domain/calendar?from=2026-10-12` from domain-service after its first official-calendar sync on the dev database | 2026-10-12, step 6a (working tree after commit `b2af2fd`) | `e22e684f7902ee0bcb676e7f175f3fcd1f7d8158c82a4e7ad34034fbd12bf8fd` |
+| calendar-2026-11-06.json | `GET /api/domain/calendar?from=2026-11-06` from domain-service right after the `CalendarEventTimes` migration and its first sync with release times on the dev database | 2026-11-06, step 6a follow-up (group A working tree) | `eec4d2522b79ffb99b47cce76056aea5e88a5ab72064eaf3afba30a32ca60fe8` |
 
-That sync stored the ECB's 55 events; the FOMC fetch failed transiently ("fetch failed"), so the service kept
-its (empty) last good set and the response has ECB events only. It was not refetched the same day (the
-calendar fetches each source at most once a day).
+That sync stored FOMC 56 events (time source `expected`) and ECB 17 (`official`); the response lists the 26 from
+2026-11-06 on. The date-only response recorded on 2026-10-12 (`calendar-2026-10-12.json`) was removed with the
+all-day layout.
