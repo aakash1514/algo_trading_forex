@@ -1,7 +1,8 @@
 import type { CalendarEvent } from '../types/api.types';
 
 // Where calendar events come from. Mirrors OFFICIAL_SOURCES in
-// apps/domain-service/src/economic-calendar/official-sources.ts.
+// apps/domain-service/src/economic-calendar/official-sources.ts and the Forex Factory export
+// (economic-calendar/forexfactory/), a third-party source approved for portfolio use only.
 export const CALENDAR_SOURCES: Readonly<Record<string, { attribution: string; url: string }>> = {
   FOMC: {
     attribution: 'Board of Governors of the Federal Reserve System',
@@ -11,15 +12,25 @@ export const CALENDAR_SOURCES: Readonly<Record<string, { attribution: string; ur
     attribution: 'European Central Bank',
     url: 'https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html',
   },
+  FOREXFACTORY: {
+    attribution: 'Forex Factory',
+    url: 'https://www.forexfactory.com/calendar',
+  },
 };
 
-// The currencies the official calendars cover today.
-export const CALENDAR_CURRENCIES = ['USD', 'EUR'] as const;
+// The third-party source: its rows say "via ForexFactory" and its impact is ForexFactory's own level.
+export const THIRD_PARTY_SOURCE = 'FOREXFACTORY';
+export const THIRD_PARTY_LABEL = 'via ForexFactory';
+export const THIRD_PARTY_IMPACT_LABEL = 'ForexFactory impact';
 
-export const IMPACT_NOTE = 'Impact is a ForexEdge classification, not source data.';
+// The currencies the calendar covers (the Forex Factory export's currencies include the official ones).
+export const CALENDAR_CURRENCIES = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'CNY'] as const;
+
+export const IMPACT_NOTE =
+  'Impact is a ForexEdge classification for FOMC and ECB events and ForexFactory’s own level for the others.';
 export const COVERAGE_NOTE =
-  'GBP and JPY events are not available. US data releases (BLS) are not included yet. '
-  + 'Events only: the official calendars publish no forecasts, previous values or actuals.';
+  'FOMC and ECB from official sources; all other events via Forex Factory. Direct BLS access is blocked '
+  + '(HTTP 403, 2026-11-06). Events only: no forecasts, previous values or actuals.';
 
 export const EXPECTED_TIME_NOTE = 'Fed publishes no standard release time; based on recent statements.';
 

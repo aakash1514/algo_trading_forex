@@ -27,8 +27,10 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
 
   it('deletes the all-day rows, logs the counts per source, and replaces all_day with time_source', async () => {
     const ds = testDb.dataSource;
-    expect(await lastMigration()).toBe('CalendarEventTimes1792300000000');
+    expect(await lastMigration()).toBe('CalendarThirdPartyEvents1792400000000');
     await ds.undoLastMigration({ transaction: 'each' });
+    await ds.undoLastMigration({ transaction: 'each' });
+    expect(await lastMigration()).toBe('RemovePreOfficialCalendarEvents1792200000000');
     await insertAllDay();
     expect(Number((await ds.query('SELECT count(*)::int AS n FROM economic_events'))[0].n)).toBe(2);
 
@@ -37,7 +39,7 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
     expect(log).toHaveBeenCalledWith('CalendarEventTimes: deleted all-day events per source: ECB 2; rows left 0');
     log.mockRestore();
 
-    expect(await lastMigration()).toBe('CalendarEventTimes1792300000000');
+    expect(await lastMigration()).toBe('CalendarThirdPartyEvents1792400000000');
     expect(Number((await ds.query('SELECT count(*)::int AS n FROM economic_events'))[0].n)).toBe(0);
     const columns = (await ds.query(
       `SELECT column_name FROM information_schema.columns WHERE table_name = 'economic_events' ORDER BY column_name`,
@@ -49,6 +51,7 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
   it('refuses a timed row whose time source is unknown, and leaves the table as it was', async () => {
     const ds = testDb.dataSource;
     await ds.undoLastMigration({ transaction: 'each' });
+    await ds.undoLastMigration({ transaction: 'each' });
     await insertAllDay();
     await ds.query(`UPDATE economic_events SET all_day = false WHERE impact = 'HIGH'`);
 
@@ -58,6 +61,6 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
 
     await ds.query('DELETE FROM economic_events');
     await ds.runMigrations({ transaction: 'each' });
-    expect(await lastMigration()).toBe('CalendarEventTimes1792300000000');
+    expect(await lastMigration()).toBe('CalendarThirdPartyEvents1792400000000');
   });
 });

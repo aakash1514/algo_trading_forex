@@ -88,6 +88,11 @@ and run 3 is reported as is.
 
 ## 5. BLS refuses the calendar's automated requests: put a contact email in the User-Agent? (BLS skipped)
 
+**Resolved (2026-11-06).** The owner approved a contact email in the BLS User-Agent. With it, bls.gov still answered
+HTTP 403 (one request to `schedule/news_release/cpi.htm`), and it isn't worked around. FOMC and ECB come from
+official sources; all other events come via Forex Factory. Direct BLS access is blocked (HTTP 403, 2026-11-06). The
+BLS work is parked on branch `step-6a-bls-wip`.
+
 The BLS release calendar feed (`https://www.bls.gov/schedule/news_release/bls.ics`, public domain) answered
 **HTTP 403 "Access Denied"** to the calendar's User-Agent
 (`ForexEdge/0.1 (economic calendar; +https://github.com/aakash1514/algo_trading_forex)`). The page says:

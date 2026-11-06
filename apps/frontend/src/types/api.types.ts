@@ -180,8 +180,9 @@ export interface CalendarEvent {
   currency: string;
   impact: 'HIGH' | 'MEDIUM' | 'LOW'; // ForexEdge classification, not source data
   scheduledAt: string;    // the release moment, UTC
-  timeSource: 'official' | 'expected'; // expected: the source publishes no time (FOMC)
-  source: string;         // 'FOMC' | 'ECB'
+  // expected: the source publishes no time (FOMC); third_party: published by a third-party export
+  timeSource: 'official' | 'expected' | 'third_party';
+  source: string;         // a key of CALENDAR_SOURCES (lib/calendar.ts)
   forecast: string | null;
   previous: string | null;
   actual: string | null;

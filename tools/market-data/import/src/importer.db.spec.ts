@@ -211,8 +211,19 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts CalendarThirdPartyEvents (refusing while third-party rows exist), CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('CalendarThirdPartyEvents1792400000000');
+
+    // CalendarThirdPartyEvents: 'third_party' allowed and the resync key includes the currency; down() refuses
+    // while a third-party row exists (the row is a real Forex Factory event, 2026-11-06 export)
+    const ffRow = `INSERT INTO economic_events (title, currency, impact, scheduled_at, source, time_source)
+       VALUES ('Unemployment Rate', $1, 'HIGH', '2026-11-06T13:30:00Z', 'FOREXFACTORY', 'third_party')`;
+    await client.query(ffRow, ['CAD']);
+    await client.query(ffRow, ['USD']);
+    await expect(testDb.dataSource.undoLastMigration({ transaction: 'each' })).rejects.toThrow(/2 third-party row\(s\) exist/);
+    await client.query(`DELETE FROM economic_events WHERE time_source = 'third_party'`);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
     expect(await last()).toBe('CalendarEventTimes1792300000000');
 
     // CalendarEventTimes: time_source (official/expected) replaces all_day; down() restores all_day

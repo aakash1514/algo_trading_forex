@@ -4,25 +4,71 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import Redis from 'ioredis';
 import { InjectRedis } from '../redis/redis.decorator';
-import {
-  CALENDAR_USER_AGENT, CalendarParseError, OFFICIAL_SOURCES, type CalendarSource, type OfficialEvent,
-} from './official-sources';
+import { CALENDAR_USER_AGENT, CalendarParseError, OFFICIAL_SOURCES, type OfficialEvent } from './official-sources';
 import { parseFomcCalendar } from './fomc.parser';
 import { parseEcbCalendar } from './ecb.parser';
+import { FOREXFACTORY } from './forexfactory/forexfactory.source';
+import { parseForexFactoryWeek } from './forexfactory/forexfactory.parser';
 
-const PARSERS: Readonly<Record<CalendarSource, (html: string) => OfficialEvent[]>> = {
-  FOMC: parseFomcCalendar,
-  ECB: parseEcbCalendar,
+export type SyncSource = 'FOMC' | 'ECB' | 'FOREXFACTORY';
+
+// What a successful fetch replaces: the source's stored events in [from, to] (to null = no upper bound)
+interface ParsedPage {
+  events: OfficialEvent[];
+  replace: { from: string; to: string | null };
+  detail?: string;
+  midnightTitles?: string[];
+}
+
+interface SourceAdapter {
+  url: string;
+  // fetches per UTC day: 1 = one claim per date; 2 = one per half day (00-12 and 12-24 UTC)
+  fetchesPerDay: 1 | 2;
+  parse(body: string, contentType: string | null, now: Date): ParsedPage;
+}
+
+const startOfUtcDay = (now: Date) => `${now.toISOString().slice(0, 10)}T00:00:00.000Z`;
+
+// FOMC/ECB: the page lists the whole schedule, so events from today on are replaced (a cancelled meeting
+// disappears) and earlier ones kept. Forex Factory: the export is one week, so exactly that week is replaced.
+const SOURCES: Readonly<Record<SyncSource, SourceAdapter>> = {
+  FOMC: {
+    url: OFFICIAL_SOURCES.FOMC.url,
+    fetchesPerDay: 1,
+    parse: (body, _type, now) => ({ events: parseFomcCalendar(body), replace: { from: startOfUtcDay(now), to: null } }),
+  },
+  ECB: {
+    url: OFFICIAL_SOURCES.ECB.url,
+    fetchesPerDay: 1,
+    parse: (body, _type, now) => ({ events: parseEcbCalendar(body), replace: { from: startOfUtcDay(now), to: null } }),
+  },
+  FOREXFACTORY: {
+    url: FOREXFACTORY.url,
+    fetchesPerDay: 2,
+    parse: (body, contentType) => {
+      const week = parseForexFactoryWeek(body, contentType);
+      const s = week.skipped;
+      return {
+        events: week.events,
+        replace: week.range,
+        detail: `week ${week.range.from} to ${week.range.to}; skipped holiday ${s.holiday}, non-economic ${s.nonEconomic}, `
+          + `midnight (possibly All Day/Tentative) ${s.midnight}, duplicate of FOMC/ECB ${s.duplicate}`,
+        midnightTitles: week.midnightTitles,
+      };
+    },
+  },
 };
 
 const CLAIM_TTL_S = 48 * 60 * 60; // outlives its UTC day
 const FETCH_TIMEOUT_MS = 30_000;
 
-export type PageFetcher = (url: string, userAgent: string) => Promise<{ status: number; body: string }>;
+export type FetchedPage = { status: number; contentType: string | null; body: string };
+export type PageFetcher = (url: string, userAgent: string) => Promise<FetchedPage>;
 
+// One plain request with the ForexEdge User-Agent: no other headers, no retry.
 export const fetchPage: PageFetcher = async (url, userAgent) => {
   const res = await fetch(url, { headers: { 'User-Agent': userAgent }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
-  return { status: res.status, body: await res.text() };
+  return { status: res.status, contentType: res.headers.get('content-type'), body: await res.text() };
 };
 
 // The error and, for a network failure, its underlying code (Node's fetch reports only "fetch failed").
@@ -34,15 +80,23 @@ export function describeFailure(err: unknown): string {
   return code ? `${err.message}: ${code}` : err.message;
 }
 
-export type SyncOutcome = { source: CalendarSource; outcome: 'synced'; events: number } |
-  { source: CalendarSource; outcome: 'skipped' } | { source: CalendarSource; outcome: 'kept'; reason: string };
+// The Redis claim key of the current fetch slot: one per UTC date, or per half day for a twice-daily source
+export function claimKey(source: SyncSource, now: Date): string {
+  const day = now.toISOString().slice(0, 10);
+  if (SOURCES[source].fetchesPerDay === 1) return `calendar:fetched:${source}:${day}`;
+  return `calendar:fetched:${source}:${day}:${now.getUTCHours() < 12 ? 'am' : 'pm'}`;
+}
 
-// Syncs the economic calendar from the official calendars, each fetched at most once per UTC day (a Redis
-// claim per source and date, set before the request, so neither restarts nor failures fetch more often;
-// the daily cron is the first attempt of each day). On a fetch or
-// parse failure the source's stored events are kept and the failure is logged; nothing is invented.
-// On success the source's events from today on are replaced by the page's (a cancelled meeting
-// disappears), and earlier events are kept.
+export type SyncOutcome = { source: SyncSource; outcome: 'synced'; events: number } |
+  { source: SyncSource; outcome: 'skipped' } | { source: SyncSource; outcome: 'kept'; reason: string };
+
+// Syncs the economic calendar: FOMC and ECB from their official calendars (at most once per UTC day) and the
+// Forex Factory weekly export (at most twice per UTC day). A Redis claim per source and fetch slot is set
+// before the request, so neither restarts nor failures fetch more often; the crons (06:15 all sources, 18:15
+// Forex Factory) are each slot's first attempt. On a fetch or parse failure (any non-200, a non-JSON answer
+// or a challenge page for Forex Factory, unexpected markup) the source's stored events are kept and one line
+// is logged; there is no retry, and nothing is invented. On success the source's events in the page's range
+// are replaced in one transaction.
 @Injectable()
 export class OfficialCalendarService implements OnApplicationBootstrap {
   private readonly logger = new Logger(OfficialCalendarService.name);
@@ -63,46 +117,58 @@ export class OfficialCalendarService implements OnApplicationBootstrap {
     await this.syncAll();
   }
 
+  @Cron('15 18 * * *', { timeZone: 'UTC' })
+  async scheduledEveningSync(): Promise<void> {
+    await this.syncSource('FOREXFACTORY');
+  }
+
   async syncAll(now = new Date()): Promise<SyncOutcome[]> {
     const outcomes: SyncOutcome[] = [];
-    for (const source of Object.keys(OFFICIAL_SOURCES) as CalendarSource[]) {
+    for (const source of Object.keys(SOURCES) as SyncSource[]) {
       outcomes.push(await this.syncSource(source, now));
     }
     return outcomes;
   }
 
-  async syncSource(source: CalendarSource, now = new Date()): Promise<SyncOutcome> {
-    const { url } = OFFICIAL_SOURCES[source];
-    // NX: only the first caller of the UTC day gets to fetch
-    const day = now.toISOString().slice(0, 10);
-    const claimed = await this.redis.set(`calendar:fetched:${source}:${day}`, now.toISOString(), 'EX', CLAIM_TTL_S, 'NX');
+  async syncSource(source: SyncSource, now = new Date()): Promise<SyncOutcome> {
+    const adapter = SOURCES[source];
+    // NX: only the first caller of the fetch slot gets to fetch
+    const claimed = await this.redis.set(claimKey(source, now), now.toISOString(), 'EX', CLAIM_TTL_S, 'NX');
     if (claimed !== 'OK') return { source, outcome: 'skipped' };
 
-    let events: OfficialEvent[];
+    let page: ParsedPage;
     try {
-      const page = await this.fetcher(url, CALENDAR_USER_AGENT);
-      if (page.status !== 200) throw new Error(`HTTP ${page.status}`);
-      events = PARSERS[source](page.body);
+      const res = await this.fetcher(adapter.url, CALENDAR_USER_AGENT);
+      if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+      page = adapter.parse(res.body, res.contentType, now);
+      await this.store(source, page);
     } catch (err) {
       const reason = describeFailure(err);
       this.logger.error(`Calendar ${source}: kept the last good events (${reason})`);
       return { source, outcome: 'kept', reason };
     }
 
-    await this.store(source, events, now);
-    this.logger.log(`Calendar ${source}: ${events.length} events from ${url}`);
-    return { source, outcome: 'synced', events: events.length };
+    this.logger.log(`Calendar ${source}: ${page.events.length} events from ${adapter.url}${page.detail ? `; ${page.detail}` : ''}`);
+    if (page.midnightTitles?.length) {
+      this.logger.warn(`Calendar ${source}: skipped at local midnight: ${page.midnightTitles.join('; ')}`);
+    }
+    return { source, outcome: 'synced', events: page.events.length };
   }
 
-  private async store(source: CalendarSource, events: OfficialEvent[], now: Date): Promise<void> {
-    const today = `${now.toISOString().slice(0, 10)}T00:00:00Z`;
+  private async store(source: SyncSource, page: ParsedPage): Promise<void> {
+    const { from, to } = page.replace;
     await this.dataSource.transaction(async (manager) => {
-      await manager.query(`DELETE FROM economic_events WHERE source = $1 AND scheduled_at >= $2`, [source, today]);
-      for (const e of events) {
+      if (to === null) {
+        await manager.query(`DELETE FROM economic_events WHERE source = $1 AND scheduled_at >= $2`, [source, from]);
+      } else {
+        await manager.query(
+          `DELETE FROM economic_events WHERE source = $1 AND scheduled_at BETWEEN $2 AND $3`, [source, from, to]);
+      }
+      for (const e of page.events) {
         await manager.query(
           `INSERT INTO economic_events (title, currency, impact, scheduled_at, time_source, source)
            VALUES ($1, $2, $3, $4, $5, $6)
-           ON CONFLICT (source, scheduled_at, title) DO NOTHING`,
+           ON CONFLICT (source, scheduled_at, currency, title) DO NOTHING`,
           [e.title, e.currency, e.impact, e.scheduledAt, e.timeSource, e.source],
         );
       }

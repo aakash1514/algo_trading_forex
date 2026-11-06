@@ -7,11 +7,11 @@ import { store } from '../../store';
 import { setCredentials } from '../../store/slices/auth.slice';
 import { baseApi } from '../../store/api/base.api';
 import { CalendarClient } from './CalendarClient';
-import { COVERAGE_NOTE, EXPECTED_TIME_NOTE, eventWhen } from '../../lib/calendar';
+import { COVERAGE_NOTE, EXPECTED_TIME_NOTE, THIRD_PARTY_IMPACT_LABEL, THIRD_PARTY_LABEL, eventWhen } from '../../lib/calendar';
 import type { CalendarEvent } from '../../types/api.types';
 
 // A recorded domain-service response (__fixtures__/README.md); only fetch is mocked.
-const BODY = readFileSync(join(__dirname, '__fixtures__', 'calendar-2026-11-06.json'));
+const BODY = readFileSync(join(__dirname, '__fixtures__', 'calendar-2026-11-06-ff.json'));
 const EVENTS = JSON.parse(BODY.toString('utf8')) as CalendarEvent[];
 
 describe('CalendarClient', () => {
@@ -58,16 +58,36 @@ describe('CalendarClient', () => {
     expect(screen.getAllByTestId('calendar-expected-note')).toHaveLength(EVENTS.filter((e) => e.timeSource === 'expected').length);
   });
 
-  it('says what is not covered and that impact is a ForexEdge classification, and cites the sources', async () => {
+  it('marks a Forex Factory row "via ForexFactory" with its impact labelled as ForexFactory’s', async () => {
+    render(<Provider store={store}><CalendarClient /></Provider>);
+    const rows = await screen.findAllByTestId('calendar-event');
+    const ff = EVENTS.findIndex((e) => e.source === 'FOREXFACTORY');
+    expect(EVENTS.filter((e) => e.source === 'FOREXFACTORY').length).toBeGreaterThan(0);
+    const cells = within(rows[ff]).getAllByRole('cell').map((c) => c.textContent);
+    expect(cells).toEqual([
+      'Fri 6 Nov 2026· 07:00 UTC', 'EUR', 'German Industrial Production m/m',
+      'LOW' + THIRD_PARTY_IMPACT_LABEL, THIRD_PARTY_LABEL, '—', '—', '—',
+    ]);
+    expect(THIRD_PARTY_LABEL).toBe('via ForexFactory');
+    expect(THIRD_PARTY_IMPACT_LABEL).toBe('ForexFactory impact');
+    expect(within(rows[ff]).getByRole('link').getAttribute('href')).toBe('https://www.forexfactory.com/calendar');
+    // official rows carry no third-party label
+    const ecb = EVENTS.findIndex((e) => e.source === 'ECB');
+    expect(within(rows[ecb]).queryByText(THIRD_PARTY_IMPACT_LABEL)).toBeNull();
+  });
+
+  it('states the coverage and the impact labelling, and cites every source', async () => {
     render(<Provider store={store}><CalendarClient /></Provider>);
     await screen.findAllByTestId('calendar-event');
     expect(screen.getByTestId('calendar-coverage').textContent).toBe(COVERAGE_NOTE);
-    expect(COVERAGE_NOTE).toContain('GBP and JPY events are not available');
+    expect(COVERAGE_NOTE).toContain('FOMC and ECB from official sources; all other events via Forex Factory. '
+      + 'Direct BLS access is blocked (HTTP 403, 2026-11-06).');
     const footer = screen.getByTestId('calendar-footer').textContent ?? '';
     expect(footer).toContain('Board of Governors of the Federal Reserve System');
     expect(footer).toContain('European Central Bank');
-    expect(footer).toContain('Impact is a ForexEdge classification, not source data.');
-    expect(screen.queryByText('GBP')).toBeNull(); // no filter for currencies without a source
+    expect(footer).toContain('Forex Factory');
+    expect(footer).toContain('Impact is a ForexEdge classification for FOMC and ECB events and ForexFactory’s own level for the others.');
+    for (const currency of ['GBP', 'JPY', 'AUD', 'CNY']) expect(screen.getByRole('button', { name: currency })).toBeTruthy();
   });
 
   it('shows every time in UTC, labelled, whatever the viewer’s zone, across a DST change', () => {

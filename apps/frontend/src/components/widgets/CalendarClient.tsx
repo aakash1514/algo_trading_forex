@@ -3,7 +3,10 @@
 import { useState } from 'react';
 import { useGetCalendarEventsQuery } from '../../store/api/domain.api';
 import { cn } from '../../lib/cn';
-import { CALENDAR_CURRENCIES, CALENDAR_SOURCES, COVERAGE_NOTE, EXPECTED_TIME_NOTE, IMPACT_NOTE, eventWhen } from '../../lib/calendar';
+import {
+  CALENDAR_CURRENCIES, CALENDAR_SOURCES, COVERAGE_NOTE, EXPECTED_TIME_NOTE, IMPACT_NOTE, THIRD_PARTY_IMPACT_LABEL,
+  THIRD_PARTY_LABEL, THIRD_PARTY_SOURCE, eventWhen,
+} from '../../lib/calendar';
 
 const IMPACT_COLORS: Record<string, string> = {
   HIGH:   'text-accent-red bg-accent-red/10 border-accent-red/20',
@@ -109,6 +112,7 @@ export function CalendarClient() {
               {events.map((event) => {
                 const when = eventWhen(event);
                 const source = event.source ? CALENDAR_SOURCES[event.source] : undefined;
+                const thirdParty = event.source === THIRD_PARTY_SOURCE;
                 return (
                   <tr key={event.id} data-testid="calendar-event" className="border-b border-terminal-border/50 hover:bg-terminal-elevated/40 transition-colors">
                     <td className="px-4 py-2.5 tabular-nums text-terminal-muted whitespace-nowrap">
@@ -128,7 +132,7 @@ export function CalendarClient() {
                     </td>
                     <td className="px-4 py-2.5">
                       <span
-                        title="ForexEdge classification, not source data"
+                        title={thirdParty ? THIRD_PARTY_IMPACT_LABEL : 'ForexEdge classification, not source data'}
                         className={cn(
                           'inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded border',
                           IMPACT_COLORS[event.impact] ?? IMPACT_COLORS.LOW
@@ -137,11 +141,14 @@ export function CalendarClient() {
                         <span className={cn('w-1 h-1 rounded-full shrink-0', IMPACT_DOT[event.impact] ?? IMPACT_DOT.LOW)} />
                         {event.impact}
                       </span>
+                      {thirdParty && (
+                        <span className="block text-[9px] text-terminal-muted/60">{THIRD_PARTY_IMPACT_LABEL}</span>
+                      )}
                     </td>
                     <td className="px-4 py-2.5 text-terminal-muted whitespace-nowrap">
                       {source ? (
                         <a href={source.url} target="_blank" rel="noreferrer" className="hover:text-[#e2e4e9] underline-offset-2 hover:underline">
-                          {source.attribution}
+                          {thirdParty ? THIRD_PARTY_LABEL : source.attribution}
                         </a>
                       ) : '—'}
                     </td>
@@ -157,8 +164,8 @@ export function CalendarClient() {
       </div>
 
       <footer className="px-4 py-2 border-t border-terminal-border text-[10px] text-terminal-muted shrink-0" data-testid="calendar-footer">
-        Sources: the Board of Governors of the Federal Reserve System (federalreserve.gov) and the European Central Bank
-        (ecb.europa.eu); dates as they publish them, times in UTC. * {IMPACT_NOTE}
+        Sources: the Board of Governors of the Federal Reserve System (federalreserve.gov), the European Central Bank
+        (ecb.europa.eu) and Forex Factory (forexfactory.com); times in UTC. * {IMPACT_NOTE}
       </footer>
     </div>
   );

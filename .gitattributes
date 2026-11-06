@@ -12,3 +12,4 @@
 apps/domain-service/src/economic-calendar/__fixtures__/*.htm -text
 apps/domain-service/src/economic-calendar/__fixtures__/*.html -text
 apps/domain-service/src/economic-calendar/__fixtures__/*/*.htm -text
+apps/domain-service/src/economic-calendar/forexfactory/__fixtures__/*.json -text

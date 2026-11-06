@@ -9,13 +9,18 @@
 //   stating any modification (https://www.ecb.europa.eu/services/disclaimer/html/index.en.html).
 //   robots.txt does not disallow /press/calendars/ and asks for a 5 s crawl delay.
 // Each page is fetched at most once a day with a User-Agent that identifies ForexEdge.
+//
+// Coverage: FOMC and ECB from official sources; all other events via Forex Factory. Direct BLS access is
+// blocked (HTTP 403, 2026-11-06). The Forex Factory export (forexfactory/) is a third-party source, approved by
+// the owner for portfolio use only.
 
 export type CalendarSource = 'FOMC' | 'ECB';
 
 // Where an event's time comes from: 'official' when the source publishes it (a time per row, or a documented
 // standard time for every event of that kind); 'expected' when the source publishes none and the time is the
-// one its recent releases used (FOMC_EXPECTED_TIME).
-export type TimeSource = 'official' | 'expected';
+// one its recent releases used (FOMC_EXPECTED_TIME); 'third_party' when a third party publishes it with the
+// event (the Forex Factory export, which gives each time with its UTC offset).
+export type TimeSource = 'official' | 'expected' | 'third_party';
 
 export interface OfficialSource {
   source: CalendarSource;
@@ -73,12 +78,12 @@ export type Impact = 'HIGH' | 'MEDIUM' | 'LOW';
 
 // One event as the source publishes it, at its release moment in UTC.
 export interface OfficialEvent {
-  source: CalendarSource;
+  source: CalendarSource | 'FOREXFACTORY';
   title: string;          // the source's own wording
-  currency: 'USD' | 'EUR';
+  currency: string;       // ISO 4217 code
   scheduledAt: string;    // ISO 8601, UTC
   timeSource: TimeSource;
-  impact: Impact;         // ForexEdge classification (impact.ts), not source data
+  impact: Impact;         // FOMC/ECB: ForexEdge classification (impact.ts); Forex Factory: its own level
 }
 
 export class CalendarParseError extends Error {}

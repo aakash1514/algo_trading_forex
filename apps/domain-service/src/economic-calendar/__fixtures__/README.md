@@ -34,5 +34,10 @@ EDT (`fomc-statement-evidence.spec.ts`). The service never fetches statement pag
 ## robots.txt
 
 Checked 2026-10-12 (federalreserve.gov again 2026-11-06): federalreserve.gov has none (its /robots.txt is a 404 page, so no rules
-apply); ecb.europa.eu does not disallow /press/calendars/ and asks for a 5 s crawl delay. bls.gov's ICS
-feed answered 403 to the same User-Agent (docs/OVERNIGHT-QUESTIONS.md #5), so there is no BLS fixture.
+apply); ecb.europa.eu does not disallow /press/calendars/ and asks for a 5 s crawl delay.
+
+## Coverage
+
+FOMC and ECB from official sources; all other events via Forex Factory (`../forexfactory/`, its own fixture).
+Direct BLS access is blocked (HTTP 403, 2026-11-06), so there is no BLS fixture (docs/OVERNIGHT-QUESTIONS.md #5;
+the blocked work is on branch `step-6a-bls-wip`).

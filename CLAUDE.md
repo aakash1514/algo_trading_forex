@@ -192,18 +192,29 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Mixed candles (hard rule):** the live `candles_*` aggregates don't separate ticks by source, and `ticks` holds
   MOCK ticks. Before any live provider is enabled, either delete the MOCK ticks and their candles or add `source`
   to the live aggregates; never show simulated history as market data.
-- **Economic calendar (step 6a):** events only, from official calendars (domain-service `economic-calendar/`):
-  FOMC (federalreserve.gov, public domain) and ECB (ecb.europa.eu, free use with attribution). Each page is fetched
-  at most once per UTC day (a Redis claim per source and date) with the `CALENDAR_USER_AGENT`; strict parsers throw on unexpected
+- **Economic calendar (step 6a):** events only (domain-service `economic-calendar/`). FOMC and ECB from official
+  sources: FOMC (federalreserve.gov, public domain) and ECB (ecb.europa.eu, free use with attribution). All other
+  events via Forex Factory (`forexfactory/`, see the data-licensing exception). Direct BLS access is blocked (HTTP 403,
+  2026-11-06; branch `step-6a-bls-wip`). Each official page is fetched at most once per UTC day, and the Forex
+  Factory export at most twice (06:15 and 18:15; a Redis claim per source and slot), with the
+  `CALENDAR_USER_AGENT`; strict parsers throw on unexpected
   markup and the service keeps the last good events. Every event is stored at its release moment in UTC
   (`scheduled_at`), converted from the source's local time with IANA zones (`zoned-time.ts`, DST included, never a
   fixed offset), and `time_source` says where the time comes from: `official` (ECB decisions, 14:15 Frankfurt, from
   the ECB's monetary policy decisions page) or `expected` (FOMC: the Fed publishes no standing time; 14:00 New York
   on a meeting's final day, the time on the last 8 recorded statements, `__fixtures__/fomc-statements/`, never
-  fetched at runtime). Only events with such a time are stored (no Day 1, notation votes, non-monetary meetings);
-  titles are the sources' wording; impact is a fixed ForexEdge classification (`impact.ts`), labelled as such; the
-  UI cites the sources. Forecast/previous/actual are null. A test fails on any reference to the removed
-  third-party weekly feed. Recording new fixtures is opt-in (`tools/ops/record-calendar-fixtures.ts`).
+  fetched at runtime), or `third_party` (Forex Factory: the time with the UTC offset its export gives; no zone is
+  ever assumed). Only events with such a time are stored (no Day 1, notation votes, non-monetary meetings; Forex
+  Factory holidays, Non-Economic and local-midnight entries are skipped and counted, and its rows for the FOMC/ECB
+  decisions are dropped as duplicates). A Forex Factory sync replaces exactly its export's week in one transaction.
+  Titles are the sources' wording; impact is a fixed ForexEdge classification (`impact.ts`) for FOMC/ECB and
+  ForexFactory's own level for its rows, labelled as such; the UI cites the sources and marks "via ForexFactory".
+  Forecast/previous/actual are null. A test fails on the Forex Factory name outside its adapter, the places that wire
+  it in or show it, and docs. Recording new fixtures is opt-in (`tools/ops/record-calendar-fixtures.ts`).
+- **Data licensing exception:** ForexFactory calendar export — approved by the owner on 2026-11-06 for portfolio use;
+  terms not confirmed for commercial use; must be re-checked or replaced before any client/commercial use. Never work
+  around their bot protection (no browser-like or changed headers, headless browsers or proxies; a 403/429/challenge
+  is logged and skipped).
 - A triggered stop-loss/take-profit is committed on the position (`pending_exit_*`) before it is booked and is retried
   from the DB, so a restart can't lose it. It books at the triggering tick's price, never the SL/TP level.
 - Stop-out (margin level < 50%) closes the biggest loser first until the level is back above 50%; close_reason
@@ -369,7 +380,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
    add a health check to every service for the host's probes.
 8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The calendar covers USD (FOMC) and EUR (ECB) policy meetings
-   only: no GBP/JPY, no US data releases (BLS), no forecasts or actuals.
+   from official sources; everything else comes from Forex Factory, a third party approved for portfolio use only (no
+   direct BLS: HTTP 403). No forecasts or actuals.
 
 ## How to work with me
 - This is a portfolio and client project. Keep it production quality, with no shortcuts or simplified "demo" code.
