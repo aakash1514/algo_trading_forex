@@ -6,6 +6,7 @@ import { SPREAD_WIDE_RATIO, isSpreadWide, priceDecimals, spreadRatio } from '@fo
 import { pairCurrencies } from '../common/instrument';
 import { MarketHoursPolicy, marketClosedReason } from '../market/market-hours.policy';
 import { exitLevelProblem } from './exit-levels';
+import { calendarWarningWindow } from './calendar-window';
 import type { InstrumentKind } from '@forexedge/common';
 import type { OrderRequest } from './dto/submit-order.dto';
 
@@ -82,7 +83,7 @@ export class OrderValidationService {
     if (!gate4.valid) return gate4;
 
     // Gate 5: Calendar warning — never blocks, only warns
-    await this.checkEconomicCalendar(dto.pair);
+    await this.checkEconomicCalendar(dto.pair, new Date());
 
     return { valid: true };
   }
@@ -188,27 +189,26 @@ export class OrderValidationService {
   }
 
   // ─── Gate 5 ────────────────────────────────────────────────────────────────
-  private async checkEconomicCalendar(pair: string): Promise<void> {
-    const currencies = pairCurrencies(pair);
-
-    const now = new Date();
-    const windowMinutes = 30;
-    const windowStart = new Date(now.getTime() - windowMinutes * 60 * 1000);
-    const windowEnd = new Date(now.getTime() + windowMinutes * 60 * 1000);
-
-    const events = await this.economicEventRepo
-      .createQueryBuilder('e')
-      .where('e.currency IN (:...currencies)', { currencies })
-      // Every event has a UTC time ('official' or, for the FOMC, 'expected'); both count the same
-      .andWhere('e.scheduled_at BETWEEN :windowStart AND :windowEnd', { windowStart, windowEnd })
-      .andWhere('e.impact IN (:...impacts)', { impacts: ['HIGH', 'MEDIUM'] })
-      .getMany();
-
+  // A warning only: the order is never blocked by it.
+  private async checkEconomicCalendar(pair: string, orderAt: Date): Promise<void> {
+    const events = await this.findEventsNearOrder(pair, orderAt);
     if (events.length > 0) {
       const names = events.map(e => `${e.currency} ${e.title}`).join(', ');
       this.logger.warn(
         `⚠️  Economic events near order time for ${pair}: ${names}`,
       );
     }
+  }
+
+  // HIGH/MEDIUM events in either currency of the pair whose UTC time is within ±30 min of the order, both
+  // ends inclusive (calendar-window.ts). Expected (FOMC) and official times count the same.
+  async findEventsNearOrder(pair: string, orderAt: Date): Promise<EconomicEventEntity[]> {
+    const { windowStart, windowEnd } = calendarWarningWindow(orderAt);
+    return this.economicEventRepo
+      .createQueryBuilder('e')
+      .where('e.currency IN (:...currencies)', { currencies: pairCurrencies(pair) })
+      .andWhere('e.scheduled_at BETWEEN :windowStart AND :windowEnd', { windowStart, windowEnd })
+      .andWhere('e.impact IN (:...impacts)', { impacts: ['HIGH', 'MEDIUM'] })
+      .getMany();
   }
 }

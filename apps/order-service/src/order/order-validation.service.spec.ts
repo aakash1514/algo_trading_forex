@@ -104,6 +104,7 @@ describe('OrderValidationService', () => {
           windowStart: new Date('2026-10-28T17:35:00Z'),
           windowEnd: new Date('2026-10-28T18:35:00Z'),
         });
+        expect(qb.where).toHaveBeenCalledWith('e.currency IN (:...currencies)', { currencies: ['EUR', 'USD'] });
       } finally {
         jest.useRealTimers();
       }
