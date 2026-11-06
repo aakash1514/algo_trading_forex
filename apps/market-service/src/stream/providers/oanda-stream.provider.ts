@@ -5,8 +5,7 @@ import { NormalizedTick } from '@forexedge/kafka';
 import { IForexStreamProvider } from '../interfaces/stream-provider.interface';
 
 // This is the real OANDA implementation.
-// Currently not used (USE_MOCK_DATA=true in .env)
-// but fully written and ready for when you get OANDA access.
+// Not used: no MARKET_FEED value selects it (there is no OANDA access).
 export class OandaStreamProvider implements IForexStreamProvider {
   readonly providerName = 'OANDA';
   private readonly logger = new Logger(OandaStreamProvider.name);

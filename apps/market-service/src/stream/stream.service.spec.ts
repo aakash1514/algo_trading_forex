@@ -1,6 +1,6 @@
 import type { KafkaProducerService, NormalizedTick } from '@forexedge/kafka';
 import { StreamService } from './stream.service';
-import { createStreamProvider, warnIfLegacyFeedFlag } from './stream.module';
+import { createStreamProvider } from './stream.module';
 import type { IForexStreamProvider } from './interfaces/stream-provider.interface';
 import type { InstrumentRepository } from '../market/instrument.repository';
 import { DOWN_AFTER_FAILURES, MAX_RETRY_MS, retryDelayMs } from './feed-status';
@@ -56,14 +56,6 @@ describe('createStreamProvider', () => {
     expect(makeMock).not.toHaveBeenCalled();
     expect(createStreamProvider('mock', makeMock)).toBeInstanceOf(ScriptedProvider);
     expect(makeMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('warns that the old USE_MOCK_DATA flag no longer enables anything', () => {
-    const logger = { warn: jest.fn() };
-    warnIfLegacyFeedFlag('true', logger as never);
-    expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('USE_MOCK_DATA is no longer read'));
-    warnIfLegacyFeedFlag(undefined, logger as never);
-    expect(logger.warn).toHaveBeenCalledTimes(1);
   });
 });
 

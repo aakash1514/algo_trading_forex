@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { parseMarketFeed, type MarketFeed } from '@forexedge/common';
 import { StreamService } from './stream.service';
@@ -22,14 +22,6 @@ export function createStreamProvider(
   }
 }
 
-// USE_MOCK_DATA used to select the simulated feed (default true). It is no longer read: an old .env
-// must not silently turn the simulator back on, so say what replaced it.
-export function warnIfLegacyFeedFlag(useMockData: string | undefined, logger = new Logger('StreamModule')): void {
-  if (useMockData !== undefined) {
-    logger.warn('USE_MOCK_DATA is no longer read; the feed is MARKET_FEED (none by default, mock for simulated prices)');
-  }
-}
-
 @Module({
   imports: [MarketModule],
   controllers: [FeedStatusController],
@@ -42,7 +34,6 @@ export function warnIfLegacyFeedFlag(useMockData: string | undefined, logger = n
     {
       provide: STREAM_PROVIDER,
       useFactory: (config: ConfigService, feed: MarketFeed, instruments: InstrumentRepository) => {
-        warnIfLegacyFeedFlag(config.get<string>('USE_MOCK_DATA'));
         return createStreamProvider(feed, () => {
           // Precision and typical spread per instrument come from the DB
           const streamWhenClosed = parseMockStreamWhenClosed(config.get<string>('MOCK_STREAM_WHEN_CLOSED'));

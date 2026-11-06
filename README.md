@@ -259,9 +259,9 @@ The default test suites never call an LLM: agent tests replay recorded real tran
 | 6b. Historical Replay mode | Next |
 | 7. Deployment on free tiers | Planned |
 
-There is no licensed live price feed: by default no prices are published and the terminal disables order
-entry. A simulated feed (`MARKET_FEED=mock`) exists for development and is marked "SIMULATED PRICES — not market
-data" everywhere it appears. The backtester, the ML evaluation and the research agent use only the real imported
+There is no licensed live price feed. The feed is set by `MARKET_FEED=none|mock`: `none` is the default (no
+prices are published and the terminal disables order entry), and `mock` is a simulated feed for development,
+marked "SIMULATED PRICES — not market data" everywhere it appears. Any other value fails startup. The backtester, the ML evaluation and the research agent use only the real imported
 history.
 
 ## Disclaimer

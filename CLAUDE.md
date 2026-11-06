@@ -181,8 +181,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   (`PriceFeedPolicy`, reasons "No live price for EUR/USD" / "Price for EUR/USD is stale: last quote N s old (max M s,
   source X)"). The tick consumer drops untradable ticks before SL/TP and P&L (a backlog after a restart no longer
   triggers exits at old prices). With no feed (the default) every order is rejected. A provider error publishes
-  nothing (prices age out); there is never a fallback to the simulator. `MARKET_FEED` must be exactly `none` or
-  `mock` (anything else fails startup); `USE_MOCK_DATA` is no longer read (a warning says so). Tests that need the
+  nothing (prices age out); there is never a fallback to the simulator. `MARKET_FEED` must be exactly `none` (the
+  default, also when unset) or `mock`; anything else fails startup. Tests that need the
   feed pass it as a value, never through `ConfigService` (Nx loads the root `.env` into `process.env`, which wins).
 - Redis `price:<INSTRUMENT>` also expires 2 s after the last tick.
   `price:last:<INSTRUMENT>` has no expiry and is only a reference (validating SL/TP while the market is closed).
