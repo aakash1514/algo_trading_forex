@@ -1,5 +1,5 @@
 import { Candle, MoneyTrade } from './strategies/strategy.interface';
-import { centsToUsd, commissionPoints, MoneySpec, pointsToUsdCents, roundHalfAwayFromZero } from './trade-money';
+import { centsToUsd, closeQuote, markToMarketCents, MoneySpec, roundHalfAwayFromZero } from '@forexedge/trading-sim';
 
 // Backtest metrics in money (USD).
 //
@@ -59,7 +59,6 @@ const toCents = (usd: number) => BigInt(Math.round(usd * 100));
 // Equity in cents at every bar close (one value per candle)
 export function equityAtBarCloses(input: Pick<MetricsInput, 'candles' | 'trades' | 'money' | 'initialCapital'>): bigint[] {
   const { candles, trades, money } = input;
-  const commission = commissionPoints(money.pipPoints);
   let realized = toCents(input.initialCapital);
   let next = 0; // next trade to close, in time order
   const curve: bigint[] = [];
@@ -69,9 +68,7 @@ export function equityAtBarCloses(input: Pick<MetricsInput, 'candles' | 'trades'
     let equity = realized;
     const open = trades[next];
     if (open && open.entryTime.getTime() <= t) {
-      const close = open.action === 'BUY' ? bar.bid.close : bar.ask.close;
-      const points = (open.action === 'BUY' ? close - open.entryPoints : open.entryPoints - close) - commission;
-      equity += pointsToUsdCents(points, money, close);
+      equity += markToMarketCents(open.action, open.entryPoints, closeQuote(open.action, bar), money);
     }
     curve.push(equity);
   }

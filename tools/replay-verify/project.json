@@ -1,0 +1,8 @@
+{
+  "name": "replay-verify",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "tools/replay-verify/src",
+  "projectType": "application",
+  "targets": {},
+  "tags": []
+}

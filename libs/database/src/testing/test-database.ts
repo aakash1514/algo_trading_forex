@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path';
 import { DataSource, type DataSourceOptions } from 'typeorm';
 import {
   AccountSummaryEntity, BacktestRunEntity, EconomicEventEntity, InstrumentEntity, OrderEntity, PositionEntity,
-  SwapRateEntity, UserEntity,
+  ReplayPositionEntity, ReplaySessionEntity, SwapRateEntity, UserEntity,
 } from '../index';
 
 // The repo root holds nx.json, the only .env and the migrations.
@@ -85,7 +85,7 @@ export async function createTestDatabase(): Promise<TestDatabase> {
     ...server,
     database: name,
     entities: [UserEntity, InstrumentEntity, SwapRateEntity, EconomicEventEntity, OrderEntity, PositionEntity,
-      AccountSummaryEntity, BacktestRunEntity],
+      AccountSummaryEntity, BacktestRunEntity, ReplaySessionEntity, ReplayPositionEntity],
     migrations: [join(REPO_ROOT, 'apps/auth-service/src/migrations/*.ts')],
     synchronize: false,
     logging: false,

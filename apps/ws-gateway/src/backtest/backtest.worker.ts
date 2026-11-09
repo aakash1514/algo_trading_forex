@@ -11,7 +11,7 @@ import { StrategyRegistry } from './strategies/strategy.registry';
 import { TradeSimulator } from './trade.simulator';
 import { calculateMetrics } from './metrics.calculator';
 import { Candle, MoneyTrade, StrategyContext } from './strategies/strategy.interface';
-import { MoneySpec, positionUnits, tradeMoney } from './trade-money';
+import { MoneySpec, positionUnits, tradeMoney } from '@forexedge/trading-sim';
 import { backtestWindow, TIMEFRAME_MS } from './backtest-window';
 
 export interface BacktestJobData {

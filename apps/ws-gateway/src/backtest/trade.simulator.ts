@@ -1,10 +1,7 @@
-import { Candle, Ohlc, Signal, StrategyContext, Trade } from './strategies/strategy.interface';
-
-// Commission: 0.7 pips per side (round trip = 1.4 pips) — realistic ECN cost.
-// The spread is not modelled: every fill uses the bar's own bid or ask.
-export const COMMISSION_PIPS_PER_SIDE = 0.7;
-
-type Side = 'BUY' | 'SELL';
+import {
+  closeQuote, COMMISSION_PIPS_PER_SIDE, entryFill, exitFill, exitQuotes, levelExit, pipPoints, priceToPoints, Side,
+} from '@forexedge/trading-sim';
+import { Candle, Signal, StrategyContext, Trade } from './strategies/strategy.interface';
 
 interface OpenTrade {
   action: Side;
@@ -15,29 +12,21 @@ interface OpenTrade {
   takeProfit?: number; // points
 }
 
-// Bar-by-bar simulation on real bid/ask bars, all prices in integer points.
+// Bar-by-bar simulation on real bid/ask bars, all prices in integer points. The
+// fill, SL/TP and end-of-data rules are @forexedge/trading-sim's (shared with
+// replay); this class runs them over a strategy's signals.
 //
-//   Fills    A signal is known only after its bar closes, so it fills at the NEXT
-//            bar's open: BUY at the ask open, SELL at the bid open; a long closes at
-//            the bid open, a short at the ask open. Closes run before opens, so a
-//            CLOSE_SHORT + BUY pair reverses at the same open.
-//   SL/TP    Checked on every bar from the fill bar on, against the fill bar's range
-//            after its open: a long on the bid, a short on the ask. A bar that opens
-//            beyond a level fills at that open (gap); a level touched inside the bar
-//            fills at the level. If SL and TP are both inside one bar, SL wins (the
-//            order within a bar is unknown, so assume the worse one).
+//   Signals  A signal is known only after its bar closes, so it fills at the NEXT
+//            bar's open. Closes run before opens, so a CLOSE_SHORT + BUY pair
+//            reverses at the same open. One trade is open at a time.
+//   SL/TP    Checked on every bar from the fill bar on (trading-sim levelExit).
 //   End      A trade still open after the last bar closes at that bar's close.
 //   P&L      In pips: point difference / points per pip (pip_size x 10^decimals).
 export class TradeSimulator {
-  constructor(private readonly context: StrategyContext) {
-    const pipPoints = this.pipPoints;
-    if (!Number.isInteger(pipPoints) || pipPoints < 1) {
-      throw new Error(`pip size ${context.pipSize} is not a whole number of points at ${context.priceDecimals} decimals`);
-    }
-  }
+  readonly pipPoints: number;
 
-  get pipPoints(): number {
-    return Math.round(this.context.pipSize * 10 ** this.context.priceDecimals * 1e6) / 1e6;
+  constructor(private readonly context: StrategyContext) {
+    this.pipPoints = pipPoints(context.pipSize, context.priceDecimals);
   }
 
   simulate(candles: Candle[], signals: Signal[]): Trade[] {
@@ -57,7 +46,7 @@ export class TradeSimulator {
         if (open && ((signal.action === 'CLOSE_LONG' && open.action === 'BUY') ||
                      (signal.action === 'CLOSE_SHORT' && open.action === 'SELL'))) {
           // A long sells at the bid, a short buys back at the ask
-          trades.push(this.close(open, (open.action === 'BUY' ? bar.bid : bar.ask).open, bar.bucket, 'SIGNAL'));
+          trades.push(this.close(open, exitFill(open.action, bar), bar.bucket, 'SIGNAL'));
           open = null;
         } else if (!open && isOpen(signal)) {
           const side = signal.action as Side;
@@ -65,7 +54,7 @@ export class TradeSimulator {
             action: side,
             lots: signal.lots,
             entryTime: bar.bucket,
-            entryPoints: side === 'BUY' ? bar.ask.open : bar.bid.open,
+            entryPoints: entryFill(side, bar),
             stopLoss: this.toPoints(signal.stopLoss),
             takeProfit: this.toPoints(signal.takeProfit),
           };
@@ -75,7 +64,7 @@ export class TradeSimulator {
 
       // 2. Stop loss / take profit on this bar's range, the fill bar included
       if (open) {
-        const exit = this.levelExit(open, open.action === 'BUY' ? bar.bid : bar.ask);
+        const exit = levelExit(open.action, open.stopLoss, open.takeProfit, exitQuotes(open.action, bar));
         if (exit) {
           trades.push(this.close(open, exit.points, bar.bucket, exit.reason));
           open = null;
@@ -88,30 +77,14 @@ export class TradeSimulator {
 
     if (open && candles.length > 0) {
       const last = candles[candles.length - 1];
-      trades.push(this.close(open, (open.action === 'BUY' ? last.bid : last.ask).close, last.bucket, 'END_OF_DATA'));
+      trades.push(this.close(open, closeQuote(open.action, last), last.bucket, 'END_OF_DATA'));
     }
     return trades;
   }
 
-  private levelExit(trade: OpenTrade, quotes: Ohlc): { points: number; reason: Trade['exitReason'] } | null {
-    const { stopLoss: sl, takeProfit: tp } = trade;
-    if (trade.action === 'BUY') {
-      if (sl !== undefined && quotes.open <= sl) return { points: quotes.open, reason: 'STOP_LOSS' };
-      if (tp !== undefined && quotes.open >= tp) return { points: quotes.open, reason: 'TAKE_PROFIT' };
-      if (sl !== undefined && quotes.low <= sl) return { points: sl, reason: 'STOP_LOSS' };
-      if (tp !== undefined && quotes.high >= tp) return { points: tp, reason: 'TAKE_PROFIT' };
-    } else {
-      if (sl !== undefined && quotes.open >= sl) return { points: quotes.open, reason: 'STOP_LOSS' };
-      if (tp !== undefined && quotes.open <= tp) return { points: quotes.open, reason: 'TAKE_PROFIT' };
-      if (sl !== undefined && quotes.high >= sl) return { points: sl, reason: 'STOP_LOSS' };
-      if (tp !== undefined && quotes.low <= tp) return { points: tp, reason: 'TAKE_PROFIT' };
-    }
-    return null;
-  }
-
   // Strategy levels are prices; rounded once to the nearest point
   private toPoints(price: number | undefined): number | undefined {
-    return price === undefined ? undefined : Math.round(price * 10 ** this.context.priceDecimals);
+    return price === undefined ? undefined : priceToPoints(price, this.context.priceDecimals);
   }
 
   private close(open: OpenTrade, exitPoints: number, exitTime: Date, reason: Trade['exitReason']): Trade {

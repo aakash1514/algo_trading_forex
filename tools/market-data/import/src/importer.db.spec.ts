@@ -211,8 +211,18 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts CalendarThirdPartyEvents (refusing while third-party rows exist), CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts ReplayTables, CalendarThirdPartyEvents (refusing while third-party rows exist), CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('ReplayTables1792500000000');
+
+    // ReplayTables: down() drops both replay tables; the cluster-wide role is kept (as ReadOnlyRole)
+    const replayTables = async () => (await client.query(
+      `SELECT array_remove(ARRAY[to_regclass('replay_positions')::text, to_regclass('replay_sessions')::text], NULL) AS t`,
+    )).rows[0].t;
+    expect(await replayTables()).toEqual(['replay_positions', 'replay_sessions']);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await replayTables()).toEqual([]);
+    expect((await client.query(`SELECT count(*)::int AS n FROM pg_roles WHERE rolname = 'forexedge_replay_writer'`)).rows[0].n).toBe(1);
     expect(await last()).toBe('CalendarThirdPartyEvents1792400000000');
 
     // CalendarThirdPartyEvents: 'third_party' allowed and the resync key includes the currency; down() refuses

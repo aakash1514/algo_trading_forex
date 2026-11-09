@@ -1,3 +1,7 @@
+import type { Ohlc } from '@forexedge/trading-sim';
+
+export type { Ohlc };
+
 // A historical bar as the backtester sees it.
 //   open/high/low/close  mid prices, for indicators (open/close are exact
 //                        (bid + ask) / 2; high/low the mean of the bid and ask extremes)
@@ -12,13 +16,6 @@ export interface Candle {
   bid: Ohlc;
   ask: Ohlc;
   minutes: number; // M1 bars in this bar
-}
-
-export interface Ohlc {
-  open: number;
-  high: number;
-  low: number;
-  close: number;
 }
 
 // Contract specs from the DB (instruments.pip_size, historical_price_scale), never hardcoded
@@ -57,7 +54,7 @@ export interface Trade {
   netPnl: number;       // pnl - commission
 }
 
-// A trade with its money (trade-money.ts): position size and USD amounts
+// A trade with its money (@forexedge/trading-sim money.ts): position size and USD amounts
 export interface MoneyTrade extends Trade {
   units: number;          // lots x lot_size
   grossUsd: number;

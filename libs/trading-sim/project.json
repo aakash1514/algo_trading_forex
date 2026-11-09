@@ -1,0 +1,19 @@
+{
+  "name": "trading-sim",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/trading-sim/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/trading-sim",
+        "main": "libs/trading-sim/src/index.ts",
+        "tsConfig": "libs/trading-sim/tsconfig.lib.json",
+        "assets": ["libs/trading-sim/*.md"]
+      }
+    }
+  }
+}
