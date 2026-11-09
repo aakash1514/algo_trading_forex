@@ -5,14 +5,15 @@ import type { ReplaySocket } from '../../hooks/useReplaySocket';
 import { PAIR_DISPLAY } from '../../lib/constants';
 import { formatReplayTime } from '../../lib/replay';
 import { EndSession } from './EndSession';
+import { ReplayChart } from './ReplayChart';
+import { ReplayControls } from './ReplayControls';
 
-// The replay itself: a REPLAY badge and the replay clock, so it can never be taken
-// for live prices.
+// The replay itself: a REPLAY badge and the replay clock next to the chart, so it can
+// never be taken for live prices; the playback controls and their status line below.
 export function ReplayScreen({ socket }: { socket: ReplaySocket }) {
   const session = useAppSelector((s) => s.replay.session);
   const account = useAppSelector((s) => s.replay.account);
   if (!session || !account) return null;
-  void socket;
 
   return (
     <div className="h-full flex flex-col">
@@ -25,8 +26,15 @@ export function ReplayScreen({ socket }: { socket: ReplaySocket }) {
         <span data-testid="replay-clock" className="text-[13px] tabular-nums text-amber-300">
           Replay time: {formatReplayTime(session.clockTime)}
         </span>
+        <span className="text-[11px] text-terminal-muted">Historical Dukascopy data · bid candles</span>
         <div className="ml-auto">
           <EndSession openPositions={account.openPositions} pendingOrders={account.pendingOrders} />
+        </div>
+      </div>
+      <ReplayControls socket={socket} />
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col min-w-0 border-r border-terminal-border">
+          <ReplayChart />
         </div>
       </div>
     </div>
