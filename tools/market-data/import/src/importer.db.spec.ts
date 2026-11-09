@@ -211,8 +211,17 @@ run('historical importer (real DB, real Dukascopy excerpts)', () => {
   });
 
   // Walks the migrations down from the newest; a new migration must be added here
-  it('reverts ReplayTables, CalendarThirdPartyEvents (refusing while third-party rows exist), CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
+  it('reverts ReplayPauseReason, ReplayTables, CalendarThirdPartyEvents (refusing while third-party rows exist), CalendarEventTimes, RemovePreOfficialCalendarEvents, EconomicEventSource, ResearchReadRole and ReadOnlyRole, refuses BacktestRunMoney while runs exist, then the integer layout while history exists', async () => {
     const last = async () => (await client.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1')).rows[0]?.name;
+    expect(await last()).toBe('ReplayPauseReason1792600000000');
+
+    // ReplayPauseReason: down() drops replay_sessions.pause_reason and its checks
+    const pauseReason = async () => (await client.query(
+      `SELECT count(*)::int AS n FROM information_schema.columns WHERE table_name = 'replay_sessions' AND column_name = 'pause_reason'`,
+    )).rows[0].n;
+    expect(await pauseReason()).toBe(1);
+    await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    expect(await pauseReason()).toBe(0);
     expect(await last()).toBe('ReplayTables1792500000000');
 
     // ReplayTables: down() drops both replay tables; the cluster-wide role is kept (as ReadOnlyRole)

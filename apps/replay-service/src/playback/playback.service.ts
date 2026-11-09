@@ -2,7 +2,7 @@ import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/commo
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Not, Repository } from 'typeorm';
 import { assertUserId } from '@forexedge/common';
-import { HistoricalTimeframe, ReplaySessionEntity } from '@forexedge/database';
+import { HistoricalTimeframe, ReplayPauseReason, ReplaySessionEntity } from '@forexedge/database';
 import { centsToDecimal } from '../engine/booking';
 import { applyEngine, toEngine } from '../engine/position-mapping';
 import { EngineEvent, runMinute } from '../engine/replay-engine';
@@ -42,6 +42,14 @@ export interface StepResult {
 //
 // Never playing without a client: the last socket leaving pauses the session, a
 // (re)connecting socket always finds it PAUSED, and a boot pauses every PLAYING session.
+// Every pause records why (pause_reason, cleared by play):
+//   USER            pause
+//   OTHER_TAB       a socket connected while another socket of the user was connected
+//                   (replaces USER or DISCONNECT on a paused session; END_OF_DATA stays)
+//   DISCONNECT      the last socket left while playing (a lone reconnect keeps it)
+//   SERVER_RESTART  boot or clean stop
+//   END_OF_DATA     the clock reached the pair's last minute
+// A step that fails while playing pauses with no reason and says so with a status event.
 @Injectable()
 export class PlaybackService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PlaybackService.name);
@@ -72,7 +80,8 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
 
   async pauseAllPlaying(): Promise<number> {
     const rows: unknown[] = await this.dataSource.query(
-      `UPDATE replay_sessions SET status = 'PAUSED', updated_at = now() WHERE status = 'PLAYING' RETURNING id`);
+      `UPDATE replay_sessions SET status = 'PAUSED', pause_reason = 'SERVER_RESTART', updated_at = now()
+        WHERE status = 'PLAYING' RETURNING id`);
     return Array.isArray(rows[0]) ? (rows[0] as unknown[]).length : rows.length;
   }
 
@@ -83,7 +92,7 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
       if (s.clockTime.getTime() >= ctx.lastTime.getTime()) {
         throw new ReplayCommandError(`End of data: the ${s.pair} history ends at ${ctx.lastTime.toISOString()}`);
       }
-      if (s.status !== 'PLAYING') await this.setStatus(s, 'PLAYING');
+      if (s.status !== 'PLAYING') await this.setStatus(s, 'PLAYING', null);
       this.schedule(s.id, userId, s.speedMs);
       return this.announce(s, ctx);
     });
@@ -92,7 +101,7 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
   pause(userId: string): Promise<SessionView> {
     return this.withSession(userId, async (s, ctx) => {
       this.cancelTimer(s.id);
-      if (s.status === 'PLAYING') await this.setStatus(s, 'PAUSED');
+      if (s.status === 'PLAYING') await this.setStatus(s, 'PAUSED', 'USER');
       return this.announce(s, ctx);
     });
   }
@@ -128,8 +137,11 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  // A socket connected: the session is paused (never auto-play) and its full state returned
-  async connected(userId: string): Promise<ReplayState | null> {
+  // A socket connected: the session is paused (never auto-play) and its full state
+  // returned. With another socket of the user already connected (otherSockets), the
+  // reason becomes OTHER_TAB and every socket is told; alone, a playing session pauses
+  // as DISCONNECT (its previous socket is gone) and a paused one keeps its reason.
+  async connected(userId: string, otherSockets: boolean): Promise<ReplayState | null> {
     assertUserId(userId);
     const found = await this.sessions.findOne({ where: { userId, status: Not('ENDED') } });
     if (!found) return null;
@@ -137,8 +149,11 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
       const s = await this.sessions.findOne({ where: { id: found.id, userId, status: Not('ENDED') } });
       if (!s) return null;
       this.cancelTimer(s.id);
-      if (s.status === 'PLAYING') {
-        await this.setStatus(s, 'PAUSED');
+      const reason: ReplayPauseReason | null = otherSockets
+        ? (s.pauseReason === 'END_OF_DATA' ? 'END_OF_DATA' : 'OTHER_TAB')
+        : (s.status === 'PLAYING' ? 'DISCONNECT' : s.pauseReason);
+      if (s.status === 'PLAYING' || reason !== s.pauseReason) {
+        await this.setStatus(s, 'PAUSED', reason);
         this.emitter.toUser(userId, 'status', sessionView(s, (await this.pairs.get(s.pair)).lastTime), s.clockTime);
       }
       return this.state.state(s);
@@ -152,7 +167,7 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     if (!found) return;
     await this.lock.run(found.id, async () => {
       this.cancelTimer(found.id);
-      await this.sessions.update({ id: found.id, userId, status: 'PLAYING' }, { status: 'PAUSED' });
+      await this.sessions.update({ id: found.id, userId, status: 'PLAYING' }, { status: 'PAUSED', pauseReason: 'DISCONNECT' });
     });
   }
 
@@ -212,7 +227,10 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
 
   private async endOfData(s: ReplaySessionEntity, ctx: PairContext): Promise<void> {
     this.cancelTimer(s.id);
-    if (s.status === 'PLAYING') await this.setStatus(s, 'PAUSED');
+    if (s.status !== 'PAUSED' || s.pauseReason !== 'END_OF_DATA') {
+      await this.setStatus(s, 'PAUSED', 'END_OF_DATA');
+      this.announce(s, ctx);
+    }
     this.emitter.toUser(s.userId, 'endOfData', {
       sessionId: s.id, clockTime: s.clockTime.toISOString(),
       message: `End of data: the ${s.pair} history ends at ${ctx.lastTime.toISOString()}`,
@@ -255,7 +273,18 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     } catch (err) {
       this.logger.error(`Replay step failed for session ${sessionId}: ${err instanceof Error ? err.message : err}`);
       this.cancelTimer(sessionId);
-      await this.sessions.update({ id: sessionId, status: 'PLAYING' }, { status: 'PAUSED' }).catch(() => undefined);
+      await this.pauseAfterFailure(sessionId, userId).catch((e) =>
+        this.logger.error(`Could not pause session ${sessionId} after a failed step: ${e instanceof Error ? e.message : e}`));
+    }
+  }
+
+  // No reason fits a failed step: the session is PAUSED with none, and the user's
+  // sockets are told (they would otherwise still show it playing)
+  private async pauseAfterFailure(sessionId: string, userId: string): Promise<void> {
+    await this.sessions.update({ id: sessionId, userId, status: 'PLAYING' }, { status: 'PAUSED', pauseReason: null });
+    const s = await this.sessions.findOneBy({ id: sessionId, userId });
+    if (s && s.status === 'PAUSED') {
+      this.emitter.toUser(userId, 'status', sessionView(s, (await this.pairs.get(s.pair)).lastTime), s.clockTime);
     }
   }
 
@@ -272,9 +301,10 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  private async setStatus(s: ReplaySessionEntity, status: 'PLAYING' | 'PAUSED'): Promise<void> {
-    await this.sessions.update({ id: s.id }, { status });
+  private async setStatus(s: ReplaySessionEntity, status: 'PLAYING' | 'PAUSED', pauseReason: ReplayPauseReason | null): Promise<void> {
+    await this.sessions.update({ id: s.id }, { status, pauseReason });
     s.status = status;
+    s.pauseReason = pauseReason;
   }
 
   private announce(s: ReplaySessionEntity, ctx: PairContext): SessionView {

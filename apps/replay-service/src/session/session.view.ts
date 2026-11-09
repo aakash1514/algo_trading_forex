@@ -9,6 +9,7 @@ export interface SessionView {
   startTime: string;
   clockTime: string;      // the last processed M1 minute
   status: string;
+  pauseReason: string | null; // why a PAUSED session is paused; null while PLAYING
   speedMs: number;
   timeframe: string;
   startingBalance: string;
@@ -26,6 +27,7 @@ export function sessionView(session: ReplaySessionEntity, lastTime: Date): Sessi
     startTime: session.startTime.toISOString(),
     clockTime: session.clockTime.toISOString(),
     status: session.status,
+    pauseReason: session.pauseReason,
     speedMs: session.speedMs,
     timeframe: session.timeframe,
     startingBalance: session.startingBalance,

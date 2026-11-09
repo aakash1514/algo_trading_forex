@@ -67,12 +67,16 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     expect((await stored(session.id)).status).toBe('PLAYING');
     await a.close();
     expect(await waitFor(async () => (await stored(session.id)).status === 'PAUSED')).toBe(true);
+    expect((await stored(session.id)).pauseReason).toBe('DISCONNECT');
     const clock = (await stored(session.id)).clockTime.getTime();
     await sleep(1_500);
     expect((await stored(session.id)).clockTime.getTime()).toBe(clock);
 
     const b = await connectClient(app.url, token);
-    expect(b.state).toMatchObject({ session: { id: session.id, status: 'PAUSED', clockTime: new Date(clock).toISOString() } });
+    // a lone reconnect keeps DISCONNECT
+    expect(b.state).toMatchObject({
+      session: { id: session.id, status: 'PAUSED', pauseReason: 'DISCONNECT', clockTime: new Date(clock).toISOString() },
+    });
     await sleep(1_500);
     expect(b.events.filter((e) => e.event === 'bar')).toEqual([]);
     expect((await stored(session.id)).clockTime.getTime()).toBe(clock);
@@ -86,15 +90,19 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     const a = await connectClient(app.url, token);
     await a.command('setSpeed', { speedMs: 500 });
     await a.command('play');
+    const toldA = a.next('status');
     const b = await connectClient(app.url, token);
-    expect(b.state).toMatchObject({ session: { status: 'PAUSED' } });
-    expect((await stored(session.id)).status).toBe('PAUSED');
-    await a.command('play');
+    expect(b.state).toMatchObject({ session: { status: 'PAUSED', pauseReason: 'OTHER_TAB' } });
+    expect(await toldA).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
+    expect(await stored(session.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
+    expect(await a.command('play')).toMatchObject({ ok: true, result: { status: 'PLAYING', pauseReason: null } });
+    expect((await stored(session.id)).pauseReason).toBeNull();
     await b.close();
     await sleep(300);
     expect((await stored(session.id)).status).toBe('PLAYING');
     await a.close();
     expect(await waitFor(async () => (await stored(session.id)).status === 'PAUSED')).toBe(true);
+    expect((await stored(session.id)).pauseReason).toBe('DISCONNECT');
     await http(app.url, token, 'POST', '/sessions/active/end');
   });
 
@@ -132,13 +140,34 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     await http(app.url, token, 'POST', '/sessions/active/end');
   });
 
+  it('a second tab on a session paused by the user: OTHER_TAB replaces USER and the first tab is told', async () => {
+    const { token } = await user();
+    const { body: session } = await create(token);
+    const a = await connectClient(app.url, token);
+    expect(a.state).toMatchObject({ session: { status: 'PAUSED', pauseReason: null } }); // never played
+    await a.command('play');
+    expect(await a.command('pause')).toMatchObject({ ok: true, result: { status: 'PAUSED', pauseReason: 'USER' } });
+    expect((await stored(session.id)).pauseReason).toBe('USER');
+    const toldA = a.next('status');
+    const b = await connectClient(app.url, token);
+    expect(b.state).toMatchObject({ session: { pauseReason: 'OTHER_TAB' } });
+    expect(await toldA).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
+    // leaving a paused session keeps its reason
+    await b.close();
+    await a.close();
+    await sleep(300);
+    expect(await stored(session.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
+    await http(app.url, token, 'POST', '/sessions/active/end');
+    expect(await stored(session.id)).toMatchObject({ status: 'ENDED', pauseReason: null });
+  });
+
   it('a boot pauses every PLAYING session and never resumes it', async () => {
     const { userId, token } = await user();
     const { body: session } = await create(token);
     await db.admin.query(`UPDATE replay_sessions SET status = 'PLAYING' WHERE user_id = $1`, [userId]);
     const second = await startReplayApp(db);
     try {
-      expect((await stored(session.id)).status).toBe('PAUSED');
+      expect(await stored(session.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'SERVER_RESTART' });
       const clock = (await stored(session.id)).clockTime.getTime();
       await sleep(1_500);
       expect((await stored(session.id)).clockTime.getTime()).toBe(clock);

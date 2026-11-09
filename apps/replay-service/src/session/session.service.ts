@@ -53,7 +53,7 @@ export class ReplaySessionService {
     const balance = centsToDecimal(BigInt(Math.round((dto.startingBalance ?? DEFAULT_STARTING_BALANCE) * 100)));
     try {
       const saved = await this.sessions.save(this.sessions.create({
-        userId, pair, startTime: start, clockTime: clock, status: 'PAUSED', speedMs: 1000,
+        userId, pair, startTime: start, clockTime: clock, status: 'PAUSED', pauseReason: null, speedMs: 1000,
         timeframe: dto.timeframe, startingBalance: balance, balance, endedAt: null,
       }));
       return sessionView(await this.sessions.findOneByOrFail({ id: saved.id, userId }), ctx.lastTime);
@@ -126,7 +126,7 @@ export class ReplaySessionService {
   // Relative update: never write back a balance read earlier
   private async addToBalanceAndEnd(manager: EntityManager, sessionId: string, cents: bigint, now: Date): Promise<void> {
     await manager.query(
-      `UPDATE replay_sessions SET balance = balance + $2::numeric, status = 'ENDED', ended_at = $3, updated_at = $3
+      `UPDATE replay_sessions SET balance = balance + $2::numeric, status = 'ENDED', pause_reason = NULL, ended_at = $3, updated_at = $3
         WHERE id = $1`, [sessionId, centsToDecimal(cents), now]);
   }
 
