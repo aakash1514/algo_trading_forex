@@ -7,6 +7,7 @@ import { cn } from '../../lib/cn';
 const links = [
   { href: '/dashboard',  label: 'Terminal',  icon: '▤' },
   { href: '/backtest',   label: 'Backtest',  icon: '◈' },
+  { href: '/replay',     label: 'Replay',    icon: '⟲' },
   { href: '/calendar',   label: 'Calendar',  icon: '◷' },
   { href: '/model-evaluation', label: 'Model evaluation', icon: '◬' },
   { href: '/research', label: 'Research', icon: '⌕' },

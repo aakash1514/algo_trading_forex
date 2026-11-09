@@ -49,6 +49,7 @@ export function Topbar() {
         {[
           { href: '/dashboard', label: 'Terminal' },
           { href: '/backtest', label: 'Backtest' },
+          { href: '/replay', label: 'Replay' },
           { href: '/calendar', label: 'Calendar' },
           { href: '/model-evaluation', label: 'Models' },
         ].map(({ href, label }) => (

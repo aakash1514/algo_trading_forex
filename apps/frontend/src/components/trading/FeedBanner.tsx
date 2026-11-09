@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useGetFeedStatusQuery } from '../../store/api/market.api';
 import { feedBanner } from '../../lib/feed';
 import { cn } from '../../lib/cn';
@@ -24,6 +25,14 @@ export function FeedBanner() {
       className={cn('shrink-0 border-b px-4 py-2 text-[12px] font-medium', TONES[banner.tone])}
     >
       {banner.text}
+      {banner.link && (
+        <>
+          {' — '}
+          <Link href={banner.link.href} className="underline underline-offset-2 text-accent-blue hover:text-[#e2e4e9]">
+            {banner.link.label}
+          </Link>
+        </>
+      )}
     </div>
   );
 }
