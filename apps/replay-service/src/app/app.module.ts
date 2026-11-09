@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
 import { AuthModule } from '../auth/auth.module';
 import { SessionLock } from '../engine/session-lock';
 import { PairContextService } from '../history/pair-context.service';
+import { PlaybackService } from '../playback/playback.service';
+import { ReplayEmitter } from '../playback/replay-emitter';
+import { ReplayGateway } from '../playback/replay.gateway';
+import { ReplayStateService } from '../playback/replay-state.service';
 import { ReplaySessionController } from '../session/session.controller';
 import { ReplaySessionService } from '../session/session.service';
 import { replayDbCredentials } from './replay-db.config';
@@ -36,8 +41,12 @@ import { replayDbCredentials } from './replay-db.config';
     }),
     TypeOrmModule.forFeature([ReplaySessionEntity, ReplayPositionEntity]),
     AuthModule,
+    JwtModule.register({}), // socket handshakes; the secret is passed on verify
   ],
   controllers: [ReplaySessionController],
-  providers: [ReplaySessionService, PairContextService, SessionLock],
+  providers: [
+    ReplaySessionService, PairContextService, SessionLock,
+    PlaybackService, ReplayStateService, ReplayEmitter, ReplayGateway,
+  ],
 })
 export class AppModule {}

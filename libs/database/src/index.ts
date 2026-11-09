@@ -10,4 +10,5 @@ export * from './lib/entities/backtest-run.entity';
 export * from './lib/entities/replay-session.entity';
 export * from './lib/entities/replay-position.entity';
 export * from './lib/historical-candles';
+export * from './lib/historical-buckets';
 export * from './lib/live-ticks';

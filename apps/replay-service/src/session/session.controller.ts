@@ -1,6 +1,8 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PlaybackService } from '../playback/playback.service';
+import { ReplayEmitter } from '../playback/replay-emitter';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { ReplaySessionService } from './session.service';
 
@@ -11,7 +13,11 @@ interface AuthenticatedRequest extends Request {
 @Controller('replay/sessions')
 @UseGuards(JwtAuthGuard)
 export class ReplaySessionController {
-  constructor(private readonly sessions: ReplaySessionService) {}
+  constructor(
+    private readonly sessions: ReplaySessionService,
+    private readonly playback: PlaybackService,
+    private readonly emitter: ReplayEmitter,
+  ) {}
 
   // POST /api/replay/sessions — 201, or 409 { activeSessionId } while one is active
   @Post()
@@ -26,9 +32,13 @@ export class ReplaySessionController {
   }
 
   // POST /api/replay/sessions/active/end — closes open positions at the clock price
+  // (its timer stops and the user's sockets get 'ended')
   @Post('active/end')
   @HttpCode(HttpStatus.OK)
-  end(@Req() req: AuthenticatedRequest) {
-    return this.sessions.end(req.user.id);
+  async end(@Req() req: AuthenticatedRequest) {
+    const ended = await this.sessions.end(req.user.id);
+    this.playback.forget(ended.session.id);
+    this.emitter.toUser(req.user.id, 'ended', ended, new Date(ended.session.clockTime));
+    return ended;
   }
 }
