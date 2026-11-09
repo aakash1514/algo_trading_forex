@@ -1,0 +1,182 @@
+{
+ "commit": "dfce1cf",
+ "user": "replayfixture_b608e584@example.com",
+ "fixtures": {
+  "account-after-order": {
+   "file": "account-after-order.json",
+   "kind": "socket",
+   "what": "'account' after the order",
+   "recorded_at": "2026-11-09T20:33:28.423Z",
+   "sha256": "3d1daf2ee11e062e975f2cf647d50ba98e7acd31c798d2cf86de4d6cde0b5a97"
+  },
+  "bar-1m": {
+   "file": "bar-1m.json",
+   "kind": "socket",
+   "what": "'bar' after a step on 1m",
+   "recorded_at": "2026-11-09T20:33:28.287Z",
+   "sha256": "ea26489d527ede1bc50c6339b738d36f8b0054a3a4f98f86cf6c7ba73c761c3f"
+  },
+  "cancel-200": {
+   "file": "cancel-200.json",
+   "kind": "rest",
+   "what": "POST /orders/:id/cancel of a pending order",
+   "status": 200,
+   "recorded_at": "2026-11-09T20:33:28.755Z",
+   "sha256": "48d2d18bfa1861426b38deb0baa3c31bbee5502caa60ae1bbb1b43c71123d5df"
+  },
+  "close-200": {
+   "file": "close-200.json",
+   "kind": "rest",
+   "what": "POST /positions/:id/close (pending until the next minute)",
+   "status": 200,
+   "recorded_at": "2026-11-09T20:33:30.068Z",
+   "sha256": "e652ccfc324ff8f52d872d8bbf7ddc79a38c67ae84275804bd4cdbab19e12a24"
+  },
+  "create-201": {
+   "file": "create-201.json",
+   "kind": "rest",
+   "what": "POST /sessions {EUR_USD, 2022-03-01T09:30Z, 1m, 10000}",
+   "status": 201,
+   "recorded_at": "2026-11-09T20:33:25.586Z",
+   "sha256": "d5a21853a565f831faf28332348bb0e589957b3051221b8ee3979a364ff2d871"
+  },
+  "create-409": {
+   "file": "create-409.json",
+   "kind": "rest",
+   "what": "POST /sessions while one is active",
+   "status": 409,
+   "recorded_at": "2026-11-09T20:33:25.608Z",
+   "sha256": "938e8ff9c13763cb9a603eafe78a52f7d9371afe466fbc02109d12ccd1fd686c"
+  },
+  "end-200": {
+   "file": "end-200.json",
+   "kind": "rest",
+   "what": "POST /sessions/active/end with one position open",
+   "status": 200,
+   "recorded_at": "2026-11-09T20:33:33.291Z",
+   "sha256": "6b94822ae0bd847753d3d80e763d0b32ed1915f4ef2b5340ee15e825f61d65c3"
+  },
+  "end-of-data": {
+   "file": "end-of-data.json",
+   "kind": "socket",
+   "what": "'endOfData' at the pair's last minute",
+   "recorded_at": "2026-11-09T20:33:34.370Z",
+   "sha256": "b80a37000df9c1cc39711357ca128bce8f42c652d4d48bb85cff4f3410e22d7f"
+  },
+  "ended": {
+   "file": "ended.json",
+   "kind": "socket",
+   "what": "'ended' after the end",
+   "recorded_at": "2026-11-09T20:33:33.293Z",
+   "sha256": "6b94822ae0bd847753d3d80e763d0b32ed1915f4ef2b5340ee15e825f61d65c3"
+  },
+  "order-201-pending": {
+   "file": "order-201-pending.json",
+   "kind": "rest",
+   "what": "POST /orders BUY 0.1 lots, SL bid-100 points, TP bid+100 points",
+   "status": 201,
+   "recorded_at": "2026-11-09T20:33:28.418Z",
+   "sha256": "6165ee20d3d0419cf7407601d5b9218f51e1cc69030a3de1cb9488fa28da3f20"
+  },
+  "order-400-margin": {
+   "file": "order-400-margin.json",
+   "kind": "rest",
+   "what": "POST /orders BUY 100 lots on 10,000 USD",
+   "status": 400,
+   "recorded_at": "2026-11-09T20:33:28.590Z",
+   "sha256": "8802eeb12888fc491b78054b06b0adb6d4b4fe5dfbce168ea273da403457f31f"
+  },
+  "order-400-sl-side": {
+   "file": "order-400-sl-side.json",
+   "kind": "rest",
+   "what": "POST /orders BUY with the stop loss above the bid",
+   "status": 400,
+   "recorded_at": "2026-11-09T20:33:28.549Z",
+   "sha256": "7ec8bd3e727a30f7394c0670ec643ac27b0257e214000af650cbf7f319c0f273"
+  },
+  "positions-closed-level": {
+   "file": "positions-closed-level.json",
+   "kind": "socket",
+   "what": "'positions' when the long closed at its SL or TP while playing",
+   "recorded_at": "2026-11-09T20:33:32.908Z",
+   "sha256": "d7e6d7042c7f4f29ac2fcd41aa04bd5bd51158e83eaee4b013406babb8bd9afc"
+  },
+  "positions-closed-manual": {
+   "file": "positions-closed-manual.json",
+   "kind": "socket",
+   "what": "'positions' from the step that closed the short (MANUAL)",
+   "recorded_at": "2026-11-09T20:33:30.214Z",
+   "sha256": "0ce7cc3dd1680fbb08283e22d4f539953e4fc57cc571598badf6eb956e0e1313"
+  },
+  "positions-filled": {
+   "file": "positions-filled.json",
+   "kind": "socket",
+   "what": "'positions' from the step that filled both orders",
+   "recorded_at": "2026-11-09T20:33:28.870Z",
+   "sha256": "e27ed209f03ab63b104584e7938756dbe31d1070aaae546abd801de7d20a256a"
+  },
+  "positions-pending": {
+   "file": "positions-pending.json",
+   "kind": "socket",
+   "what": "'positions' after the order",
+   "recorded_at": "2026-11-09T20:33:28.420Z",
+   "sha256": "28e93162738c8cdb5039cb355aa40e8305a83d0c2346ac106adc5b55fc8c3ca9"
+  },
+  "state-closed-trades": {
+   "file": "state-closed-trades.json",
+   "kind": "socket",
+   "what": "'state' with two closed trades and an open short",
+   "recorded_at": "2026-11-09T20:33:33.232Z",
+   "sha256": "635ca8c405a87012aa7d828f01a351794544ea08d2ea371f518eeab282d271d5"
+  },
+  "state-end-of-data": {
+   "file": "state-end-of-data.json",
+   "kind": "socket",
+   "what": "'state' on reconnect at the end of the data",
+   "recorded_at": "2026-11-09T20:33:34.461Z",
+   "sha256": "7efa980ffb5c5ea5afdf22ab6e114bc960d2d0fa820f9d033b8c10333f71aaef"
+  },
+  "state-no-session": {
+   "file": "state-no-session.json",
+   "kind": "socket",
+   "what": "'state' on connect without a session",
+   "recorded_at": "2026-11-09T20:33:25.405Z",
+   "sha256": "bda339da8bd567ff70e6c0353b141536dd5b18d603e699a479305f4b17f3a3fd"
+  },
+  "state-open-positions": {
+   "file": "state-open-positions.json",
+   "kind": "socket",
+   "what": "'state' with a long and a short open",
+   "recorded_at": "2026-11-09T20:33:29.994Z",
+   "sha256": "7b53c74c7483f998565e839a2a0b9bf89417e9f0f7151a5d29cfd721ddf61a99"
+  },
+  "state-paused": {
+   "file": "state-paused.json",
+   "kind": "socket",
+   "what": "'state' on connect: the new session, PAUSED",
+   "recorded_at": "2026-11-09T20:33:27.223Z",
+   "sha256": "6f20e04983571ec0cce71e8982a9cf3360536d7fff264b0b812e85cb4a437c91"
+  },
+  "state-usdjpy-open-positions": {
+   "file": "state-usdjpy-open-positions.json",
+   "kind": "socket",
+   "what": "'state' of USD/JPY (2016-06-24, Brexit vote night) with a long and a short open",
+   "recorded_at": "2026-11-09T20:33:33.865Z",
+   "sha256": "f6192e4b2684fab5998631ed5fdd12e5ffa83e9c0e7565ae92009d8b0e2a8716"
+  },
+  "status-end-of-data": {
+   "file": "status-end-of-data.json",
+   "kind": "socket",
+   "what": "'status' at the end of the data (END_OF_DATA)",
+   "recorded_at": "2026-11-09T20:33:34.376Z",
+   "sha256": "a318ab3255e31181f8110e7f43bdc20a3952eaae86e7b9ee3bd9dc0de0459715"
+  },
+  "status-paused-user": {
+   "file": "status-paused-user.json",
+   "kind": "socket",
+   "what": "'status' after pause (USER)",
+   "recorded_at": "2026-11-09T20:33:32.933Z",
+   "sha256": "a312d3b5ab802381942d92c18c50f7225cbe7cd1086b53c19e87ef383ab49fe6"
+  }
+ }
+}
