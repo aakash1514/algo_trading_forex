@@ -1,10 +1,10 @@
-import { COMMISSION_PIPS_PER_SIDE } from './trade.simulator';
-import { Trade } from './strategies/strategy.interface';
+import { COMMISSION_PIPS_PER_SIDE } from './fills';
+import { Side } from './types';
 
-// Money for backtest trades, in USD (the account currency), computed from integer
+// Money for simulated trades, in USD (the account currency), computed from integer
 // points so that each amount is rounded once, to cents, from an exact fraction:
 //
-//   units      = lots x instruments.lot_size        (a whole number, or the run fails)
+//   units      = lots x instruments.lot_size        (a whole number, or the trade is rejected)
 //   points     = direction x (exit - entry), and the round-trip commission in points
 //   USD-quoted (EUR/USD, GBP/USD, XAU/USD)   usd = points x units / 10^decimals
 //   USD-based  (USD/JPY)                     usd = points x units / ratePoints
@@ -31,6 +31,12 @@ export interface TradeMoney {
   grossUsd: number;
   commissionUsd: number;  // grossUsd - netUsd
   netUsd: number;
+}
+
+export interface ClosedTradePoints {
+  action: Side;
+  entryPoints: number;
+  exitPoints: number;
 }
 
 export function usdLeg(pair: string): UsdLeg {
@@ -77,7 +83,7 @@ export function pointsToUsdCents(points: number, spec: MoneySpec, ratePoints: nu
 export const centsToUsd = (cents: bigint) => Number(cents) / 100;
 
 // Gross, commission and net USD of a closed trade, converted at its exit fill
-export function tradeMoney(trade: Pick<Trade, 'action' | 'entryPoints' | 'exitPoints'>, spec: MoneySpec): TradeMoney {
+export function tradeMoney(trade: ClosedTradePoints, spec: MoneySpec): TradeMoney {
   const direction = trade.action === 'BUY' ? 1 : -1;
   const gross = direction * (trade.exitPoints - trade.entryPoints);
   const grossCents = pointsToUsdCents(gross, spec, trade.exitPoints);
@@ -88,4 +94,13 @@ export function tradeMoney(trade: Pick<Trade, 'action' | 'entryPoints' | 'exitPo
     commissionUsd: centsToUsd(grossCents - netCents),
     netUsd: centsToUsd(netCents),
   };
+}
+
+// What an open position would net if closed at `quotePoints` (its exit-side price:
+// the bid for a long, the ask for a short), round-trip commission deducted, a
+// USD-based pair converted at that same price. Equals tradeMoney(...).netUsd in cents
+// for a close at that price.
+export function markToMarketCents(action: Side, entryPoints: number, quotePoints: number, spec: MoneySpec): bigint {
+  const points = (action === 'BUY' ? quotePoints - entryPoints : entryPoints - quotePoints) - commissionPoints(spec.pipPoints);
+  return pointsToUsdCents(points, spec, quotePoints);
 }

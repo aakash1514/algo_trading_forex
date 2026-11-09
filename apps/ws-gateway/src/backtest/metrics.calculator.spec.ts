@@ -10,7 +10,7 @@ import { join } from 'node:path';
 import {
   calculateMetrics, dailyEquityCents, equityAtBarCloses, maxDrawdownPct, newYorkClose, newYorkCloses, TRADING_DAYS_PER_YEAR,
 } from './metrics.calculator';
-import { MoneySpec, positionUnits, tradeMoney } from './trade-money';
+import { MoneySpec, positionUnits, tradeMoney } from '@forexedge/trading-sim';
 import { TradeSimulator } from './trade.simulator';
 import { Candle, MoneyTrade, Signal } from './strategies/strategy.interface';
 

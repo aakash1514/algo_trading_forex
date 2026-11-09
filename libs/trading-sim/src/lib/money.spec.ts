@@ -7,13 +7,9 @@
 // Lot sizes are the instruments rows (100,000 for FX, 100 oz for XAU/USD).
 // EUR/USD and XAU/USD are trades #1 and #4 of the step-2 backtest proof; the
 // USD/JPY trade is an illustration on real bars, not a strategy output.
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import {
-  commissionPoints, MoneySpec, pointsToUsdCents, positionUnits, roundHalfAwayFromZero, tradeMoney, usdLeg,
-} from './trade-money';
-import { TradeSimulator } from './trade.simulator';
-import { Candle } from './strategies/strategy.interface';
+  commissionPoints, markToMarketCents, MoneySpec, pointsToUsdCents, positionUnits, roundHalfAwayFromZero, tradeMoney, usdLeg,
+} from './money';
 
 const spec = (pair: string, lots: number, lotSize: number, priceDecimals: number): MoneySpec =>
   ({ pair, units: positionUnits(lots, lotSize), priceDecimals, pipPoints: 10 });
@@ -73,28 +69,16 @@ describe('contract checks', () => {
   });
 });
 
-describe('simulated trades on real M1 bars', () => {
-  const FIXTURES = join(__dirname, '../../../../tools/market-data/import/src/fixtures');
-  const points = (text: string) => { const [w, f = ''] = text.split('.'); return Number(w + f.padEnd(5, '0')); };
-  const eur: Candle[] = readFileSync(join(FIXTURES, 'EURUSD-2022-01-03.csv'), 'utf8').split('\n').slice(1).filter(Boolean)
-    .map((l) => l.split(',')).filter((c) => Number(c[5]) > 0 || Number(c[10]) > 0)
-    .map((c) => {
-      const bid = { open: points(c[1]), high: points(c[2]), low: points(c[3]), close: points(c[4]) };
-      const ask = { open: points(c[6]), high: points(c[7]), low: points(c[8]), close: points(c[9]) };
-      return { bucket: new Date(Number(c[0])), bid, ask, minutes: 1, open: 0, high: 0, low: 0, close: 0 };
-    });
-
-  it('EUR/USD at 0.1 lot: net USD is exactly net pips x $1 for every trade', () => {
-    const at = (i: number) => eur[i].bucket;
-    const trades = new TradeSimulator({ pipSize: 0.0001, priceDecimals: 5 }).simulate(eur, [
-      { timestamp: at(100), action: 'BUY', lots: 0.1, reason: 'test' }, { timestamp: at(400), action: 'CLOSE_LONG', lots: 0.1, reason: 'test' },
-      { timestamp: at(500), action: 'SELL', lots: 0.1, reason: 'test' }, { timestamp: at(900), action: 'CLOSE_SHORT', lots: 0.1, reason: 'test' },
-    ]);
-    expect(trades).toHaveLength(2);
-    for (const t of trades) {
-      const m = tradeMoney(t, spec('EUR/USD', 0.1, 100_000, 5));
-      expect([m.grossUsd, m.netUsd]).toEqual([t.pnl, t.netPnl]);
-      expect(t.entryPoints / 1e5).toBe(t.entryPrice);
-    }
+describe('marking an open position to market', () => {
+  it.each([
+    ['EUR/USD long', 'BUY', 113030, 112897, spec('EUR/USD', 0.1, 100_000, 5)],
+    ['XAU/USD long', 'BUY', 1812805, 1810068, spec('XAU/USD', 0.1, 100, 3)],
+    ['USD/JPY long', 'BUY', 114929, 115471, spec('USD/JPY', 0.1, 100_000, 3)],
+    ['USD/JPY short', 'SELL', 114926, 115474, spec('USD/JPY', 0.1, 100_000, 3)],
+  ] as const)('%s: equals the net of a close at that price, to the cent', (_name, action, entry, quote, money) => {
+    expect(centsOf(tradeMoney({ action, entryPoints: entry, exitPoints: quote }, money).netUsd))
+      .toBe(markToMarketCents(action, entry, quote, money));
   });
 });
+
+const centsOf = (usd: number) => BigInt(Math.round(usd * 100));

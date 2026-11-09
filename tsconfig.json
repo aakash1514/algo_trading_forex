@@ -11,6 +11,9 @@
     },
     {
       "path": "./libs/kafka"
+    },
+    {
+      "path": "./libs/trading-sim"
     }
   ]
 }

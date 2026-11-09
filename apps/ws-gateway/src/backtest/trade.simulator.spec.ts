@@ -3,6 +3,7 @@
 // written by hand; prices always come from the bars.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { MoneySpec, positionUnits, tradeMoney } from '@forexedge/trading-sim';
 import { Candle, Signal, StrategyContext } from './strategies/strategy.interface';
 import { TradeSimulator } from './trade.simulator';
 
@@ -116,5 +117,25 @@ describe('TradeSimulator on real bid/ask bars', () => {
 
   it('rejects a pip size that is not a whole number of points', () => {
     expect(() => new TradeSimulator({ pipSize: 0.0001, priceDecimals: 3 })).toThrow('not a whole number of points');
+  });
+});
+
+// Moved from trade-money.spec.ts when the money moved to @forexedge/trading-sim
+describe('simulated trades on real M1 bars', () => {
+  const spec = (pair: string, lots: number, lotSize: number, priceDecimals: number): MoneySpec =>
+    ({ pair, units: positionUnits(lots, lotSize), priceDecimals, pipPoints: 10 });
+
+  it('EUR/USD at 0.1 lot: net USD is exactly net pips x $1 for every trade', () => {
+    const at = (i: number) => eur[i].bucket;
+    const trades = new TradeSimulator({ pipSize: 0.0001, priceDecimals: 5 }).simulate(eur, [
+      { timestamp: at(100), action: 'BUY', lots: 0.1, reason: 'test' }, { timestamp: at(400), action: 'CLOSE_LONG', lots: 0.1, reason: 'test' },
+      { timestamp: at(500), action: 'SELL', lots: 0.1, reason: 'test' }, { timestamp: at(900), action: 'CLOSE_SHORT', lots: 0.1, reason: 'test' },
+    ]);
+    expect(trades).toHaveLength(2);
+    for (const t of trades) {
+      const m = tradeMoney(t, spec('EUR/USD', 0.1, 100_000, 5));
+      expect([m.grossUsd, m.netUsd]).toEqual([t.pnl, t.netPnl]);
+      expect(t.entryPoints / 1e5).toBe(t.entryPrice);
+    }
   });
 });

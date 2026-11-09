@@ -17,7 +17,8 @@
       "@forexedge/common": ["./libs/common/src/index.ts"],
       "@forexedge/database": ["./libs/database/src/index.ts"],
       "@forexedge/database/testing": ["./libs/database/src/testing/test-database.ts"],
-      "@forexedge/kafka": ["./libs/kafka/src/index.ts"]
+      "@forexedge/kafka": ["./libs/kafka/src/index.ts"],
+      "@forexedge/trading-sim": ["./libs/trading-sim/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
