@@ -6,6 +6,8 @@ import { ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
 import { AuthModule } from '../auth/auth.module';
 import { SessionLock } from '../engine/session-lock';
 import { PairContextService } from '../history/pair-context.service';
+import { ReplayOrderController } from '../orders/order.controller';
+import { ReplayOrderService } from '../orders/order.service';
 import { PlaybackService } from '../playback/playback.service';
 import { ReplayEmitter } from '../playback/replay-emitter';
 import { ReplayGateway } from '../playback/replay.gateway';
@@ -43,10 +45,10 @@ import { replayDbCredentials } from './replay-db.config';
     AuthModule,
     JwtModule.register({}), // socket handshakes; the secret is passed on verify
   ],
-  controllers: [ReplaySessionController],
+  controllers: [ReplaySessionController, ReplayOrderController],
   providers: [
     ReplaySessionService, PairContextService, SessionLock,
-    PlaybackService, ReplayStateService, ReplayEmitter, ReplayGateway,
+    PlaybackService, ReplayStateService, ReplayEmitter, ReplayGateway, ReplayOrderService,
   ],
 })
 export class AppModule {}

@@ -3,3 +3,4 @@
 export * from './lib/types';
 export * from './lib/fills';
 export * from './lib/money';
+export * from './lib/margin';

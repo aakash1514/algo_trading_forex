@@ -23,6 +23,11 @@ export function exitQuotes(side: Side, bar: BidAskBar): Ohlc {
   return side === 'BUY' ? bar.bid : bar.ask;
 }
 
+// The quotes a position opens on: BUY at the ask, SELL at the bid
+export function entryQuotes(side: Side, bar: BidAskBar): Ohlc {
+  return side === 'BUY' ? bar.ask : bar.bid;
+}
+
 // Opening fill at a bar's open: BUY at the ask, SELL at the bid
 export function entryFill(side: Side, bar: BidAskBar): number {
   return side === 'BUY' ? bar.ask.open : bar.bid.open;

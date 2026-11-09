@@ -3,10 +3,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Not, Repository } from 'typeorm';
-import { closeQuote } from '@forexedge/trading-sim';
 import { assertUserId } from '@forexedge/common';
 import { HistoricalDataError, ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
-import { centsToDecimal, realizedCents } from '../engine/booking';
+import { centsToDecimal } from '../engine/booking';
+import { applyEngine, toEngine } from '../engine/position-mapping';
+import { closeAtMinuteClose } from '../engine/replay-engine';
 import { SessionLock } from '../engine/session-lock';
 import { PairContextService } from '../history/pair-context.service';
 import { firstMinuteAtOrAfter, lastMinuteAtOrBefore, minuteAt } from '../history/replay-history';
@@ -104,13 +105,10 @@ export class ReplaySessionService {
       if (open.length > 0) {
         const minute = await minuteAt(this.dataSource, session.pair, session.clockTime);
         for (const p of open) {
-          const exitPoints = closeQuote(p.side, minute);
-          const cents = realizedCents(p.side, p.entryPoints as number, exitPoints, ctx, p.units);
-          total += cents;
-          Object.assign(p, {
-            status: 'CLOSED', exitTime: session.clockTime, exitPoints, exitReason: 'SESSION_END',
-            realizedPnlUsd: centsToDecimal(cents),
-          });
+          const engine = toEngine(p);
+          closeAtMinuteClose(engine, minute, ctx, 'SESSION_END');
+          applyEngine(p, engine);
+          total += engine.realizedCents as bigint;
         }
         await manager.save(open);
       }

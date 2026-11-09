@@ -15,6 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@forexedge/common": ["./libs/common/src/index.ts"],
+      "@forexedge/common/money": ["./libs/common/src/lib/money.ts"],
       "@forexedge/database": ["./libs/database/src/index.ts"],
       "@forexedge/database/testing": ["./libs/database/src/testing/test-database.ts"],
       "@forexedge/kafka": ["./libs/kafka/src/index.ts"],
