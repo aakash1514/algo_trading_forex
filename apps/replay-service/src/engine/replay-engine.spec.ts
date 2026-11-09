@@ -71,6 +71,15 @@ describe('replay engine on real minutes', () => {
     expect(buy).toMatchObject({ status: 'CLOSED', exitReason: 'SL', exitPoints: m.bid.low, entryTime: m.time, exitTime: m.time });
   });
 
+  it('a requested close fills at the open before the minute can reach the stop', () => {
+    const i = find((m) => m.bid.low < m.bid.open);
+    const m = minutes[i];
+    const long = order('BUY', { status: 'OPEN', entryTime: minutes[i - 1].time, entryPoints: minutes[i - 1].ask.open,
+      stopLossPoints: m.bid.low, exitRequestedAt: minutes[i - 1].time });
+    runMinute([long], m, EURUSD);
+    expect(long).toMatchObject({ exitReason: 'MANUAL', exitPoints: m.bid.open });
+  });
+
   it('SL first when SL and TP are both inside one minute (long on the bid, short on the ask)', () => {
     const i = find((m) => m.bid.low < m.bid.open && m.bid.high > m.bid.open);
     const m = minutes[i];

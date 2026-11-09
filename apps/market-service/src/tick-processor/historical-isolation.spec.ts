@@ -10,7 +10,7 @@ import { join, relative } from 'node:path';
 const REPO_ROOT = join(__dirname, '../../../..');
 const SCANNED = [
   'apps/market-service/src', 'apps/order-service/src', 'apps/domain-service/src', 'apps/ws-gateway/src',
-  'libs/common/src', 'libs/database/src', 'libs/kafka/src',
+  'apps/replay-service/src', 'libs/common/src', 'libs/database/src', 'libs/kafka/src', 'libs/trading-sim/src',
 ];
 
 // A write statement whose target is a historical_* relation (within one statement).

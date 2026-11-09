@@ -36,22 +36,26 @@ function toMinute(r: Record<string, unknown>): Minute {
   };
 }
 
+// Every time bound below is a query parameter computed here, never a value joined in
+// from another row: TimescaleDB excludes chunks only on bounds it knows when the query
+// starts (a bound from a CTE made each step scan all ~4.9M minutes of a pair, 1.2 s).
+
 // The minutes of the next bar after the clock, oldest first; [] at the end of the data
 export async function nextBarMinutes(
   dataSource: DataSource, pair: string, timeframe: HistoricalTimeframe, clock: Date,
 ): Promise<Minute[]> {
+  const next: { time: Date }[] = await dataSource.query(
+    'SELECT time FROM historical_candles WHERE pair = $1 AND time > $2 ORDER BY time ASC LIMIT 1', [pair, clock]);
+  if (next.length === 0) return [];
+  const first = new Date(next[0].time);
   const bucket = (column: string) => historicalBucketSql(timeframe, column);
   const rows: Record<string, unknown>[] = await dataSource.query(`
-    WITH nxt AS (
-      SELECT time FROM historical_candles WHERE pair = $1 AND time > $2 ORDER BY time ASC LIMIT 1
-    )
     SELECT ${MINUTE_COLUMNS}
-      FROM nxt
-      JOIN historical_candles h
-        ON h.pair = $1 AND h.time >= nxt.time AND h.time < nxt.time + $3::interval
-     WHERE ${bucket('h.time')} = ${bucket('nxt.time')}
+      FROM historical_candles h
+     WHERE h.pair = $1 AND h.time >= $2 AND h.time < $3
+       AND ${bucket('h.time')} = ${bucket('$2::timestamptz')}
      ORDER BY h.time ASC
-  `, [pair, clock, `${HISTORICAL_BUCKET_MAX_MS[timeframe] / 1000} seconds`]);
+  `, [pair, first, new Date(first.getTime() + HISTORICAL_BUCKET_MAX_MS[timeframe])]);
   return rows.map(toMinute);
 }
 
@@ -61,17 +65,16 @@ export async function currentBar(
 ): Promise<ReplayBar> {
   const bucket = (column: string) => historicalBucketSql(timeframe, column);
   const rows: Record<string, unknown>[] = await dataSource.query(`
-    WITH c AS (SELECT ${bucket('$2::timestamptz')} AS bucket)
-    SELECT c.bucket, max(h.time) AS last_minute, count(*)::int AS minutes,
+    SELECT ${bucket('$2::timestamptz')} AS bucket, max(h.time) AS last_minute, count(*)::int AS minutes,
            (array_agg(h.bid_open ORDER BY h.time ASC))[1] AS bid_open, max(h.bid_high) AS bid_high,
            min(h.bid_low) AS bid_low, (array_agg(h.bid_close ORDER BY h.time DESC))[1] AS bid_close,
            (array_agg(h.ask_open ORDER BY h.time ASC))[1] AS ask_open, max(h.ask_high) AS ask_high,
            min(h.ask_low) AS ask_low, (array_agg(h.ask_close ORDER BY h.time DESC))[1] AS ask_close
-      FROM c
-      JOIN historical_candles h ON h.pair = $1 AND h.time >= c.bucket AND h.time <= $2
-     WHERE ${bucket('h.time')} = c.bucket
-     GROUP BY c.bucket
-  `, [pair, clock]);
+      FROM historical_candles h
+     WHERE h.pair = $1 AND h.time > $3 AND h.time <= $2
+       AND ${bucket('h.time')} = ${bucket('$2::timestamptz')}
+    HAVING count(*) > 0
+  `, [pair, clock, new Date(clock.getTime() - HISTORICAL_BUCKET_MAX_MS[timeframe])]);
   if (rows.length === 0) throw new Error(`No ${pair} minute at or before ${clock.toISOString()} in its ${timeframe} bar`);
   const r = rows[0];
   return {

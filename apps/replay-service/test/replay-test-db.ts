@@ -48,6 +48,7 @@ export interface ReplayTestDb {
   testDb: TestDatabase;
   admin: DataSource;   // the migrating user, for setup and assertions only
   replay: DataSource;  // the replay login: what the services under test use
+  login: { username: string; password: string };
   createUser(): Promise<string>;
   close(): Promise<void>;
 }
@@ -86,7 +87,7 @@ export async function createReplayTestDb(excerpts: HistoryExcerpt[]): Promise<Re
 
   let users = 0;
   return {
-    testDb, admin, replay,
+    testDb, admin, replay, login: { username: login, password },
     async createUser() {
       const tag = `${Date.now()}_${++users}`;
       const [{ id }] = await admin.query(
