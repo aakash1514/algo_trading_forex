@@ -147,6 +147,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Use Windows-compatible commands. In Git Bash, wrap Docker commands that use paths in `bash -c "..."`,
   and set `MSYS_NO_PATHCONV=1` for `docker exec` with container paths (e.g. `/opt/kafka/bin/...`).
 - Local Postgres 13/15 occupy 5432/5433, so TimescaleDB is on host port **15432**. Don't change it.
+- Docker Desktop on Windows can reset IPv6 connections to forwarded ports ([::1]:15432, [::1]:9092) while 127.0.0.1
+  works; Node 24 tries localhost as IPv6 first. Use 127.0.0.1 for DB/Redis/Kafka hosts in .env.
 - The laptop is low on resources. For running several services, prefer compiled mode
   (`npx nx build <svc>` then `node dist/apps/<svc>/main.js`) over multiple `nx serve` watchers.
 
