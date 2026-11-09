@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-ForexEdge is a forex trading platform built as an Nx monorepo (npm workspaces). It has five NestJS microservices that talk over Kafka, a Python FastAPI ML service (`apps/ml-service`, inference only), a Python research agent (`apps/research-agent`, LangGraph + MCP, read-only), a Next.js 16 frontend, and three shared libraries. Trading is paper-only for now: order-service binds `BROKER_ADAPTER` to `PaperBrokerAdapter`.
+ForexEdge is a forex trading platform built as an Nx monorepo (npm workspaces). It has five NestJS microservices that talk over Kafka, a sixth NestJS service for bar replay over the history (`apps/replay-service`, no Kafka), a Python FastAPI ML service (`apps/ml-service`, inference only), a Python research agent (`apps/research-agent`, LangGraph + MCP, read-only), a Next.js 16 frontend, and four shared libraries. Trading is paper-only for now: order-service binds `BROKER_ADAPTER` to `PaperBrokerAdapter`.
 
 ## Commands
 
@@ -15,7 +15,7 @@ Run every command from the repo root. Each Nx target has the form `npx nx <targe
 docker compose -f infra/docker-compose.yml --env-file .env up -d
 
 # Run a service (serve builds with webpack first, then runs the dist output)
-npx nx serve auth-service        # also: market-service, domain-service, order-service, ws-gateway
+npx nx serve auth-service        # also: market-service, domain-service, order-service, ws-gateway, replay-service
 npx nx dev frontend              # Next.js dev server
 
 npx nx build <project>
@@ -44,6 +44,14 @@ RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
 # Independent backtest verification (auth-service + ws-gateway running): API run vs SQL reproduction
 npm run backtest:verify -- [--pairs EUR_USD,XAU_USD] [--from 2022-01-01] [--to 2022-12-30]
 
+# Replay (replay-service, :3008): its DB login from REPLAY_DB_USER/REPLAY_DB_PASS, then the equivalence check
+npx ts-node --transpile-only tools/ops/create-replay-db-user.ts
+npm run replay:verify -- [--pairs EUR_USD,XAU_USD,USD_JPY]   # auth-service + replay-service running; replays the
+                                                            # verified trades of docs/validation/backtest-verification.md
+npm run replay:e2e                                          # end-to-end run -> docs/validation/replay-backend-e2e.md
+RUN_DB_TESTS=true npx nx test replay-service --skip-nx-cache  # + DB/socket suites (real minutes, replay login)
+npx ts-node --transpile-only tools/ops/delete-verification-users.ts [--apply]   # throwaway verify_*/replay* users
+
 # ML service (Python 3.12, apps/ml-service; see its README)
 npx nx setup ml-service                         # venv + hash-checked install of the lock files
 npx nx run-many -t lint typecheck test -p ml-service    # ruff, mypy --strict, pytest
@@ -67,8 +75,8 @@ npx ts-node --transpile-only tools/ops/research-demo-data.ts        # demo users
 ## Architecture
 
 ### Services and ports
-All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`,
-except research-agent, which allows only `localhost:4200`.
+All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`
+(replay-service too, HTTP and socket), except research-agent, which allows only `localhost:4200`.
 
 | Service | Port | Responsibility |
 |---|---|---|
@@ -78,6 +86,7 @@ except research-agent, which allows only `localhost:4200`.
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ml-service (Python) | 3006 | FastAPI, inference only: LSTM next-H1-direction models trained offline walk-forward (`models/`, manifest + sha256). `GET /api/ml/{health,models,evaluation,predictions/{instrument}}`, JWT on all but health. Reads the history as the read-only login `forexedge_ml` (role `forexedge_readonly`). Results are a **historical walk-forward test, not live signals**. |
 | research-agent (Python) | 3007 | FastAPI + LangGraph agent over a FastMCP stdio server (7 read-only tools: available data, bars, market stats, the caller's backtest runs, ML evaluation/predictions). `POST /api/research/ask` (JWT) returns a structured report whose every number is checked by a deterministic verifier. LLM from env (`RESEARCH_LLM_MODEL`, default `groq:openai/gpt-oss-120b`, free tier). DB login `forexedge_research` (roles `forexedge_readonly` + `forexedge_research_reader`); calls ml-service with the caller's own token. |
+| replay-service | 3008 | Bar replay over the imported 2010-2022 history (step 6b-1). REST `/api/replay/sessions` (create: 409 `{activeSessionId}` while one is active; `active`; `active/end`), `active/orders`, `active/orders/:id/cancel`, `active/positions/:id/close`; Socket.IO namespace `/replay` (JWT in `handshake.auth.token`, room `user:<id>`; commands play, pause, step, setSpeed, setTimeframe, acked `{ok, result or error}`; events state, bar, account, positions, status, endOfData, ended). Trades through `@forexedge/trading-sim`. DB login `forexedge_replay` (roles `forexedge_readonly` + `forexedge_replay_writer`). **No Kafka, no Redis.** |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
 order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
@@ -96,7 +105,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 ### Shared libraries (path aliases in `tsconfig.base.json`)
 - `@forexedge/database`: every TypeORM entity. Each service lists only the entities it needs in its own `TypeOrmModule.forRootAsync`, with `synchronize: false`. A new entity must be exported from `libs/database/src/index.ts`, added to the services that use it, and get a migration under `apps/auth-service/src/migrations/`.
 - `@forexedge/kafka`: Kafka client, producer/consumer services, `KAFKA_TOPICS`, tick interface.
-- `@forexedge/common`: broker interface and the `BROKER_ADAPTER` DI token.
+- `@forexedge/common`: broker interface and the `BROKER_ADAPTER` DI token. `@forexedge/common/money` is the money file
+  alone (margin, pip value), for code that must not pull in the barrel's NestJS imports.
+- `@forexedge/trading-sim`: the trading rules shared by the backtester and replay, pure functions on integer points
+  (fills, SL/TP `levelExit`, USD money and commission, mark to market, margin). No I/O, NestJS, TypeORM or Kafka, and
+  only `@forexedge/common/money` from common (a static test in replay-service enforces it).
 
 ### Per-service conventions
 - Every service has its own small `redis/` module (with an injection decorator) instead of a shared lib.
@@ -266,6 +279,31 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   replayed); record new ones with `scripts/record_transcripts.py`.
 - Only MARKET orders are executed; LIMIT/STOP/... are rejected (no pending-order engine yet). SL/TP must sit on the
   right side of the exit price (LONG: SL < bid < TP; SHORT: TP < ask < SL), at placement and on PATCH.
+- **Replay rules (step 6b-1, replay-service):**
+  - **The server owns the clock** (`replay_sessions.clock_time` = the last processed M1 minute) and never sends
+    anything after it: the current bar is rebuilt from M1 minutes up to the clock (the aggregate row of an unfinished
+    bucket is never read), history is the completed aggregate bars before the current bucket (500), and every emitted
+    payload passes `assertNothingAfterClock`. Buckets use `historicalBucketSql` (`@forexedge/database`), the
+    aggregates' own expressions; a DB test rebuilds every 5m-1d row from M1.
+  - **One bar per step**: the next bar's minutes (weekends and gaps skipped) run in order through the engine, then
+    positions, balance (relative update) and clock are saved in one transaction, then bar/positions/account are sent.
+    Per minute: requested closes at the open, then pending orders at the open, then SL/TP from the fill minute on.
+  - **Fills are the backtester's next-open rule**: an order or close placed at clock t is PENDING and fills at the
+    next processed minute's open (BUY at the ask, SELL at the bid; a long closes at the bid). SESSION_END closes at
+    the clock minute's close. Money, commission (0.7 pip/side) and USD/JPY conversion are trading-sim's; replaying the
+    verified backtest trades gives the same trades to the cent (`npm run replay:verify`).
+  - Validation at the clock minute's close: SL/TP whole points on the right side; margin = `marginRequiredUsd`
+    (1:100 capped by `max_leverage`) at the side's close vs free margin = equity - margin of OPEN + PENDING. Equity =
+    balance + mark to market at the clock close. **No stop-out or margin call** (none in the backtester).
+  - Speeds are exactly 500, 1000 or 2000 ms per bar. One chained timer per PLAYING session (token-guarded); every
+    command, order and step runs under the per-session `SessionLock`. The last socket leaving pauses and saves, a
+    connecting socket always gets a PAUSED state (also a second tab), a boot or clean stop pauses every PLAYING
+    session, and the end of the history pauses with `endOfData`. **Single instance only** (in-process timers/lock).
+  - One non-ENDED session per user (partial unique index). The replay login can't write `historical_*`, `ticks`,
+    `candles_*` or `instruments`, and can't read users/orders/live ticks; replay-service refuses to start as `DB_USER`.
+  - Tests use real minutes only: `test/replay-test-db.ts` loads the importer's real fixtures into `<DB_NAME>_test`
+    with the real instruments seed (the only cross-project imports, test code) and connects as a temporary login
+    with the replay grants; `test/replay-app.ts` runs the real AppModule in-process.
 
 ### Tooling gotchas
 - **Never put `NODE_ENV` in `.env`.** Nx loads the root `.env` into every task, and
@@ -322,9 +360,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-5-research-agent.md`.
 - **Step 5b (Research page) is done** (2026-10-12), merged into main (PR #5). The manual browser check is pending
   (`docs/validation/research-page-e2e.md`). Write-up: §13 of the step-5 summary.
-- **Step 6a (price safety + calendar) is done** (2026-10-12, follow-up 2026-11-06) on branch `step-6-live-data`
-  (not merged): exact UTC event times, Forex Factory for non-FOMC/ECB events, BLS parked on `step-6a-bls-wip` (403).
+- **Step 6a (price safety + calendar) is done** (2026-10-12, follow-up 2026-11-06), merged into main (PR #7):
+  exact UTC event times, Forex Factory for non-FOMC/ECB events, BLS parked on `step-6a-bls-wip` (403).
   Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
+- **Step 6b-1 (bar replay backend) is done** (2026-11-10) on branch `step-6b-1-replay-backend` (not merged):
+  `@forexedge/trading-sim`, replay-service (3008), replay tables and login, playback over `/replay`, orders.
+  Write-up: `docs/phase-summaries/step-6b-1-replay-backend.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -369,7 +410,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    calendar with exact UTC times: FOMC (expected 14:00 New York) and ECB (14:15 Frankfurt) from official sources,
    all other events via Forex Factory (owner exception, portfolio use only); direct BLS access is blocked (HTTP 403,
    2026-11-06, docs/OVERNIGHT-QUESTIONS.md #5).
-   Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`. Next: 6b, historical Replay mode.
+   Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
+   **6b-1 done (2026-11-10)** on branch `step-6b-1-replay-backend`: the bar replay backend (replay-service, see the
+   replay rules). Write-up: `docs/phase-summaries/step-6b-1-replay-backend.md`. Next: 6b-2, the Replay page (frontend).
    A licensed live provider needs bid/ask and display rights; before enabling it, follow the mixed-candles rule.
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
    realign the live views to the NY close when a live provider is added.
@@ -383,6 +426,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    `forexedge_research_reader` the same way, and a non-free LLM tier or rate limits for real traffic (free Groq
    is about one question per minute).
    CORS: other services also allow 3001 with credentials — narrow before deployment.
+   replay-service: the role `forexedge_replay_writer` and its login (as for ml-service), and a single instance (timers
+   and the session lock are in-process; more instances need a DB-level lock and timer ownership).
    market-service: its own DB login with INSERT on `ticks` only (and SELECT where needed), so the database itself
    blocks writes to `historical_*` (step 6a enforces it with tests only).
    Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
