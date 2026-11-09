@@ -5,7 +5,7 @@ import { useAppSelector, useAppDispatch } from '../../store';
 import { useGetCurrentSessionQuery } from '../../store/api/domain.api';
 import { useLogoutMutation } from '../../store/api/auth.api';
 import { clearCredentials } from '../../store/slices/auth.slice';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
 import { cn } from '../../lib/cn';
 import { getPriceDecimals } from '../../lib/pip';
@@ -33,6 +33,8 @@ export function Topbar() {
   }
 
   const displayPairs = MAJOR_PAIRS.slice(0, 6);
+  // On the Replay page nothing up here may look like live prices
+  const onReplay = usePathname() === '/replay';
 
   return (
     <header className="h-11 bg-terminal-surface border-b border-terminal-border flex items-center px-4 shrink-0">
@@ -65,7 +67,7 @@ export function Topbar() {
 
       {/* Live price ticker strip */}
       <div className="flex items-stretch gap-0 flex-1 overflow-hidden">
-        {displayPairs.map((pair) => {
+        {!onReplay && displayPairs.map((pair) => {
           const price = prices[pair];
           return (
             <div
@@ -96,10 +98,14 @@ export function Topbar() {
         )}
 
         {/* Live indicator */}
-        <div className="flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />
-          <span className="text-[10px] text-terminal-muted">Live</span>
-        </div>
+        {onReplay ? (
+          <span className="text-[10px] font-medium text-amber-300">Historical replay</span>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />
+            <span className="text-[10px] text-terminal-muted">Live</span>
+          </div>
+        )}
 
         {/* User + logout */}
         <div className="flex items-center gap-2 pl-3 border-l border-terminal-border">

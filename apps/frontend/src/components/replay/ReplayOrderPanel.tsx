@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { usePlaceReplayOrderMutation } from '../../store/api/replay.api';
 import { accountReceived, positionsReceived } from '../../store/slices/replay.slice';
@@ -27,6 +27,9 @@ export function ReplayOrderPanel() {
   const [problem, setProblem] = useState<string | null>(null);
   const [placed, setPlaced] = useState(false);
   const [place, { isLoading }] = usePlaceReplayOrderMutation();
+  const clock = session?.clockTime;
+  // "Order placed" is about the minute it was placed at
+  useEffect(() => setPlaced(false), [clock]);
   if (!session || !bar) return null;
 
   const bid = bar.bid.close;

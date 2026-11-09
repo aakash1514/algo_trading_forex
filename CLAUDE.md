@@ -49,6 +49,10 @@ npx ts-node --transpile-only tools/ops/create-replay-db-user.ts
 npm run replay:verify -- [--pairs EUR_USD,XAU_USD,USD_JPY]   # auth-service + replay-service running; replays the
                                                             # verified trades of docs/validation/backtest-verification.md
 npm run replay:e2e                                          # end-to-end run -> docs/validation/replay-backend-e2e.md
+npm run replay:browser                                      # Replay page in Playwright's Chromium (auth + replay-service
+                                                            # + production frontend :4200) -> docs/validation/replay-frontend-e2e.md
+npx ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/record-frontend-fixtures.ts
+                                                            # re-records the Replay page's fixtures (auth + replay-service)
 RUN_DB_TESTS=true npx nx test replay-service --skip-nx-cache  # + DB/socket suites (real minutes, replay login)
 npx ts-node --transpile-only tools/ops/delete-verification-users.ts [--apply]   # throwaway verify_*/replay* users
 
@@ -133,6 +137,18 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   `could_not_verify` shows a fixed warning only, never `answer`, `claims` or `verification.failures` (a failure
   message can quote the rejected number). Component tests use real recorded `/ask` bodies
   (`components/research/__fixtures__`, sha256 in its manifest).
+- **Replay page (`/replay`, step 6b-2):** the server owns everything; the page keeps the latest copy in the `replay`
+  slice (a `state` replaces it all, `bar`/`account`/`positions`/`status` replace their part, positions by id).
+  `useReplaySocket` opens one socket per page visit to replay-service `/replay`; the token is read from the store on
+  every (re)connect (`auth` callback), never captured, so a token refresh doesn't tear the socket down (a disconnect
+  would pause the replay). A `replayError` 'Unauthorized' runs `refreshSession()` once and connects again. The page
+  never sends `play` by itself. The chart draws **bid** candles: `setData` on a new state (`stateVersion`),
+  `update` for a bar event; a bar of another timeframe is ignored. Money and prices stay decimal strings (USD
+  formatted from cents as BigInt). Each open position's P&L is computed with `@forexedge/trading-sim`'s
+  `markToMarketCents` at the current bar's close (the server sends only the total; a test checks the rows add up
+  to `unrealizedPnlUsd`). On /replay the Topbar hides the live ticker and shows "Historical replay". Component
+  tests use recorded replay-service bodies and socket events (`components/replay/__fixtures__`, written by
+  `record-frontend-fixtures.ts`, sha256 in its manifest).
 
 
 ## Environment
@@ -301,6 +317,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
     command, order and step runs under the per-session `SessionLock`. The last socket leaving pauses and saves, a
     connecting socket always gets a PAUSED state (also a second tab), a boot or clean stop pauses every PLAYING
     session, and the end of the history pauses with `endOfData`. **Single instance only** (in-process timers/lock).
+  - **Pause reason** (`replay_sessions.pause_reason`, step 6b-2, in `state` and `status`; null unless PAUSED): USER
+    (pause), OTHER_TAB (a socket connected while another of the user's was connected; replaces USER/DISCONNECT on a
+    paused session, never END_OF_DATA; the other sockets get a `status`), DISCONNECT (the last socket left while
+    playing; a lone reconnect keeps it), SERVER_RESTART (boot or clean stop), END_OF_DATA. A step that fails while
+    playing pauses with no reason and sends a `status`.
   - One non-ENDED session per user (partial unique index). The replay login can't write `historical_*`, `ticks`,
     `candles_*` or `instruments`, and can't read users/orders/live ticks; replay-service refuses to start as `DB_USER`.
   - Tests use real minutes only: `test/replay-test-db.ts` loads the importer's real fixtures into `<DB_NAME>_test`
@@ -338,6 +359,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   (`store.dispatch(baseApi.util.resetApiState())`), or a later test is served an earlier test's response.
 - **`nx run <p>:<t> --args='...'` turns commas inside the args into spaces** (seen with the eval's `--note`).
   Avoid commas in such arguments, or run the module directly.
+- **Workspace libs in the frontend:** Turbopack refuses a lib whose `package.json` says `"type": "commonjs"` while
+  its sources use `import`/`export`; `libs/common` and `libs/trading-sim` therefore declare no `type` (CommonJS is
+  Node's default, so the services are unchanged). Keep it that way for any lib the frontend imports. The frontend
+  type-checks at `ES2020` (BigInt literals).
+- **A stale Nx project graph** can drop a real dependency (seen: ws-gateway → trading-sim) and make `nx sync`
+  remove a valid project reference. Don't commit such a sync; run `npx nx reset --only-workspace-data` and check again.
 - **Every check fails on empty input.** A data check, validation or test assertion that compared zero rows must
   fail, never pass (an empty comparison once read as "equal"). Assert the count compared is > 0.
 - **Tests must use real DB query keys and real request shapes.** Mocks with alternate formats hid broken
@@ -365,9 +392,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Step 6a (price safety + calendar) is done** (2026-10-12, follow-up 2026-11-06), merged into main (PR #7):
   exact UTC event times, Forex Factory for non-FOMC/ECB events, BLS parked on `step-6a-bls-wip` (403).
   Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
-- **Step 6b-1 (bar replay backend) is done** (2026-11-10) on branch `step-6b-1-replay-backend` (not merged):
+- **Step 6b-1 (bar replay backend) is done** (2026-11-10), merged into main (PR #8):
   `@forexedge/trading-sim`, replay-service (3008), replay tables and login, playback over `/replay`, orders.
   Write-up: `docs/phase-summaries/step-6b-1-replay-backend.md`.
+- **Step 6b-2 (Replay page) is done** (2026-11-10) on branch `step-6b-2-replay-frontend` (not merged): `/replay`,
+  the pause reason, a Playwright browser run. Write-up: `docs/phase-summaries/step-6b-2-replay-frontend.md`.
+  Deferred items: `docs/BACKLOG.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -413,8 +443,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    all other events via Forex Factory (owner exception, portfolio use only); direct BLS access is blocked (HTTP 403,
    2026-11-06, docs/OVERNIGHT-QUESTIONS.md #5).
    Write-up: `docs/phase-summaries/step-6a-price-safety-calendar.md`.
-   **6b-1 done (2026-11-10)** on branch `step-6b-1-replay-backend`: the bar replay backend (replay-service, see the
-   replay rules). Write-up: `docs/phase-summaries/step-6b-1-replay-backend.md`. Next: 6b-2, the Replay page (frontend).
+   **6b-1 done (2026-11-10)**: the bar replay backend (replay-service, see the replay rules). Write-up:
+   `docs/phase-summaries/step-6b-1-replay-backend.md`. **6b-2 done (2026-11-10)** on branch
+   `step-6b-2-replay-frontend`: the Replay page. Write-up: `docs/phase-summaries/step-6b-2-replay-frontend.md`.
+   Future replay items: `docs/BACKLOG.md`.
    A licensed live provider needs bid/ask and display rights; before enabling it, follow the mixed-candles rule.
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
    realign the live views to the NY close when a live provider is added.
