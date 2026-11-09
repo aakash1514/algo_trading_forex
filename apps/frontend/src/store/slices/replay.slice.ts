@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { endSummary, RECENT_CLOSED_CAP, type EndSummary } from '../../lib/replay';
 import type {
   BarEvent, EndedSession, EndOfDataEvent, ReplayAccount, ReplayBar, ReplayPosition, ReplaySession, ReplayState,
@@ -136,3 +136,19 @@ export const {
   endOfDataReceived, sessionEnded, summaryDismissed, commandStarted, commandFinished, errorReceived, replayReset,
 } = replaySlice.actions;
 export default replaySlice.reducer;
+
+// ── Derived lists (memoized: a new array on every render would re-render the tables) ──
+
+const selectPositionMap = (s: { replay: ReplaySliceState }) => s.replay.positions;
+
+// Pending orders and open positions, oldest first
+export const selectLiveReplayPositions = createSelector(selectPositionMap, (positions) =>
+  Object.values(positions)
+    .filter((p) => p.status === 'PENDING' || p.status === 'OPEN')
+    .sort((a, b) => a.placedAt.localeCompare(b.placedAt) || a.id.localeCompare(b.id)));
+
+// Closed trades, newest first (cancelled orders never traded and aren't listed)
+export const selectClosedReplayPositions = createSelector(selectPositionMap, (positions) =>
+  Object.values(positions)
+    .filter((p) => p.status === 'CLOSED')
+    .sort((a, b) => (b.exitTime ?? '').localeCompare(a.exitTime ?? '') || b.id.localeCompare(a.id)));

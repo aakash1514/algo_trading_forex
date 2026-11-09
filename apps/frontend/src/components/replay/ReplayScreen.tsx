@@ -7,6 +7,9 @@ import { formatReplayTime } from '../../lib/replay';
 import { EndSession } from './EndSession';
 import { ReplayChart } from './ReplayChart';
 import { ReplayControls } from './ReplayControls';
+import { ReplayAccountStrip } from './ReplayAccountStrip';
+import { ReplayOrderPanel } from './ReplayOrderPanel';
+import { ReplayPositions } from './ReplayPositions';
 
 // The replay itself: a REPLAY badge and the replay clock next to the chart, so it can
 // never be taken for live prices; the playback controls and their status line below.
@@ -36,6 +39,13 @@ export function ReplayScreen({ socket }: { socket: ReplaySocket }) {
         <div className="flex-1 flex flex-col min-w-0 border-r border-terminal-border">
           <ReplayChart />
         </div>
+        <div className="w-64 shrink-0 flex flex-col bg-terminal-surface overflow-y-auto">
+          <ReplayOrderPanel />
+          <ReplayAccountStrip />
+        </div>
+      </div>
+      <div className="h-48 shrink-0 border-t border-terminal-border overflow-hidden">
+        <ReplayPositions />
       </div>
     </div>
   );

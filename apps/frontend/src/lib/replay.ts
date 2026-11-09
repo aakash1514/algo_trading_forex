@@ -81,29 +81,25 @@ export function decimalToPoints(value: string, decimals: number): number | null 
   return m[1] === '-' ? -points : points;
 }
 
-// (the frontend's TypeScript target predates BigInt literals)
-const ZERO = BigInt(0);
-const HUNDRED = BigInt(100);
-
 export function decimalToCents(value: string): bigint {
   const m = /^(-?)(\d+)(?:\.(\d{1,2}))?$/.exec(value.trim());
   if (!m) throw new Error(`Not a USD amount: ${value}`);
-  const cents = BigInt(m[2]) * HUNDRED + BigInt((m[3] ?? '').padEnd(2, '0'));
+  const cents = BigInt(m[2]) * 100n + BigInt((m[3] ?? '').padEnd(2, '0'));
   return m[1] === '-' ? -cents : cents;
 }
 
 export function centsToDecimal(cents: bigint): string {
-  const abs = cents < ZERO ? -cents : cents;
-  return `${cents < ZERO ? '-' : ''}${abs / HUNDRED}.${String(abs % HUNDRED).padStart(2, '0')}`;
+  const abs = cents < 0n ? -cents : cents;
+  return `${cents < 0n ? '-' : ''}${abs / 100n}.${String(abs % 100n).padStart(2, '0')}`;
 }
 
 // '10000.00' -> '$10,000.00'; '-12.30' -> '-$12.30'; signed: '+$12.30'
 export function formatUsd(value: string, signed = false): string {
   const cents = decimalToCents(value);
-  const abs = cents < ZERO ? -cents : cents;
-  const whole = (abs / HUNDRED).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  const sign = cents < ZERO ? '-' : signed ? '+' : '';
-  return `${sign}$${whole}.${String(abs % HUNDRED).padStart(2, '0')}`;
+  const abs = cents < 0n ? -cents : cents;
+  const whole = (abs / 100n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const sign = cents < 0n ? '-' : signed ? '+' : '';
+  return `${sign}$${whole}.${String(abs % 100n).padStart(2, '0')}`;
 }
 
 // '2015-03-14T10:32:00.000Z' -> '2015-03-14 10:32 UTC'
