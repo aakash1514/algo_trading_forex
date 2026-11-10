@@ -76,3 +76,14 @@ __pycache__/
 
 # production / local-prod settings and demo users (real values; templates in .env.example)
 infra/.env*
+
+# Terraform (infra/terraform): providers, state, plans and real variable values never committed;
+# only .terraform.lock.hcl and terraform.tfvars.example are
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+.terraform.tfstate.lock.info
+crash.log
+crash.*.log
