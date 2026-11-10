@@ -3,7 +3,8 @@
 # credentials: init skips the backend, terraform test runs against a mocked provider, tflint runs without
 # deep_check. Fails on the first failing check.
 #
-#   fmt -check, init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck
+#   fmt -check, source rules (compose images = ECR, no key pair, no inline SG rules), init (lock file
+#   read-only), validate, terraform test, tflint + AWS ruleset, shellcheck
 #
 # Terraform is the exact version of versions.tf (TERRAFORM=/path/to/terraform to use another binary of that
 # version). tflint and shellcheck run from images pinned by digest, so Docker must be running.
@@ -38,17 +39,8 @@ cd "$TF_DIR"
 step "terraform fmt -check"
 "$TERRAFORM" fmt -check -recursive -diff
 
-step "terraform init -backend=false"
-"$TERRAFORM" init -backend=false -input=false -lockfile=readonly >/dev/null
-echo "providers installed from .terraform.lock.hcl"
-
-step "terraform validate"
-"$TERRAFORM" validate
-
-step "terraform test"
-"$TERRAFORM" test
-
 step "compose images = ECR repositories"
+# shellcheck disable=SC2016  # literal ${...} in the pattern
 compose_images="$(sed -n 's|^ *image: \${IMAGE_REGISTRY:-forexedge}/\([a-z-]*\):\${IMAGE_TAG:-local}$|\1|p' "$INFRA_DIR/docker-compose.prod.yml" | sort)"
 ecr_images="$(sed -n '/^  images = toset(\[/,/^  \])/s/^ *"\([a-z-]*\)",$/\1/p' "$TF_DIR/locals.tf" | sort)"
 if [[ -z "$compose_images" || "$compose_images" != "$ecr_images" ]]; then
@@ -66,6 +58,24 @@ if grep -nE '^\s*(key_name|ingress|egress)\s*(=|\{)' ./*.tf >&2; then
   exit 1
 fi
 echo "none"
+
+step "terraform init -backend=false"
+"$TERRAFORM" init -backend=false -input=false -lockfile=readonly >/dev/null
+echo "providers installed from .terraform.lock.hcl"
+
+step "terraform validate"
+"$TERRAFORM" validate
+
+step "terraform test"
+test_log="$(mktemp)"
+"$TERRAFORM" test | tee "$test_log"
+# A filter or layout mistake can run zero tests, which terraform reports as success
+if ! grep -qE 'Success!.* [1-9][0-9]* passed, 0 failed' "$test_log"; then
+  rm -f "$test_log"
+  echo "terraform test ran no test" >&2
+  exit 1
+fi
+rm -f "$test_log"
 
 step "tflint (AWS ruleset)"
 tf_mount="$(host_path "$TF_DIR")"
