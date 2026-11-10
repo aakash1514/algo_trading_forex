@@ -16,11 +16,10 @@ coverage
 .claude
 .vscode
 .idea
-# secrets: every image takes its configuration from the environment at run time
-.env
-.env.*
-!.env.example
-infra/.env*
+# secrets: every image takes its configuration from the environment at run time. Every .env file at any
+# depth stays out, the template too (no build needs it; an image must contain no .env* at all)
+**/.env
+**/.env.*
 # the raw Dukascopy exports and history transfers (GBs; loaded into the database, not into images)
 data
 packages

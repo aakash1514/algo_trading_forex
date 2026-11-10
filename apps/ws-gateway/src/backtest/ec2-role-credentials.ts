@@ -12,6 +12,12 @@ import { Credentials } from 'minio/dist/main/Credentials.js';
 //
 // In a container the metadata service is one network hop further than on the host: the instance needs
 // HttpPutResponseHopLimit = 2 (docs/DEPLOY.md), or the token request times out.
+//
+// Refresh: the credentials are reused until five minutes before their Expiration, then fetched again
+// (getCredentials; concurrent callers share one fetch). The IMDSv2 session token asks for 6 hours
+// (TOKEN_TTL_S) and is fetched anew with every credential fetch, so it never outlives its use.
+// Secrets: nothing here logs, and no error carries a credential, the session token or a response
+// body: errors name the request, the HTTP status or the response's Code only.
 
 export const IMDS_ENDPOINT = 'http://169.254.169.254';
 const TOKEN_TTL_S = 21_600;
@@ -60,9 +66,14 @@ export class Ec2RoleCredentialProvider extends CredentialProvider {
     const roles = (await this.request('/latest/meta-data/iam/security-credentials/', { headers }))
       .split(/\r?\n/).map((r) => r.trim()).filter(Boolean);
     if (roles.length === 0) throw new Error('No IAM role is attached to this instance');
-    const body = JSON.parse(
-      await this.request(`/latest/meta-data/iam/security-credentials/${encodeURIComponent(roles[0])}`, { headers }),
-    ) as RoleCredentials;
+    const text = await this.request(`/latest/meta-data/iam/security-credentials/${encodeURIComponent(roles[0])}`, { headers });
+    let body: RoleCredentials;
+    try {
+      body = JSON.parse(text) as RoleCredentials;
+    } catch {
+      // never rethrow the parser's error: its message quotes the input, which holds the credentials
+      throw new Error('Instance metadata returned credentials that are not JSON');
+    }
     const expiresAtMs = Date.parse(body.Expiration ?? '');
     if (body.Code !== 'Success' || !body.AccessKeyId || !body.SecretAccessKey || !body.Token || !Number.isFinite(expiresAtMs)) {
       throw new Error(`Instance metadata returned no usable credentials (Code ${body.Code ?? 'missing'})`);

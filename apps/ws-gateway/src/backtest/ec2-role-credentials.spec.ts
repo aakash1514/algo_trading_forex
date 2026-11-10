@@ -100,6 +100,59 @@ describe('Ec2RoleCredentialProvider (STORAGE=s3 credentials)', () => {
     expect(imds.calls).toHaveLength(6);
   });
 
+  it('with the real clock under fake timers: cached until 5 min before Expiration, then fetched again', async () => {
+    // only Date is faked: the stand-in server and fetch need the real event loop
+    jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate', 'setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'queueMicrotask'] });
+    try {
+      const expires = Date.parse(DOCUMENTED.Expiration);
+      jest.setSystemTime(expires - 60 * 60_000); // an hour before
+      const imds = fakeImds(DOCUMENTED);
+      servers.push(imds.server);
+      const provider = new Ec2RoleCredentialProvider(await listen(imds.server)); // default clock: Date.now
+      const first = await provider.getCredentials();
+      jest.setSystemTime(expires - 5 * 60_000 - 1_000); // 5 min 1 s before: still cached
+      expect(await provider.getCredentials()).toBe(first);
+      expect(imds.calls).toHaveLength(3);
+      jest.setSystemTime(expires - 5 * 60_000 + 1_000); // 4 min 59 s before: refreshed
+      await provider.getCredentials();
+      expect(imds.calls).toHaveLength(6);
+      expect(imds.calls[3]).toBe('PUT /latest/api/token'); // a new session token too
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('asks for a 6-hour session token', async () => {
+    let ttl: string | undefined;
+    const server = createServer((req, res) => {
+      if (req.method === 'PUT') ttl = req.headers['x-aws-ec2-metadata-token-ttl-seconds'] as string;
+      res.writeHead(500).end();
+    });
+    servers.push(server);
+    await expect(new Ec2RoleCredentialProvider(await listen(server)).getCredentials()).rejects.toThrow('HTTP 500');
+    expect(ttl).toBe('21600');
+  });
+
+  it('no error carries a credential, the session token or a response body', async () => {
+    const secret = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
+    // a malformed body holding the secret: JSON.parse's own message would quote it
+    const broken = createServer((req, res) => {
+      if (req.method === 'PUT') return res.end(IMDS_TOKEN);
+      if (req.url?.endsWith('/security-credentials/')) return res.end(`${ROLE}\n`);
+      res.end(`{"Code":"Success","SecretAccessKey":${secret}}`); // unquoted: V8's message quotes the input here
+    });
+    // a refused credential request after a valid token
+    const refused = createServer((req, res) => (req.method === 'PUT' ? res.end(IMDS_TOKEN) : res.writeHead(403).end(secret)));
+    servers.push(broken, refused);
+    for (const server of [broken, refused]) {
+      const error = await new Ec2RoleCredentialProvider(await listen(server)).getCredentials().then(() => null, (e: Error) => e);
+      expect(error).toBeInstanceOf(Error);
+      const seen = `${error?.message} ${error?.stack} ${String((error as { cause?: unknown })?.cause ?? '')}`;
+      expect(seen).not.toContain(secret.slice(0, 8)); // V8 quotes only part of a bad JSON input
+      expect(seen).not.toContain(IMDS_TOKEN);
+    }
+  });
+
   it.each([
     ['a failed credential response', { Code: 'AssumeRoleUnauthorizedAccess', Message: 'denied' }],
     ['a response without a session token', { ...DOCUMENTED, Token: undefined }],
