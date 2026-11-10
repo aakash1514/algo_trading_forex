@@ -5,3 +5,17 @@ mock_data "aws_caller_identity" {
     account_id = "111122223333"
   }
 }
+
+mock_data "aws_ssm_parameter" {
+  defaults = {
+    insecure_value = "ami-0123456789abcdef0"
+  }
+}
+
+# The instance ARN the deploy role's SendCommand statement must name
+mock_resource "aws_instance" {
+  defaults = {
+    id  = "i-0123456789abcdef0"
+    arn = "arn:aws:ec2:ap-south-1:111122223333:instance/i-0123456789abcdef0"
+  }
+}

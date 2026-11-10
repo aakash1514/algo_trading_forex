@@ -58,6 +58,15 @@ if [[ -z "$compose_images" || "$compose_images" != "$ecr_images" ]]; then
 fi
 echo "$(wc -l <<<"$compose_images") images, same in both"
 
+# Attributes a mocked provider fills with random values when they are left unset, so terraform test
+# can't see them: checked in the source instead
+step "no key pair, no inline security group rules"
+if grep -nE '^\s*(key_name|ingress|egress)\s*(=|\{)' ./*.tf >&2; then
+  echo "key pairs and inline security group rules are not allowed (SSM only; rules are separate resources)" >&2
+  exit 1
+fi
+echo "none"
+
 step "tflint (AWS ruleset)"
 tf_mount="$(host_path "$TF_DIR")"
 docker run --rm -e TFLINT_PLUGIN_DIR=/plugins -v "$TFLINT_PLUGIN_VOLUME:/plugins" \
