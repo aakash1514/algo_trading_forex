@@ -48,6 +48,16 @@ step "terraform validate"
 step "terraform test"
 "$TERRAFORM" test
 
+step "compose images = ECR repositories"
+compose_images="$(sed -n 's|^ *image: \${IMAGE_REGISTRY:-forexedge}/\([a-z-]*\):\${IMAGE_TAG:-local}$|\1|p' "$INFRA_DIR/docker-compose.prod.yml" | sort)"
+ecr_images="$(sed -n '/^  images = toset(\[/,/^  \])/s/^ *"\([a-z-]*\)",$/\1/p' "$TF_DIR/locals.tf" | sort)"
+if [[ -z "$compose_images" || "$compose_images" != "$ecr_images" ]]; then
+  echo "docker-compose.prod.yml images and locals.tf images differ:" >&2
+  diff <(echo "$compose_images") <(echo "$ecr_images") >&2 || true
+  exit 1
+fi
+echo "$(wc -l <<<"$compose_images") images, same in both"
+
 step "tflint (AWS ruleset)"
 tf_mount="$(host_path "$TF_DIR")"
 docker run --rm -e TFLINT_PLUGIN_DIR=/plugins -v "$TFLINT_PLUGIN_VOLUME:/plugins" \
