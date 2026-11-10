@@ -6,7 +6,10 @@ import { AppService } from './app.service';
 import { config } from 'process';
 import * as path from 'path';
 import { AuthModule } from '../auth/auth.module';
-import { RedisModule } from '../redis/redis.module';
+import { DataSource } from 'typeorm';
+import Redis from 'ioredis';
+import { HealthModule, redisCheck, sqlCheck } from '@forexedge/common';
+import { REDIS_CLIENT, RedisModule } from '../redis/redis.module';
 import { UserEntity, InstrumentEntity } from '@forexedge/database';
 
 
@@ -38,7 +41,11 @@ import { UserEntity, InstrumentEntity } from '@forexedge/database';
 })
     }),
     RedisModule,
-    AuthModule
+    AuthModule,
+    HealthModule.forRoot({
+      inject: [DataSource, REDIS_CLIENT],
+      useFactory: (db: DataSource, redis: Redis) => ({ db: sqlCheck(db), redis: redisCheck(redis) }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

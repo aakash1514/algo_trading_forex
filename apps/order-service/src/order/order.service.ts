@@ -50,9 +50,9 @@ export class OrderService {
     private readonly openPairs: OpenPairsIndex,
     private readonly marketHours: MarketHoursPolicy,
   ) {
-    // Kafka producer — wired up in Step 10
-    // Declared here so OrderService doesn't need to change in Step 10
-    const kafka = new Kafka({ brokers: ['localhost:9092'] });
+    // Kafka producer for orders.lifecycle, on the configured broker (KAFKA_BROKER; in a container
+    // localhost is the container itself)
+    const kafka = new Kafka({ brokers: [process.env.KAFKA_BROKER ?? 'localhost:9092'] });
     this.producer = kafka.producer();
     this.producer.connect().catch(err =>
       this.logger.warn(`Kafka producer not available: ${this.getErrorMessage(err)}`)

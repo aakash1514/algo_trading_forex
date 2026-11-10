@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
+import { HEALTH_ROUTES } from '@forexedge/common';
 
 const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
 
@@ -12,7 +13,7 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Idempotency-Key'],
   });
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: HEALTH_ROUTES }); // /health/live and /health/ready
   const port = process.env.PORT || 3003;
   await app.listen(port);
   Logger.log(`🚀 Domain Service running on http://localhost:${port}/api`);

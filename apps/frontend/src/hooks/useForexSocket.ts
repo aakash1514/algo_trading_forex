@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useStore } from 'react-redux';
 import { io, type Socket } from 'socket.io-client';
-import { useAppDispatch, useAppSelector } from '../store';
+import { useAppDispatch, useAppSelector, type RootState } from '../store';
 import { tickReceived } from '../store/slices/market.slice';
 import { positionUpdated, setPositions } from '../store/slices/positions.slice';
 import { setAccountSummary } from '../store/slices/account.slice';
 import { signalReceived } from '../store/slices/signals.slice';
 import { baseApi } from '../store/api/base.api';
 import { WS_URL, MAJOR_PAIRS, SOCKET_EVENTS } from '../lib/constants';
+import { renewSessionForSocket } from '../lib/socket-auth';
 import type {
   TickEvent,
   PositionUpdateEvent,
@@ -17,22 +19,47 @@ import type {
   SignalUpdateEvent,
 } from '../types/api.types';
 
+// A refused or expired token is renewed at most once in this window; a second refusal right after a
+// fresh token (a secret mismatch, a clock far off) stops instead of looping refresh → connect → refuse.
+export const RENEW_WINDOW_MS = 30_000;
+
+// One Socket.IO connection to ws-gateway while signed in. The token is read from the store at each
+// (re)connect, never captured, so a token refresh doesn't tear the socket down.
+// ws-gateway closes the socket when its token expires (authExpired, then a server disconnect, after
+// which socket.io doesn't reconnect by itself): the hook renews the session once and connects again
+// with the fresh token, resubscribing to the tickers on connect. If the refresh fails, the session is
+// over: the login page says so, and nothing reconnects.
 export function useForexSocket() {
   const dispatch = useAppDispatch();
-  const accessToken = useAppSelector((s) => s.auth.accessToken);
+  const store = useStore<RootState>();
+  const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated);
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (!accessToken) return;
+    if (!isAuthenticated) return;
 
     const socket = io(WS_URL, {
-      auth: { token: accessToken },
+      auth: (cb) => cb({ token: store.getState().auth.accessToken ?? '' }),
       transports: ['websocket'],
       reconnectionAttempts: 5,
       reconnectionDelay: 2000,
     });
 
     socketRef.current = socket;
+    let lastRenewAt = -Infinity;
+    let stopped = false;
+
+    socket.on('disconnect', async (reason) => {
+      // Only a server-side close needs us: other drops reconnect by themselves
+      if (reason !== 'io server disconnect' || stopped) return;
+      if (Date.now() - lastRenewAt < RENEW_WINDOW_MS) {
+        stopped = true; // refused again right after a fresh token: no loop
+        return;
+      }
+      lastRenewAt = Date.now();
+      if (await renewSessionForSocket(dispatch)) socket.connect();
+      else stopped = true;
+    });
 
     socket.on('connect', () => {
       // Subscribe to all major pairs on connect
@@ -80,7 +107,7 @@ export function useForexSocket() {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [accessToken, dispatch]);
+  }, [isAuthenticated, dispatch, store]);
 
   return socketRef;
 }

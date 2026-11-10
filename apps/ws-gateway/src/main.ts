@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { BACKTEST_QUEUE } from './backtest/backtest-queue.module';
 import { basicAuth, bullBoardCredentials } from './admin/bull-board-auth';
+import { HEALTH_ROUTES } from '@forexedge/common';
 
 
 const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
@@ -59,7 +60,7 @@ async function bootstrap() {
   app.useWebSocketAdapter(new SocketIoAdapter(app));
 
   app.setGlobalPrefix('api', {
-    exclude: ['/admin/queues', '/admin/queues/*path'],
+    exclude: ['/admin/queues', '/admin/queues/*path', ...HEALTH_ROUTES],
   });
 
   await app.listen(3005);

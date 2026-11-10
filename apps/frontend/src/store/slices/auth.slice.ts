@@ -9,6 +9,7 @@ const initialState: AuthState = {
   accessToken: null,
   isAuthenticated: false,
   sessionRestored: false,
+  sessionExpired: false,
 };
 
 export const authSlice = createSlice({
@@ -20,15 +21,28 @@ export const authSlice = createSlice({
       state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
       state.sessionRestored = true;
+      state.sessionExpired = false;
     },
     clearCredentials(state) {
       state.user = null;
       state.accessToken = null;
       state.isAuthenticated = false;
       state.sessionRestored = true;
+      state.sessionExpired = false;
+    },
+    // A refresh failed while the user was signed in (the refresh cookie expired or was revoked).
+    // AuthGuard sends them to /login, which shows SESSION_EXPIRED_MESSAGE; nothing retries.
+    sessionExpired(state) {
+      state.user = null;
+      state.accessToken = null;
+      state.isAuthenticated = false;
+      state.sessionRestored = true;
+      state.sessionExpired = true;
     },
   },
 });
 
-export const { setCredentials, clearCredentials } = authSlice.actions;
+export const SESSION_EXPIRED_MESSAGE = 'Session expired, please log in';
+
+export const { setCredentials, clearCredentials, sessionExpired } = authSlice.actions;
 export default authSlice.reducer;

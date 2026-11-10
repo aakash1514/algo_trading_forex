@@ -1,5 +1,6 @@
 """FastAPI app for the research agent. Stateless: one question in, one structured report out.
 
+GET  /health/live, /health/ready   public, for the host's probes (research_agent.health)
 GET  /api/research/health    public
 POST /api/research/ask       JWT  {"question": "..."} -> report.Report
 """
@@ -15,6 +16,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from research_agent.agent import ResearchAgent
 from research_agent.auth import CurrentUser
 from research_agent.config import get_settings
+from research_agent.db import check_db
+from research_agent.health import add_health_routes
 from research_agent.report import Report
 
 API_PREFIX = "/api/research"
@@ -41,6 +44,8 @@ def create_app(agent: ResearchAgent | None = None) -> FastAPI:
         allow_methods=["GET", "POST"],
         allow_headers=["Authorization", "Content-Type"],
     )
+
+    add_health_routes(app, {"db": check_db})
 
     @app.get(f"{API_PREFIX}/health")
     def health() -> dict[str, Any]:

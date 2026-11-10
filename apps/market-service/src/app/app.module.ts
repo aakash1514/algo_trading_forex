@@ -2,8 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { InstrumentEntity } from '@forexedge/database';
-import { KafkaModule } from '@forexedge/kafka';
-import { RedisModule } from '../redis/redis.module';
+import { DataSource } from 'typeorm';
+import Redis from 'ioredis';
+import { HealthModule, redisCheck, sqlCheck } from '@forexedge/common';
+import { KafkaModule, kafkaHealthCheck } from '@forexedge/kafka';
+import { REDIS_CLIENT, RedisModule } from '../redis/redis.module';
 import { MarketModule } from '../market/market.module';
 import { StreamModule } from '../stream/stream.module';
 import { TickProcessorModule } from '../tick-processor/tick-processor.module';
@@ -37,6 +40,14 @@ import { TickProcessorModule } from '../tick-processor/tick-processor.module';
     MarketModule,       // REST endpoints + InstrumentRepository
     StreamModule,       // OANDA/Mock stream → Kafka producer
     TickProcessorModule, // Kafka consumers → TimescaleDB + Redis
+    HealthModule.forRoot({
+      inject: [DataSource, REDIS_CLIENT, ConfigService],
+      useFactory: (db: DataSource, redis: Redis, config: ConfigService) => ({
+        db: sqlCheck(db),
+        redis: redisCheck(redis),
+        kafka: kafkaHealthCheck(config.get<string>('KAFKA_BROKER', 'localhost:9092')),
+      }),
+    }),
   ],
 })
 export class AppModule {}

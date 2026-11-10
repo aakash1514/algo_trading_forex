@@ -5,6 +5,7 @@ export interface AuthState {
   accessToken: string | null; // in memory only
   isAuthenticated: boolean;
   sessionRestored: boolean;   // false until the app-load refresh attempt resolves
+  sessionExpired: boolean;    // the session ended because a refresh failed (not a logout): the login page says so
 }
 
 export interface MarketState {

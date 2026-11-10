@@ -21,7 +21,7 @@ from pathlib import Path
 import jwt
 import numpy as np
 
-from ml_service.auth import access_secret
+from ml_service.auth import ACCESS_TOKEN_CLAIMS, access_secret
 from ml_service.config import REPO_ROOT, SERVICE_ROOT
 
 MONTHS = {
@@ -41,6 +41,7 @@ def main() -> None:
     now = int(time.time())
     tok = jwt.encode(
         {
+            **ACCESS_TOKEN_CLAIMS,
             "sub": "aaaaaaaa-0000-4000-8000-000000000001",
             "email": "parity@example.com",
             "role": "TRADER",

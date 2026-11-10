@@ -84,6 +84,41 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     await http(app.url, token, 'POST', '/sessions/active/end');
   });
 
+  it('an expiring token without a reauth: authExpired, disconnected, a playing replay paused as DISCONNECT', async () => {
+    const { userId } = await user();
+    const token = accessToken(userId, 3); // expires in 2-3 s (exp has whole seconds)
+    const { body: session } = await create(token);
+    const a = await connectClient(app.url, token);
+    expect((await a.command('setSpeed', { speedMs: 500 })).ok).toBe(true);
+    expect((await a.command('play')).ok).toBe(true);
+    await a.next('bar');
+    const disconnected = new Promise<void>((resolve) => a.socket.once('disconnect', () => resolve()));
+    await a.next('authExpired', 5_000);
+    await disconnected;
+    expect(await waitFor(async () => (await stored(session.id)).status === 'PAUSED')).toBe(true);
+    expect((await stored(session.id)).pauseReason).toBe('DISCONNECT');
+    const fresh = accessToken(userId);
+    await http(app.url, fresh, 'POST', '/sessions/active/end');
+  });
+
+  it('a reauth with the same user\'s fresh token keeps the socket; another user\'s token is refused', async () => {
+    const { userId } = await user();
+    const { token: otherUsersToken } = await user();
+    const token = accessToken(userId, 3);
+    await create(token);
+    const a = await connectClient(app.url, token);
+    expect(await a.command('reauth', { token: otherUsersToken })).toEqual({ ok: false, error: 'Unauthorized' });
+    expect(await a.command('reauth', { token: accessToken(userId, -1) })).toEqual({ ok: false, error: 'Unauthorized' });
+    const renewed = await a.command<{ expiresAt: string }>('reauth', { token: accessToken(userId) });
+    expect(renewed.ok).toBe(true);
+    expect(new Date(renewed.result!.expiresAt).getTime()).toBeGreaterThan(Date.now() + 14 * 60_000);
+    await sleep(4_000); // past the first token's expiry
+    expect(a.socket.connected).toBe(true);
+    expect(a.events.map((e) => e.event)).not.toContain('authExpired');
+    await a.close();
+    await http(app.url, accessToken(userId), 'POST', '/sessions/active/end');
+  });
+
   it('a second tab: connecting pauses, and only the last socket leaving pauses a replay played again', async () => {
     const { token } = await user();
     const { body: session } = await create(token);

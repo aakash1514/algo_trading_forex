@@ -27,7 +27,7 @@ from langchain_core.messages import AIMessage
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from research_agent.agent import DEFAULT_MODEL, ResearchAgent, RunStats
-from research_agent.auth import access_secret
+from research_agent.auth import ACCESS_TOKEN_CLAIMS, access_secret
 from research_agent.db import connect
 
 OUT = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "transcripts"
@@ -76,7 +76,11 @@ def sanitize(messages: list[AIMessage]) -> list[dict[str, Any]]:
 
 async def record(name: str, question: str, user_id: str) -> None:
     now = int(time.time())
-    token = jwt.encode({"sub": user_id, "role": "TRADER", "iat": now, "exp": now + 600}, access_secret(), "HS256")
+    token = jwt.encode(
+        {**ACCESS_TOKEN_CLAIMS, "sub": user_id, "role": "TRADER", "iat": now, "exp": now + 600},
+        access_secret(),
+        "HS256",
+    )
     replies: list[AIMessage] = []
     stats = RunStats()
     report = await ResearchAgent(recorder=replies).ask(question, user_id, token, stats)

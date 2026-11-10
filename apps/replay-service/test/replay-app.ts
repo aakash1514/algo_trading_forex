@@ -5,6 +5,7 @@ import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { io, Socket } from 'socket.io-client';
+import { ACCESS_TOKEN_SIGN_OPTIONS } from '@forexedge/common';
 import { rootEnv } from '@forexedge/database/testing';
 import { AppModule } from '../src/app/app.module';
 import { configureApp } from '../src/app/configure-app';
@@ -31,10 +32,13 @@ export async function startReplayApp(db: ReplayTestDb): Promise<ReplayApp> {
 }
 
 // An access token as auth-service issues it (same secret, sub = user id)
-export function accessToken(userId: string): string {
+export function accessToken(userId: string, expiresIn: number | '15m' = '15m'): string {
   const secret = rootEnv()['JWT_ACCESS_SECRET'];
   if (!secret) throw new Error('JWT_ACCESS_SECRET is not set in .env');
-  return new JwtService().sign({ sub: userId, email: `${userId}@example.com`, role: 'TRADER' }, { secret, expiresIn: '15m' });
+  return new JwtService().sign(
+    { sub: userId, email: `${userId}@example.com`, role: 'TRADER' },
+    { ...ACCESS_TOKEN_SIGN_OPTIONS, secret, expiresIn },
+  );
 }
 
 export async function http<T = unknown>(

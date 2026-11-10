@@ -10,6 +10,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
+import { AUTH_EXPIRED_EVENT, SocketDeadlines, verifyAccessToken } from '@forexedge/common';
 
 @WebSocketGateway({
   cors: {
@@ -29,38 +30,31 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private readonly jwtService: JwtService) {}
 
-  // ── Connection handler — JWT auth on handshake ──
-  // Known limitation: token expiry mid-session not enforced.
-  // Client reconnects on server restart with a fresh token at that point.
-  async handleConnection(socket: Socket) {
-    const token = socket.handshake.auth?.token as string | undefined;
+  // One deadline per socket: the access token's expiry (see @forexedge/common socket-auth)
+  private readonly deadlines = new SocketDeadlines();
 
-    if (!token) {
-      this.logger.warn(`Socket ${socket.id} rejected — no token`);
+  // ── Connection handler — JWT auth on handshake, held to the token's expiry ──
+  // When the token expires the socket gets AUTH_EXPIRED_EVENT and is disconnected; the client
+  // refreshes its token and reconnects (useForexSocket).
+  async handleConnection(socket: Socket) {
+    const verified = verifyAccessToken(this.jwtService, socket.handshake.auth?.token, process.env.JWT_ACCESS_SECRET ?? '');
+    if (!verified) {
+      this.logger.warn(`Socket ${socket.id} rejected — missing, invalid or expired token`);
       socket.disconnect(true);
       return;
     }
-
-    try {
-      const payload = this.jwtService.verify<{ sub: string; email: string; role: string }>(
-        token,
-        { secret: process.env.JWT_ACCESS_SECRET },
-      );
-      // Without a subject every such socket would share the room "user:undefined".
-      if (typeof payload.sub !== 'string' || payload.sub.trim() === '') {
-        throw new Error('Token has no subject');
-      }
-      socket.data.userId = payload.sub;
-      socket.join(`user:${payload.sub}`);
-      this.logger.log(`Socket ${socket.id} connected — user:${payload.sub}`);
-    } catch {
-      this.logger.warn(`Socket ${socket.id} rejected — invalid/expired token`);
+    socket.data.userId = verified.userId;
+    socket.join(`user:${verified.userId}`);
+    this.deadlines.schedule(socket.id, verified.expiresAtMs, () => {
+      socket.emit(AUTH_EXPIRED_EVENT);
       socket.disconnect(true);
-    }
+    });
+    this.logger.log(`Socket ${socket.id} connected — user:${verified.userId}`);
   }
 
   // ── Disconnect handler — clean up ALL tickSubscription entries ──
   handleDisconnect(socket: Socket) {
+    this.deadlines.clear(socket.id);
     this.tickSubscriptions.forEach((socketIds, instrument) => {
       socketIds.delete(socket.id);
       // Remove instrument key entirely if no subscribers remain — prevents Map bloat

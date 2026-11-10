@@ -4,13 +4,12 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useStore } from 'react-redux';
 import { io, type Socket } from 'socket.io-client';
 import { useAppDispatch, type RootState } from '../store';
-import { clearCredentials, setCredentials } from '../store/slices/auth.slice';
 import {
   accountReceived, barReceived, commandFinished, commandStarted, connectionChanged, endOfDataReceived, errorReceived,
   positionsReceived, replayReset, sessionEnded, stateReceived, statusReceived,
 } from '../store/slices/replay.slice';
 import { REPLAY_WS_URL } from '../lib/constants';
-import { refreshSession } from '../lib/session';
+import { AUTH_EXPIRED_EVENT, REAUTH_EVENT, renewSessionForSocket } from '../lib/socket-auth';
 import type {
   BarEvent, CommandAck, EndedSession, EndOfDataEvent, ReplayAccount, ReplayPosition, ReplaySession, ReplayState,
 } from '../types/replay.types';
@@ -35,9 +34,14 @@ export interface ReplaySocket {
 // The token is read from the store each time the socket (re)connects, never captured:
 // a token refreshed by an API call is simply used next time, and the socket isn't torn
 // down when it changes (a disconnect would pause the replay as DISCONNECT).
-// The server refuses an expired token by emitting replayError 'Unauthorized' and
-// closing the socket; the hook then runs the app's shared refresh (one in flight for
-// the whole app, the refresh token rotates) and connects again with the new token.
+// replay-service holds the socket to its token's expiry: whenever the store gets a new
+// token (useTokenRefresh refreshes a minute before expiry), the hook sends it as a
+// 'reauth', which moves the server's deadline, so the socket (and a playing replay)
+// carries on. If the deadline passes anyway, the server emits authExpired and closes the
+// socket (the replay pauses as DISCONNECT); a refused handshake is replayError
+// 'Unauthorized'. Either way the hook runs the app's shared refresh once (one in flight
+// across tabs, the refresh token rotates) and connects again with the new token; if the
+// refresh fails the session is over (the login page says so) and nothing reconnects.
 // The server always sends a PAUSED state on connect, and nothing here ever sends
 // 'play' by itself.
 export function useReplaySocket(): ReplaySocket {
@@ -56,14 +60,44 @@ export function useReplaySocket(): ReplaySocket {
     socketRef.current = socket;
     dispatch(connectionChanged('connecting'));
     let refreshedSinceConnect = false;
+    let expiredByServer = false;
+
+    // Renews the session once, then connects again; a failure ends the session (no loop)
+    const renewAndConnect = async () => {
+      if (refreshedSinceConnect) {
+        dispatch(connectionChanged('failed'));
+        return;
+      }
+      refreshedSinceConnect = true;
+      if (await renewSessionForSocket(dispatch)) socket.connect();
+    };
+
+    // A new token while connected: hand it to the server before the old one expires
+    let lastToken = store.getState().auth.accessToken;
+    const unsubscribe = store.subscribe(() => {
+      const token = store.getState().auth.accessToken;
+      if (token === lastToken) return;
+      lastToken = token;
+      if (token && socket.connected) {
+        socket.timeout(COMMAND_TIMEOUT_MS).emitWithAck(REAUTH_EVENT, { token }).catch(() => undefined);
+      }
+    });
 
     socket.on('connect', () => dispatch(connectionChanged('connected')));
     socket.on('disconnect', (reason) => {
       // 'io client disconnect': this page closed it (leaving, or a resync)
-      // 'io server disconnect': refused by the server (handled on replayError)
+      // 'io server disconnect': closed by the server: its token expired (authExpired came
+      //   first) or was refused at the handshake (handled on replayError)
       // anything else: the connection dropped and socket.io reconnects by itself
       if (reason === 'io client disconnect') return;
       dispatch(connectionChanged(reason === 'io server disconnect' ? 'connecting' : 'reconnecting'));
+      if (reason === 'io server disconnect' && expiredByServer) {
+        expiredByServer = false;
+        void renewAndConnect();
+      }
+    });
+    socket.on(AUTH_EXPIRED_EVENT, () => {
+      expiredByServer = true;
     });
     socket.on('connect_error', () => {
       dispatch(connectionChanged(socket.active ? 'reconnecting' : 'failed'));
@@ -76,18 +110,7 @@ export function useReplaySocket(): ReplaySocket {
         return;
       }
       // One refresh per refusal: a second refusal right after a fresh token is final
-      if (refreshedSinceConnect) {
-        dispatch(connectionChanged('failed'));
-        return;
-      }
-      refreshedSinceConnect = true;
-      const session = await refreshSession();
-      if (!session) {
-        dispatch(clearCredentials()); // AuthGuard sends the user to /login
-        return;
-      }
-      dispatch(setCredentials(session));
-      socket.connect();
+      await renewAndConnect();
     });
 
     socket.on('state', (payload: ReplayState | { session: null }) => {
@@ -102,6 +125,7 @@ export function useReplaySocket(): ReplaySocket {
     socket.on('ended', (payload: EndedSession) => dispatch(sessionEnded(payload)));
 
     return () => {
+      unsubscribe();
       socket.removeAllListeners();
       socket.io.removeAllListeners();
       socket.disconnect();

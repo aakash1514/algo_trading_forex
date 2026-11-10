@@ -7,7 +7,7 @@ import time
 
 import jwt
 
-from research_agent.auth import access_secret
+from research_agent.auth import ACCESS_TOKEN_CLAIMS, access_secret
 
 TEST_USER_ID = "aaaaaaaa-0000-4000-8000-000000000005"
 WRONG_KEY = "a-wrong-secret-that-is-long-enough-for-hs256"
@@ -15,6 +15,7 @@ WRONG_KEY = "a-wrong-secret-that-is-long-enough-for-hs256"
 
 def token(**over: object) -> str:
     claims: dict[str, object] = {
+        **ACCESS_TOKEN_CLAIMS,
         "sub": TEST_USER_ID,
         "email": "research-test@example.com",
         "role": "TRADER",
@@ -32,14 +33,17 @@ def auth(t: str | None = None) -> dict[str, str]:
 
 def invalid_auth_headers() -> list[dict[str, str]]:
     """Every way a request must be refused: no header, wrong scheme, not a JWT, wrong key,
-    expired, no subject, blank subject."""
+    expired, no subject, blank subject, another issuer, a refresh token's audience, no audience."""
     now = int(time.time())
     return [
         {},
         {"Authorization": f"Basic {token()}"},
         auth("not-a-jwt"),
-        auth(jwt.encode({"sub": TEST_USER_ID, "exp": now + 60}, WRONG_KEY, algorithm="HS256")),
+        auth(jwt.encode({**ACCESS_TOKEN_CLAIMS, "sub": TEST_USER_ID, "exp": now + 60}, WRONG_KEY, algorithm="HS256")),
         auth(token(exp=now - 10)),
         auth(token(sub=None)),
         auth(token(sub="  ")),
+        auth(token(iss="someone-else")),
+        auth(token(aud="forexedge-refresh")),
+        auth(token(aud=None)),
     ]

@@ -7,8 +7,11 @@ import {
   SwapRateEntity,
   EconomicEventEntity,
 } from '@forexedge/database';
-import { KafkaModule } from '@forexedge/kafka';
-import { RedisModule } from '../redis/redis.module';
+import { DataSource } from 'typeorm';
+import Redis from 'ioredis';
+import { HealthModule, redisCheck, sqlCheck } from '@forexedge/common';
+import { KafkaModule, kafkaHealthCheck } from '@forexedge/kafka';
+import { REDIS_CLIENT, RedisModule } from '../redis/redis.module';
 import { PipCalculatorModule } from '../pip-calculator/pip-calculator.module';
 import { SessionClockModule } from '../session-clock/session-clock.module';
 import { SpreadMonitorModule } from '../spread-monitor/spread-monitor.module';
@@ -48,6 +51,14 @@ import { AppService } from './app.service';
     SwapCalculationModule,
     MarginEngineModule,
     EconomicCalendarModule,
+    HealthModule.forRoot({
+      inject: [DataSource, REDIS_CLIENT, ConfigService],
+      useFactory: (db: DataSource, redis: Redis, config: ConfigService) => ({
+        db: sqlCheck(db),
+        redis: redisCheck(redis),
+        kafka: kafkaHealthCheck(config.get<string>('KAFKA_BROKER', 'localhost:9092')),
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

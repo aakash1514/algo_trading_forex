@@ -1,6 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { ServerOptions } from 'socket.io';
+import { HEALTH_ROUTES } from '@forexedge/common';
 
 export const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
 
@@ -22,7 +23,7 @@ export function configureApp(app: INestApplication): void {
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: HEALTH_ROUTES }); // /health/live and /health/ready
   app.useWebSocketAdapter(new SocketIoAdapter(app));
   app.enableShutdownHooks(); // pauses PLAYING sessions on a clean stop
   app.useGlobalPipes(

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { assertUserId } from '@forexedge/common';
+import { REFRESH_TOKEN_VERIFY_OPTIONS, assertUserId } from '@forexedge/common';
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(
@@ -16,6 +16,9 @@ export class JwtRefreshStrategy extends PassportStrategy(
         (req: Request) => req?.cookies?.refresh_token ?? null,
       ]),
       ignoreExpiration: false,
+      algorithms: [...REFRESH_TOKEN_VERIFY_OPTIONS.algorithms],
+      issuer: REFRESH_TOKEN_VERIFY_OPTIONS.issuer,
+      audience: REFRESH_TOKEN_VERIFY_OPTIONS.audience,
       secretOrKey: configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
       passReqToCallback: true,
     });

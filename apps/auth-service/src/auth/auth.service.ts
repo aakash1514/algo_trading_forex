@@ -16,6 +16,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UserEntity } from '@forexedge/database';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { ACCESS_TOKEN_SIGN_OPTIONS, REFRESH_TOKEN_SIGN_OPTIONS } from '@forexedge/common';
 
 @Injectable()
 export class AuthService {
@@ -114,10 +115,12 @@ export class AuthService {
 
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
+        ...ACCESS_TOKEN_SIGN_OPTIONS,
         secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
         expiresIn: accessExpiresIn,
       }),
       this.jwtService.signAsync(payload, {
+        ...REFRESH_TOKEN_SIGN_OPTIONS,
         secret: this.configService.getOrThrow<string>('JWT_REFRESH_SECRET'),
         expiresIn: refreshExpiresIn,
       }),
