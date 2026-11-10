@@ -1,0 +1,33 @@
+# Build context for infra/docker/*.Dockerfile: the sources, never secrets, dependencies or data.
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/.next
+dist
+tmp
+out-tsc
+coverage
+.nx
+.swc
+.git
+.claude
+.vscode
+.idea
+# secrets: every image takes its configuration from the environment at run time
+.env
+.env.*
+!.env.example
+infra/.env*
+# the raw Dukascopy exports and history transfers (GBs; loaded into the database, not into images)
+data
+packages
+candle_test.json
+*.log
+# the Python images copy their app directory whole: no tests, recording scripts or models' training logs
+apps/ml-service/tests
+apps/ml-service/scripts
+apps/research-agent/tests
+apps/research-agent/scripts

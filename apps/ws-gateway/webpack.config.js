@@ -20,6 +20,8 @@ module.exports = {
       assets: ['./src/assets'],
       optimization: false,
       outputHashing: 'none',
+      // package.json + lock of what main.js requires, for the production image (npm ci --omit=dev)
+      generatePackageJson: true,
     }),
   ],
 };

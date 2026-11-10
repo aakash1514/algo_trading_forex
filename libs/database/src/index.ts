@@ -1,3 +1,8 @@
+// TypeORM loads the Postgres driver with a dynamic require that a service's build can't see, so the
+// generated package.json of its production image would leave pg out (the container then fails at
+// startup). Importing it here makes every service that uses this library declare it.
+import 'pg';
+
 export * from './lib/database';
 export * from './lib/entities/user.entity';
 export * from './lib/entities/instrument.entity';

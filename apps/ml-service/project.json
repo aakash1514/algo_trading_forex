@@ -9,11 +9,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/ml-service",
-        "commands": [
-          "py -3.12 -m venv .venv",
-          ".venv\\Scripts\\python.exe -m pip install --require-hashes --no-deps -r requirements.lock -r requirements-dev.lock"
-        ],
-        "parallel": false
+        "command": "node ../../tools/python/run.cjs --setup"
       }
     },
     "lint": {
@@ -22,7 +18,7 @@
       "inputs": ["default"],
       "options": {
         "cwd": "apps/ml-service",
-        "commands": [".venv\\Scripts\\python.exe -m ruff check .", ".venv\\Scripts\\python.exe -m ruff format --check ."],
+        "commands": ["node ../../tools/python/run.cjs -m ruff check .", "node ../../tools/python/run.cjs -m ruff format --check ."],
         "parallel": false
       }
     },
@@ -32,7 +28,7 @@
       "inputs": ["default"],
       "options": {
         "cwd": "apps/ml-service",
-        "command": ".venv\\Scripts\\python.exe -m mypy"
+        "command": "node ../../tools/python/run.cjs -m mypy"
       }
     },
     "test": {
@@ -41,7 +37,7 @@
       "inputs": ["default", { "env": "RUN_DB_TESTS" }],
       "options": {
         "cwd": "apps/ml-service",
-        "command": ".venv\\Scripts\\python.exe -m pytest"
+        "command": "node ../../tools/python/run.cjs -m pytest"
       }
     },
     "train": {
@@ -49,14 +45,14 @@
       "options": {
         "cwd": "apps/ml-service",
         "env": { "PYTHONPATH": "src" },
-        "command": ".venv\\Scripts\\python.exe -m ml_service.walk_forward"
+        "command": "node ../../tools/python/run.cjs -m ml_service.walk_forward"
       }
     },
     "serve": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "apps/ml-service",
-        "command": ".venv\\Scripts\\python.exe -m uvicorn ml_service.main:create_app --factory --app-dir src --port 3006"
+        "command": "node ../../tools/python/run.cjs -m uvicorn ml_service.main:create_app --factory --app-dir src --port 3006"
       }
     }
   }

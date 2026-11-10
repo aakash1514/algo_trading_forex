@@ -1,0 +1,350 @@
+# ForexEdge in production: one host (EC2 t3.medium, 4 GB RAM + 4 GB swap), Docker Compose, Caddy in front.
+#
+#   docker compose -f infra/docker-compose.prod.yml --env-file infra/.env.prod up -d
+#
+# Only Caddy publishes ports (80, 443). Every other container is reachable on the compose network only.
+# Each app container gets exactly the settings it uses (no shared env_file), from infra/.env.prod
+# (template: .env.example, section "Production"). Images: ${IMAGE_REGISTRY}/<app>:${IMAGE_TAG}, built
+# here from infra/docker/*.Dockerfile or pulled from ECR (docs/DEPLOY.md).
+# Memory: a limit per container (sum ~3.9 GB of ceilings; real use is measured in docs/DEPLOY.md).
+# No Prometheus, Grafana or MinIO (backtest results go to S3 with the instance role); Bull Board is not
+# mounted (BULL_BOARD_USER/PASS unset) and Caddy answers 404 for /admin.
+
+name: forexedge
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: 10m
+    max-file: '3'
+
+x-app: &app
+  restart: unless-stopped
+  logging: *logging
+  init: true
+
+x-node-health: &node-health
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 60s
+
+# The main DB login, for the services that still use it (auth owns the migrations; see BACKLOG for
+# per-service logins). Never given to replay-service, ml-service or research-agent.
+x-db: &db
+  DB_HOST: timescaledb
+  DB_PORT: '5432'
+  DB_NAME: ${DB_NAME:?}
+  DB_USER: ${DB_USER:?}
+  DB_PASS: ${DB_PASS:?}
+
+x-redis: &redis
+  REDIS_HOST: redis
+  REDIS_PORT: '6379'
+  REDIS_PASS: ${REDIS_PASS:?}
+
+x-common: &common
+  NODE_ENV: production
+  CORS_ORIGIN: https://${DOMAIN:?}
+
+services:
+  # ─── Data ────────────────────────────────────────────────────────────────
+  timescaledb:
+    <<: *app
+    image: timescale/timescaledb:2.27.0-pg16
+    environment:
+      POSTGRES_USER: ${DB_USER:?}
+      POSTGRES_PASSWORD: ${DB_PASS:?}
+      POSTGRES_DB: ${DB_NAME:?}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=trust
+      TIMESCALEDB_TELEMETRY: 'off'
+    # Sized for its 1 GB share of a 4 GB host shared with ~12 containers (not timescaledb-tune's
+    # whole-machine figures). Historical sessions raise work_mem for themselves (CLAUDE.md).
+    command: >
+      postgres
+      -c shared_buffers=384MB
+      -c effective_cache_size=1GB
+      -c work_mem=8MB
+      -c maintenance_work_mem=128MB
+      -c max_connections=60
+      -c max_worker_processes=8
+      -c max_parallel_workers=2
+      -c max_parallel_workers_per_gather=1
+      -c timescaledb.max_background_workers=4
+      -c wal_buffers=8MB
+      -c max_wal_size=1GB
+      -c checkpoint_completion_target=0.9
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c timescaledb.telemetry_level=off
+    volumes:
+      - tsdb_data:/var/lib/postgresql/data
+    mem_limit: 1g
+    shm_size: 256m
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    <<: *app
+    image: redis:7.4.9-alpine
+    # noeviction: BullMQ's queue and the refresh tokens must never be evicted; the cap makes Redis
+    # refuse writes instead of growing past its share
+    command: redis-server --requirepass ${REDIS_PASS:?} --appendonly yes --maxmemory 96mb --maxmemory-policy noeviction
+    volumes:
+      - redis_data:/data
+    mem_limit: 160m
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASS" --no-auth-warning ping | grep -q PONG']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      REDIS_PASS: ${REDIS_PASS:?}
+
+  kafka:
+    <<: *app
+    image: apache/kafka:4.2.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_HEAP_OPTS: -Xms512m -Xmx512m
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    mem_limit: 800m
+    healthcheck:
+      test: ['CMD-SHELL', '/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null']
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 60s
+
+  # ─── NestJS services ─────────────────────────────────────────────────────
+  auth-service:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/auth-service:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: service, args: { APP: auth-service } }
+    environment:
+      <<: [*common, *db, *redis]
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?}
+      JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES:-15m}
+      JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES:-7d}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    depends_on: { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy } }
+    mem_limit: 192m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  market-service:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/market-service:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: service, args: { APP: market-service } }
+    environment:
+      <<: [*common, *db, *redis]
+      KAFKA_BROKER: kafka:9092
+      MARKET_FEED: ${MARKET_FEED:-none}
+    depends_on:
+      { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy }, kafka: { condition: service_healthy } }
+    mem_limit: 192m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3002/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  domain-service:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/domain-service:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: service, args: { APP: domain-service } }
+    environment:
+      <<: [*common, *db, *redis]
+      KAFKA_BROKER: kafka:9092
+    depends_on:
+      { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy }, kafka: { condition: service_healthy } }
+    mem_limit: 192m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3003/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  order-service:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/order-service:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: service, args: { APP: order-service } }
+    environment:
+      <<: [*common, *db, *redis]
+      KAFKA_BROKER: kafka:9092
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?}
+      MARKET_FEED: ${MARKET_FEED:-none}
+    depends_on:
+      { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy }, kafka: { condition: service_healthy } }
+    mem_limit: 224m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3004/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  ws-gateway:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/ws-gateway:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: service, args: { APP: ws-gateway } }
+    environment:
+      <<: [*common, *db, *redis]
+      KAFKA_BROKER: kafka:9092
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?}
+      MARKET_FEED: ${MARKET_FEED:-none}
+      FEED_LIVE_MAX_AGE_S: ${FEED_LIVE_MAX_AGE_S:-10}
+      # backtest results: S3 with the instance role (no keys); see docker-compose.local.yml for MinIO
+      STORAGE: ${STORAGE:-s3}
+      AWS_REGION: ${AWS_REGION:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+    depends_on:
+      { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy }, kafka: { condition: service_healthy } }
+    mem_limit: 320m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3005/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  replay-service:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/replay-service:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: service, args: { APP: replay-service } }
+    environment:
+      <<: *common
+      DB_HOST: timescaledb
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:?}
+      DB_USER: ${DB_USER:?} # compared only: replay-service refuses to start as the main user
+      REPLAY_DB_USER: ${REPLAY_DB_USER:?}
+      REPLAY_DB_PASS: ${REPLAY_DB_PASS:?}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?}
+    depends_on: { timescaledb: { condition: service_healthy } }
+    mem_limit: 288m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3008/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  # ─── Python services ─────────────────────────────────────────────────────
+  ml-service:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/ml-service:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/python.Dockerfile, args: { APP: ml-service, MODULE: ml_service } }
+    environment:
+      <<: *common
+      PORT: '3006'
+      DB_HOST: timescaledb
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:?}
+      DB_USER: ${DB_USER:?} # compared only: the ML login must differ from it
+      ML_DB_USER: ${ML_DB_USER:?}
+      ML_DB_PASS: ${ML_DB_PASS:?}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?}
+    depends_on: { timescaledb: { condition: service_healthy } }
+    mem_limit: 640m
+    healthcheck:
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+      test: ['CMD', 'python', '-c', "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:3006/health/live', timeout=4).status == 200 else 1)"]
+
+  research-agent:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/research-agent:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/python.Dockerfile, args: { APP: research-agent, MODULE: research_agent } }
+    environment:
+      <<: [*common, *redis]
+      PORT: '3007'
+      DB_HOST: timescaledb
+      DB_PORT: '5432'
+      DB_NAME: ${DB_NAME:?}
+      DB_USER: ${DB_USER:?} # compared only
+      ML_DB_USER: ${ML_DB_USER:?} # compared only
+      RESEARCH_DB_USER: ${RESEARCH_DB_USER:?}
+      RESEARCH_DB_PASS: ${RESEARCH_DB_PASS:?}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?}
+      ML_SERVICE_URL: http://ml-service:3006/api/ml
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      RESEARCH_LLM_MODEL: ${RESEARCH_LLM_MODEL:-groq:openai/gpt-oss-120b}
+      RESEARCH_DAILY_LIMIT: ${RESEARCH_DAILY_LIMIT:-20}
+    depends_on: { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy } }
+    mem_limit: 480m
+    healthcheck:
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+      test: ['CMD', 'python', '-c', "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:3007/health/live', timeout=4).status == 200 else 1)"]
+
+  # ─── Frontend and the front door ─────────────────────────────────────────
+  frontend:
+    <<: *app
+    image: ${IMAGE_REGISTRY:-forexedge}/frontend:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: frontend }
+    mem_limit: 192m
+    healthcheck:
+      <<: *node-health
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/health/live').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+
+  caddy:
+    <<: *app
+    image: caddy:2.10.2-alpine
+    environment:
+      DOMAIN: ${DOMAIN:?}
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [frontend, auth-service, market-service, domain-service, order-service, ws-gateway, replay-service, ml-service, research-agent]
+    mem_limit: 64m
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:2019/config/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ─── One-off tools (docker compose run --rm ops ...): migrations, roles, demo users, history ────
+  ops:
+    profiles: [ops]
+    image: ${IMAGE_REGISTRY:-forexedge}/ops:${IMAGE_TAG:-local}
+    build: { context: .., dockerfile: infra/docker/node.Dockerfile, target: ops }
+    logging: *logging
+    environment:
+      <<: *db
+      ML_DB_USER: ${ML_DB_USER:?}
+      ML_DB_PASS: ${ML_DB_PASS:?}
+      RESEARCH_DB_USER: ${RESEARCH_DB_USER:?}
+      RESEARCH_DB_PASS: ${RESEARCH_DB_PASS:?}
+      REPLAY_DB_USER: ${REPLAY_DB_USER:?}
+      REPLAY_DB_PASS: ${REPLAY_DB_PASS:?}
+      DEMO_USERS: ${DEMO_USERS:-}
+    env_file:
+      - path: .env.demo-users # DEMO_<USERNAME>_EMAIL / _PASS, kept out of this file (docs/DEPLOY.md)
+        required: false
+    volumes:
+      - ../data/history-transfer:/repo/data/history-transfer
+    depends_on: { timescaledb: { condition: service_healthy } }
+
+volumes:
+  tsdb_data:
+  redis_data:
+  kafka_data:
+  caddy_data:
+  caddy_config:
