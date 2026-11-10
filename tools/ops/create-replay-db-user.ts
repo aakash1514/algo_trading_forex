@@ -9,6 +9,7 @@
 //
 // From the repo root, after npm run migration:run:
 //   npx ts-node --transpile-only tools/ops/create-replay-db-user.ts
+import { existsSync } from 'fs';
 import * as path from 'path';
 import { Client } from 'pg';
 
@@ -48,7 +49,9 @@ const REPLAY_DENIED = [
 ];
 
 async function main(): Promise<void> {
-  process.loadEnvFile(path.resolve(__dirname, '../../.env'));
+  // the repo's .env on a laptop; a container passes the variables instead
+  const envFile = path.resolve(__dirname, '../../.env');
+  if (existsSync(envFile)) process.loadEnvFile(envFile);
   const env = process.env;
   const user = env['REPLAY_DB_USER'];
   const password = env['REPLAY_DB_PASS'];

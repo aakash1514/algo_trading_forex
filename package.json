@@ -8,10 +8,12 @@
     "migration:revert": "typeorm-ts-node-commonjs -d data-source.ts migration:revert",
     "seed:instruments": "ts-node -r tsconfig-paths/register apps/auth-service/src/seeds/run-seeds.ts",
     "data:import": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/main.ts",
+    "data:transfer": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/transfer-main.ts",
     "data:validate": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/validate-main.ts",
     "backtest:verify": "ts-node --transpile-only --project tools/backtest-verify/tsconfig.app.json tools/backtest-verify/src/main.ts",
     "replay:verify": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/main.ts",
     "replay:e2e": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/e2e.ts",
+    "prod:smoke": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/prod-smoke.ts",
     "replay:browser": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/browser-run.ts"
   },
   "private": true,
