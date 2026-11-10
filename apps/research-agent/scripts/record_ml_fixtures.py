@@ -19,7 +19,7 @@ import jwt
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from research_agent.auth import access_secret
+from research_agent.auth import ACCESS_TOKEN_CLAIMS, access_secret
 from research_agent.tools.ml import ml_base_url
 
 OUT = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "ml"
@@ -34,7 +34,13 @@ MONTHS = {
 
 def main() -> None:
     now = int(time.time())
-    claims = {"sub": "aaaaaaaa-0000-4000-8000-000000000005", "role": "TRADER", "iat": now, "exp": now + 300}
+    claims = {
+        **ACCESS_TOKEN_CLAIMS,
+        "sub": "aaaaaaaa-0000-4000-8000-000000000005",
+        "role": "TRADER",
+        "iat": now,
+        "exp": now + 300,
+    }
     headers = {"Authorization": f"Bearer {jwt.encode(claims, access_secret(), algorithm='HS256')}"}
     OUT.mkdir(parents=True, exist_ok=True)
     with httpx.Client(base_url=ml_base_url(), timeout=120) as http:

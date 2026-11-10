@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { assertUserId } from '@forexedge/common';
+import { ACCESS_TOKEN_VERIFY_OPTIONS, assertUserId } from '@forexedge/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
@@ -19,6 +19,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
+      algorithms: [...ACCESS_TOKEN_VERIFY_OPTIONS.algorithms],
+      issuer: ACCESS_TOKEN_VERIFY_OPTIONS.issuer,
+      audience: ACCESS_TOKEN_VERIFY_OPTIONS.audience,
       secretOrKey: secret,
     });
   }

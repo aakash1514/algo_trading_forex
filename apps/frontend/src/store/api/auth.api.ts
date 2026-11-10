@@ -18,6 +18,10 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
+    // Public: whether sign-up is open on this deployment (auth-service REGISTRATION_ENABLED)
+    getAuthConfig: build.query<{ registrationEnabled: boolean }, void>({
+      query: () => `${API_BASE.AUTH}/auth/config`,
+    }),
     getMe: build.query<AuthUser, void>({
       query: () => `${API_BASE.AUTH}/auth/me`,
     }),
@@ -39,6 +43,7 @@ export const authApi = baseApi.injectEndpoints({
 export const {
   useLoginMutation,
   useRegisterMutation,
+  useGetAuthConfigQuery,
   useGetMeQuery,
   useLogoutMutation,
   useRefreshMutation,

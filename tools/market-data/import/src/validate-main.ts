@@ -2,7 +2,7 @@
 //   npm run data:validate
 // Prints the results, writes docs/validation/historical-spot-checks.md and exits
 // non-zero if any check fails. References: tools/market-data/reference/README.md.
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Client } from 'pg';
 import { CHECKS_WORK_MEM } from './checks';
@@ -78,7 +78,9 @@ function goldTable(results: GoldResult[]): string[] {
 }
 
 async function main(): Promise<void> {
-  process.loadEnvFile(join(REPO_ROOT, '.env'));
+  // the repo's .env on a laptop; a container passes the variables instead
+  const envFile = join(REPO_ROOT, '.env');
+  if (existsSync(envFile)) process.loadEnvFile(envFile);
   const env = process.env;
   const client = new Client({
     host: env['DB_HOST'] || 'localhost', port: Number(env['DB_PORT']), user: env['DB_USER'],

@@ -57,11 +57,11 @@ const toPoints = (price: string) => Number(price.replace('.', ''));
 const toCents = (usd: string) => Math.round(Number(usd) * 100);
 
 class Api {
-  constructor(private readonly base: string, private readonly token: string) {}
+  constructor(private readonly base: string, private readonly tokens: Tokens) {}
 
   async call<T>(method: string, path: string, body?: unknown): Promise<T> {
     const res = await fetch(`${this.base}${path}`, {
-      method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.token}` },
+      method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.tokens.current}` },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     const text = await res.text();
@@ -70,7 +70,40 @@ class Api {
   }
 }
 
-async function register(authUrl: string): Promise<{ token: string; user: string }> {
+// The access token, kept fresh for a run that outlasts it (three pairs take about 15 minutes, the token
+// lasts JWT_ACCESS_EXPIRES = 15m): every REFRESH_EVERY_MS the tool logs in again, uses the new token for
+// REST and sends it as 'reauth' on the open replay socket, as the Replay page does. Without it,
+// replay-service closes the socket at the token's expiry (step 7) and the run stops.
+const REFRESH_EVERY_MS = 10 * 60_000;
+class Tokens {
+  private listeners: ((token: string) => void)[] = [];
+  private timer: NodeJS.Timeout | undefined;
+  constructor(public current: string, private readonly authUrl: string, private readonly login: { email: string; password: string }) {}
+
+  start(): void {
+    this.timer = setInterval(() => void this.renew().catch((err) => console.error(`token renewal failed: ${err}`)), REFRESH_EVERY_MS);
+  }
+
+  stop(): void {
+    clearInterval(this.timer);
+  }
+
+  onRenew(listener: (token: string) => void): () => void {
+    this.listeners.push(listener);
+    return () => { this.listeners = this.listeners.filter((l) => l !== listener); };
+  }
+
+  private async renew(): Promise<void> {
+    const res = await fetch(`${this.authUrl}/auth/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.login),
+    });
+    if (!res.ok) throw new Error(`login: HTTP ${res.status}`);
+    this.current = ((await res.json()) as { accessToken: string }).accessToken;
+    this.listeners.forEach((l) => l(this.current));
+  }
+}
+
+async function register(authUrl: string): Promise<{ tokens: Tokens; user: string }> {
   const id = randomBytes(4).toString('hex');
   const fresh = { email: `replayverify_${id}@example.com`, username: `rverify_${id}`,
     password: `Verify@${randomBytes(6).toString('hex')}1A`, firstName: 'Replay', lastName: 'Verify' };
@@ -78,7 +111,8 @@ async function register(authUrl: string): Promise<{ token: string; user: string 
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(fresh),
   });
   if (!res.ok) throw new Error(`register: HTTP ${res.status} ${await res.text()}`);
-  return { token: ((await res.json()) as { accessToken: string }).accessToken, user: fresh.email };
+  const token = ((await res.json()) as { accessToken: string }).accessToken;
+  return { tokens: new Tokens(token, authUrl, { email: fresh.email, password: fresh.password }), user: fresh.email };
 }
 
 // The H1 bar before `hour` (the bar whose close produced the signal)
@@ -99,7 +133,10 @@ interface PairResult {
   comparison: Comparison;
 }
 
-async function replayPair(db: Client, replayUrl: string, token: string, pair: string, run: VerifiedRun): Promise<PairResult> {
+// A command's acknowledgement, or an error: a socket that went away must fail the run, not hang it
+const ACK_TIMEOUT_MS = 30_000;
+
+async function replayPair(db: Client, replayUrl: string, tokens: Tokens, pair: string, run: VerifiedRun): Promise<PairResult> {
   const verified = run.pairs.get(pair);
   if (!verified || verified.length === 0) throw new Error(`${pair}: no verified trades in the report`);
 
@@ -118,15 +155,23 @@ async function replayPair(db: Client, replayUrl: string, token: string, pair: st
     else if (t.exit !== 'END_OF_DATA') throw new Error(`${pair} #${t.n}: ${t.exit} exits are not replayed by this tool`);
   }
 
-  const api = new Api(`${replayUrl}/api/replay`, token);
+  const api = new Api(`${replayUrl}/api/replay`, tokens);
   const session = await api.call<{ id: string; clockTime: string }>('POST', '/sessions', {
     instrument: pair.replace('/', '_'), startTime: `${run.from}T00:00Z`, timeframe: '1h', startingBalance: run.capital,
   });
-  const socket: Socket = io(`${replayUrl}/replay`, { auth: { token }, transports: ['websocket'] });
+  const socket: Socket = io(`${replayUrl}/replay`, {
+    path: '/api/replay/socket.io', auth: (cb) => cb({ token: tokens.current }), transports: ['websocket'],
+  });
+  const stopRenewals = tokens.onRenew((token) => {
+    socket.timeout(ACK_TIMEOUT_MS).emitWithAck('reauth', { token }).then(
+      (a: { ok: boolean; error?: string }) => { if (!a.ok) console.error(`reauth refused: ${a.error}`); },
+      () => console.error('reauth: no acknowledgement'));
+  });
   const positions = new Map<string, PositionView>();
   socket.on('positions', (list: PositionView[]) => list.forEach((p) => positions.set(p.id, p)));
   await new Promise((ok, fail) => { socket.once('state', ok); socket.once('connect_error', fail); });
-  const ack = <T>(command: string) => new Promise<{ ok: boolean; result: T; error?: string }>((ok) => socket.emit(command, {}, ok));
+  const ack = <T>(command: string) => socket.timeout(ACK_TIMEOUT_MS).emitWithAck(command, {}) as
+    Promise<{ ok: boolean; result: T; error?: string }>;
 
   const lastDay = Date.parse(`${run.to}T00:00Z`) + 86_400_000;
   const positionOf = new Map<number, string>();
@@ -177,6 +222,7 @@ async function replayPair(db: Client, replayUrl: string, token: string, pair: st
       finalBalance: ended.session.balance, replayed, comparison,
     };
   } finally {
+    stopRenewals();
     socket.disconnect();
   }
 }
@@ -236,12 +282,15 @@ async function main(): Promise<void> {
   });
   await db.connect();
   const results: PairResult[] = [];
+  let tokensInUse: Tokens | undefined;
   try {
     await db.query('SET SESSION CHARACTERISTICS AS TRANSACTION READ ONLY');
-    const { token, user } = await register(authUrl);
+    const { tokens, user } = await register(authUrl);
+    tokensInUse = tokens;
+    tokens.start();
     for (const instrument of o.pairs) {
       const pair = instrument.replace('_', '/');
-      const r = await replayPair(db, replayUrl, token, pair, run);
+      const r = await replayPair(db, replayUrl, tokens, pair, run);
       results.push(r);
       console.log(`${instrument}: ${r.comparison.compared} trades compared in ${r.steps} steps (${r.seconds} s), ` +
         `net ${usd(r.comparison.replayedNetCents)} USD: ${r.comparison.ok ? 'MATCH' : 'DIFFERS'}`);
@@ -250,6 +299,7 @@ async function main(): Promise<void> {
     writeFileSync(o.report, report(run, results, user, commit, o.verified.slice(REPO_ROOT.length + 1).replace(/\\/g, '/')));
     console.log(`report: ${o.report}`);
   } finally {
+    tokensInUse?.stop();
     await db.end();
   }
   if (results.length === 0 || results.some((r) => !r.comparison.ok)) process.exit(1);

@@ -58,3 +58,41 @@ export function priceProblem(pair: string, price: PriceStamp, feed: MarketFeed, 
   }
   return null;
 }
+
+// What the terminal's status dot shows about the feed (ws-gateway computes it from the ticks it relays
+// and sends it as feed:status; the browser adds "Disconnected" when its socket is down):
+//   'none'   MARKET_FEED=none: no feed is configured ("No live feed")
+//   'mock'   the simulator, or any MOCK tick ("Mock feed"); never green
+//   'live'   a real feed with a non-MOCK tick no older than the maximum age (the only green state)
+//   'stale'  a real feed without such a tick ("Feed stale")
+export type FeedDisplayState = 'none' | 'mock' | 'live' | 'stale';
+
+export interface LastTick {
+  timestamp: string | Date;
+  source: string;
+}
+
+export const DEFAULT_FEED_LIVE_MAX_AGE_MS = 10_000;
+
+// FEED_LIVE_MAX_AGE_S (ws-gateway): seconds a real tick counts as live; a positive whole number
+export function parseFeedLiveMaxAgeMs(raw: string | undefined): number {
+  if (raw === undefined || raw.trim() === '') return DEFAULT_FEED_LIVE_MAX_AGE_MS;
+  if (!/^[1-9]\d*$/.test(raw.trim())) throw new Error(`FEED_LIVE_MAX_AGE_S must be a positive whole number, got "${raw}"`);
+  return Number(raw.trim()) * 1000;
+}
+
+export function feedDisplayState(feed: MarketFeed, last: LastTick | null, nowMs: number, liveMaxAgeMs: number): FeedDisplayState {
+  if (feed === 'none') return 'none';
+  if (feed === 'mock' || last?.source === 'MOCK') return 'mock';
+  if (!last) return 'stale';
+  const age = nowMs - new Date(last.timestamp).getTime();
+  // A tick stamped in the future (clock skew) or without a valid time is not evidence of a live feed
+  return Number.isFinite(age) && age >= -MAX_FUTURE_SKEW_MS && age <= liveMaxAgeMs ? 'live' : 'stale';
+}
+
+// Milliseconds since the last tick, or null without one (sent with the state, for display only)
+export function lastTickAgeMs(last: LastTick | null, nowMs: number): number | null {
+  if (!last) return null;
+  const age = nowMs - new Date(last.timestamp).getTime();
+  return Number.isFinite(age) ? Math.max(0, age) : null;
+}

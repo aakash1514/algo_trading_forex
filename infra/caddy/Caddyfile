@@ -1,0 +1,71 @@
+# The front door: HTTPS for {$DOMAIN} (Let's Encrypt; Caddy's own local CA for DOMAIN=localhost), www
+# redirected to the apex domain, and one origin for the whole app. Every path prefix goes to the
+# service that serves it (the real controller prefixes, checked in docs/DEPLOY.md); everything else,
+# the /replay page included, is the frontend. The domain comes from the environment only.
+{
+	# admin API on localhost only, for the container's healthcheck
+	admin 127.0.0.1:2019
+}
+
+www.{$DOMAIN} {
+	redir https://{$DOMAIN}{uri} permanent
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Frame-Options DENY
+		-Server
+	}
+
+	# route: the handlers run in the order written. Without it Caddy sorts directives itself, and
+	# `respond` (the 404s) would run before every reverse_proxy, answering all of /api with 404.
+	route {
+		# Not public: the containers' probes (Docker healthchecks call each container directly) and the
+		# Bull Board admin UI (not mounted in production anyway)
+		@internal path /health /health/* /admin /admin/*
+		respond @internal 404
+
+		@auth path /api/auth /api/auth/*
+		reverse_proxy @auth auth-service:3000
+
+		@market path /api/market /api/market/*
+		reverse_proxy @market market-service:3002
+
+		@domain path /api/domain /api/domain/*
+		reverse_proxy @domain domain-service:3003
+
+		# order-service serves three prefixes
+		@order path /api/orders /api/orders/* /api/positions /api/positions/* /api/account /api/account/*
+		reverse_proxy @order order-service:3004
+
+		# ws-gateway: the backtester's REST and the default Socket.IO path (WebSockets pass through)
+		@wsgateway path /api/backtest /api/backtest/* /socket.io /socket.io/*
+		reverse_proxy @wsgateway ws-gateway:3005
+
+		@ml path /api/ml /api/ml/*
+		reverse_proxy @ml ml-service:3006
+
+		@research path /api/research /api/research/*
+		reverse_proxy @research research-agent:3007 {
+			# an /ask can take up to 100 s (the page's timeout)
+			transport http {
+				response_header_timeout 110s
+			}
+		}
+
+		# replay-service: REST and its Socket.IO path /api/replay/socket.io
+		@replay path /api/replay /api/replay/*
+		reverse_proxy @replay replay-service:3008
+
+		# any other /api path is a 404 here, not a page from the frontend
+		@unknownApi path /api /api/*
+		respond @unknownApi 404
+
+		reverse_proxy frontend:3000
+	}
+}

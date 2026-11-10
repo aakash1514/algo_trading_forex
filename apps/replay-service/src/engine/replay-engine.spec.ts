@@ -50,6 +50,22 @@ describe('replay engine on real minutes', () => {
     expect([buy.status, buy.entryTime, buy.entryPoints]).toEqual(['OPEN', m.time, m.ask.open]);
   });
 
+  // Step 7 check of the 6b-2 browser run, where a BUY placed at bid 1.11942 (2022-03-01 09:51) showed an
+  // entry of 1.11942: in the DB, 09:52 opened at bid 1.11939 / ask 1.11942, so that entry was the ask open
+  // and only matched the earlier bid by coincidence. The same coincidence on this fixture's real minutes:
+  // placed at 09:39 (bid close 1.13481), filled at 09:40's ask open 1.13481 while its bid opened at 1.13477.
+  it('a BUY fills at the next minute\'s ask open even when that equals the bid at placement', () => {
+    const placed = find((m) => m.time.toISOString() === '2022-01-03T09:39:00.000Z');
+    const [atPlacement, fillMinute] = [minutes[placed], minutes[placed + 1]];
+    expect(fillMinute.time.toISOString()).toBe('2022-01-03T09:40:00.000Z');
+    expect([atPlacement.bid.close, fillMinute.bid.open, fillMinute.ask.open]).toEqual([113481, 113477, 113481]);
+    const buy = order('BUY');
+    const sell = order('SELL');
+    runMinute([buy, sell], fillMinute, EURUSD);
+    expect(buy.entryPoints).toBe(113481); // the ask open, not the bid open 113477
+    expect(sell.entryPoints).toBe(113477); // the bid open
+  });
+
   it('a requested close fills at the open, before new orders, at the backtester money', () => {
     const entry = minutes[200];
     const long = order('BUY', { status: 'OPEN', entryTime: entry.time, entryPoints: entry.ask.open, exitRequestedAt: minutes[300].time });

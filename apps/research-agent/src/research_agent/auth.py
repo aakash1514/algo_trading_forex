@@ -19,6 +19,13 @@ from research_agent.config import REPO_ROOT, load_env_file
 
 _bearer = HTTPBearer(auto_error=False)
 
+# The claims auth-service puts in an access token, as in libs/common/src/lib/jwt-claims.ts (a test
+# keeps the two equal). A refresh token (audience forexedge-refresh) is refused here.
+JWT_ALGORITHM = "HS256"
+JWT_ISSUER = "forexedge-auth"
+JWT_ACCESS_AUDIENCE = "forexedge-api"
+ACCESS_TOKEN_CLAIMS = {"iss": JWT_ISSUER, "aud": JWT_ACCESS_AUDIENCE}
+
 
 @dataclass(frozen=True)
 class User:
@@ -47,7 +54,12 @@ def current_user(credentials: Annotated[HTTPAuthorizationCredentials | None, Dep
         raise _unauthorized("Missing bearer token")
     try:
         payload = jwt.decode(
-            credentials.credentials, access_secret(), algorithms=["HS256"], options={"require": ["exp", "sub"]}
+            credentials.credentials,
+            access_secret(),
+            algorithms=[JWT_ALGORITHM],
+            issuer=JWT_ISSUER,
+            audience=JWT_ACCESS_AUDIENCE,
+            options={"require": ["exp", "sub", "iss", "aud"]},
         )
     except jwt.PyJWTError as err:
         raise _unauthorized("Invalid or expired token") from err

@@ -6,7 +6,7 @@ import {
   type FetchBaseQueryError,
 } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../index';
-import { setCredentials, clearCredentials } from '../slices/auth.slice';
+import { setCredentials, sessionExpired } from '../slices/auth.slice';
 import { refreshSession } from '../../lib/session';
 
 const baseQuery = fetchBaseQuery({
@@ -36,8 +36,9 @@ export const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, Fetch
       api.dispatch(setCredentials(session));
       result = await baseQuery(args, api, extraOptions);
     } else {
-      // AuthGuard redirects to /login once isAuthenticated is false.
-      api.dispatch(clearCredentials());
+      // The session ended (the refresh cookie expired or was revoked). AuthGuard redirects to
+      // /login once isAuthenticated is false, and the login page says the session expired.
+      api.dispatch(sessionExpired());
     }
   }
 

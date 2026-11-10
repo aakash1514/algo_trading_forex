@@ -37,6 +37,14 @@ npm run seed:instruments
 npm run data:import -- --years 2022 [--pairs EURUSD,XAUUSD] [--force EURUSD:2022] [--dry-run]
 npm run data:import -- --check-only
 npm run data:validate        # FRED noon fixings + gold extremes -> docs/validation/historical-spot-checks.md
+npm run data:transfer -- export|import|check [--dir data/history-transfer]   # history dev -> prod (docs/DEPLOY.md)
+
+# Production stack (docs/DEPLOY.md): images, bootstrap, local run behind Caddy on https://localhost
+docker compose -f infra/docker-compose.prod.yml -f infra/docker-compose.local.yml --env-file infra/.env.local-prod up -d
+docker compose -f infra/docker-compose.prod.yml --env-file infra/.env.prod --profile ops run --rm ops \
+  npx ts-node --transpile-only tools/ops/bootstrap-prod.ts   # migrations, instruments, logins, demo users
+node infra/check-compose.mjs                                 # only Caddy publishes ports; limits, healthchecks...
+npm run prod:smoke                                           # the stack in a browser over HTTPS + memory
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
@@ -79,8 +87,10 @@ npx ts-node --transpile-only tools/ops/research-demo-data.ts        # demo users
 ## Architecture
 
 ### Services and ports
-All backend services use the global prefix `/api`. Every service's CORS allowlist is `localhost:4200` and `localhost:3001`
-(replay-service too, HTTP and socket), except research-agent, which allows only `localhost:4200`.
+All backend services use the global prefix `/api`, and answer `/health/live` and `/health/ready` outside it (no auth,
+dependency names only; `HealthModule` in `@forexedge/common`). CORS comes from `CORS_ORIGIN` (comma list, required
+when `NODE_ENV=production`); unset, the dev default is `localhost:4200` and `localhost:3001` (research-agent: 4200
+only). In production everything is one origin behind Caddy (`infra/caddy/Caddyfile`, routes in docs/DEPLOY.md).
 
 | Service | Port | Responsibility |
 |---|---|---|
@@ -90,7 +100,7 @@ All backend services use the global prefix `/api`. Every service's CORS allowlis
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ml-service (Python) | 3006 | FastAPI, inference only: LSTM next-H1-direction models trained offline walk-forward (`models/`, manifest + sha256). `GET /api/ml/{health,models,evaluation,predictions/{instrument}}`, JWT on all but health. Reads the history as the read-only login `forexedge_ml` (role `forexedge_readonly`). Results are a **historical walk-forward test, not live signals**. |
 | research-agent (Python) | 3007 | FastAPI + LangGraph agent over a FastMCP stdio server (7 read-only tools: available data, bars, market stats, the caller's backtest runs, ML evaluation/predictions). `POST /api/research/ask` (JWT) returns a structured report whose every number is checked by a deterministic verifier. LLM from env (`RESEARCH_LLM_MODEL`, default `groq:openai/gpt-oss-120b`, free tier). DB login `forexedge_research` (roles `forexedge_readonly` + `forexedge_research_reader`); calls ml-service with the caller's own token. |
-| replay-service | 3008 | Bar replay over the imported 2010-2022 history (step 6b-1). REST `/api/replay/sessions` (create: 409 `{activeSessionId}` while one is active; `active`; `active/end`), `active/orders`, `active/orders/:id/cancel`, `active/positions/:id/close`; Socket.IO namespace `/replay` (JWT in `handshake.auth.token`, room `user:<id>`; commands play, pause, step, setSpeed, setTimeframe, acked `{ok, result or error}`; events state, bar, account, positions, status, endOfData, ended). Trades through `@forexedge/trading-sim`. DB login `forexedge_replay` (roles `forexedge_readonly` + `forexedge_replay_writer`). **No Kafka, no Redis.** |
+| replay-service | 3008 | Bar replay over the imported 2010-2022 history (step 6b-1). REST `/api/replay/sessions` (create: 409 `{activeSessionId}` while one is active; `active`; `active/end`), `active/orders`, `active/orders/:id/cancel`, `active/positions/:id/close`; Socket.IO namespace `/replay` on path `/api/replay/socket.io` (JWT in `handshake.auth.token`, room `user:<id>`; commands play, pause, step, setSpeed, setTimeframe, reauth, acked `{ok, result or error}`; events state, bar, account, positions, status, endOfData, ended). Trades through `@forexedge/trading-sim`. DB login `forexedge_replay` (roles `forexedge_readonly` + `forexedge_replay_writer`). **No Kafka, no Redis.** |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
 order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
@@ -128,7 +138,19 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 ### Frontend (`apps/frontend`)
 - Next.js App Router with route groups `(auth)` and `(dashboard)`, Tailwind, Radix UI, and `lightweight-charts`.
 - State uses Redux Toolkit. RTK Query APIs in `src/store/api/*.api.ts` all extend `baseApi`, which attaches the bearer token from the store. The access token is **in memory only** (never localStorage); on app load `SessionRestorer` restores the session from the httpOnly refresh cookie, and `AuthGuard` waits for it. On a 401, `baseApi` awaits `refreshSession()` (`src/lib/session.ts`), stores the new token, then retries.
-- Backend URLs are hardcoded in `src/lib/constants.ts` (`API_BASE`, `WS_URL`). Live data comes through `hooks/useForexSocket.ts`.
+- Every API and socket is called on the page's own origin (`/api/...`, `/socket.io`, `/api/replay/socket.io`;
+  `src/lib/constants.ts`): Caddy routes them in production, `next dev`'s rewrites (`next.config.js`, socket paths
+  with their trailing slash) in development. A production build has no rewrites and no localhost address
+  (`apps/frontend/scripts/check-production-build.cjs`, run in the Docker build). Live data comes through
+  `hooks/useForexSocket.ts`, mounted once in the dashboard layout (`LiveConnection`); the Topbar dot follows
+  ws-gateway's `feed:status` (green only for a real feed with a real recent tick).
+- **Tokens on sockets (step 7):** every JWT is HS256 with issuer `forexedge-auth` and audience `forexedge-api`
+  (refresh: `forexedge-refresh`), shared from `@forexedge/common` `jwt-claims.ts` by every verifier (the Python
+  services test their copy against it). Both gateways disconnect a socket at its token's expiry (`authExpired`);
+  `useTokenRefresh` refreshes a minute before, the replay socket sends it as `reauth`, the ws-gateway socket reads
+  it at its next connect. `refreshSession()` holds a Web Lock across tabs (refresh tokens rotate). A failed
+  refresh ends the session as `sessionExpired` ("Session expired, please log in"), never a reconnect loop.
+- `REGISTRATION_ENABLED` (unset = closed): the Register link and page follow `GET /api/auth/config` at runtime.
 - Instrument symbols use OANDA format (`EUR_USD`).
 - **Research page (`/research`, step 5b):** `askResearch` is a mutation with a 100 s timeout and no retry wrapper
   (every call spends free LLM quota); one request in flight; the question limit (3-500 code points) mirrors
@@ -286,7 +308,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   (PyPI JSON; refuses releases younger than 14 days). Don't use `pip-compile --generate-hashes` (downloads every torch wheel).
   A dependency whose ownership can't be proven (e.g. no PyPI provenance) isn't added. httpx2 is unproven, so
   research-agent holds back mcp at 1.30.0 (2.x needs httpx2) and langsmith at 0.11.2 (0.12+ needs httpx2); check
-  this before bumping either. langchain-mcp-adapters 0.3.2 was accepted by a byte diff against its tag (README).
+  this before bumping either. langchain-mcp-adapters 0.3.2 and redis 8.1.0 were accepted by a byte diff against their
+  tags (README). The Docker images use `requirements.linux.lock`, derived by `tools/python/linux_lock.py` (no pywin32,
+  torch's CPU build from PyTorch's index); a test fails if it drifts from `requirements.lock`. The Nx Python
+  targets run through `tools/python/run.cjs` (the venv's python on Windows or Linux).
 - **Research agent rules:** every number in an answer must be a claim that the verifier (`research_agent/verifier.py`,
   no LLM) matches to a unit-suffixed field of a successful tool call (prices at the pair's price_decimals, pct/pips
   with >= 3 significant digits, counts/USD exact, signed, no unit conversion); otherwise the response is
@@ -371,6 +396,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   trading: specs used `EURUSD` while the DB holds `EUR/USD` and Redis `price:EUR_USD`, and DTOs were
   built with fields the UI never sent. Assert the exact query/where clause and validate request bodies
   through the real `ValidationPipe` options.
+- **Caddy sorts directives itself**: `respond` runs before `reverse_proxy` wherever it is written. Keep the routes
+  in the Caddyfile's `route { }` block (in order), or a 404 rule swallows every API path (it did; caught by
+  `npm run prod:smoke`, which checks that each prefix reaches its own service).
+- **Docker Desktop resets IPv6 to published ports for every client**, Chromium too: browser runs against a local
+  container use `--host-resolver-rules=MAP localhost 127.0.0.1`, Node `--dns-result-order=ipv4first`.
+- **One refresh token per user**: an API login (a script) ends the same user's browser session at its next page
+  load. Scripts that drive the browser take their API token before the browser logs in.
 
 ## Current status
 - Phases 1–6 (5 services + frontend: trading terminal, backtesting, economic calendar) were built by ~June 2026 and **haven't been run since**, so verify before assuming anything works.
@@ -398,6 +430,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Step 6b-2 (Replay page) is done** (2026-11-10) on branch `step-6b-2-replay-frontend` (not merged): `/replay`,
   the pause reason, a Playwright browser run. Write-up: `docs/phase-summaries/step-6b-2-replay-frontend.md`.
   Deferred items: `docs/BACKLOG.md`.
+- **Step 7 phase 1 (deploy readiness) is done** (2026-11-10) on branch `step-7-deploy-readiness` (not merged):
+  health endpoints, token expiry on sockets, pinned JWT claims, live feed dot, closed registration + demo users,
+  research quota, same-origin frontend, S3 results with the instance role, images, prod compose, Caddy, history
+  transfer, bootstrap; the whole stack ran on the laptop over HTTPS (1.98 GB while a replay plays).
+  Write-up: `docs/phase-summaries/step-7-deploy-readiness.md`; runbook: `docs/DEPLOY.md`.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.
@@ -450,22 +487,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
    A licensed live provider needs bid/ask and display rights; before enabling it, follow the mixed-candles rule.
    Live `candles_4h` and `candles_1d` are UTC-aligned while the historical H4/D1 are New York-close aligned;
    realign the live views to the NY close when a live provider is added.
-7. Deployment (no credit card): Vercel, Aiven (TimescaleDB + Valkey), Cloudflare R2, free-tier service host.
-   Refresh-token cookie needs `secure: true` and `sameSite: 'none'` for cross-origin (Vercel → backend); make it env-driven.
-   MinIO community images are no longer pullable. Replace local MinIO with an R2 dev bucket or another S3-compatible image.
+7. Deployment: one EC2 t3.medium (ap-south-1), Docker Compose, Caddy (HTTPS, one origin), images in ECR, backtest
+   results in S3 with the instance role. **Phase 1 done (2026-11-10)**: everything deployable and run locally
+   (`docs/DEPLOY.md`). **Phase 2**: the AWS side (instance, IMDSv2 hop limit 2, role policy, ECR, DNS, swap).
    Re-check Dukascopy's terms of use before a public deployment serves its historical data.
-   ml-service: a Linux image (the Nx targets call `.venv\Scripts\python.exe`), the models/ directory, and the
-   read-only role (create it in the provider console if `CREATE ROLE` isn't allowed in SQL).
-   research-agent: a Linux image and a Linux lock (mcp pulls in `pywin32`, Windows only), the role
-   `forexedge_research_reader` the same way, and a non-free LLM tier or rate limits for real traffic (free Groq
-   is about one question per minute).
-   CORS: other services also allow 3001 with credentials — narrow before deployment.
-   replay-service: the role `forexedge_replay_writer` and its login (as for ml-service), and a single instance (timers
-   and the session lock are in-process; more instances need a DB-level lock and timer ownership).
-   market-service: its own DB login with INSERT on `ticks` only (and SELECT where needed), so the database itself
-   blocks writes to `historical_*` (step 6a enforces it with tests only).
-   Health endpoints: market-service and domain-service have no root/health route (`/api` 404s);
-   add a health check to every service for the host's probes.
+   Still open (docs/BACKLOG.md): per-service DB logins for the Node services (market-service first), a non-free
+   LLM tier for real research traffic, a single replay instance only, no production metrics or alerting.
 8. Known gaps: `forex.calendar-events` has no consumer (and its producer has never fired). The calendar covers USD (FOMC) and EUR (ECB) policy meetings
    from official sources; everything else comes from Forex Factory, a third party approved for portfolio use only (no
    direct BLS: HTTP 403). No forecasts or actuals.

@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from '../store';
 import { setCredentials, clearCredentials } from '../store/slices/auth.slice';
 import { refreshSession } from '../lib/session';
+import { useTokenRefresh } from '../hooks/useTokenRefresh';
 
 // On app load, restore the session from the httpOnly refresh cookie.
 // refreshSession() is single-flight, so StrictMode's double effect is harmless.
@@ -27,10 +28,16 @@ function SessionRestorer() {
   return null;
 }
 
+function TokenRefresher() {
+  useTokenRefresh();
+  return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <Provider store={store}>
       <SessionRestorer />
+      <TokenRefresher />
       {children}
     </Provider>
   );

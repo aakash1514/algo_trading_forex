@@ -73,3 +73,6 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# production / local-prod settings and demo users (real values; templates in .env.example)
+infra/.env*

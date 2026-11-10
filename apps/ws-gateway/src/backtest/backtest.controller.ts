@@ -50,15 +50,16 @@ export class BacktestController {
     return this.backtestService.findOne(runId, req.user.id);
   }
 
-  // GET /api/backtest/:runId/results — redirects to fresh presigned MinIO URL
+  // GET /api/backtest/:runId/results — the run's results.json, read from the store (MinIO or S3) by
+  // ws-gateway after the owner check. The bucket is never exposed to the browser (no presigned URL).
   @Get(':runId/results')
   async getResults(
     @Req() req: AuthenticatedRequest,
     @Param('runId') runId: string,
     @Res() res: Response,
   ) {
-    const url = await this.backtestService.getResultsUrl(runId, req.user.id);
-    return res.redirect(url);
+    const body = await this.backtestService.getResults(runId, req.user.id);
+    res.type('application/json').send(body);
   }
 
   // DELETE /api/backtest/:runId — cancel queued job

@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../../users/users.service';
-import { assertUserId } from '@forexedge/common';
+import { ACCESS_TOKEN_VERIFY_OPTIONS, assertUserId } from '@forexedge/common';
 
 export interface JwtPayload {
   sub: string;      // user id
@@ -22,6 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
+      algorithms: [...ACCESS_TOKEN_VERIFY_OPTIONS.algorithms],
+      issuer: ACCESS_TOKEN_VERIFY_OPTIONS.issuer,
+      audience: ACCESS_TOKEN_VERIFY_OPTIONS.audience,
       secretOrKey: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
     });
   }

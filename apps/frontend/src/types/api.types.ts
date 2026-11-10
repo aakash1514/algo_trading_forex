@@ -202,6 +202,13 @@ export interface FeedStatus {
 }
 
 // Socket payloads (see SOCKET_EVENTS in lib/constants.ts)
+
+// feed:status from ws-gateway (libs/kafka FeedStatusEvent): the feed as the status dot shows it
+export interface FeedStatusEvent {
+  state: 'none' | 'mock' | 'live' | 'stale';
+  lastTickAgeMs: number | null;
+}
+
 export interface PositionUpdateEvent {
   positionId: string;
   currentPrice: number;

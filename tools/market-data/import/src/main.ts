@@ -91,7 +91,9 @@ async function importAll(client: Client, args: ImportArgs): Promise<TimeRange[]>
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  process.loadEnvFile(join(REPO_ROOT, '.env'));
+  // the repo's .env on a laptop; a container passes the variables instead
+  const envFile = join(REPO_ROOT, '.env');
+  if (existsSync(envFile)) process.loadEnvFile(envFile);
   const env = process.env;
   const client = new Client({
     host: env['DB_HOST'] || 'localhost',

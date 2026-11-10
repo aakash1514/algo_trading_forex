@@ -2,11 +2,11 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import cookieParser = require('cookie-parser');
-
-const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
+import { HEALTH_ROUTES, corsOrigins } from '@forexedge/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const CORS_ORIGIN = corsOrigins(); // CORS_ORIGIN from the env, required in production
   app.use(cookieParser());
   app.enableCors({
     origin: CORS_ORIGIN,
@@ -21,7 +21,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: HEALTH_ROUTES }); // /health/live and /health/ready
   const port = process.env.PORT || 3000;
   await app.listen(port);
   Logger.log(`🚀 Application is running on: http://localhost:${port}/api`);

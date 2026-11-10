@@ -1,6 +1,7 @@
 import { AuthGuard } from '../../components/auth/AuthGuard';
 import { Topbar } from '../../components/layout/Topbar';
 import { Sidenav } from '../../components/layout/Sidenav';
+import { LiveConnection } from '../../components/layout/LiveConnection';
 
 export default function DashboardLayout({
   children,
@@ -9,6 +10,7 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
+      <LiveConnection />
       <div className="h-screen flex flex-col bg-terminal-bg overflow-hidden">
         <Topbar />
         <div className="flex-1 flex overflow-hidden">

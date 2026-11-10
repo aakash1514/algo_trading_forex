@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BacktestRunEntity } from '@forexedge/database';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
-import { RedisModule } from '../redis/redis.module';
+import { DataSource } from 'typeorm';
+import Redis from 'ioredis';
+import { HealthModule, redisCheck, sqlCheck } from '@forexedge/common';
+import { kafkaHealthCheck } from '@forexedge/kafka';
+import { REDIS_CLIENT, RedisModule } from '../redis/redis.module';
 import { GatewayModule } from '../gateway/gateway.module';
 import { KafkaConsumersModule } from '../kafka/kafka-consumers.module';
 import { BacktestQueueModule } from '../backtest/backtest-queue.module';
 import { BacktestModule } from '../backtest/backtest.module';
+import { BACKTEST_RESULT_STORE, BacktestResultStore } from '../backtest/result-store';
 import { UserEntity } from '@forexedge/database';
 
 @Module({
@@ -35,6 +40,16 @@ import { UserEntity } from '@forexedge/database';
     KafkaConsumersModule,
     BacktestQueueModule,
     BacktestModule,
+    HealthModule.forRoot({
+      imports: [BacktestModule],
+      inject: [DataSource, REDIS_CLIENT, ConfigService, BACKTEST_RESULT_STORE],
+      useFactory: (db: DataSource, redis: Redis, config: ConfigService, results: BacktestResultStore) => ({
+        db: sqlCheck(db),
+        redis: redisCheck(redis),
+        kafka: kafkaHealthCheck(config.get<string>('KAFKA_BROKER', 'localhost:9092')),
+        storage: () => results.check(),
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

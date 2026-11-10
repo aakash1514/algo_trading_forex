@@ -9,6 +9,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MAJOR_PAIRS, PAIR_DISPLAY } from '../../lib/constants';
 import { cn } from '../../lib/cn';
 import { getPriceDecimals } from '../../lib/pip';
+import { liveIndicator, type LiveTone } from '../../lib/feed';
+import { useNow } from '../../hooks/useNow';
+
+const DOT: Record<LiveTone, string> = {
+  green: 'bg-accent-green animate-pulse',
+  amber: 'bg-yellow-400',
+  grey: 'bg-terminal-muted',
+};
 
 export function Topbar() {
   const dispatch = useAppDispatch();
@@ -16,6 +24,8 @@ export function Topbar() {
   const [logout] = useLogoutMutation();
   const user = useAppSelector((s) => s.auth.user);
   const prices = useAppSelector((s) => s.market.prices);
+  const live = useAppSelector((s) => s.live);
+  const indicator = liveIndicator(live.socket, live.feed, live.feedAt, useNow());
   const { data: session } = useGetCurrentSessionQuery(undefined, {
     pollingInterval: 30_000,
   });
@@ -40,7 +50,7 @@ export function Topbar() {
     <header className="h-11 bg-terminal-surface border-b border-terminal-border flex items-center px-4 shrink-0">
       {/* Logo */}
       <div className="flex items-center gap-2 mr-6 shrink-0">
-        <div className="w-1.5 h-1.5 rounded-full bg-accent-green shadow-[0_0_6px_#22c55e]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-accent-blue" />
         <span className="text-[11px] font-medium tracking-[0.1em] uppercase text-[#e2e4e9]">
           ForexEdge
         </span>
@@ -101,9 +111,9 @@ export function Topbar() {
         {onReplay ? (
           <span className="text-[10px] font-medium text-amber-300">Historical replay</span>
         ) : (
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />
-            <span className="text-[10px] text-terminal-muted">Live</span>
+          <div className="flex items-center gap-1.5" data-testid="live-indicator" data-tone={indicator.tone}>
+            <div className={cn('w-1.5 h-1.5 rounded-full', DOT[indicator.tone])} />
+            <span className="text-[10px] text-terminal-muted">{indicator.label}</span>
           </div>
         )}
 

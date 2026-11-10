@@ -6,3 +6,7 @@ export * from './lib/spread';
 export * from './lib/market-hours';
 export * from './lib/market-feed';
 export * from './lib/auth-guards';
+export * from './lib/health';
+export * from './lib/jwt-claims';
+export * from './lib/socket-auth';
+export * from './lib/runtime-env';

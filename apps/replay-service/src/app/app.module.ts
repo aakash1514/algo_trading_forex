@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { HealthModule, sqlCheck } from '@forexedge/common';
 import { ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
 import { AuthModule } from '../auth/auth.module';
 import { SessionLock } from '../engine/session-lock';
@@ -44,6 +46,7 @@ import { replayDbCredentials } from './replay-db.config';
     TypeOrmModule.forFeature([ReplaySessionEntity, ReplayPositionEntity]),
     AuthModule,
     JwtModule.register({}), // socket handshakes; the secret is passed on verify
+    HealthModule.forRoot({ inject: [DataSource], useFactory: (db: DataSource) => ({ db: sqlCheck(db) }) }),
   ],
   controllers: [ReplaySessionController, ReplayOrderController],
   providers: [

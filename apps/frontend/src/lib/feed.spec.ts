@@ -1,4 +1,4 @@
-import { feedBanner, MAX_PRICE_AGE_MS, NO_FEED_MESSAGE, orderEntry, priceState, SIMULATED_MESSAGE } from './feed';
+import { feedBanner, liveIndicator, MAX_PRICE_AGE_MS, NO_FEED_MESSAGE, orderEntry, priceState, SIMULATED_MESSAGE } from './feed';
 import type { FeedStatus } from '../types/api.types';
 import noneStatus from '../components/trading/__fixtures__/feed-status-none.json';
 import mockStatus from '../components/trading/__fixtures__/feed-status-mock.json';
@@ -68,5 +68,27 @@ describe('orderEntry', () => {
     expect(orderEntry(MOCK, false, 'EUR/USD', undefined, fresh).reason).toBe('No live price for EUR/USD');
     expect(orderEntry(withState('down'), false, 'EUR/USD', recordedTick, fresh).reason).toBe('Market feed down: no fresh prices');
     expect(orderEntry(undefined, true, 'EUR/USD', recordedTick, fresh).reason).toBe('Market feed status unavailable');
+  });
+});
+
+describe('liveIndicator (the Topbar status dot)', () => {
+  const now = 1_000_000;
+  const feed = (state: 'none' | 'mock' | 'live' | 'stale') => ({ state });
+
+  it.each([
+    ['live', { tone: 'green', label: 'Live' }],
+    ['mock', { tone: 'amber', label: 'Mock feed' }],
+    ['stale', { tone: 'amber', label: 'Feed stale' }],
+    ['none', { tone: 'grey', label: 'No live feed' }],
+  ] as const)('connected, gateway says %s', (state, expected) => {
+    expect(liveIndicator('connected', feed(state), now - 1_000, now)).toEqual(expected);
+  });
+
+  it('is never green without a connected socket and a recent report from the gateway', () => {
+    expect(liveIndicator('disconnected', feed('live'), now, now)).toEqual({ tone: 'grey', label: 'Disconnected' });
+    expect(liveIndicator('connecting', feed('live'), now, now)).toEqual({ tone: 'grey', label: 'Connecting' });
+    expect(liveIndicator('connected', null, null, now)).toEqual({ tone: 'grey', label: 'Disconnected' });
+    expect(liveIndicator('connected', feed('live'), now - 15_001, now).tone).toBe('grey'); // reports stopped
+    expect(liveIndicator('connected', feed('live'), now - 15_000, now).tone).toBe('green');
   });
 });

@@ -22,7 +22,7 @@ import jwt
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from research_agent.auth import access_secret
+from research_agent.auth import ACCESS_TOKEN_CLAIMS, access_secret
 from research_agent.db import connect
 from research_agent.domain import ToolError
 from research_agent.tools import backtests, data, ml
@@ -33,7 +33,13 @@ DEMO_RUN = "29f80e07-73df-473d-9621-948797c8f9e0"
 
 def main() -> None:
     now = int(time.time())
-    claims = {"sub": "aaaaaaaa-0000-4000-8000-000000000005", "role": "TRADER", "iat": now, "exp": now + 300}
+    claims = {
+        **ACCESS_TOKEN_CLAIMS,
+        "sub": "aaaaaaaa-0000-4000-8000-000000000005",
+        "role": "TRADER",
+        "iat": now,
+        "exp": now + 300,
+    }
     token = jwt.encode(claims, access_secret(), algorithm="HS256")
     OUT.mkdir(parents=True, exist_ok=True)
     with connect() as conn, httpx.Client(base_url=ml.ml_base_url(), timeout=120) as http:

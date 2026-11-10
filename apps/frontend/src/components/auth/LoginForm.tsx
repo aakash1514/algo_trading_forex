@@ -6,9 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
-import { useLoginMutation } from '../../store/api/auth.api';
+import { useGetAuthConfigQuery, useLoginMutation } from '../../store/api/auth.api';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { setCredentials } from '../../store/slices/auth.slice';
+import { SESSION_EXPIRED_MESSAGE, setCredentials } from '../../store/slices/auth.slice';
 import { cn } from '../../lib/cn';
 
 const loginSchema = z.object({
@@ -24,6 +24,8 @@ export function LoginForm() {
   const [login, { isLoading }] = useLoginMutation();
   const [serverError, setServerError] = useState<string | null>(null);
   const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated);
+  const expired = useAppSelector((s) => s.auth.sessionExpired);
+  const { data: authConfig } = useGetAuthConfigQuery();
 
   // A session restored from the refresh cookie skips the login form.
   useEffect(() => {
@@ -55,6 +57,12 @@ export function LoginForm() {
       <p className="text-sm text-terminal-muted mb-6">
         Access your trading terminal
       </p>
+
+      {expired && (
+        <p role="status" className="mb-4 px-3 py-2 rounded border border-yellow-400/40 bg-yellow-400/10 text-xs text-yellow-300">
+          {SESSION_EXPIRED_MESSAGE}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
@@ -122,15 +130,18 @@ export function LoginForm() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-[12px] text-terminal-muted">
-        No account?{' '}
-        <Link
-          href="/register"
-          className="text-accent-blue hover:text-accent-blue/80 transition-colors"
-        >
-          Create one
-        </Link>
-      </p>
+      {/* Only offered when this deployment accepts sign-ups (unknown or closed: hidden) */}
+      {authConfig?.registrationEnabled === true && (
+        <p className="mt-6 text-center text-[12px] text-terminal-muted">
+          No account?{' '}
+          <Link
+            href="/register"
+            className="text-accent-blue hover:text-accent-blue/80 transition-colors"
+          >
+            Create one
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

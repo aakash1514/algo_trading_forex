@@ -6,6 +6,7 @@ import positionsReducer from './slices/positions.slice';
 import accountReducer from './slices/account.slice';
 import signalsReducer from './slices/signals.slice';
 import replayReducer from './slices/replay.slice';
+import liveReducer from './slices/live.slice';
 import { baseApi } from './api/base.api';
 
 export const store = configureStore({
@@ -16,6 +17,7 @@ export const store = configureStore({
     account: accountReducer,
     signals: signalsReducer,
     replay: replayReducer,
+    live: liveReducer,
     [baseApi.reducerPath]: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

@@ -15,7 +15,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from ml_service.auth import access_secret
+from ml_service.auth import ACCESS_TOKEN_CLAIMS, access_secret
 from ml_service.config import SERVICE_ROOT
 from ml_service.main import create_app
 
@@ -33,6 +33,7 @@ db = pytest.mark.skipif(os.environ.get("RUN_DB_TESTS") != "true", reason="needs 
 
 def token(**over: object) -> str:
     claims: dict[str, object] = {
+        **ACCESS_TOKEN_CLAIMS,
         "sub": "aaaaaaaa-0000-4000-8000-000000000001",
         "email": "ml-test@example.com",
         "role": "TRADER",
@@ -70,7 +71,10 @@ def test_every_data_endpoint_needs_a_valid_token(client: TestClient, path: str) 
         client.get(
             path,
             headers=auth(
-                jwt.encode({"sub": "x", "exp": int(time.time()) + 60}, "a-wrong-secret-that-is-long-enough-for-hs256")
+                jwt.encode(
+                    {**ACCESS_TOKEN_CLAIMS, "sub": "x", "exp": int(time.time()) + 60},
+                    "a-wrong-secret-that-is-long-enough-for-hs256",
+                )
             ),
         ).status_code
         == 401
@@ -78,6 +82,9 @@ def test_every_data_endpoint_needs_a_valid_token(client: TestClient, path: str) 
     assert client.get(path, headers=auth(token(exp=int(time.time()) - 10))).status_code == 401  # expired
     assert client.get(path, headers=auth(token(sub=None))).status_code == 401  # no subject
     assert client.get(path, headers=auth(token(sub="  "))).status_code == 401
+    assert client.get(path, headers=auth(token(iss="someone-else"))).status_code == 401
+    assert client.get(path, headers=auth(token(aud="forexedge-refresh"))).status_code == 401  # a refresh token
+    assert client.get(path, headers=auth(token(aud=None))).status_code == 401
 
 
 def test_models_lists_one_model_per_pair_and_test_year(client: TestClient) -> None:

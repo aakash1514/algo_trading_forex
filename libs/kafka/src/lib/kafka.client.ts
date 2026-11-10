@@ -1,4 +1,4 @@
-import { Kafka, KafkaConfig, logLevel } from 'kafkajs';
+import { Admin, Kafka, KafkaConfig, logLevel } from 'kafkajs';
 
 let kafkaInstance: Kafka | null = null;
 
@@ -50,4 +50,32 @@ export async function ensureTopicsExist(
   } finally {
     await admin.disconnect();
   }
+}
+// Readiness check (/health/ready): the broker answers a metadata request. A client of its own with
+// no retries and short timeouts, so a down broker fails within the probe's timeout instead of
+// retrying in the background; the admin connection is kept between probes and dropped on a failure.
+export function kafkaHealthCheck(broker: string): () => Promise<void> {
+  const kafka = new Kafka({
+    clientId: 'forexedge-health',
+    brokers: [broker],
+    logLevel: logLevel.NOTHING,
+    connectionTimeout: 1_000,
+    requestTimeout: 1_500,
+    retry: { retries: 0 },
+  });
+  let admin: Admin | null = null;
+  return async () => {
+    try {
+      if (!admin) {
+        admin = kafka.admin();
+        await admin.connect();
+      }
+      await admin.describeCluster();
+    } catch (err) {
+      const failed = admin;
+      admin = null;
+      await failed?.disconnect().catch(() => undefined);
+      throw err;
+    }
+  };
 }

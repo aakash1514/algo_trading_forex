@@ -40,9 +40,10 @@ def db_settings() -> DbSettings:
     )
 
 
-def connect() -> psycopg.Connection[tuple[object, ...]]:
+def connect(connect_timeout: int | None = None) -> psycopg.Connection[tuple[object, ...]]:
     s = db_settings()
     return psycopg.connect(
+        connect_timeout=connect_timeout,
         host=s.host,
         port=s.port,
         dbname=s.dbname,
@@ -51,3 +52,9 @@ def connect() -> psycopg.Connection[tuple[object, ...]]:
         options="-c default_transaction_read_only=on",
         application_name="research-agent",
     )
+
+
+def check_db() -> None:
+    """Readiness: the login connects and answers (/health/ready)."""
+    with connect(connect_timeout=2) as conn:
+        conn.execute("SELECT 1")

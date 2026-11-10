@@ -26,6 +26,22 @@ def load_env_file(path: Path) -> None:
         os.environ.setdefault(key, value)
 
 
+def cors_origins(dev_default: tuple[str, ...]) -> tuple[str, ...]:
+    """CORS_ORIGIN (comma-separated origins), as the Node services read it (libs/common runtime-env.ts):
+    required when NODE_ENV=production, the local default otherwise."""
+    raw = (os.environ.get("CORS_ORIGIN") or "").strip()
+    if not raw:
+        if os.environ.get("NODE_ENV") == "production":
+            raise RuntimeError("CORS_ORIGIN must be set when NODE_ENV=production")
+        return dev_default
+    origins = tuple(o.strip() for o in raw.split(",") if o.strip())
+    for origin in origins:
+        scheme, sep, rest = origin.partition("://")
+        if scheme not in ("http", "https") or not sep or not rest or "/" in rest:
+            raise RuntimeError(f'CORS_ORIGIN entry "{origin}" must be an origin like https://example.com')
+    return origins
+
+
 @dataclass(frozen=True)
 class Settings:
     port: int
@@ -37,5 +53,5 @@ def get_settings() -> Settings:
     return Settings(
         port=int(os.environ.get("RESEARCH_AGENT_PORT", "3007")),
         # the frontend only (not Grafana's 3001); the browser sends the access token as a bearer header
-        cors_origins=("http://localhost:4200",),
+        cors_origins=cors_origins(("http://localhost:4200",)),
     )

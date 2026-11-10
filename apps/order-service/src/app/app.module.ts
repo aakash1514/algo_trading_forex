@@ -9,8 +9,11 @@ import {
   InstrumentEntity,
   EconomicEventEntity,
 } from '@forexedge/database';
-import { BROKER_ADAPTER } from '@forexedge/common';
-import { RedisModule } from '../redis/redis.module';
+import { DataSource } from 'typeorm';
+import Redis from 'ioredis';
+import { BROKER_ADAPTER, HealthModule, redisCheck, sqlCheck } from '@forexedge/common';
+import { kafkaHealthCheck } from '@forexedge/kafka';
+import { REDIS_CLIENT, RedisModule } from '../redis/redis.module';
 import { AuthModule } from '../auth/auth.module';
 import { KafkaConsumerModule } from '../kafka/kafka.module';
 import { PaperBrokerAdapter } from '../broker/paper-broker.adapter';
@@ -56,6 +59,14 @@ import { AppService } from './app.service';
     RedisModule,
     AuthModule,
     KafkaConsumerModule,
+    HealthModule.forRoot({
+      inject: [DataSource, REDIS_CLIENT, ConfigService],
+      useFactory: (db: DataSource, redis: Redis, config: ConfigService) => ({
+        db: sqlCheck(db),
+        redis: redisCheck(redis),
+        kafka: kafkaHealthCheck(config.get<string>('KAFKA_BROKER', 'localhost:9092')),
+      }),
+    }),
   ],
   controllers: [
     AppController,

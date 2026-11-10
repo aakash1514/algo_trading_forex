@@ -38,7 +38,7 @@ from typing import Any
 import jwt
 
 from research_agent.agent import DEFAULT_MODEL, ResearchAgent, RunStats
-from research_agent.auth import access_secret
+from research_agent.auth import ACCESS_TOKEN_CLAIMS, access_secret
 from research_agent.config import REPO_ROOT, SERVICE_ROOT
 from research_agent.db import connect
 from research_agent.report import Report
@@ -296,7 +296,11 @@ async def run(qs: list[Question], user_id: str) -> list[Outcome]:
         if i:
             await asyncio.sleep(SPACING_S)
         now = int(time.time())
-        token = jwt.encode({"sub": user_id, "role": "TRADER", "iat": now, "exp": now + 600}, access_secret(), "HS256")
+        token = jwt.encode(
+            {**ACCESS_TOKEN_CLAIMS, "sub": user_id, "role": "TRADER", "iat": now, "exp": now + 600},
+            access_secret(),
+            "HS256",
+        )
         before = counter.count
         stats = RunStats()
         report = await agent.ask(q.text, user_id, token, stats)

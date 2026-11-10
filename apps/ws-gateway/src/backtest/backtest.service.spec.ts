@@ -3,6 +3,7 @@ import type { DataSource, Repository } from 'typeorm';
 import type { Queue } from 'bullmq';
 import type { BacktestRunEntity } from '@forexedge/database';
 import { BacktestService } from './backtest.service';
+import type { BacktestResultStore } from './result-store';
 
 const USER_A = 'aaaaaaaa-0000-4000-8000-000000000001';
 const USER_B = 'bbbbbbbb-0000-4000-8000-000000000002';
@@ -18,9 +19,10 @@ function makeService() {
     update: jest.fn(),
   };
   const queue = { getJob: jest.fn(), add: jest.fn() };
+  const results = { read: jest.fn().mockResolvedValue(Buffer.from('{"trades":[]}')) };
   const service = new BacktestService(repo as unknown as Repository<BacktestRunEntity>, queue as unknown as Queue,
-    {} as DataSource);
-  return { service, repo, queue };
+    {} as DataSource, results as unknown as BacktestResultStore);
+  return { service, repo, queue, results };
 }
 
 describe('BacktestService cross-user access', () => {
@@ -35,9 +37,17 @@ describe('BacktestService cross-user access', () => {
     expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 'run-1', userId: USER_B } });
   });
 
-  it("user B gets 404 on user A's results URL", async () => {
+  it('the owner gets the stored results.json; user B gets 404 and the store is never read', async () => {
+    const { service, results } = makeService();
+    await expect(service.getResults('run-1', USER_B)).rejects.toBeInstanceOf(NotFoundException);
+    expect(results.read).not.toHaveBeenCalled();
+    await expect(service.getResults('run-1', USER_A)).resolves.toEqual(Buffer.from('{"trades":[]}'));
+    expect(results.read).toHaveBeenCalledWith('backtests/run-1.json');
+  });
+
+  it("user B gets 404 on user A's results", async () => {
     const { service } = makeService();
-    await expect(service.getResultsUrl('run-1', USER_B)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.getResults('run-1', USER_B)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it("user B gets 404 cancelling user A's run, and nothing is changed", async () => {
@@ -53,7 +63,7 @@ describe('BacktestService cross-user access', () => {
     expect(repo.find).toHaveBeenCalledWith(expect.objectContaining({ where: { userId: USER_B } }));
   });
 
-  it.each(['findOne', 'getResultsUrl', 'cancel'] as const)('%s with a missing user id fails closed (401)', async (method) => {
+  it.each(['findOne', 'getResults', 'cancel'] as const)('%s with a missing user id fails closed (401)', async (method) => {
     const { service, repo } = makeService();
     await expect(service[method]('run-1', undefined as unknown as string)).rejects.toBeInstanceOf(UnauthorizedException);
     expect(repo.findOne).not.toHaveBeenCalled();
@@ -73,7 +83,7 @@ describe('BacktestService submit: historical coverage', () => {
     const queue = { add: jest.fn() };
     const query = jest.fn().mockResolvedValue(rows);
     const service = new BacktestService(repo as unknown as Repository<BacktestRunEntity>, queue as unknown as Queue,
-      { query } as unknown as DataSource);
+      { query } as unknown as DataSource, {} as BacktestResultStore);
     return { service, queue, query };
   }
   const dto = (over: Record<string, unknown> = {}) => ({

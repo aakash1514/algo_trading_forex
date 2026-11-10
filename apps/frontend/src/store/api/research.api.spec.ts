@@ -1,10 +1,10 @@
-/** @jest-environment node */
+/** @jest-environment ./test/jsdom-with-fetch.cjs */
 import { store } from '../index';
 import { setCredentials } from '../slices/auth.slice';
 import { researchApi } from './research.api';
 import { ASK_TIMEOUT_MS, askErrorKind } from '../../lib/research';
 
-const ASK_URL = 'http://localhost:3007/api/research/ask';
+const ASK_URL = 'http://localhost/api/research/ask';
 const status = (code: number) => new Response('{}', { status: code, headers: { 'Content-Type': 'application/json' } });
 const askCalls = (spy: jest.SpyInstance) =>
   spy.mock.calls.filter((c) => (c[0] instanceof Request ? c[0].url : String(c[0])) === ASK_URL);

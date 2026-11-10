@@ -14,7 +14,16 @@ export const SOCKET_EVENTS = {
   POSITION_UPDATE: 'position:update',
   POSITIONS_SNAPSHOT: 'positions:snapshot',
   ACCOUNT_UPDATE: 'account:update',
+  // ws-gateway's own (not from Kafka): what the status dot shows, on connect and every 5 s
+  FEED_STATUS: 'feed:status',
 } as const;
+
+// feed:status. state from feedDisplayState (@forexedge/common market-feed.ts); the age is measured on
+// the server, so the browser's clock doesn't matter.
+export interface FeedStatusEvent {
+  state: 'none' | 'mock' | 'live' | 'stale';
+  lastTickAgeMs: number | null;
+}
 
 // Tick-driven P&L for one open position (throttled to ~1/s per position).
 export interface PositionPnlMessage {

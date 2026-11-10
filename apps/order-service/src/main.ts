@@ -1,18 +1,18 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-
-const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
+import { HEALTH_ROUTES, corsOrigins } from '@forexedge/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const CORS_ORIGIN = corsOrigins(); // CORS_ORIGIN from the env, required in production
   app.enableCors({
     origin: CORS_ORIGIN,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Idempotency-Key'],
   });
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: HEALTH_ROUTES }); // /health/live and /health/ready
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );

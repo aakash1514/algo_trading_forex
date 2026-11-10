@@ -14,7 +14,7 @@ import { OrderForm } from './OrderForm';
 // The terminal through the real store and RTK Query; only fetch is mocked, answering the feed status
 // endpoint with a recorded market-service response (__fixtures__/README.md).
 const FIXTURES = join(__dirname, '__fixtures__');
-const STATUS_URL = 'http://localhost:3002/api/market/feed/status';
+const STATUS_URL = 'http://localhost/api/market/feed/status';
 const recordedTick = JSON.parse(readFileSync(join(FIXTURES, 'tick-eurusd-mock.json'), 'utf8'));
 const TICK_AT = Date.parse(recordedTick.timestamp);
 

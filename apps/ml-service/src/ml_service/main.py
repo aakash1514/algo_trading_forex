@@ -1,6 +1,7 @@
 """FastAPI app. Inference only: models are trained offline (ml_service.walk_forward)
 and loaded from models/ (manifest.json) at startup.
 
+  GET /health/live, /health/ready          public, for the host's probes (ml_service.health)
   GET /api/ml/health                       public
   GET /api/ml/models                       JWT  the walk-forward models (one per pair and test year)
   GET /api/ml/evaluation                   JWT  pooled tests (Holm), per pair-year metrics, controls
@@ -19,7 +20,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from ml_service.auth import CurrentUser
 from ml_service.config import SERVICE_ROOT, get_settings
-from ml_service.db import connect
+from ml_service.db import check_db, connect
+from ml_service.health import add_health_routes
 from ml_service.inference import PredictionError, Registry, predict, validate
 
 API_PREFIX = "/api/ml"
@@ -57,6 +59,12 @@ def create_app(models: Path | None = None) -> FastAPI:
         allow_methods=["GET"],
         allow_headers=["Authorization", "Content-Type"],
     )
+
+    def check_models() -> None:
+        if not registry.models:
+            raise RuntimeError("no models loaded")
+
+    add_health_routes(app, {"db": check_db, "models": check_models})
 
     @app.get(f"{API_PREFIX}/health")
     def health() -> dict[str, Any]:
