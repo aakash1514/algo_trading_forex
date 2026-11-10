@@ -3,6 +3,10 @@ import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateCol
 export const REPLAY_STATUSES = ['PLAYING', 'PAUSED', 'ENDED'] as const;
 export type ReplayStatus = (typeof REPLAY_STATUSES)[number];
 
+// Why a PAUSED session is paused (migration ReplayPauseReason); null while PLAYING
+export const REPLAY_PAUSE_REASONS = ['USER', 'OTHER_TAB', 'DISCONNECT', 'SERVER_RESTART', 'END_OF_DATA'] as const;
+export type ReplayPauseReason = (typeof REPLAY_PAUSE_REASONS)[number];
+
 // One bar replay over the imported history (migration ReplayTables). At most one
 // session per user is not ENDED.
 @Entity('replay_sessions')
@@ -26,6 +30,9 @@ export class ReplaySessionEntity {
 
   @Column({ type: 'varchar', length: 7, default: 'PAUSED' })
   status!: ReplayStatus;
+
+  @Column({ name: 'pause_reason', type: 'varchar', length: 14, nullable: true })
+  pauseReason!: ReplayPauseReason | null;
 
   @Column({ name: 'speed_ms', type: 'integer', default: 1000 })
   speedMs!: number;

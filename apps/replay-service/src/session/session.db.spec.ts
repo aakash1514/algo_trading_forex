@@ -66,7 +66,7 @@ run('replay sessions (real DB, real history, replay login)', () => {
     const expected = await firstMinute('EUR/USD', '2022-01-03T09:30Z');
     expect(expected).not.toBeNull();
     expect(session).toMatchObject({
-      instrument: 'EUR_USD', status: 'PAUSED', speedMs: 1000, timeframe: '1h', endOfData: false,
+      instrument: 'EUR_USD', status: 'PAUSED', pauseReason: null, speedMs: 1000, timeframe: '1h', endOfData: false,
       startTime: '2022-01-03T09:30:00.000Z', clockTime: expected?.toISOString(),
       startingBalance: '10000.00', balance: '10000.00', endedAt: null,
     });

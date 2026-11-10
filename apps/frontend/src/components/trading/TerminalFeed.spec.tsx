@@ -55,7 +55,8 @@ describe('trading terminal feed states', () => {
     serveStatus('feed-status-none.json');
     terminal();
     await waitFor(() => expect(screen.getByTestId('feed-banner').textContent)
-      .toBe('No live market feed — historical Replay mode is coming'));
+      .toBe('No live market feed — Try historical Replay →'));
+    expect(screen.getByRole('link', { name: 'Try historical Replay →' }).getAttribute('href')).toBe('/replay');
     expect(screen.getByTestId('order-entry-disabled').textContent).toBe('Order entry disabled: No live price for EUR/USD');
     const submit = screen.getByRole('button', { name: /buy$/ }) as HTMLButtonElement;
     expect(submit.disabled).toBe(true);

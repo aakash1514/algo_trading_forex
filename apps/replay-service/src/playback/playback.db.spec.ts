@@ -104,7 +104,7 @@ run('replay playback (real DB, real minutes, replay login)', () => {
 
   it('a step on H1 from mid-hour processes the rest of that hour, then whole hours', async () => {
     const { userId, session: s } = await start('2022-01-03T09:30Z', '1h');
-    const state = await playback.connected(userId);
+    const state = await playback.connected(userId, false);
     // Before stepping: the current bar holds only the minutes up to 09:30
     const partial = await rebuilt('1h', '2022-01-03T09:00Z', s.clockTime);
     const full = await aggregate('1h', '2022-01-03T09:00Z');
@@ -136,7 +136,7 @@ run('replay playback (real DB, real minutes, replay login)', () => {
 
   it('D1 across the New York close: the Monday bar ends at 21:59 UTC, the next starts at 22:00', async () => {
     const { userId } = await start('2022-01-03T21:30Z', '1d');
-    const state = await playback.connected(userId);
+    const state = await playback.connected(userId, false);
     expect(state?.currentBar.time).toBe('2022-01-02T22:00:00.000Z'); // 17:00 New York (EST) on Sunday
     const first = await playback.step(userId);
     expect(first.session.clockTime).toBe('2022-01-03T21:59:00.000Z');
@@ -156,7 +156,7 @@ run('replay playback (real DB, real minutes, replay login)', () => {
 
   it('H4 buckets are New York-aligned: 14:00-17:59 then 18:00-21:59 UTC', async () => {
     const { userId } = await start('2022-01-03T17:30Z', '4h');
-    expect((await playback.connected(userId))?.currentBar.time).toBe('2022-01-03T14:00:00.000Z');
+    expect((await playback.connected(userId, false))?.currentBar.time).toBe('2022-01-03T14:00:00.000Z');
     expect((await playback.step(userId)).session.clockTime).toBe('2022-01-03T17:59:00.000Z');
     emitter.events.length = 0;
     expect((await playback.step(userId)).session.clockTime).toBe('2022-01-03T21:59:00.000Z');
@@ -168,7 +168,7 @@ run('replay playback (real DB, real minutes, replay login)', () => {
 
   it('switching the timeframe resends the state on the new bars, from minutes up to the clock', async () => {
     const { userId } = await start('2022-01-03T13:47Z', '1m');
-    await playback.connected(userId);
+    await playback.connected(userId, false);
     for (const timeframe of ['5m', '15m', '1h', '4h', '1d'] as HistoricalTimeframe[]) {
       const state = await playback.setTimeframe(userId, timeframe);
       const expected = await rebuilt(timeframe, '2022-01-03T13:47Z', '2022-01-03T13:47Z');
@@ -199,7 +199,8 @@ run('replay playback (real DB, real minutes, replay login)', () => {
     expect((await playback.play(userId)).status).toBe('PLAYING');
     await expect(playback.step(userId)).rejects.toThrow('Pause before stepping');
     expect(await waitFor(async () => (await session(userId)).clockTime.getTime() >= before + 2 * 60_000, 5_000)).toBe(true);
-    expect((await playback.pause(userId)).status).toBe('PAUSED');
+    expect((await session(userId)).pauseReason).toBeNull();
+    expect(await playback.pause(userId)).toMatchObject({ status: 'PAUSED', pauseReason: 'USER' });
     const paused = (await session(userId)).clockTime.getTime();
     await new Promise((resolve) => setTimeout(resolve, 1_200));
     expect((await session(userId)).clockTime.getTime()).toBe(paused);
@@ -211,9 +212,9 @@ run('replay playback (real DB, real minutes, replay login)', () => {
     const { userId } = await start('2022-01-03T09:00Z', '1m');
     await playback.play(userId);
     await playback.lastSocketLeft(userId);
-    expect((await session(userId)).status).toBe('PAUSED');
+    expect(await session(userId)).toMatchObject({ status: 'PAUSED', pauseReason: 'DISCONNECT' });
     await playback.play(userId);
-    const state = await playback.connected(userId);
+    const state = await playback.connected(userId, false);
     expect(state?.session.status).toBe('PAUSED');
     expect((await session(userId)).status).toBe('PAUSED');
     await sessions.end(userId);
@@ -225,10 +226,46 @@ run('replay playback (real DB, real minutes, replay login)', () => {
     const clock = (await session(userId)).clockTime.getTime();
     const booted = newPlayback();
     await booted.onModuleInit();
-    expect((await session(userId)).status).toBe('PAUSED');
+    expect(await session(userId)).toMatchObject({ status: 'PAUSED', pauseReason: 'SERVER_RESTART' });
     await new Promise((resolve) => setTimeout(resolve, 1_200));
     expect((await session(userId)).clockTime.getTime()).toBe(clock);
     await booted.onModuleDestroy();
+    await sessions.end(userId);
+  });
+
+  it('the end of the data pauses with END_OF_DATA, which a second tab does not replace', async () => {
+    const { userId } = await start('2022-01-03T23:57Z', '1m');
+    let result: Awaited<ReturnType<PlaybackService['step']>> | undefined;
+    for (let i = 0; i < 5 && !result?.endOfData; i++) result = await playback.step(userId);
+    expect(result?.endOfData).toBe(true);
+    expect(await session(userId)).toMatchObject({ status: 'PAUSED', pauseReason: 'END_OF_DATA' });
+    const told = emitter.events.filter((e) => e.userId === userId && e.event === 'status').at(-1);
+    expect(told?.payload).toMatchObject({ status: 'PAUSED', pauseReason: 'END_OF_DATA', endOfData: true });
+    expect((await playback.connected(userId, true))?.session.pauseReason).toBe('END_OF_DATA');
+    await expect(playback.play(userId)).rejects.toThrow(/End of data/);
+    await sessions.end(userId);
+  });
+
+  it('a step that fails while playing pauses with no reason and tells the sockets', async () => {
+    const { userId } = await start('2022-01-03T09:00Z', '1m');
+    class FailingBarEmitter extends RecordingEmitter {
+      override toUser(id: string, event: string, payload: unknown, clock: Date): void {
+        if (event === 'bar') throw new Error('planted failure');
+        super.toUser(id, event, payload, clock);
+      }
+    }
+    const failing = new FailingBarEmitter();
+    const pairs = new PairContextService(db.replay);
+    const broken = new PlaybackService(
+      db.replay.getRepository(ReplaySessionEntity), db.replay, pairs, new SessionLock(), failing,
+      new ReplayStateService(db.replay.getRepository(ReplayPositionEntity), db.replay, pairs));
+    await broken.setSpeed(userId, 500);
+    await broken.play(userId);
+    expect(await waitFor(async () => (await session(userId)).status === 'PAUSED', 5_000)).toBe(true);
+    expect((await session(userId)).pauseReason).toBeNull();
+    const told = failing.events.filter((e) => e.event === 'status').at(-1);
+    expect(told?.payload).toMatchObject({ status: 'PAUSED', pauseReason: null });
+    await broken.onModuleDestroy();
     await sessions.end(userId);
   });
 

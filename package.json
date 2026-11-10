@@ -11,7 +11,8 @@
     "data:validate": "ts-node --transpile-only --project tools/market-data/import/tsconfig.app.json tools/market-data/import/src/validate-main.ts",
     "backtest:verify": "ts-node --transpile-only --project tools/backtest-verify/tsconfig.app.json tools/backtest-verify/src/main.ts",
     "replay:verify": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/main.ts",
-    "replay:e2e": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/e2e.ts"
+    "replay:e2e": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/e2e.ts",
+    "replay:browser": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/browser-run.ts"
   },
   "private": true,
   "devDependencies": {
@@ -58,6 +59,7 @@
     "jest-util": "^30.0.2",
     "jsonc-eslint-parser": "^2.1.0",
     "nx": "22.7.1",
+    "playwright": "1.64.1",
     "postcss": "^8.5.15",
     "prettier": "~3.6.2",
     "tailwindcss": "^3.4.19",

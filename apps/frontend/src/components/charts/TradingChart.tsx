@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { createChart, CandlestickSeries, ColorType } from 'lightweight-charts';
+import { createChart, CandlestickSeries } from 'lightweight-charts';
+import { CANDLE_OPTIONS, CHART_OPTIONS } from './chart-options';
 import type { CandlestickData, IChartApi, ISeriesApi, UTCTimestamp } from 'lightweight-charts';
 import { useAppSelector } from '../../store';
 import { useGetCandlesQuery } from '../../store/api/market.api';
@@ -71,42 +72,12 @@ export function TradingChart({ pair }: TradingChartProps) {
     if (!containerRef.current) return;
 
     const chart = createChart(containerRef.current, {
-      layout: {
-        background: { type: ColorType.Solid, color: '#0d0f12' },
-        textColor: '#6b7280',
-        fontSize: 11,
-        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-      },
-      grid: {
-        vertLines: { color: '#1c1f28' },
-        horzLines: { color: '#1c1f28' },
-      },
-      crosshair: {
-        vertLine: { color: '#3b4151', width: 1, style: 3 },
-        horzLine: { color: '#3b4151', width: 1, style: 3 },
-      },
-      rightPriceScale: {
-        borderColor: '#2a2d35',
-        textColor: '#6b7280',
-      },
-      // Time-scale labels inherit layout.textColor (v5 has no timeScale.textColor).
-      timeScale: {
-        borderColor: '#2a2d35',
-        timeVisible: true,
-        secondsVisible: false,
-      },
+      ...CHART_OPTIONS,
       width: containerRef.current.clientWidth,
       height: containerRef.current.clientHeight,
     });
 
-    const series = chart.addSeries(CandlestickSeries, {
-      upColor: '#22c55e',
-      downColor: '#ef4444',
-      borderUpColor: '#22c55e',
-      borderDownColor: '#ef4444',
-      wickUpColor: '#22c55e',
-      wickDownColor: '#ef4444',
-    });
+    const series = chart.addSeries(CandlestickSeries, CANDLE_OPTIONS);
 
     chartRef.current = chart;
     seriesRef.current = series;

@@ -40,7 +40,9 @@ export class ReplayGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     socket.data.userId = userId;
     await socket.join(`user:${userId}`);
     try {
-      const state = await this.playback.connected(userId);
+      // this socket has joined the room: more than one means another tab or window
+      const otherSockets = (await this.emitter.socketCount(userId)) > 1;
+      const state = await this.playback.connected(userId, otherSockets);
       if (socket.connected) socket.emit('state', state ?? { session: null });
     } catch (err) {
       this.logger.error(`Replay state for user ${userId} failed: ${err instanceof Error ? err.message : err}`);

@@ -5,6 +5,8 @@
 //   replayverify_<8 hex>@example.com  npm run replay:verify
 //   replaye2e_<8 hex>@example.com     npm run replay:e2e
 //   replaysmoke_<8 hex>@example.com   manual replay smoke checks (step 6b-1)
+//   replayfixture_<8 hex>@example.com the Replay page's fixture recorder (step 6b-2)
+//   replayui_<8 hex>@example.com      npm run replay:browser (step 6b-2)
 // Refuses if any of them has orders, positions or an account summary (they never
 // trade), or a backtest still queued or running. Their BullMQ jobs are stale once the
 // runs are gone: remove them afterwards with clear-stale-backtest-jobs.ts --apply.
@@ -17,7 +19,7 @@ import { Client as MinioClient } from 'minio';
 import { Client } from 'pg';
 
 const BUCKET = 'backtests';
-const THROWAWAY_EMAIL = '^(verify|replayverify|replaye2e|replaysmoke)_[0-9a-f]{8}@example\\.com$';
+const THROWAWAY_EMAIL = '^(verify|replayverify|replaye2e|replaysmoke|replayfixture|replayui)_[0-9a-f]{8}@example\\.com$';
 
 async function main(): Promise<void> {
   const apply = process.argv.includes('--apply');

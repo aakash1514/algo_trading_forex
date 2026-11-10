@@ -4,7 +4,9 @@ import type { FeedStatus } from '../types/api.types';
 // libs/common/src/lib/market-feed.ts (order-service enforces it; this only drives the display).
 export const MAX_PRICE_AGE_MS: Readonly<Record<string, number>> = { MOCK: 2_000 };
 
-export const NO_FEED_MESSAGE = 'No live market feed — historical Replay mode is coming';
+export const NO_FEED_MESSAGE = 'No live market feed';
+// Shown with the no-feed banner: the historical replay works without a feed
+export const REPLAY_LINK = { href: '/replay', label: 'Try historical Replay →' } as const;
 export const SIMULATED_MESSAGE = 'SIMULATED PRICES — not market data';
 
 export interface TerminalPrice {
@@ -27,12 +29,13 @@ export function priceState(price: TerminalPrice | undefined, nowMs: number): Pri
 export interface FeedBanner {
   tone: 'neutral' | 'simulated' | 'warning';
   text: string;
+  link?: { href: string; label: string };
 }
 
 export function feedBanner(status: FeedStatus | undefined, statusError: boolean): FeedBanner | null {
   if (statusError) return { tone: 'warning', text: 'Market feed status unavailable — is market-service running? Orders are disabled.' };
   if (!status) return null;
-  if (status.feed === 'none' || status.state === 'off') return { tone: 'neutral', text: NO_FEED_MESSAGE };
+  if (status.feed === 'none' || status.state === 'off') return { tone: 'neutral', text: NO_FEED_MESSAGE, link: REPLAY_LINK };
   if (status.state === 'degraded' || status.state === 'down') {
     return { tone: 'warning', text: `Market feed ${status.state}: prices are stale and orders are rejected until it reconnects.` };
   }

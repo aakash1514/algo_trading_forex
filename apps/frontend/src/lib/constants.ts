@@ -6,9 +6,13 @@ export const API_BASE = {
   WS:     'http://localhost:3005/api',
   ML:     'http://localhost:3006/api',
   RESEARCH: 'http://localhost:3007/api',
+  REPLAY: 'http://localhost:3008/api',
 } as const;
 
 export const WS_URL = 'http://localhost:3005';
+
+// replay-service's Socket.IO namespace /replay (bar replay, step 6b)
+export const REPLAY_WS_URL = 'http://localhost:3008/replay';
 
 // Per-user Socket.IO events from ws-gateway. Mirrors SOCKET_EVENTS in
 // libs/kafka/src/lib/interfaces/realtime.interface.ts; keep the two in sync.

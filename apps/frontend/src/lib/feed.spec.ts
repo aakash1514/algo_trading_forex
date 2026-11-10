@@ -27,8 +27,10 @@ describe('priceState', () => {
 
 describe('feedBanner', () => {
   it('says there is no live feed by default', () => {
-    expect(feedBanner(NONE, false)).toEqual({ tone: 'neutral', text: NO_FEED_MESSAGE });
-    expect(NO_FEED_MESSAGE).toBe('No live market feed — historical Replay mode is coming');
+    expect(feedBanner(NONE, false)).toEqual({
+      tone: 'neutral', text: NO_FEED_MESSAGE, link: { href: '/replay', label: 'Try historical Replay →' },
+    });
+    expect(NO_FEED_MESSAGE).toBe('No live market feed');
   });
 
   it('marks simulated prices as not market data', () => {
