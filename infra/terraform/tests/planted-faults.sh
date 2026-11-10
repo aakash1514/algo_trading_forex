@@ -73,6 +73,7 @@ run_check() {
         "$SHELLCHECK_IMAGE" "$1" >"$out" 2>&1
       ;;
     check.sh) bash "$TF_DIR/check.sh" >"$out" 2>&1 ;;
+    compose) node infra/check-compose.mjs >"$out" 2>&1 ;;
     *)
       echo "unknown check $kind" >&2
       exit 2
@@ -278,6 +279,30 @@ fault "check.sh: compose image missing from ECR" terraform/locals.tf \
   '    "ops",
 ' '' \
   'images differ' check.sh
+
+echo "== the metadata guard's network (check-compose.mjs)"
+fault "ws-gateway at another address than the guard's" docker-compose.prod.yml \
+  'ipv4_address: 172.30.0.10' 'ipv4_address: 172.30.0.11' \
+  'the guard admits 172.30.0.10' compose
+fault "ws-gateway's address inside the dynamic range" docker-compose.prod.yml \
+  'ip_range: 172.30.0.128/25' 'ip_range: 172.30.0.0/25' \
+  'outside the dynamic range' compose
+fault "bridge renamed in the guard only" vm/setup.sh \
+  'IMDS_GUARD_BRIDGE="fxedge0"' 'IMDS_GUARD_BRIDGE="fxedge1"' \
+  'differs from the guard' compose
+fault "a service on the host network" docker-compose.prod.yml \
+  '    command: redis-server' '    network_mode: host
+    command: redis-server' \
+  'would bypass the metadata guard' compose
+fault "a second fixed address (auth-service)" docker-compose.prod.yml \
+  'redis: { condition: service_healthy } }
+    mem_limit: 192m' \
+  'redis: { condition: service_healthy } }
+    networks:
+      default:
+        ipv4_address: 172.30.0.20
+    mem_limit: 192m' \
+  'only ws-gateway has a fixed address' compose
 
 rm -f "$out"
 printf '\n%d faults caught, %d missed\n' "$passed" "$failed"

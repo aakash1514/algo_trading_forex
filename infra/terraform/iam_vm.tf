@@ -1,6 +1,7 @@
 # The host's role (forexedge-ec2): Session Manager, the CloudWatch agent, ECR pull on the ten repositories,
 # and read/write (never delete) on the two buckets. ws-gateway gets these credentials through instance
-# metadata (ec2-role-credentials.ts); only ws-gateway's container may reach it (infra/vm/imds-guard.sh).
+# metadata (ec2-role-credentials.ts); only ws-gateway's container may reach it (the metadata guard in
+# infra/vm/setup.sh).
 resource "aws_iam_role" "ec2" {
   name        = "forexedge-ec2"
   description = "ForexEdge host: SSM, CloudWatch agent, ECR pull, results and backups buckets"

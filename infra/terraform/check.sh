@@ -3,8 +3,10 @@
 # credentials: init skips the backend, terraform test runs against a mocked provider, tflint runs without
 # deep_check. Fails on the first failing check.
 #
-#   fmt -check, source rules (compose images = ECR, no key pair, no inline SG rules), init (lock file
-#   read-only), validate, terraform test, tflint + AWS ruleset, shellcheck
+#   fmt -check, source rules (compose images = ECR, check-compose.mjs, no key pair, no inline SG rules),
+#   init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck
+#
+# The metadata guard's end-to-end test (Docker-in-Docker) is separate: npm run infra:imds-test
 #
 # Terraform is the exact version of versions.tf (TERRAFORM=/path/to/terraform to use another binary of that
 # version). tflint and shellcheck run from images pinned by digest, so Docker must be running.
@@ -49,6 +51,9 @@ if [[ -z "$compose_images" || "$compose_images" != "$ecr_images" ]]; then
   exit 1
 fi
 echo "$(wc -l <<<"$compose_images") images, same in both"
+
+step "compose rules (check-compose.mjs: ports, limits, the metadata guard's network)"
+(cd "$INFRA_DIR/.." && node infra/check-compose.mjs)
 
 # Attributes a mocked provider fills with random values when they are left unset, so terraform test
 # can't see them: checked in the source instead

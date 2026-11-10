@@ -50,6 +50,7 @@ npm run prod:smoke                                           # the stack in a br
 # Claude never runs plan/apply or anything against AWS; the owner does, with SSO
 npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck
 bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
+npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
@@ -365,6 +366,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   `mock_provider`, so it couldn't be tested); ARNs the tests compare are built from names in `locals.tf`.
 - `terraform test -filter` needs the platform's path separator: with `tests/x.tftest.hcl` on Windows it finds
   nothing, warns and **passes**. check.sh and planted-faults.sh fail on a run of zero tests.
+- **Only ws-gateway may reach the instance metadata service** (the role's credentials; hop limit 2 lets every
+  container try): ws-gateway has the fixed address 172.30.0.10 on bridge `fxedge0`, and setup.sh's guard
+  (DOCKER-USER) resets everything else. Never give another service a fixed address, a second network or
+  `network_mode` (`check-compose.mjs` refuses them), and change the address only in compose and setup.sh together.
 - Map attributes compare equal only to `tomap({...})`, sets only to `toset([...])` (an object literal is a
   different type and the assertion is simply false).
 
@@ -452,7 +457,7 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   Write-up: `docs/phase-summaries/step-7-deploy-readiness.md`; runbook: `docs/DEPLOY.md`.
 
 - **Step 7 phase 2a (Terraform) is done** (2026-11-10) on branch `step-7-terraform` (not merged): `infra/terraform`
-  (VPC, host, IAM, ECR, S3, GitHub OIDC deploy role, alarms, DLM), `infra/vm/setup.sh`, offline
+  (VPC, host, IAM, ECR, S3, GitHub OIDC deploy role, alarms, DLM), `infra/vm/setup.sh`, the metadata guard, offline
   checks with planted faults. Nothing applied yet (the owner runs it). Runbook: `docs/DEPLOY.md` section 7.
 
 ### Deferred from the health check

@@ -15,6 +15,7 @@
     "replay:e2e": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/e2e.ts",
     "prod:smoke": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/prod-smoke.ts",
     "infra:check": "bash infra/terraform/check.sh",
+    "infra:imds-test": "bash infra/vm/tests/imds-guard.test.sh",
     "replay:browser": "ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json tools/replay-verify/src/browser-run.ts"
   },
   "private": true,

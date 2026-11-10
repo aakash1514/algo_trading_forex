@@ -10,6 +10,11 @@
 #   5. CloudWatch agent (exact version, sha256 and AWS signature checked): mem_used_percent and
 #      disk_used_percent for /, with the dimensions of the alarms in infra/terraform/monitoring.tf
 #   6. /opt/forexedge, owned by root, mode 700
+#   7. Instance metadata guard: only ws-gateway's container reaches 169.254.169.254 (right after step 1,
+#      so it is in place before any container runs)
+#
+#   bash setup.sh                       as root, on the host
+#   bash setup.sh --print-imds-guard    prints the guard script it installs (tests; no root needed)
 #
 # Upgrades are deliberate (docs/DEPLOY.md, monthly check): change a version below and run the script again.
 set -euo pipefail
@@ -33,6 +38,12 @@ CWAGENT_CTL="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
 SWAP_FILE="/swapfile"
 SWAP_SIZE_MB=4096
 APP_DIR="/opt/forexedge"
+
+# The compose bridge and ws-gateway's fixed address (infra/docker-compose.prod.yml; check-compose.mjs
+# fails if they differ)
+IMDS_GUARD_BRIDGE="fxedge0"
+IMDS_GUARD_WS_GATEWAY_IP="172.30.0.10"
+IMDS_GUARD_PATH="/usr/local/sbin/forexedge-imds-guard"
 
 log() { printf '[setup] %s\n' "$*"; }
 die() {
@@ -65,6 +76,43 @@ key_fingerprint() {
 }
 
 installed_version() { dpkg-query -W -f='${Version}' "$1" 2>/dev/null || true; }
+
+# The guard installed as ${IMDS_GUARD_PATH}. Docker's systemd unit runs it before and after dockerd
+# starts (drop-in below), so it holds across reboots and Docker restarts. The role's credentials are for
+# ws-gateway (backtest results in S3); with the hop limit at 2 every container could otherwise read them.
+print_imds_guard() {
+  cat <<EOF
+#!/usr/bin/env bash
+# ForexEdge instance metadata guard (installed by infra/vm/setup.sh; do not edit here).
+# Only ws-gateway (${IMDS_GUARD_WS_GATEWAY_IP}, from the compose bridge ${IMDS_GUARD_BRIDGE}) may reach
+# 169.254.169.254; any other container gets a TCP reset (other protocols: ICMP unreachable). The host's own
+# processes (SSM and CloudWatch agents) are not affected: their traffic doesn't cross FORWARD.
+# A spoofed source address gets nowhere: the answer goes to the real ws-gateway, so no TCP handshake.
+set -euo pipefail
+chain=FOREXEDGE-IMDS
+# DOCKER-USER is Docker's chain for user rules: Docker creates it if missing and never flushes it
+iptables -w -N DOCKER-USER 2>/dev/null || true
+# One atomic replace of this chain (--noflush leaves every other chain as it is)
+iptables-restore -w --noflush <<RULES
+*filter
+:\${chain} - [0:0]
+-A \${chain} -s ${IMDS_GUARD_WS_GATEWAY_IP}/32 -d 169.254.169.254/32 -i ${IMDS_GUARD_BRIDGE} -p tcp --dport 80 -j RETURN
+-A \${chain} -d 169.254.169.254/32 -p tcp -j REJECT --reject-with tcp-reset
+-A \${chain} -d 169.254.169.254/32 -j REJECT --reject-with icmp-port-unreachable
+COMMIT
+RULES
+iptables -w -C DOCKER-USER -j "\${chain}" 2>/dev/null || iptables -w -I DOCKER-USER 1 -j "\${chain}"
+EOF
+}
+
+case "${1:-}" in
+  --print-imds-guard)
+    print_imds_guard
+    exit 0
+    ;;
+  "") ;;
+  *) die "usage: setup.sh [--print-imds-guard]" ;;
+esac
 
 [[ "${EUID}" -eq 0 ]] || die "run as root (sudo bash setup.sh)"
 # shellcheck source=/dev/null
@@ -126,6 +174,20 @@ for spec in "${docker_packages[@]}"; do
     apt-mark hold "$pkg" >/dev/null
   fi
 done
+
+# ── 7. Instance metadata guard (before anything restarts Docker) ────────────
+print_imds_guard | write_if_changed "$IMDS_GUARD_PATH" 0755 || true
+if write_if_changed /etc/systemd/system/docker.service.d/forexedge-imds-guard.conf 0644 <<EOF; then
+# ForexEdge: the metadata guard before dockerd starts (no container runs unguarded, also at boot) and
+# again once it is up (in case Docker rebuilt its chains). Installed by infra/vm/setup.sh.
+[Service]
+ExecStartPre=${IMDS_GUARD_PATH}
+ExecStartPost=${IMDS_GUARD_PATH}
+EOF
+  systemctl daemon-reload
+fi
+# Applied now as well (idempotent: the same rules replace themselves)
+"$IMDS_GUARD_PATH"
 
 # ── 2. Docker log rotation ──────────────────────────────────────────────────
 # Compose sets the same per service; this covers any container started by hand
@@ -247,4 +309,4 @@ install -d -o root -g root -m 0700 "$APP_DIR"
   chmod 0700 "$APP_DIR"
 }
 
-log "done: $(docker --version), $(docker compose version), swap $(swapon --show=SIZE --noheadings "$SWAP_FILE" | tr -d ' '), swappiness $(sysctl -n vm.swappiness), agent ${CWAGENT_PACKAGE_VERSION}, ${APP_DIR} $(stat -c '%U:%G %a' "$APP_DIR")"
+log "done: $(docker --version), $(docker compose version), swap $(swapon --show=SIZE --noheadings "$SWAP_FILE" | tr -d ' '), swappiness $(sysctl -n vm.swappiness), agent ${CWAGENT_PACKAGE_VERSION}, ${APP_DIR} $(stat -c '%U:%G %a' "$APP_DIR"), metadata for ${IMDS_GUARD_WS_GATEWAY_IP} only"

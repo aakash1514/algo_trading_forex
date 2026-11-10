@@ -203,7 +203,8 @@ deliberate edit plus `terraform providers lock -platform=windows_amd64 -platform
 -platform=darwin_amd64 -platform=darwin_arm64`.
 
 **Offline checks** (no AWS call, Docker running): `npm run infra:check` runs `terraform fmt -check`, the
-source rules (compose images = ECR repositories, no key pair, no inline security group rules), `validate`,
+source rules (compose images = ECR repositories, `check-compose.mjs`, no key pair, no inline security group
+rules), `validate`,
 `terraform test` (a mocked provider: security group, IMDSv2, encryption, credits, buckets, OIDC trust,
 deploy and host role rights, alarms, snapshots, outputs), tflint with the AWS ruleset and shellcheck (both from
 images pinned by digest). `bash infra/terraform/tests/planted-faults.sh` plants a fault for every rule and
@@ -276,19 +277,25 @@ Command needs nothing but the AWS CLI:
 
 ```sh
 ID=$(terraform -chdir=infra/terraform output -raw instance_id)
-SUM=$(sha256sum infra/vm/setup.sh | cut -d' ' -f1)
-node -e '
-  const fs = require("fs"); const b64 = fs.readFileSync("infra/vm/setup.sh").toString("base64");
-  fs.writeFileSync(process.argv[1], JSON.stringify({ commands: [
-    `echo ${b64} | base64 -d > /root/setup.sh`,
-    `echo "${process.argv[2]}  /root/setup.sh" | sha256sum -c -`,
-    "bash /root/setup.sh" ] }));' setup-params.json "$SUM"
-CMD=$(aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
-  --comment "forexedge setup.sh $SUM" --parameters file://setup-params.json \
-  --query Command.CommandId --output text)
-rm setup-params.json
-aws ssm get-command-invocation --command-id "$CMD" --instance-id "$ID" \
-  --query '[Status, StandardOutputContent, StandardErrorContent]' --output text   # repeat until Success
+# run_on_host FILE: copies a script of the repo to /root on the host (sha256 checked there) and runs it as root
+run_on_host() {
+  local name sum cmd
+  name=$(basename "$1"); sum=$(sha256sum "$1" | cut -d' ' -f1)
+  node -e '
+    const [file, name, sum] = process.argv.slice(1);
+    const b64 = require("fs").readFileSync(file).toString("base64");
+    console.log(JSON.stringify({ commands: [
+      `echo ${b64} | base64 -d > /root/${name}`, `echo "${sum}  /root/${name}" | sha256sum -c -`,
+      `bash /root/${name}` ] }));' "$1" "$name" "$sum" > ssm-params.json
+  cmd=$(aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
+    --comment "forexedge $name $sum" --parameters file://ssm-params.json --query Command.CommandId --output text)
+  rm ssm-params.json
+  aws ssm wait command-executed --command-id "$cmd" --instance-id "$ID" || true   # the waiter gives up at 100 s
+  echo "aws ssm get-command-invocation --command-id $cmd --instance-id $ID --query '[Status, StandardOutputContent, StandardErrorContent]' --output text"
+  aws ssm get-command-invocation --command-id "$cmd" --instance-id "$ID" \
+    --query '[Status, StandardOutputContent, StandardErrorContent]' --output text
+}
+run_on_host infra/vm/setup.sh      # "InProgress" after 100 s: run the printed command again until Success
 ```
 
 Or interactively (needs the Session Manager plugin for the AWS CLI): `aws ssm start-session --target "$ID"`,
@@ -299,9 +306,44 @@ What it does: Docker Engine 29.9.2 + Compose 5.6.1 from Docker's apt repository 
 `9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88` checked; packages held), daemon log rotation 3 x 10 MB, a
 4 GB `/swapfile` (swappiness 10), unattended-upgrades for security updates without automatic reboot, the
 CloudWatch agent 1.300073.2 (sha256 and AWS's signature checked) sending `mem_used_percent` and
-`disk_used_percent` for `/`, and `/opt/forexedge` (root, 700). After it: `forexedge-memory-high` and
+`disk_used_percent` for `/`, `/opt/forexedge` (root, 700), and the metadata guard (7.4.1). After it: `forexedge-memory-high` and
 `forexedge-disk-high` leave INSUFFICIENT_DATA within a few minutes
 (`aws cloudwatch describe-alarms --alarm-name-prefix forexedge- --query 'MetricAlarms[].[AlarmName,StateValue]'`).
+
+### 7.4.1 Instance metadata guard (go-live gate)
+
+The hop limit of 2 lets containers reach the instance metadata service, and with it the role's credentials
+(ECR pull, S3 read/write on both buckets). Only ws-gateway needs them. So:
+
+- **Compose** gives ws-gateway a fixed address, `172.30.0.10`, on a bridge with a fixed name, `fxedge0`
+  (network `forexedge_default`, subnet `172.30.0.0/24`). Every other container gets its address from
+  `172.30.0.128/25`, so none can be given ws-gateway's. `check-compose.mjs` fails if these values differ from
+  the guard's, if another service has a fixed address, or if a service uses `network_mode` (a host-network
+  container's traffic never crosses FORWARD).
+- **setup.sh** installs `/usr/local/sbin/forexedge-imds-guard`: a `FOREXEDGE-IMDS` chain, jumped to from
+  Docker's `DOCKER-USER`, that lets `172.30.0.10` from `fxedge0` reach `169.254.169.254:80` and answers
+  every other container with a TCP reset. A systemd drop-in for `docker.service` runs it before dockerd starts
+  (no container runs unguarded, also at boot) and again once it is up, so it survives reboots and Docker
+  restarts. The host's own processes (SSM and CloudWatch agents) are not affected.
+- A container that forges ws-gateway's source address gets nothing back: the reply goes to the real
+  ws-gateway, so no TCP connection is ever made.
+
+**Gate:** the site isn't announced (and DNS isn't shared) until this passes on the host, after the first
+`docker compose up` with ws-gateway healthy, again after `systemctl restart docker`, and again after a reboot:
+
+```sh
+run_on_host infra/vm/check-imds-guard.sh
+# ok    ws-gateway (172.30.0.10)                             token received
+# ok    new container of ws-gateway's image on forexedge_default refused
+# ok    auth-service ... (every running Node container)      refused
+# ok    new container on Docker's default bridge             refused
+# metadata guard: only ws-gateway reaches 169.254.169.254 (N other containers refused)
+```
+
+The token is never printed. On the laptop, `npm run infra:imds-test` runs the same check against the guard
+setup.sh installs, in Docker-in-Docker with a fake metadata service one routed hop away (as on EC2), and
+plants three faults (no guard, the guard admitting another address, ws-gateway off its address) that must
+each make the check fail.
 
 ### 7.5 CPU credits during Phase 3
 
@@ -323,11 +365,11 @@ month, in a Session Manager shell (`sudo -i`):
 
 1. **Reboot if needed:** `cat /var/run/reboot-required.pkgs 2>/dev/null` lists the packages waiting for one.
    Reboot in a quiet hour (`systemctl reboot`); every container comes back (`restart: unless-stopped`); then
-   run the health checks of section 3.
+   run the health checks of section 3 and `check-imds-guard.sh` (7.4.1).
 2. **Docker:** compare `docker version` with Docker's release notes. To upgrade, pick releases at least 14
    days old, change `DOCKER_VERSION`, `CONTAINERD_VERSION`, `COMPOSE_VERSION` in `setup.sh` (versions from
    `apt-cache madison docker-ce containerd.io docker-compose-plugin`), commit, and run `setup.sh` again (it
-   restarts Docker, so the stack restarts).
+   restarts Docker, so the stack restarts), then `check-imds-guard.sh`.
 3. **CloudWatch agent:** the same for `CWAGENT_BUILD`, `CWAGENT_PACKAGE_VERSION` and `CWAGENT_SHA256` (and the
    signature check in the script).
 4. **Security updates applied:** `tail /var/log/unattended-upgrades/unattended-upgrades.log`.
