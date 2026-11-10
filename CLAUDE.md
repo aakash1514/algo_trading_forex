@@ -46,6 +46,12 @@ docker compose -f infra/docker-compose.prod.yml --env-file infra/.env.prod --pro
 node infra/check-compose.mjs                                 # only Caddy publishes ports; limits, healthchecks...
 npm run prod:smoke                                           # the stack in a browser over HTTPS + memory
 
+# AWS infrastructure (infra/terraform, Terraform 1.16.7 exactly; docs/DEPLOY.md section 7). Offline only:
+# Claude never runs plan/apply or anything against AWS; the owner does, with SSO
+npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck
+bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
+npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
+
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
 
@@ -353,6 +359,20 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
     with the real instruments seed (the only cross-project imports, test code) and connects as a temporary login
     with the replay grants; `test/replay-app.ts` runs the real AppModule in-process.
 
+### Terraform rules (`infra/terraform`)
+- No secret in any variable, resource argument or output: state is plain JSON in the S3 state bucket.
+  `*.tfvars`, `.terraform/` and `*.tfstate*` are git-ignored; only `terraform.tfvars.example` (placeholders) is committed.
+- IAM policies are `jsonencode()`, never `aws_iam_policy_document` (a data source is random under
+  `mock_provider`, so it couldn't be tested); ARNs the tests compare are built from names in `locals.tf`.
+- `terraform test -filter` needs the platform's path separator: with `tests/x.tftest.hcl` on Windows it finds
+  nothing, warns and **passes**. check.sh and planted-faults.sh fail on a run of zero tests.
+- **Only ws-gateway may reach the instance metadata service** (the role's credentials; hop limit 2 lets every
+  container try): ws-gateway has the fixed address 172.30.0.10 on bridge `fxedge0`, and setup.sh's guard
+  (DOCKER-USER) resets everything else. Never give another service a fixed address, a second network or
+  `network_mode` (`check-compose.mjs` refuses them), and change the address only in compose and setup.sh together.
+- Map attributes compare equal only to `tomap({...})`, sets only to `toset([...])` (an object literal is a
+  different type and the assertion is simply false).
+
 ### Tooling gotchas
 - **Never put `NODE_ENV` in `.env`.** Nx loads the root `.env` into every task, and
   `NODE_ENV=development` makes `next build` fail while prerendering (`Cannot read properties of null
@@ -435,6 +455,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   research quota, same-origin frontend, S3 results with the instance role, images, prod compose, Caddy, history
   transfer, bootstrap; the whole stack ran on the laptop over HTTPS (1.98 GB while a replay plays).
   Write-up: `docs/phase-summaries/step-7-deploy-readiness.md`; runbook: `docs/DEPLOY.md`.
+
+- **Step 7 phase 2a (Terraform) is done** (2026-11-10) on branch `step-7-terraform` (not merged): `infra/terraform`
+  (VPC, host, IAM, ECR, S3, GitHub OIDC deploy role, alarms, DLM), `infra/vm/setup.sh`, the metadata guard, offline
+  checks with planted faults. Nothing applied yet (the owner runs it). Runbook: `docs/DEPLOY.md` section 7.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.

@@ -213,6 +213,12 @@ services:
       S3_BUCKET: ${S3_BUCKET:-}
     depends_on:
       { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy }, kafka: { condition: service_healthy } }
+    # The only container allowed to reach the instance metadata service (the role's S3 credentials): the
+    # host's firewall admits this address alone (infra/vm/setup.sh, imds guard). Outside the network's
+    # dynamic range, so no other container can be given it.
+    networks:
+      default:
+        ipv4_address: 172.30.0.10
     mem_limit: 320m
     healthcheck:
       <<: *node-health
@@ -341,6 +347,21 @@ services:
     volumes:
       - ../data/history-transfer:/repo/data/history-transfer
     depends_on: { timescaledb: { condition: service_healthy } }
+
+# One bridge with a fixed name and subnet, so the host's metadata guard (infra/vm/setup.sh) can name
+# ws-gateway's address and the bridge it comes from. Containers get addresses from ip_range only
+# (.128-.255); ws-gateway's fixed .10 is outside it. node infra/check-compose.mjs checks these values
+# against the guard's.
+networks:
+  default:
+    name: forexedge_default
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: fxedge0
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+          ip_range: 172.30.0.128/25
 
 volumes:
   tsdb_data:
