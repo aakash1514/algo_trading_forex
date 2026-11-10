@@ -1,8 +1,7 @@
-import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Worker, Job } from 'bullmq';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { Client as MinioClient } from 'minio';
 import {
   BacktestRunEntity, HISTORICAL_SOURCES, HistoricalTimeframe, pointsToPrice, readHistoricalBars, requireHistoricalCoverage,
 } from '@forexedge/database';
@@ -13,6 +12,7 @@ import { calculateMetrics } from './metrics.calculator';
 import { Candle, MoneyTrade, StrategyContext } from './strategies/strategy.interface';
 import { MoneySpec, positionUnits, tradeMoney } from '@forexedge/trading-sim';
 import { backtestWindow, TIMEFRAME_MS } from './backtest-window';
+import { BACKTEST_RESULT_STORE, BacktestResultStore } from './result-store';
 
 export interface BacktestJobData {
   runId: string;
@@ -27,13 +27,11 @@ export interface BacktestJobData {
   initialCapital: number; // USD
 }
 
-const MINIO_BUCKET = 'backtests';
 
 @Injectable()
 export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(BacktestWorker.name);
   private worker!: Worker;
-  private readonly minioClient: MinioClient;
 
   constructor(
     @InjectRepository(BacktestRunEntity)
@@ -41,22 +39,17 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
     private readonly dataSource: DataSource,
     private readonly gateway: AppGateway,
     private readonly strategyRegistry: StrategyRegistry,
-  ) {
-    this.minioClient = new MinioClient({
-      endPoint: process.env.MINIO_ENDPOINT ?? 'localhost',
-      port: Number(process.env.MINIO_PORT ?? 9000),
-      useSSL: process.env.MINIO_USE_SSL === 'true', // was hardcoded false
-      accessKey: process.env.MINIO_USER ?? 'minio_admin',
-      secretKey: process.env.MINIO_PASS ?? 'minio_secret123',
-    });
-  }
+    @Inject(BACKTEST_RESULT_STORE)
+    private readonly results: BacktestResultStore,
+  ) {}
 
   async onModuleInit() {
     // ── Verify TimescaleDB views exist before accepting jobs ──
     await this.verifyViews();
 
-    // ── Ensure MinIO bucket exists ──
-    await this.ensureBucket();
+    // ── The results bucket: MinIO creates it, S3's must exist ──
+    const bucket = await this.results.ensureBucket();
+    this.logger.log(`Results store ${this.results.kind}, bucket '${this.results.bucket}' ${bucket}`);
 
     // ── Start BullMQ worker ──
     this.worker = new Worker(
@@ -169,19 +162,13 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
       await this.repo.update(runId, { progress: 85 });
       this.emitProgress(userId, runId, 85, 'Saving results...');
 
-      // 6. Save full results to MinIO
+      // 6. Save full results to the results store (MinIO or S3)
       const objectKey = `${runId}/results.json`;
       const resultsJson = JSON.stringify({
         initialCapital: job.data.initialCapital, lots: job.data.lots, units: money.units,
         metrics, finalEquity, dailyEquity, trades,
       }, null, 2);
-      await this.minioClient.putObject(
-        MINIO_BUCKET,
-        objectKey,
-        resultsJson,
-        Buffer.byteLength(resultsJson),
-        { 'Content-Type': 'application/json' },
-      );
+      await this.results.save(objectKey, resultsJson);
 
       // 7. Mark COMPLETED
       await this.repo.update(runId, {
@@ -236,14 +223,4 @@ export class BacktestWorker implements OnModuleInit, OnModuleDestroy {
     this.logger.log('Historical candle tables verified');
   }
 
-  // ── Ensure MinIO bucket exists ──
-  private async ensureBucket(): Promise<void> {
-    const exists = await this.minioClient.bucketExists(MINIO_BUCKET);
-    if (!exists) {
-      await this.minioClient.makeBucket(MINIO_BUCKET);
-      this.logger.log(`MinIO bucket '${MINIO_BUCKET}' created`);
-    } else {
-      this.logger.log(`MinIO bucket '${MINIO_BUCKET}' ready`);
-    }
-  }
 }

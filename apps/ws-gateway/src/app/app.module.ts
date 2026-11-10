@@ -14,6 +14,7 @@ import { GatewayModule } from '../gateway/gateway.module';
 import { KafkaConsumersModule } from '../kafka/kafka-consumers.module';
 import { BacktestQueueModule } from '../backtest/backtest-queue.module';
 import { BacktestModule } from '../backtest/backtest.module';
+import { BACKTEST_RESULT_STORE, BacktestResultStore } from '../backtest/result-store';
 import { UserEntity } from '@forexedge/database';
 
 @Module({
@@ -40,11 +41,13 @@ import { UserEntity } from '@forexedge/database';
     BacktestQueueModule,
     BacktestModule,
     HealthModule.forRoot({
-      inject: [DataSource, REDIS_CLIENT, ConfigService],
-      useFactory: (db: DataSource, redis: Redis, config: ConfigService) => ({
+      imports: [BacktestModule],
+      inject: [DataSource, REDIS_CLIENT, ConfigService, BACKTEST_RESULT_STORE],
+      useFactory: (db: DataSource, redis: Redis, config: ConfigService, results: BacktestResultStore) => ({
         db: sqlCheck(db),
         redis: redisCheck(redis),
         kafka: kafkaHealthCheck(config.get<string>('KAFKA_BROKER', 'localhost:9092')),
+        storage: () => results.check(),
       }),
     }),
   ],
