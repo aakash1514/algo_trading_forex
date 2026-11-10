@@ -63,7 +63,7 @@ async function main(): Promise<void> {
     return { status: r.status, body: (await r.json()) as T };
   };
   const connect = async () => {
-    const socket: Socket = io(`${replayUrl}/replay`, { auth: { token }, transports: ['websocket'], reconnection: false });
+    const socket: Socket = io(`${replayUrl}/replay`, { path: '/api/replay/socket.io', auth: { token }, transports: ['websocket'], reconnection: false });
     const events: Received[] = [];
     socket.onAny((event: string, payload: unknown) => events.push({ event, payload, at: Date.now() }));
     const state = await new Promise<State>((ok, fail) => { socket.once('state', ok); socket.once('connect_error', fail); });

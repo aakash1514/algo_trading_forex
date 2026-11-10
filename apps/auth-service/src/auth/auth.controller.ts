@@ -15,12 +15,38 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { RegistrationOpenGuard } from './guards/registration-open.guard';
+import { cookieSecure } from '@forexedge/common';
+
+// The refresh-token cookie. secure from COOKIE_SECURE (default true in production, HTTPS only);
+// sameSite lax: the app and its API share one origin, so the cookie never has to travel cross-site,
+// and lax still keeps it off cross-site POSTs. clearCookie must repeat the same attributes.
+const REFRESH_COOKIE = 'refresh_token';
+const REFRESH_COOKIE_PATH = '/api/auth'; // cookie only sent to auth routes
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly cookieOptions = {
+    httpOnly: true, // JS cannot read this cookie — prevents XSS theft
+    secure: cookieSecure(),
+    sameSite: 'lax' as const,
+    path: REFRESH_COOKIE_PATH,
+  };
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly registration: RegistrationOpenGuard,
+  ) {}
+
+  // Public: what the login and register pages may offer (read at runtime, so one frontend build
+  // serves an open or a closed deployment)
+  @Get('config')
+  getConfig() {
+    return { registrationEnabled: this.registration.open };
+  }
 
   @Post('register')
+  @UseGuards(RegistrationOpenGuard)
   async register(@Body() dto: RegisterDto, @Res() res: Response) {
     const result = await this.authService.register(dto);
     this.setRefreshTokenCookie(res, result.refreshToken);
@@ -63,8 +89,8 @@ export class AuthController {
   async logout(@Req() req: Request, @Res() res: Response) {
     const user = req.user as any;
     await this.authService.logout(user.id);
-    // Must match the path the cookie was set with, or the browser keeps it.
-    res.clearCookie('refresh_token', { path: '/api/auth' });
+    // Must match the attributes the cookie was set with, or the browser keeps it.
+    res.clearCookie(REFRESH_COOKIE, this.cookieOptions);
     return res.json({ message: 'Logged out successfully' });
   }
 
@@ -78,12 +104,9 @@ export class AuthController {
 
   // ─── Helper ──────────────────────────────────────────────
   private setRefreshTokenCookie(res: Response, token: string) {
-    res.cookie('refresh_token', token, {
-      httpOnly: true,   // JS cannot read this cookie — prevents XSS theft
-      secure: false,    // set true in production (requires HTTPS)
-      sameSite: 'strict',
+    res.cookie(REFRESH_COOKIE, token, {
+      ...this.cookieOptions,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-      path: '/api/auth', // cookie only sent to auth routes
     });
   }
 }

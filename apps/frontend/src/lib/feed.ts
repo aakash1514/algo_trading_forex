@@ -62,3 +62,32 @@ export function orderEntry(
   if (state === 'stale') return disabled(`Price for ${pair} is stale`);
   return { enabled: true, label: status.simulated ? 'Paper trade on simulated prices' : 'Paper trade', reason: null };
 }
+
+// The Topbar's status dot. Green ("Live") only when ws-gateway says a real feed delivered a real tick
+// recently; the gateway decides that (feedDisplayState in libs/common), the page only adds what it
+// alone knows: whether its socket is up, and whether the gateway's reports stopped arriving.
+export type LiveTone = 'green' | 'amber' | 'grey';
+export interface LiveIndicator {
+  tone: LiveTone;
+  label: string;
+}
+
+// The gateway reports every 5 s; three missed reports means the status shown would be a guess
+export const FEED_STATUS_MAX_AGE_MS = 15_000;
+
+export function liveIndicator(
+  socket: 'connecting' | 'connected' | 'disconnected',
+  feed: { state: 'none' | 'mock' | 'live' | 'stale' } | null,
+  feedAt: number | null,
+  nowMs: number,
+): LiveIndicator {
+  if (socket !== 'connected' || !feed || feedAt === null || nowMs - feedAt > FEED_STATUS_MAX_AGE_MS) {
+    return { tone: 'grey', label: socket === 'connecting' ? 'Connecting' : 'Disconnected' };
+  }
+  switch (feed.state) {
+    case 'live': return { tone: 'green', label: 'Live' };
+    case 'mock': return { tone: 'amber', label: 'Mock feed' };
+    case 'stale': return { tone: 'amber', label: 'Feed stale' };
+    default: return { tone: 'grey', label: 'No live feed' };
+  }
+}

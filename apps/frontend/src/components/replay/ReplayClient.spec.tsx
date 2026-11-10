@@ -83,7 +83,7 @@ beforeEach(() => {
     const req = input as Request;
     const text = await req.text();
     calls.push({ method: req.method, url: req.url, body: text ? JSON.parse(text) : undefined });
-    const route = routes.find((r) => r.method === req.method && req.url === `http://localhost:3008/api/replay/sessions${r.path}`);
+    const route = routes.find((r) => r.method === req.method && req.url === `http://localhost/api/replay/sessions${r.path}`);
     return route
       ? new Response(route.body, { status: route.status, headers: { 'Content-Type': 'application/json' } })
       : new Response('{}', { status: 404 });
@@ -120,7 +120,7 @@ describe('Replay page: start, resume, end', () => {
 
   it('creates the session from the form and opens it paused, with the REPLAY badge and the replay clock', async () => {
     await openScreen();
-    expect(calls).toEqual([{ method: 'POST', url: 'http://localhost:3008/api/replay/sessions',
+    expect(calls).toEqual([{ method: 'POST', url: 'http://localhost/api/replay/sessions',
       body: { instrument: 'EUR_USD', startTime: '2022-03-01T09:30Z', timeframe: '1h', startingBalance: 10000 } }]);
     expect(socket.connects).toBe(1); // connected again for the new session's state
     expect(screen.getByTestId('replay-badge').textContent).toBe('REPLAY');

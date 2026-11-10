@@ -20,7 +20,7 @@ describe('CalendarClient', () => {
     store.dispatch(baseApi.util.resetApiState());
     jest.spyOn(global, 'fetch').mockImplementation(async (input) => {
       const url = input instanceof Request ? input.url : String(input);
-      return url.startsWith('http://localhost:3003/api/domain/calendar')
+      return url.startsWith('http://localhost/api/domain/calendar')
         ? new Response(BODY, { status: 200, headers: { 'Content-Type': 'application/json' } })
         : new Response('{}', { status: 404 });
     });

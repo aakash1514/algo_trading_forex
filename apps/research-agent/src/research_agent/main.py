@@ -2,7 +2,8 @@
 
 GET  /health/live, /health/ready   public, for the host's probes (research_agent.health)
 GET  /api/research/health    public
-POST /api/research/ask       JWT  {"question": "..."} -> report.Report
+POST /api/research/ask       JWT  {"question": "..."} -> report.Report; RESEARCH_DAILY_LIMIT per user per UTC day
+                                  (research_agent.quota: 429 past it, 503 without Redis)
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ from research_agent.auth import CurrentUser
 from research_agent.config import get_settings
 from research_agent.db import check_db
 from research_agent.health import add_health_routes
+from research_agent.quota import DailyQuota
 from research_agent.report import Report
 
 API_PREFIX = "/api/research"
@@ -32,8 +34,9 @@ class AskRequest(BaseModel):
     question: str = Field(min_length=3, max_length=MAX_QUESTION_CHARS)
 
 
-def create_app(agent: ResearchAgent | None = None) -> FastAPI:
+def create_app(agent: ResearchAgent | None = None, quota: DailyQuota | None = None) -> FastAPI:
     research = agent or ResearchAgent()
+    questions = quota or DailyQuota.from_env()
     app = FastAPI(
         title="ForexEdge research agent", docs_url=f"{API_PREFIX}/docs", openapi_url=f"{API_PREFIX}/openapi.json"
     )
@@ -53,6 +56,8 @@ def create_app(agent: ResearchAgent | None = None) -> FastAPI:
 
     @app.post(f"{API_PREFIX}/ask", response_model=Report)
     async def ask(body: AskRequest, user: CurrentUser) -> Report:
+        # counted only after the token and the body are valid, and only for the token's own user
+        await questions.spend(user.id)
         return await research.ask(body.question.strip(), user.id, user.token)
 
     return app

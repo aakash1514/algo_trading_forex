@@ -16,6 +16,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UserEntity } from '@forexedge/database';
 import { JwtPayload } from './strategies/jwt.strategy';
+import { hashPassword } from './password-hash';
 import { ACCESS_TOKEN_SIGN_OPTIONS, REFRESH_TOKEN_SIGN_OPTIONS } from '@forexedge/common';
 
 @Injectable()
@@ -29,12 +30,7 @@ export class AuthService {
 
   // ─── Register ────────────────────────────────────────────
   async register(dto: RegisterDto) {
-    const passwordHash = await argon2.hash(dto.password, {
-      type: argon2.argon2id,  // most secure variant
-      memoryCost: 65536,       // 64MB memory — makes brute force expensive
-      timeCost: 3,             // 3 iterations
-      parallelism: 4,          // 4 parallel threads
-    });
+    const passwordHash = await hashPassword(dto.password);
 
     const user = await this.usersService.create({
       email: dto.email,

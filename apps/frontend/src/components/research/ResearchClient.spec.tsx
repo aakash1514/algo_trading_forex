@@ -10,7 +10,7 @@ import { RESEARCH_DISCLAIMER } from '../../lib/research';
 
 // Goes through the real askResearch mutation and fetchBaseQuery; only fetch is mocked, answering
 // with the real recorded response bodies (__fixtures__/README.md).
-const ASK_URL = 'http://localhost:3007/api/research/ask';
+const ASK_URL = 'http://localhost/api/research/ask';
 const recorded = (name: string, status = 200) =>
   new Response(readFileSync(join(__dirname, '__fixtures__', `${name}.json`)), {
     status,

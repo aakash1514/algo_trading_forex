@@ -58,6 +58,7 @@ Ownership:
 | langchain, langchain-core, langchain-protocol, langgraph, langgraph-prebuilt, langgraph-checkpoint, langgraph-sdk, langchain-groq | PyPI owner account `langchain`, project URLs pointing at the langchain-ai repositories (no attestations) |
 | groq | PyPI owner account `groq`, project URL github.com/groq/groq-python |
 | langchain-mcp-adapters 0.3.2 | No attestation and no source URL on PyPI, so the wheel was compared with the source (below) |
+| redis 8.1.0 | No attestation on PyPI for any redis release (checked 8.1.0 back to 5.2.1), so the wheel was compared with the source (below) |
 
 **langchain-mcp-adapters 0.3.2, wheel vs source (2026-10-12):** the wheel
 `langchain_mcp_adapters-0.3.2-py3-none-any.whl` (sha256 `094e6b3096dbcc408417d5722f6915f164772e50c502ae3d8989405bf12c3c84`,
@@ -67,6 +68,14 @@ the hash in `requirements.lock`) was unpacked and compared byte for byte (`diff 
 are identical, and so is `LICENSE`. The wheel's `RECORD` hashes match its 14 files. The rest is packaging
 metadata (`METADATA`, `WHEEL`, `RECORD`, empty `entry_points.txt`; name, version and requirements as in the
 tag's `pyproject.toml`).
+
+**redis 8.1.0, wheel vs source (2026-11-10, step 7, the research quota):** the wheel
+`redis-8.1.0-py3-none-any.whl` (sha256 `a4fe1aac3d3b3cc791d4b3d5931c5a956045dc951ee74d1c913ee3ac4d2ee9fb`, equal to
+PyPI's digest and to the hash in `requirements.lock`) was compared byte for byte with tag `v8.1.0` of
+github.com/redis/redis-py (lightweight tag, commit `e013126df18e476fbb8b8215f040f39bd3242683`, the archive GitHub
+serves for the tag): all 121 files of the `redis/` package are identical, none is missing on either side. The wheel's
+`RECORD` hashes match its other 124 files. The rest is packaging metadata (`METADATA`, `WHEEL`, `LICENSE`, `RECORD`;
+no entry points). On Python 3.12 it has no required dependencies (async-timeout only below 3.11.3).
 
 The lock is Windows-specific for now: mcp pulls in `pywin32` (Windows only), and the Nx targets call
 `.venv\Scripts\python.exe`. A Linux image comes with deployment (roadmap step 7).

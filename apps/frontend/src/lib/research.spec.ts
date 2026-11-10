@@ -1,4 +1,4 @@
-import { MAX_QUESTION_CHARS, askErrorKind, questionLength, questionProblem } from './research';
+import { ASK_ERROR_MESSAGES, MAX_QUESTION_CHARS, askErrorKind, questionLength, questionProblem } from './research';
 import tooLong from '../components/research/__fixtures__/too-long.json';
 
 describe('research question limits', () => {
@@ -35,6 +35,22 @@ describe('askErrorKind', () => {
     expect(askErrorKind({ status: 500, data: {} })).toBe('server');
     expect(askErrorKind({ status: 'PARSING_ERROR', originalStatus: 200, data: '', error: 'x' })).toBe('server');
     expect(askErrorKind({ message: 'boom' })).toBe('server');
+  });
+});
+
+// The body research-agent sends past the daily quota (asserted field for field in
+// apps/research-agent/tests/test_quota.py) and when Redis is down
+const DAILY_LIMIT_BODY = {
+  detail: { code: 'daily_limit', message: 'Daily limit of 20 questions reached. It resets at 00:00 UTC.', limit: 20 },
+};
+const QUOTA_DOWN_BODY = { detail: { code: 'quota_unavailable', message: "The question limit can't be checked right now. Please try again later." } };
+
+describe('askErrorKind and the daily quota', () => {
+  it('the daily limit has its own message; any other 429 or a quota outage stays "busy"', () => {
+    expect(askErrorKind({ status: 429, data: DAILY_LIMIT_BODY })).toBe('daily_limit');
+    expect(ASK_ERROR_MESSAGES.daily_limit).toBe("You've reached today's limit of research questions. It resets at 00:00 UTC.");
+    expect(askErrorKind({ status: 429, data: { detail: 'Too Many Requests' } })).toBe('busy');
+    expect(askErrorKind({ status: 503, data: QUOTA_DOWN_BODY })).toBe('busy');
   });
 });
 

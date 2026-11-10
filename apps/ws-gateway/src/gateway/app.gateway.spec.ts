@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Socket } from 'socket.io';
 import { ACCESS_TOKEN_SIGN_OPTIONS, REFRESH_TOKEN_SIGN_OPTIONS } from '@forexedge/common';
 import { AppGateway } from './app.gateway';
+import { FeedStatusService } from './feed-status.service';
 
 const SECRET = 'test-access-secret-long-enough-for-hs256';
 const jwt = new JwtService();
@@ -25,16 +26,18 @@ describe('AppGateway user rooms', () => {
 
   it('joins the user room for a valid token', async () => {
     const s = socket(sign({ sub: 'user-1', email: 'a@b.c', role: 'TRADER' }, 900));
-    const gateway = new AppGateway(jwt);
+    const gateway = new AppGateway(jwt, new FeedStatusService());
     await gateway.handleConnection(s);
     expect(s.join).toHaveBeenCalledWith('user:user-1');
     expect(s.disconnect).not.toHaveBeenCalled();
+    // the dot's state right away, not only at the next 5 s broadcast
+    expect(s.emit).toHaveBeenCalledWith('feed:status', { state: expect.any(String), lastTickAgeMs: null });
     gateway.handleDisconnect(s);
   });
 
   it('rejects a token without a subject instead of joining "user:undefined"', async () => {
     const s = socket(sign({ email: 'a@b.c', role: 'TRADER' }, 900));
-    await new AppGateway(jwt).handleConnection(s);
+    await new AppGateway(jwt, new FeedStatusService()).handleConnection(s);
     expect(s.join).not.toHaveBeenCalled();
     expect(s.disconnect).toHaveBeenCalledWith(true);
   });
@@ -45,7 +48,7 @@ describe('AppGateway user rooms', () => {
     ['a token from another issuer', () => sign({ sub: 'user-1' }, 900, { ...ACCESS_TOKEN_SIGN_OPTIONS, issuer: 'x' })],
   ])('rejects %s at the handshake', async (_label, token) => {
     const s = socket(token());
-    await new AppGateway(jwt).handleConnection(s);
+    await new AppGateway(jwt, new FeedStatusService()).handleConnection(s);
     expect(s.join).not.toHaveBeenCalled();
     expect(s.disconnect).toHaveBeenCalledWith(true);
   });
@@ -54,7 +57,7 @@ describe('AppGateway user rooms', () => {
     jest.useFakeTimers();
     jest.setSystemTime(Date.UTC(2026, 10, 10, 12));
     const s = socket(sign({ sub: 'user-1' }, 60));
-    await new AppGateway(jwt).handleConnection(s);
+    await new AppGateway(jwt, new FeedStatusService()).handleConnection(s);
     jest.advanceTimersByTime(59_000);
     expect(s.disconnect).not.toHaveBeenCalled();
     jest.advanceTimersByTime(1_000);
@@ -65,14 +68,14 @@ describe('AppGateway user rooms', () => {
   it('a socket that disconnects first leaves no timer behind', async () => {
     jest.useFakeTimers();
     const s = socket(sign({ sub: 'user-1' }, 60));
-    const gateway = new AppGateway(jwt);
+    const gateway = new AppGateway(jwt, new FeedStatusService());
     await gateway.handleConnection(s);
     gateway.handleDisconnect(s);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it('never emits to an empty user id', () => {
-    const gateway = new AppGateway(jwt);
+    const gateway = new AppGateway(jwt, new FeedStatusService());
     const to = jest.fn().mockReturnValue({ emit: jest.fn() });
     (gateway as unknown as { server: { to: jest.Mock } }).server = { to };
     gateway.emitToUser('', 'position:update', {});

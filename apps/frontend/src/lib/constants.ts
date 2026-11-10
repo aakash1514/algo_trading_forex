@@ -1,18 +1,25 @@
+// Every backend is reached on the page's own origin. In production Caddy routes each /api/<service>
+// prefix and the two socket paths to its service; in development `next dev` does the same with the
+// rewrites in next.config.js. So no host, port or domain is in the code or the build. The per-service
+// keys stay so a call site still says which service it calls.
 export const API_BASE = {
-  AUTH:   'http://localhost:3000/api',
-  MARKET: 'http://localhost:3002/api',
-  DOMAIN: 'http://localhost:3003/api',
-  ORDER:  'http://localhost:3004/api',
-  WS:     'http://localhost:3005/api',
-  ML:     'http://localhost:3006/api',
-  RESEARCH: 'http://localhost:3007/api',
-  REPLAY: 'http://localhost:3008/api',
+  AUTH:   '/api',
+  MARKET: '/api',
+  DOMAIN: '/api',
+  ORDER:  '/api',
+  WS:     '/api',
+  ML:     '/api',
+  RESEARCH: '/api',
+  REPLAY: '/api',
 } as const;
 
-export const WS_URL = 'http://localhost:3005';
+// ws-gateway's Socket.IO on the default path /socket.io, same origin
+export const WS_URL = '/';
 
-// replay-service's Socket.IO namespace /replay (bar replay, step 6b)
-export const REPLAY_WS_URL = 'http://localhost:3008/replay';
+// replay-service's Socket.IO: namespace /replay on its own path, under the service's /api/replay
+// prefix, so one origin routes it to replay-service and /socket.io to ws-gateway
+export const REPLAY_WS_URL = '/replay';
+export const REPLAY_SOCKET_PATH = '/api/replay/socket.io';
 
 // Per-user Socket.IO events from ws-gateway. Mirrors SOCKET_EVENTS in
 // libs/kafka/src/lib/interfaces/realtime.interface.ts; keep the two in sync.
@@ -21,6 +28,7 @@ export const SOCKET_EVENTS = {
   POSITION_UPDATE: 'position:update',
   POSITIONS_SNAPSHOT: 'positions:snapshot',
   ACCOUNT_UPDATE: 'account:update',
+  FEED_STATUS: 'feed:status',
 } as const;
 
 // The tradable instruments shown in the terminal and the backtester: the ones

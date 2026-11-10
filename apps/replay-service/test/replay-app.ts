@@ -8,7 +8,7 @@ import { io, Socket } from 'socket.io-client';
 import { ACCESS_TOKEN_SIGN_OPTIONS } from '@forexedge/common';
 import { rootEnv } from '@forexedge/database/testing';
 import { AppModule } from '../src/app/app.module';
-import { configureApp } from '../src/app/configure-app';
+import { configureApp, REPLAY_SOCKET_PATH } from '../src/app/configure-app';
 import { ReplayTestDb } from './replay-test-db';
 
 export interface ReplayApp {
@@ -68,7 +68,9 @@ export interface ReplayClient {
 
 // Connects to /replay and waits for the state the server sends on connect
 export async function connectClient(url: string, token: string): Promise<ReplayClient> {
-  const socket = io(`${url}/replay`, { auth: { token }, transports: ['websocket'], reconnection: false, forceNew: true });
+  const socket = io(`${url}/replay`, {
+    path: REPLAY_SOCKET_PATH, auth: { token }, transports: ['websocket'], reconnection: false, forceNew: true,
+  });
   const events: Received[] = [];
   socket.onAny((event: string, payload: unknown) => events.push({ event, payload }));
   const state = await new Promise<Record<string, unknown>>((resolve, reject) => {

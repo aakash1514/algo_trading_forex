@@ -4,21 +4,23 @@ import {
   SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
   MessageBody,
   ConnectedSocket,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { AUTH_EXPIRED_EVENT, SocketDeadlines, verifyAccessToken } from '@forexedge/common';
+import { SOCKET_EVENTS } from '@forexedge/kafka';
+import { FeedStatusService } from './feed-status.service';
 
-@WebSocketGateway({
-  cors: {
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:4200',
-    credentials: true,
-  },
-})
-export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
+// How often every socket gets feed:status (the dot), besides once on connect
+export const FEED_STATUS_INTERVAL_MS = 5_000;
+
+// CORS comes from the SocketIoAdapter in main.ts (CORS_ORIGIN), not from this decorator
+@WebSocketGateway()
+export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
   @WebSocketServer()
   server!: Server;
 
@@ -28,7 +30,20 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // Tracks which sockets subscribed to which currency pair ticks
   private tickSubscriptions = new Map<string, Set<string>>();
 
-  constructor(private readonly jwtService: JwtService) {}
+  private feedTimer: NodeJS.Timeout | undefined;
+
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly feedStatus: FeedStatusService,
+  ) {}
+
+  afterInit(): void {
+    this.feedTimer = setInterval(() => this.server.emit(SOCKET_EVENTS.FEED_STATUS, this.feedStatus.status()), FEED_STATUS_INTERVAL_MS);
+  }
+
+  onModuleDestroy(): void {
+    clearInterval(this.feedTimer);
+  }
 
   // One deadline per socket: the access token's expiry (see @forexedge/common socket-auth)
   private readonly deadlines = new SocketDeadlines();
@@ -49,6 +64,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       socket.emit(AUTH_EXPIRED_EVENT);
       socket.disconnect(true);
     });
+    socket.emit(SOCKET_EVENTS.FEED_STATUS, this.feedStatus.status());
     this.logger.log(`Socket ${socket.id} connected — user:${verified.userId}`);
   }
 

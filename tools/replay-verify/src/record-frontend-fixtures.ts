@@ -65,7 +65,7 @@ async function main(): Promise<void> {
   };
   // A socket whose events are kept in order; next(event) waits for one not yet taken
   const connect = async () => {
-    const socket: Socket = io(`${replayUrl}/replay`, { auth: { token }, transports: ['websocket'], reconnection: false, forceNew: true });
+    const socket: Socket = io(`${replayUrl}/replay`, { path: '/api/replay/socket.io', auth: { token }, transports: ['websocket'], reconnection: false, forceNew: true });
     const queue: { event: string; payload: unknown }[] = [];
     socket.onAny((event: string, payload: unknown) => queue.push({ event, payload }));
     const next = async (event: string, timeoutMs = 10_000, match: (p: unknown) => boolean = () => true) => {

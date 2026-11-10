@@ -8,11 +8,13 @@ import { tickReceived } from '../store/slices/market.slice';
 import { positionUpdated, setPositions } from '../store/slices/positions.slice';
 import { setAccountSummary } from '../store/slices/account.slice';
 import { signalReceived } from '../store/slices/signals.slice';
+import { feedStatusReceived, liveSocketChanged } from '../store/slices/live.slice';
 import { baseApi } from '../store/api/base.api';
 import { WS_URL, MAJOR_PAIRS, SOCKET_EVENTS } from '../lib/constants';
 import { renewSessionForSocket } from '../lib/socket-auth';
 import type {
   TickEvent,
+  FeedStatusEvent,
   PositionUpdateEvent,
   PositionsSnapshotEvent,
   AccountUpdateEvent,
@@ -39,6 +41,7 @@ export function useForexSocket() {
     if (!isAuthenticated) return;
 
     const socket = io(WS_URL, {
+      path: '/socket.io',
       auth: (cb) => cb({ token: store.getState().auth.accessToken ?? '' }),
       transports: ['websocket'],
       reconnectionAttempts: 5,
@@ -46,10 +49,12 @@ export function useForexSocket() {
     });
 
     socketRef.current = socket;
+    dispatch(liveSocketChanged('connecting'));
     let lastRenewAt = -Infinity;
     let stopped = false;
 
     socket.on('disconnect', async (reason) => {
+      dispatch(liveSocketChanged('disconnected'));
       // Only a server-side close needs us: other drops reconnect by themselves
       if (reason !== 'io server disconnect' || stopped) return;
       if (Date.now() - lastRenewAt < RENEW_WINDOW_MS) {
@@ -61,7 +66,13 @@ export function useForexSocket() {
       else stopped = true;
     });
 
+    socket.on('connect_error', () => dispatch(liveSocketChanged('disconnected')));
+    socket.on(SOCKET_EVENTS.FEED_STATUS, (status: FeedStatusEvent) => {
+      dispatch(feedStatusReceived({ status, at: Date.now() }));
+    });
+
     socket.on('connect', () => {
+      dispatch(liveSocketChanged('connected'));
       // Subscribe to all major pairs on connect
       MAJOR_PAIRS.forEach((pair) => {
         socket.emit('subscribe:ticker', pair);
@@ -104,8 +115,10 @@ export function useForexSocket() {
       MAJOR_PAIRS.forEach((pair) => {
         socket.emit('unsubscribe:ticker', pair);
       });
+      socket.removeAllListeners();
       socket.disconnect();
       socketRef.current = null;
+      dispatch(liveSocketChanged('disconnected'));
     };
   }, [isAuthenticated, dispatch, store]);
 

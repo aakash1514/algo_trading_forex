@@ -8,7 +8,7 @@ import {
   accountReceived, barReceived, commandFinished, commandStarted, connectionChanged, endOfDataReceived, errorReceived,
   positionsReceived, replayReset, sessionEnded, stateReceived, statusReceived,
 } from '../store/slices/replay.slice';
-import { REPLAY_WS_URL } from '../lib/constants';
+import { REPLAY_SOCKET_PATH, REPLAY_WS_URL } from '../lib/constants';
 import { AUTH_EXPIRED_EVENT, REAUTH_EVENT, renewSessionForSocket } from '../lib/socket-auth';
 import type {
   BarEvent, CommandAck, EndedSession, EndOfDataEvent, ReplayAccount, ReplayPosition, ReplaySession, ReplayState,
@@ -51,6 +51,7 @@ export function useReplaySocket(): ReplaySocket {
 
   useEffect(() => {
     const socket = io(REPLAY_WS_URL, {
+      path: REPLAY_SOCKET_PATH,
       auth: (cb) => cb({ token: store.getState().auth.accessToken ?? '' }),
       transports: ['websocket'],
       reconnectionAttempts: RECONNECT_ATTEMPTS,

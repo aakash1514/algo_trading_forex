@@ -1,4 +1,4 @@
-/** @jest-environment node */
+/** @jest-environment ./test/jsdom-with-fetch.cjs */
 import type { BaseQueryApi } from '@reduxjs/toolkit/query';
 import { store } from '../index';
 import { setCredentials, clearCredentials } from '../slices/auth.slice';
@@ -34,7 +34,7 @@ describe('baseQueryWithReauth', () => {
       return auth === 'Bearer fresh' ? json(200, { ok: true }) : json(401, { message: 'Unauthorized' });
     });
 
-    const result = await baseQueryWithReauth('http://localhost:3004/api/positions', queryApi(), {});
+    const result = await baseQueryWithReauth('http://localhost/api/positions', queryApi(), {});
 
     expect(result.data).toEqual({ ok: true });
     expect(store.getState().auth.accessToken).toBe('fresh');
@@ -54,9 +54,9 @@ describe('baseQueryWithReauth', () => {
     });
 
     const results = await Promise.all([
-      baseQueryWithReauth('http://localhost:3004/api/positions', queryApi(), {}),
-      baseQueryWithReauth('http://localhost:3004/api/account/summary', queryApi(), {}),
-      baseQueryWithReauth('http://localhost:3004/api/orders', queryApi(), {}),
+      baseQueryWithReauth('http://localhost/api/positions', queryApi(), {}),
+      baseQueryWithReauth('http://localhost/api/account/summary', queryApi(), {}),
+      baseQueryWithReauth('http://localhost/api/orders', queryApi(), {}),
     ]);
 
     expect(results.every((r) => r.data)).toBe(true);
@@ -69,14 +69,14 @@ describe('baseQueryWithReauth', () => {
       return url.endsWith('/auth/refresh') ? json(403, {}) : json(401, {});
     });
 
-    await baseQueryWithReauth('http://localhost:3004/api/positions', queryApi(), {});
+    await baseQueryWithReauth('http://localhost/api/positions', queryApi(), {});
     expect(store.getState().auth).toMatchObject({ isAuthenticated: false, accessToken: null, sessionRestored: true });
   });
 
   it('does not try to refresh on a failed login', async () => {
     store.dispatch(clearCredentials());
     const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue(json(401, { message: 'Invalid credentials' }));
-    await baseQueryWithReauth({ url: 'http://localhost:3000/api/auth/login', method: 'POST', body: {} }, queryApi(), {});
+    await baseQueryWithReauth({ url: 'http://localhost/api/auth/login', method: 'POST', body: {} }, queryApi(), {});
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 });

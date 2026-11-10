@@ -12,6 +12,8 @@ langchain-core==1.6.5
 langgraph==1.2.12
 langchain-mcp-adapters==0.3.2
 langchain-groq==1.1.3
+# the daily question quota (step 7); no PyPI attestation: wheel compared with tag v8.1.0 (README)
+redis==8.1.0
 
 # Held back on purpose
 # mcp 2.x requires httpx2, whose ownership can't be proven (no PyPI provenance); langchain-mcp-adapters needs mcp<2

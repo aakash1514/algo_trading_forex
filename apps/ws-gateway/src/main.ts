@@ -10,17 +10,19 @@ import cookieParser from 'cookie-parser';
 import { AppModule } from './app/app.module';
 import { BACKTEST_QUEUE } from './backtest/backtest-queue.module';
 import { basicAuth, bullBoardCredentials } from './admin/bull-board-auth';
-import { HEALTH_ROUTES } from '@forexedge/common';
+import { HEALTH_ROUTES, corsOrigins } from '@forexedge/common';
 
-
-const CORS_ORIGIN = ['http://localhost:4200', 'http://localhost:3001'];
-
+// Socket.IO CORS (not enableCors), from the same CORS_ORIGIN setting as the HTTP routes
 class SocketIoAdapter extends IoAdapter {
-  createIOServer(port: number, options?: ServerOptions) {
+  constructor(app: ConstructorParameters<typeof IoAdapter>[0], private readonly origins: string[]) {
+    super(app);
+  }
+
+  override createIOServer(port: number, options?: ServerOptions) {
     return super.createIOServer(port, {
       ...options,
       cors: {
-        origin: CORS_ORIGIN,
+        origin: this.origins,
         credentials: true,
         methods: ['GET', 'POST'],
       },
@@ -30,6 +32,7 @@ class SocketIoAdapter extends IoAdapter {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const CORS_ORIGIN = corsOrigins(); // CORS_ORIGIN from the env, required in production
 
   app.enableCors({
     origin: CORS_ORIGIN,
@@ -57,7 +60,7 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),
   );
 
-  app.useWebSocketAdapter(new SocketIoAdapter(app));
+  app.useWebSocketAdapter(new SocketIoAdapter(app, CORS_ORIGIN));
 
   app.setGlobalPrefix('api', {
     exclude: ['/admin/queues', '/admin/queues/*path', ...HEALTH_ROUTES],

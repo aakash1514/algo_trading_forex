@@ -10,7 +10,7 @@ describe('refreshSession', () => {
     const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValue(ok({ accessToken: 't1', user: { id: 'u1' } }));
     const [a, b, c] = await Promise.all([refreshSession(), refreshSession(), refreshSession()]);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy).toHaveBeenCalledWith('http://localhost:3000/api/auth/refresh', { method: 'POST', credentials: 'include' });
+    expect(fetchSpy).toHaveBeenCalledWith('/api/auth/refresh', { method: 'POST', credentials: 'include' });
     expect(a).toEqual({ accessToken: 't1', user: { id: 'u1' } });
     expect(b).toBe(a);
     expect(c).toBe(a);

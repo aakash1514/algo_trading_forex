@@ -9,3 +9,4 @@ export * from './lib/auth-guards';
 export * from './lib/health';
 export * from './lib/jwt-claims';
 export * from './lib/socket-auth';
+export * from './lib/runtime-env';

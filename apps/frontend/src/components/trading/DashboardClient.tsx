@@ -8,7 +8,6 @@ import {
   useGetAccountSummaryQuery,
   useGetPositionsQuery,
 } from '../../store/api/order.api';
-import { useForexSocket } from '../../hooks/useForexSocket';
 import { TradingChart } from '../charts/TradingChart';
 import { OrderForm } from './OrderForm';
 import { PositionsTable } from './PositionsTable';
@@ -21,8 +20,6 @@ export function DashboardClient() {
   const dispatch = useAppDispatch();
   const activePair = useAppSelector((s) => s.market.activePair);
   const accessToken = useAppSelector((s) => s.auth.accessToken);
-
-  useForexSocket();
 
   const {
     data: accountData,

@@ -122,7 +122,7 @@ async function replayPair(db: Client, replayUrl: string, token: string, pair: st
   const session = await api.call<{ id: string; clockTime: string }>('POST', '/sessions', {
     instrument: pair.replace('/', '_'), startTime: `${run.from}T00:00Z`, timeframe: '1h', startingBalance: run.capital,
   });
-  const socket: Socket = io(`${replayUrl}/replay`, { auth: { token }, transports: ['websocket'] });
+  const socket: Socket = io(`${replayUrl}/replay`, { path: '/api/replay/socket.io', auth: { token }, transports: ['websocket'] });
   const positions = new Map<string, PositionView>();
   socket.on('positions', (list: PositionView[]) => list.forEach((p) => positions.set(p.id, p)));
   await new Promise((ok, fail) => { socket.once('state', ok); socket.once('connect_error', fail); });

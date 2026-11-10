@@ -25,11 +25,12 @@ export function questionProblem(question: string): 'empty' | 'too_short' | 'too_
   return null;
 }
 
-export type AskErrorKind = 'too_long' | 'invalid' | 'busy' | 'network' | 'session' | 'server';
+export type AskErrorKind = 'too_long' | 'invalid' | 'daily_limit' | 'busy' | 'network' | 'session' | 'server';
 
 export const ASK_ERROR_MESSAGES: Record<AskErrorKind, string> = {
   too_long: `The question is too long (at most ${MAX_QUESTION_CHARS} characters).`,
   invalid: `The question was rejected; it needs ${MIN_QUESTION_CHARS} to ${MAX_QUESTION_CHARS} characters.`,
+  daily_limit: "You've reached today's limit of research questions. It resets at 00:00 UTC.",
   busy: 'The research agent is busy or took too long. Try again in a minute.',
   network: 'The research agent could not be reached. Check your connection and that the service is running.',
   session: 'Your session has expired. Log in again.',
@@ -43,6 +44,10 @@ function isFetchError(e: unknown): e is FetchBaseQueryError {
 export function askErrorKind(error: FetchBaseQueryError | SerializedError): AskErrorKind {
   if (!isFetchError(error)) return 'server';
   const { status } = error;
+  // research-agent's per-user daily quota (research_agent/quota.py), not the model being busy
+  if (status === 429 && (error.data as { detail?: { code?: string } } | undefined)?.detail?.code === 'daily_limit') {
+    return 'daily_limit';
+  }
   if (status === 'TIMEOUT_ERROR' || status === 429 || status === 503) return 'busy';
   if (status === 'FETCH_ERROR') return 'network';
   if (status === 401) return 'session';
