@@ -426,10 +426,10 @@ fault "workflow: runs on any branch" "$W" \
   "must run only if github.ref == 'refs/heads/main'" workflows
 fault "workflow: push trigger" "$W" \
   'on:
-  workflow_dispatch:' 'on:
+  workflow_call:' 'on:
   push:
-  workflow_dispatch:' \
-  'workflow_dispatch only' workflows
+  workflow_call:' \
+  'workflow_call and workflow_dispatch only' workflows
 fault "workflow: cancels a running build" "$W" \
   'cancel-in-progress: false' 'cancel-in-progress: true' \
   'cancel-in-progress: false' workflows
@@ -503,6 +503,69 @@ fault ".nvmrc differs from the images' Node" .nvmrc \
   '24.13.1' '24.11.0' \
   '.nvmrc is 24.11.0' workflows
 
+fault "build-images: workflow_call passes secrets" "$W" \
+  'on:
+  workflow_call:' 'on:
+  workflow_call:
+    secrets:
+      token:
+        required: false' \
+  'workflow_call takes no inputs, secrets or outputs' workflows
+D=.github/workflows/deploy.yml
+fault "deploy: no paths-ignore (docs-only merges deploy)" "$D" \
+  "    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+" '' \
+  'push paths-ignore is []' workflows
+fault "deploy: paths-ignore also skips infra/" "$D" \
+  "      - '**/*.md'
+" "      - '**/*.md'
+      - 'infra/**'
+" \
+  'exactly docs/** and **/*.md' workflows
+fault "deploy: push to any branch" "$D" \
+  '    branches: [main]' "    branches: ['**']" \
+  'push branches are ["**"]; exactly [main]' workflows
+fault "deploy: a pull_request trigger" "$D" \
+  'on:
+  push:' 'on:
+  pull_request:
+  push:' \
+  'push and workflow_dispatch only' workflows
+fault "deploy: cancels a running deploy" "$D" \
+  'cancel-in-progress: false' 'cancel-in-progress: true' \
+  'cancel-in-progress: false (a cancelled deploy' workflows
+fault "deploy: the deploy job on any branch" "$D" \
+  "    needs: build
+    if: github.ref == 'refs/heads/main'
+" '    needs: build
+' \
+  "deploy.yml job deploy: must run only if github.ref == 'refs/heads/main'" workflows
+fault "deploy: simulate_failure on by default" "$D" \
+  '        default: false' '        default: true' \
+  'exactly one input, simulate_failure, boolean, default false' workflows
+fault "deploy: build from another repository's workflow" "$D" \
+  'uses: ./.github/workflows/build-images.yml' 'uses: someone/forexedge/.github/workflows/build-images.yml@main' \
+  'must be uses: ./.github/workflows/build-images.yml' workflows
+fault "deploy: deploys without waiting for the build" "$D" \
+  '    needs: build
+' '' \
+  'deploy.yml job deploy: must need build' workflows
+fault "deploy: reads a secret" "$D" \
+  'role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}' 'role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}' \
+  'deploy.yml: reads secrets.*' workflows
+fault "deploy: action pinned to a tag" "$D" \
+  'aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0' 'aws-actions/configure-aws-credentials@v6' \
+  'is not pinned to a full commit SHA' workflows
+fault "deploy: no job timeout" "$D" \
+  '    timeout-minutes: 45
+' '' \
+  'deploy.yml job deploy: no timeout-minutes' workflows
+fault "deploy: contents: write" "$D" \
+  'contents: read' 'contents: write' \
+  'deploy.yml: permissions are' workflows
+
 echo "== host tooling (stage.test.sh, run-on-host.test.sh, host-scripts.test.sh)"
 fault "stage.sh: mismatched tag accepted" vm/stage.sh \
   '[[ "$tag" == "$head" ]] || die' 'true || die' \
@@ -529,8 +592,8 @@ fault2 "make-env.sh: .env.prod overwritten" vm/make-env.sh \
 fault "make-env.sh: a secret printed" vm/make-env.sh \
   'jwt_refresh="$(random_string 64)"' 'jwt_refresh="$(random_string 64)"; echo "JWT_REFRESH_SECRET=$jwt_refresh"' \
   'FAIL  make-env: files' host-tests
-fault "make-env.sh: mismatched tag accepted" vm/make-env.sh \
-  '[[ "${arg[IMAGE_TAG]}" == "$staged" ]] || die' 'true || die' \
+fault "make-env.sh: a tag without a release accepted" vm/make-env.sh \
+  '[[ -f "$release_file" ]] || die' 'true || die' \
   'FAIL  make-env: other tag' host-tests
 fault "set-secret.sh: short demo password accepted" vm/set-secret.sh \
   '[[ ${#value} -ge 12 && ${#value} -le 32 ]] || die' 'true || die' \
@@ -538,23 +601,21 @@ fault "set-secret.sh: short demo password accepted" vm/set-secret.sh \
 fault "set-secret.sh: the value printed" vm/set-secret.sh \
   'echo "$name set in $file (replaced $previous)"' 'echo "$name set in $file (replaced $previous): $value"' \
   'FAIL  set-secret: GROQ_API_KEY' host-tests
-fault "stack.sh: mismatched tag accepted" vm/stack.sh \
-  '[[ "$tag" == "$staged" ]] || die' 'true || die' \
-  'FAIL  stack: other tag' host-tests
+fault "stack.sh: a release recording another commit accepted" vm/stack.sh \
+  '[[ "$tag" == "$recorded" ]] || die' 'true || die' \
+  'FAIL  stack: release record' host-tests
 fault "fetch.sh: history files root only (600)" vm/fetch.sh \
-  '[[ "$path" == data/history-transfer/* ]] && mode=0644' '[[ "$path" == data/history-transfer/* ]] && mode=0600' \
+  'install -D -o root -g root -m 0644' 'install -D -o root -g root -m 0600' \
   'FAIL  fetch: history modes' host-tests
-fault "bootstrap.sh: mismatched tag accepted" vm/bootstrap.sh \
-  '[[ "$tag" == "$staged" ]] || die' 'true || die' \
+fault "bootstrap.sh: a tag without a release accepted" vm/bootstrap.sh \
+  '[[ -f "$RELEASES/$tag/release" ]] || die' 'true || die' \
   'FAIL  bootstrap: other tag' host-tests
 fault "stack.sh: a secret printed (no redaction)" vm/stack.sh \
   'run() { "$@" 2>&1 | redact; }' 'run() { "$@" 2>&1; }' \
   'FAIL  stack: up' host-tests
 fault "stack.sh: up with placeholders" vm/stack.sh \
   '    check_no_placeholders
-    ecr_login
-    set_image_tag' '    ecr_login
-    set_image_tag' \
+    check_current' '    check_current' \
   'FAIL  stack: placeholders' host-tests
 fault "stack.sh: an env file others can read accepted" vm/stack.sh \
   '[[ "$(stat -c '"'"'%U %a'"'"' "$f")" == "root 600" ]] || die' 'true || die' \
@@ -570,6 +631,69 @@ fault "bootstrap.sh: goes on after a failed step" vm/bootstrap.sh \
 fault "bootstrap.sh: shared block drifts from stack.sh" vm/bootstrap.sh \
   'compose() { docker compose -p forexedge -f' 'compose() { docker compose -p forexedge-old -f' \
   'FAIL  shared block' host-tests
+
+fault "deploy.sh: shared block drifts from stack.sh" vm/deploy.sh \
+  'compose() { docker compose -p forexedge -f' 'compose() { docker compose -p forexedge-old -f' \
+  'FAIL  shared block' host-tests
+fault "deploy.sh: readiness block drifts from stack.sh" vm/deploy.sh \
+  'echo "not ready after ${READY_SECONDS} s: ${pending[*]}" >&2' 'echo "not ready after ${READY_SECONDS} s; ${pending[*]}" >&2' \
+  'FAIL  readiness block' host-tests
+fault "deploy.sh: rollback with the new release's compose file" vm/deploy.sh \
+  'if up_release "$previous" && ready; then' 'if IMAGE_TAG="$previous" run compose up -d --remove-orphans --quiet-pull && ready; then' \
+  'FAIL  deploy: simulated failure' host-tests
+fault "deploy.sh: a failed rollback exits like a rollback" vm/deploy.sh \
+  'exit 4' 'exit 3' \
+  'FAIL  deploy: rollback failure' host-tests
+fault "deploy.sh: --simulate-failure ignored" vm/deploy.sh \
+  'elif [[ "$simulate" == true ]]; then' 'elif false; then' \
+  'FAIL  deploy: simulated failure' host-tests
+fault2 "deploy.sh: switch before the backup" vm/deploy.sh \
+  'backup "$tag" "$bucket"
+' '' \
+  'echo "current -> $tag"
+' 'echo "current -> $tag"
+backup "$tag" "$bucket"
+' \
+  'FAIL  deploy: success' host-tests
+fault "deploy.sh: a missing release accepted" vm/deploy.sh \
+  '[[ -f "$RELEASES/$tag/release" ]] || die' 'true || die' \
+  'FAIL  deploy: refusals' host-tests
+fault "deploy.sh: an empty table list dumped" vm/deploy.sh \
+  '((${#tables[@]} > 0)) || { rm -rf "$work"; die "backup: no app table found"; }' '' \
+  'FAIL  deploy: backup failures' host-tests
+fault "deploy.sh: pruning removes the previous release" vm/deploy.sh \
+  '[[ "$tag" == "$keep" || "$tag" == "$previous" ]] && continue' '[[ "$tag" == "$keep" ]] && continue' \
+  'FAIL  deploy: pruning' host-tests
+fault "deploy.sh: adoption restarts a container" vm/deploy.sh \
+  '  log_deploy "$tag" adopted
+' '  log_deploy "$tag" adopted
+  compose restart caddy
+' \
+  'FAIL  deploy: adoption' host-tests
+fault "deploy.sh: adoption without the IMAGE_TAG check" vm/deploy.sh \
+  '[[ -n "$tag" && "$tag" == "$running" ]] ||' '[[ -n "$tag" ]] ||' \
+  'FAIL  deploy: adoption refusals' host-tests
+fault "deploy.sh: legacy files removed while mounted" vm/deploy.sh \
+  'grep -qF "$ROOT/infra/caddy/"; then' 'grep -qF "/nonexistent/"; then' \
+  'FAIL  deploy: legacy removal' host-tests
+fault "bootstrap.sh --deploy: dependencies recreated (no --no-deps)" vm/bootstrap.sh \
+  'RUN_FLAGS=(--no-deps)' 'RUN_FLAGS=()' \
+  'FAIL  bootstrap --deploy' host-tests
+fault "fetch.sh: a fetched release changed" vm/fetch.sh \
+  'cmp -s "$incoming/$path" "$release/$path" || die' 'true || die' \
+  'FAIL  fetch: changed release' host-tests
+fault "stage.sh: --bucket ignored (terraform called)" vm/stage.sh \
+  'if [[ -z "$bucket" ]]; then bucket=' 'if true; then bucket=' \
+  'FAIL  --bucket' stage-test
+fault "run-on-host.sh: a paused host not recognised" vm/run-on-host.sh \
+  'if grep -q InvalidInstanceId "$send_err"; then' 'if false; then' \
+  'FAIL  paused host' run-on-host-test
+fault "stack.sh: up starts a tag other than current" vm/stack.sh \
+  '[[ "${target##*/}" == "$tag" ]] || die' 'true || die' \
+  'FAIL  stack: current release' host-tests
+fault "stack.sh: up ignores the Phase 3 layout" vm/stack.sh \
+  '[[ ! -f "$ROOT/infra/docker-compose.prod.yml" ]] ||' 'true ||' \
+  'FAIL  stack: current release' host-tests
 
 rm -f "$out"
 printf '\n%d faults caught, %d missed\n' "$passed" "$failed"

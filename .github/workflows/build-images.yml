@@ -1,6 +1,7 @@
 # Builds the ten images of infra/docker-compose.prod.yml for linux/amd64 and pushes them to ECR, tagged with
-# the commit (docs/DEPLOY.md section 8). Manual only, from main only: the deploy role trusts main's OIDC token
-# and nothing else.
+# the commit (docs/DEPLOY.md sections 8 and 10). Called by deploy.yml for every push to main (workflow_call:
+# github.* is the caller's, so the same commit and ref), or run by hand (workflow_dispatch). From main only:
+# the deploy role trusts main's OIDC token and nothing else.
 #
 # Repository variables (Settings > Secrets and variables > Actions > Variables; nothing here is a secret):
 #   AWS_DEPLOY_ROLE_ARN   terraform output deploy_role_arn
@@ -14,6 +15,7 @@
 name: build-images
 
 on:
+  workflow_call:
   workflow_dispatch:
 
 permissions:

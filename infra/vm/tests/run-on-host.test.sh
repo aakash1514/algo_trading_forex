@@ -9,6 +9,7 @@
 #   tampered sha256  the same commands with another sha256 fail and never run the script (planted fault)
 #   Failed           exits non-zero and prints the stderr
 #   AWS error        an error other than InvocationDoesNotExist stops at once
+#   paused host      send-command answers InvalidInstanceId: "host paused ...", exit 3 (planted fault)
 #   time limit       still InProgress at the limit: exits non-zero, prints how to check later
 #   default id       the instance id comes from terraform output
 #   arguments        the arguments after -- reach the script on the host; --timeout sets executionTimeout;
@@ -35,6 +36,9 @@ echo "$*" >>"$STUB_DIR/aws.log"
 echo "PYTHONIOENCODING=${PYTHONIOENCODING:-}" >>"$STUB_DIR/aws.env"
 case "$2" in
   send-command)
+    if [[ -f "$STUB_DIR/paused" ]]; then
+      echo "An error occurred (InvalidInstanceId) when calling the SendCommand operation: Instances [[i-0123456789abcdef0]] not in a valid state for account 111122223333" >&2; exit 254
+    fi
     for arg in "$@"; do [[ "$arg" == file://* ]] && cp "${arg#file://}" "$STUB_DIR/params.json"; done
     printf 'cmd-1234\r\n' ;;
   get-command-invocation)
@@ -105,6 +109,14 @@ sed -E 's/[0-9a-f]{64}/000000000000000000000000000000000000000000000000000000000
 if ! grep -q 0000000000000000 "$work/tampered.sh"; then fail "tampered sha256: no sha256 in the commands"
 elif (cd "$work" && sh tampered.sh >/dev/null 2>&1) || [[ -f "$work/ran" ]]; then fail "tampered sha256: the script ran"
 else pass "tampered sha256 refused, script not run"; fi
+
+# A stopped instance (or one whose agent isn't registered): a clear message and exit 3, no polling
+touch "$work/paused"
+run Success -- "$target" "$ID"
+rm -f "$work/paused"
+if [[ $rc -eq 3 ]] && has "host paused (instance_state=stopped) or not registered in SSM" && [[ ! -f "$work/calls" ]]; then
+  pass "paused host: exit 3 with a clear message"
+else fail "paused host (rc $rc)"; cat "$work/out" >&2; fi
 
 run InProgress Failed -- "$target" "$ID"
 if [[ $rc -ne 0 ]] && has "Status: Failed" && has "host stderr line"; then pass "Failed exits non-zero"

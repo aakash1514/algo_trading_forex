@@ -7,9 +7,14 @@
 //   - ci.yml: pull_request to main only, permissions exactly contents: read, no id-token, exactly one job
 //     named `ci` (branch protection requires that check by name) with timeout-minutes, a concurrency group
 //     that cancels; .nvmrc (the Node of CI) equals the images' Node in infra/docker/node.Dockerfile
-//   - build-images.yml: workflow_dispatch only, permissions exactly id-token: write + contents: read, one
-//     concurrency group that never cancels, the job runs only on refs/heads/main, and its matrix equals the
-//     images of infra/docker-compose.prod.yml with the same dockerfile, target and build args
+//   - build-images.yml: workflow_call (deploy.yml) and workflow_dispatch only, permissions exactly id-token:
+//     write + contents: read, one concurrency group that never cancels, the job runs only on refs/heads/main,
+//     and its matrix equals the images of infra/docker-compose.prod.yml with the same dockerfile, target and
+//     build args
+//   - deploy.yml: push to main (paths-ignore exactly docs/** and **/*.md) and workflow_dispatch (one boolean
+//     input simulate_failure, default false) only, permissions exactly id-token: write + contents: read, one
+//     concurrency group that never cancels, every job only on refs/heads/main, build = the local
+//     build-images.yml, deploy needs build
 // Fails on an empty comparison (no workflow, no `uses:`, no matrix entry).
 //
 //   node infra/check-workflows.mjs
@@ -24,7 +29,8 @@ const REPO = resolve(import.meta.dirname, '..');
 const WORKFLOWS = join(REPO, '.github', 'workflows');
 const COMPOSE = join(REPO, 'infra', 'docker-compose.prod.yml');
 // The only workflows that may request GitHub's OIDC token (and so assume the deploy role)
-const OIDC_WORKFLOWS = ['build-images.yml'];
+const OIDC_WORKFLOWS = ['build-images.yml', 'deploy.yml'];
+const MAIN_ONLY = "github.ref == 'refs/heads/main'";
 
 const problems = [];
 
@@ -110,7 +116,12 @@ if (!build) {
 } else {
   const f = 'build-images.yml';
   const triggers = triggersOf(build);
-  if (triggers.join(',') !== 'workflow_dispatch') problems.push(`${f}: triggers are ${triggers.join(', ')}; workflow_dispatch only`);
+  if ([...triggers].sort().join(',') !== 'workflow_call,workflow_dispatch') {
+    problems.push(`${f}: triggers are ${triggers.join(', ')}; workflow_call and workflow_dispatch only`);
+  }
+  if (build.on?.workflow_call && Object.keys(build.on.workflow_call).length > 0) {
+    problems.push(`${f}: workflow_call takes no inputs, secrets or outputs`);
+  }
   const perms = build.permissions ?? {};
   if (JSON.stringify(sortKeys(perms)) !== JSON.stringify({ contents: 'read', 'id-token': 'write' })) {
     problems.push(`${f}: permissions are ${JSON.stringify(perms)}; exactly id-token: write, contents: read`);
@@ -122,7 +133,7 @@ if (!build) {
   if (jobs.length === 0) problems.push(`${f}: no job`);
   for (const [name, job] of jobs) {
     if (job.permissions !== undefined) problems.push(`${f} job ${name}: sets its own permissions`);
-    if (String(job.if ?? '').trim() !== "github.ref == 'refs/heads/main'") {
+    if (String(job.if ?? '').trim() !== MAIN_ONLY) {
       problems.push(`${f} job ${name}: must run only if github.ref == 'refs/heads/main'`);
     }
   }
@@ -135,6 +146,47 @@ if (!build) {
   if (matrix.length !== Object.keys(fromWorkflow).length) problems.push(`${f}: an image appears twice in the matrix`);
   const fromCompose = composeBuilds();
   compare(`${f} matrix`, fromWorkflow, fromCompose);
+}
+
+// ── deploy.yml ───────────────────────────────────────────────────────────────
+const deploy = workflows['deploy.yml'];
+if (!deploy) {
+  problems.push('deploy.yml: missing');
+} else {
+  const f = 'deploy.yml';
+  const triggers = triggersOf(deploy);
+  if ([...triggers].sort().join(',') !== 'push,workflow_dispatch') problems.push(`${f}: triggers are ${triggers.join(', ')}; push and workflow_dispatch only`);
+  const push = deploy.on?.push ?? {};
+  if (JSON.stringify(push.branches ?? []) !== '["main"]') problems.push(`${f}: push branches are ${JSON.stringify(push.branches ?? [])}; exactly [main]`);
+  if (push.tags !== undefined || push.paths !== undefined || push['branches-ignore'] !== undefined) {
+    problems.push(`${f}: push may set only branches and paths-ignore`);
+  }
+  const ignored = [...(push['paths-ignore'] ?? [])].sort();
+  if (JSON.stringify(ignored) !== JSON.stringify(['**/*.md', 'docs/**'])) {
+    problems.push(`${f}: push paths-ignore is ${JSON.stringify(push['paths-ignore'] ?? [])}; exactly docs/** and **/*.md (a docs-only merge deploys nothing, anything else deploys)`);
+  }
+  const inputs = deploy.on?.workflow_dispatch?.inputs ?? {};
+  const drill = inputs.simulate_failure;
+  if (Object.keys(inputs).join(',') !== 'simulate_failure' || drill?.type !== 'boolean' || drill?.default !== false) {
+    problems.push(`${f}: workflow_dispatch needs exactly one input, simulate_failure, boolean, default false`);
+  }
+  if (JSON.stringify(sortKeys(deploy.permissions ?? {})) !== JSON.stringify({ contents: 'read', 'id-token': 'write' })) {
+    problems.push(`${f}: permissions are ${JSON.stringify(deploy.permissions ?? {})}; exactly id-token: write, contents: read`);
+  }
+  if (!deploy.concurrency?.group || deploy.concurrency['cancel-in-progress'] !== false) {
+    problems.push(`${f}: needs a concurrency group with cancel-in-progress: false (a cancelled deploy could stop mid-switch)`);
+  }
+  const jobs = deploy.jobs ?? {};
+  if (Object.keys(jobs).sort().join(',') !== 'build,deploy') problems.push(`${f}: jobs are ${Object.keys(jobs).join(', ')}; exactly build and deploy`);
+  for (const [name, job] of Object.entries(jobs)) {
+    if (String(job.if ?? '').trim() !== MAIN_ONLY) problems.push(`${f} job ${name}: must run only if ${MAIN_ONLY}`);
+    if (job.permissions !== undefined) problems.push(`${f} job ${name}: sets its own permissions`);
+    if (job.secrets !== undefined) problems.push(`${f} job ${name}: passes secrets`);
+  }
+  if (jobs.build && jobs.build.uses !== './.github/workflows/build-images.yml') {
+    problems.push(`${f} job build: must be uses: ./.github/workflows/build-images.yml`);
+  }
+  if (jobs.deploy && JSON.stringify([jobs.deploy.needs].flat()) !== '["build"]') problems.push(`${f} job deploy: must need build`);
 }
 
 // The images built from this repository, as `docker compose config` resolves them (ops included)

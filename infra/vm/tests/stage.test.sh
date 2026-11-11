@@ -9,6 +9,7 @@
 #   bundle         the compose file, the Caddyfile and the host scripts, then manifest.sha256 last, with the
 #                  commit and a sha256 per file that matches what was uploaded; prints the prefix
 #   --history      adds every file of data/history-transfer; refused without its manifest.json
+#   --bucket       uploads there without calling terraform (deploy.yml); another bucket or a bad flag refused
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
@@ -31,6 +32,7 @@ echo "$key" >>"$STUB_DIR/uploads"
 EOF
 cat >"$work/bin/terraform" <<'EOF'
 #!/usr/bin/env bash
+echo "$*" >>"$STUB_DIR/terraform.calls"
 [[ "$*" == "-chdir=infra/terraform output -raw backups_bucket" ]] || { echo "unexpected terraform call: $*" >&2; exit 1; }
 printf 'forexedge-backups-123456789012\r\n'
 EOF
@@ -114,6 +116,23 @@ run "$HEAD_SHA" --history
 mv "$work/manifest.json" "$repo/data/history-transfer/manifest.json"
 if [[ $rc -ne 0 ]] && has "manifest.json is missing" && no_upload; then pass "--history without manifest.json refused"
 else fail "--history without manifest (rc $rc)"; fi
+
+# deploy.yml has no Terraform state: --bucket names the bucket, and terraform is never called
+rm -f "$STUB_DIR/terraform.calls"
+run "$HEAD_SHA" --bucket forexedge-backups-999999999999
+prefix="$(sed -n 's/^prefix: //p' "$work/out")"
+if [[ $rc -eq 0 && -f "$STUB_DIR/s3/forexedge-backups-999999999999/${prefix}manifest.sha256" && ! -e "$STUB_DIR/terraform.calls" ]] \
+  && has "staged 6 files of commit $HEAD_SHA (history: false)"; then
+  pass "--bucket: uploads to that bucket, no terraform call"
+else fail "--bucket (rc $rc)"; cat "$work/out" >&2; fi
+run "$HEAD_SHA" --bucket forexedge-results-999999999999
+if [[ $rc -ne 0 ]] && has "not the backups bucket" && no_upload; then pass "--bucket: another bucket refused"
+else fail "--bucket other bucket (rc $rc)"; fi
+run "$HEAD_SHA" --bucket
+r1=$rc
+run "$HEAD_SHA" --history --history
+if [[ $r1 -eq 2 && $rc -eq 2 ]] && no_upload; then pass "--bucket without a name, a repeated flag: usage"
+else fail "bad flags ($r1 $rc)"; fi
 
 if ((failures > 0)); then echo "stage: $failures failed" >&2; exit 1; fi
 echo "stage: all checks passed"
