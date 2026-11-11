@@ -48,7 +48,7 @@ npm run prod:smoke                                           # the stack in a br
 
 # AWS infrastructure (infra/terraform, Terraform 1.16.7 exactly; docs/DEPLOY.md section 7). Offline only:
 # Claude never runs plan/apply or anything against AWS; the owner does, with SSO
-npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck
+npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck, run-on-host stubs
 bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
 npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
 
@@ -362,6 +362,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 ### Terraform rules (`infra/terraform`)
 - No secret in any variable, resource argument or output: state is plain JSON in the S3 state bucket.
   `*.tfvars`, `.terraform/` and `*.tfstate*` are git-ignored; only `terraform.tfvars.example` (placeholders) is committed.
+- GitHub's OIDC provider is shared with the owner's other projects and pre-exists: read it with
+  `data "aws_iam_openid_connect_provider"`, never own it (a destroy would delete it; check.sh refuses the resource).
 - IAM policies are `jsonencode()`, never `aws_iam_policy_document` (a data source is random under
   `mock_provider`, so it couldn't be tested); ARNs the tests compare are built from names in `locals.tf`.
 - `terraform test -filter` needs the platform's path separator: with `tests/x.tftest.hcl` on Windows it finds

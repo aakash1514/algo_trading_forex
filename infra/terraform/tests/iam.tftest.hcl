@@ -7,6 +7,15 @@ variables {
   alert_email = "alerts@example.com"
 }
 
+# The pre-existing, shared provider: a distinct ARN, so the trust must name the data source's
+override_data {
+  target = data.aws_iam_openid_connect_provider.github
+  values = {
+    arn            = "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+    client_id_list = ["sts.amazonaws.com", "other-audience"]
+  }
+}
+
 run "vm_role_never_deletes" {
   assert {
     condition = alltrue(flatten([for s in jsondecode(aws_iam_role_policy.ec2.policy).Statement : [
@@ -71,15 +80,31 @@ run "oidc_trusts_main_branch_only" {
   }
 
   assert {
-    condition = (jsondecode(aws_iam_role.github_deploy.assume_role_policy).Statement[0].Principal == { Federated = aws_iam_openid_connect_provider.github.arn } &&
+    condition = (jsondecode(aws_iam_role.github_deploy.assume_role_policy).Statement[0].Principal == { Federated = "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com" } &&
     jsondecode(aws_iam_role.github_deploy.assume_role_policy).Statement[0].Action == "sts:AssumeRoleWithWebIdentity")
     error_message = "Only GitHub's OIDC provider may assume the deploy role, with a web identity token."
   }
 
   assert {
-    condition     = aws_iam_openid_connect_provider.github.url == "https://token.actions.githubusercontent.com" && toset(aws_iam_openid_connect_provider.github.client_id_list) == toset(["sts.amazonaws.com"])
-    error_message = "The OIDC provider must be GitHub's, for the audience sts.amazonaws.com."
+    condition     = data.aws_iam_openid_connect_provider.github.url == "https://token.actions.githubusercontent.com"
+    error_message = "The deploy role must trust GitHub's OIDC provider (https://token.actions.githubusercontent.com)."
   }
+}
+
+# A shared provider without the audience sts.amazonaws.com fails the plan instead of creating a role no
+# workflow can assume
+run "oidc_provider_without_sts_audience_fails" {
+  command = plan
+
+  override_data {
+    target = data.aws_iam_openid_connect_provider.github
+    values = {
+      arn            = "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+      client_id_list = ["other-audience"]
+    }
+  }
+
+  expect_failures = [data.aws_iam_openid_connect_provider.github]
 }
 
 run "deploy_role_rights" {

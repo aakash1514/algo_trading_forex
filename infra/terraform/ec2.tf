@@ -1,5 +1,8 @@
 # The single host: Ubuntu 24.04 LTS (x86_64) from Canonical's public SSM parameter. The AMI is read once:
 # ignore_changes keeps a newer image from replacing the instance (and the database on its root volume).
+# associate_public_ip_address is false at creation, but AWS reports true once the Elastic IP is associated
+# and the attribute forces replacement: ignored too, or every plan after the first apply rebuilds the host
+# (check.sh refuses an ignore_changes without both).
 # A deliberate rebuild is `terraform apply -replace=aws_instance.app` after a backup (docs/DEPLOY.md).
 
 # Account-wide: every new EBS volume and snapshot copy in this region is encrypted
@@ -53,7 +56,7 @@ resource "aws_instance" "app" {
   tags = { Name = "forexedge" }
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, associate_public_ip_address]
   }
 
   depends_on = [aws_ebs_encryption_by_default.this]

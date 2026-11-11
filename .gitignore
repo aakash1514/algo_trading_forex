@@ -80,6 +80,7 @@ infra/.env*
 # Terraform (infra/terraform): providers, state, plans and real variable values never committed;
 # only .terraform.lock.hcl and terraform.tfvars.example are
 **/.terraform/
+**/.terraform-check/
 *.tfstate
 *.tfstate.*
 *.tfplan

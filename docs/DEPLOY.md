@@ -185,13 +185,21 @@ your SSO login; there are no access keys anywhere.
 | File | Creates |
 |---|---|
 | `network.tf` | VPC 10.20.0.0/16, one public subnet (ap-south-1a), internet gateway, the default security group emptied, security group `forexedge-web` (TCP 80/443 and UDP 443 from 0.0.0.0/0 and ::/0; no SSH) |
-| `ec2.tf` | The t3.medium host: Ubuntu 24.04 from Canonical's SSM parameter (later AMIs ignored), IMDSv2 only, hop limit 2, encrypted 40 GB gp3 root, `cpu_credits` standard, termination protection, no key pair; Elastic IP; EBS encryption by default (account) |
+| `ec2.tf` | The t3.medium host: Ubuntu 24.04 from Canonical's SSM parameter (later AMIs and the public IP flag the Elastic IP turns on are ignored), IMDSv2 only, hop limit 2, encrypted 40 GB gp3 root, `cpu_credits` standard, termination protection, no key pair; Elastic IP; EBS encryption by default (account) |
 | `iam_vm.tf` | Role and instance profile `forexedge-ec2`: SSM core, CloudWatch agent, ECR pull on the ten repositories, S3 list/get/put (no delete) on the two buckets |
 | `ecr.tf` | `forexedge/<image>` for the ten compose images: immutable tags, scan on push, last 5 kept |
 | `s3.tf` | `forexedge-results-<account>` and `forexedge-backups-<account>` (versioned, every version gone after 14 days): public access blocked, ACLs off, SSE-S3, TLS only; S3 public access block (account) |
-| `github_oidc.tf` | GitHub OIDC provider; role `forexedge-github-deploy` for `main` of the repository only: ECR push, `ssm:SendCommand` on this instance with `AWS-RunShellScript`, `ssm:GetCommandInvocation` (unused until Phase 4) |
+| `github_oidc.tf` | Role `forexedge-github-deploy` for `main` of the repository only: ECR push, `ssm:SendCommand` on this instance with `AWS-RunShellScript`, `ssm:GetCommandInvocation` (unused until Phase 4). It trusts GitHub's OIDC provider, which is **not** created here (next paragraph) |
 | `monitoring.tf` | SNS topic `forexedge-alerts` → `alert_email`; alarms: CPU > 80% for 15 min, CPU credits < 30, status check, memory > 90%, disk / > 80% |
 | `dlm.tf` | Daily snapshot of the root volume at 20:30 UTC, 7 kept, with its own minimal role |
+
+**GitHub OIDC provider (shared, pre-existing):** the account already has the provider for
+`https://token.actions.githubusercontent.com` (an account has one per URL), shared with other projects.
+This stack reads it with a data source and never creates, changes or destroys it. The plan fails if it is
+missing (`no matching IAM OpenID Connect Provider`) or doesn't list the audience `sts.amazonaws.com`;
+check with `aws iam list-open-id-connect-providers` and `aws iam get-open-id-connect-provider
+--open-id-connect-provider-arn <arn>` (`ClientIDList`). `npm run infra:check` refuses a
+`resource "aws_iam_openid_connect_provider"`.
 
 Phase 4 note: the deploy role can push but not pull. If the GitHub workflow uses ECR as a build cache
 (`--cache-from`), it will need `ecr:BatchGetImage` and `ecr:GetDownloadUrlForLayer` on the same
@@ -250,7 +258,7 @@ export AWS_PROFILE=forexedge && aws sso login
 cd infra/terraform
 cp terraform.tfvars.example terraform.tfvars        # git-ignored; set alert_email (stays out of git)
 terraform init -backend-config="bucket=forexedge-tfstate-$ACCOUNT"
-terraform plan -out=forexedge.tfplan                 # 69 to add on the first run, 0 to change/destroy
+terraform plan -out=forexedge.tfplan                 # 68 to add on the first run, 0 to change/destroy
 terraform apply forexedge.tfplan
 terraform output
 ```
@@ -273,30 +281,18 @@ makes such an apply fail.
 ### 7.4 Host setup (`infra/vm/setup.sh`)
 
 The script goes to the host through SSM (the SSM agent comes with Canonical's AMI; no SSH, no key). Run
-Command needs nothing but the AWS CLI:
+Command needs nothing but the AWS CLI, through `infra/vm/run-on-host.sh` (from the repo root, Git Bash or Linux):
 
 ```sh
-ID=$(terraform -chdir=infra/terraform output -raw instance_id)
-# run_on_host FILE: copies a script of the repo to /root on the host (sha256 checked there) and runs it as root
-run_on_host() {
-  local name sum cmd
-  name=$(basename "$1"); sum=$(sha256sum "$1" | cut -d' ' -f1)
-  node -e '
-    const [file, name, sum] = process.argv.slice(1);
-    const b64 = require("fs").readFileSync(file).toString("base64");
-    console.log(JSON.stringify({ commands: [
-      `echo ${b64} | base64 -d > /root/${name}`, `echo "${sum}  /root/${name}" | sha256sum -c -`,
-      `bash /root/${name}` ] }));' "$1" "$name" "$sum" > ssm-params.json
-  cmd=$(aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
-    --comment "forexedge $name $sum" --parameters file://ssm-params.json --query Command.CommandId --output text)
-  rm ssm-params.json
-  aws ssm wait command-executed --command-id "$cmd" --instance-id "$ID" || true   # the waiter gives up at 100 s
-  echo "aws ssm get-command-invocation --command-id $cmd --instance-id $ID --query '[Status, StandardOutputContent, StandardErrorContent]' --output text"
-  aws ssm get-command-invocation --command-id "$cmd" --instance-id "$ID" \
-    --query '[Status, StandardOutputContent, StandardErrorContent]' --output text
-}
-run_on_host infra/vm/setup.sh      # "InProgress" after 100 s: run the printed command again until Success
+bash infra/vm/run-on-host.sh infra/vm/setup.sh     # instance id from `terraform output`; or pass it second
 ```
+
+It copies the script to `/root/<name>` on the host (root only), checks its sha256 there against the laptop's
+copy, runs it with bash only if they match, polls every 10 s (at most 15 min, the host stops it at the same limit),
+then prints the status, stdout and stderr, and exits non-zero unless the status is `Success`. It needs no `node`
+(in Git Bash `node` may be winpty, which prints "stdout is not a tty" when redirected) and prints nothing but the
+host's output. `npm run infra:check` runs it against stub `aws`/`terraform` commands
+(`infra/vm/tests/run-on-host.test.sh`, with a tampered sha256 that must not run).
 
 Or interactively (needs the Session Manager plugin for the AWS CLI): `aws ssm start-session --target "$ID"`,
 `sudo -i`, put the file in `/root/setup.sh`, `bash /root/setup.sh`. A second run must print only the final
@@ -332,7 +328,7 @@ The hop limit of 2 lets containers reach the instance metadata service, and with
 `docker compose up` with ws-gateway healthy, again after `systemctl restart docker`, and again after a reboot:
 
 ```sh
-run_on_host infra/vm/check-imds-guard.sh
+bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh
 # ok    ws-gateway (172.30.0.10)                             token received
 # ok    new container of ws-gateway's image on forexedge_default refused
 # ok    auth-service ... (every running Node container)      refused
@@ -405,6 +401,8 @@ public access block). To keep them, run `terraform state rm aws_ebs_encryption_b
 aws_s3_account_public_access_block.this` before step 4.
 
 Left behind, by design or by AWS:
+
+- **The GitHub OIDC provider**: shared and pre-existing, only read by this stack (7, `github_oidc.tf`).
 
 - **DLM snapshots**: deleting the policy doesn't delete them. `aws ec2 describe-snapshots --owner-ids self
   --filters Name=tag:forexedge:dlm,Values=daily --query 'Snapshots[].SnapshotId' --output text`, then
