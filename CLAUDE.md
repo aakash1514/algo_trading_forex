@@ -48,7 +48,7 @@ npm run prod:smoke                                           # the stack in a br
 
 # AWS infrastructure (infra/terraform, Terraform 1.16.7 exactly; docs/DEPLOY.md section 7). Offline only:
 # Claude never runs plan/apply or anything against AWS; the owner does, with SSO
-npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck
+npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck, run-on-host stubs
 bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
 npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
 

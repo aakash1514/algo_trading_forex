@@ -281,30 +281,18 @@ makes such an apply fail.
 ### 7.4 Host setup (`infra/vm/setup.sh`)
 
 The script goes to the host through SSM (the SSM agent comes with Canonical's AMI; no SSH, no key). Run
-Command needs nothing but the AWS CLI:
+Command needs nothing but the AWS CLI, through `infra/vm/run-on-host.sh` (from the repo root, Git Bash or Linux):
 
 ```sh
-ID=$(terraform -chdir=infra/terraform output -raw instance_id)
-# run_on_host FILE: copies a script of the repo to /root on the host (sha256 checked there) and runs it as root
-run_on_host() {
-  local name sum cmd
-  name=$(basename "$1"); sum=$(sha256sum "$1" | cut -d' ' -f1)
-  node -e '
-    const [file, name, sum] = process.argv.slice(1);
-    const b64 = require("fs").readFileSync(file).toString("base64");
-    console.log(JSON.stringify({ commands: [
-      `echo ${b64} | base64 -d > /root/${name}`, `echo "${sum}  /root/${name}" | sha256sum -c -`,
-      `bash /root/${name}` ] }));' "$1" "$name" "$sum" > ssm-params.json
-  cmd=$(aws ssm send-command --instance-ids "$ID" --document-name AWS-RunShellScript \
-    --comment "forexedge $name $sum" --parameters file://ssm-params.json --query Command.CommandId --output text)
-  rm ssm-params.json
-  aws ssm wait command-executed --command-id "$cmd" --instance-id "$ID" || true   # the waiter gives up at 100 s
-  echo "aws ssm get-command-invocation --command-id $cmd --instance-id $ID --query '[Status, StandardOutputContent, StandardErrorContent]' --output text"
-  aws ssm get-command-invocation --command-id "$cmd" --instance-id "$ID" \
-    --query '[Status, StandardOutputContent, StandardErrorContent]' --output text
-}
-run_on_host infra/vm/setup.sh      # "InProgress" after 100 s: run the printed command again until Success
+bash infra/vm/run-on-host.sh infra/vm/setup.sh     # instance id from `terraform output`; or pass it second
 ```
+
+It copies the script to `/root/<name>` on the host (root only), checks its sha256 there against the laptop's
+copy, runs it with bash only if they match, polls every 10 s (at most 15 min, the host stops it at the same limit),
+then prints the status, stdout and stderr, and exits non-zero unless the status is `Success`. It needs no `node`
+(in Git Bash `node` may be winpty, which prints "stdout is not a tty" when redirected) and prints nothing but the
+host's output. `npm run infra:check` runs it against stub `aws`/`terraform` commands
+(`infra/vm/tests/run-on-host.test.sh`, with a tampered sha256 that must not run).
 
 Or interactively (needs the Session Manager plugin for the AWS CLI): `aws ssm start-session --target "$ID"`,
 `sudo -i`, put the file in `/root/setup.sh`, `bash /root/setup.sh`. A second run must print only the final
@@ -340,7 +328,7 @@ The hop limit of 2 lets containers reach the instance metadata service, and with
 `docker compose up` with ws-gateway healthy, again after `systemctl restart docker`, and again after a reboot:
 
 ```sh
-run_on_host infra/vm/check-imds-guard.sh
+bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh
 # ok    ws-gateway (172.30.0.10)                             token received
 # ok    new container of ws-gateway's image on forexedge_default refused
 # ok    auth-service ... (every running Node container)      refused

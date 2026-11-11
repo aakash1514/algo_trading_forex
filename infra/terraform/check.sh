@@ -5,7 +5,8 @@
 #
 #   fmt -check, source rules (compose images = ECR, check-compose.mjs, no key pair, no inline SG rules,
 #   no owned OIDC provider, the instance ignores AMI and public IP drift),
-#   init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck
+#   init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck,
+#   infra/vm/run-on-host.sh against stub aws/terraform commands
 #
 # The metadata guard's end-to-end test (Docker-in-Docker) is separate: npm run infra:imds-test
 #
@@ -135,5 +136,8 @@ mapfile -t scripts < <(cd "$INFRA_DIR" && find vm terraform -name '*.sh' -not -p
 docker run --rm --mount "type=bind,source=$(host_path "$INFRA_DIR"),target=/mnt,readonly" -w /mnt \
   "$SHELLCHECK_IMAGE" "${scripts[@]}"
 printf 'shellcheck: %s\n' "${scripts[@]}"
+
+step "run-on-host.sh (stub aws and terraform)"
+bash "$INFRA_DIR/vm/tests/run-on-host.test.sh"
 
 printf '\nAll infrastructure checks passed.\n'
