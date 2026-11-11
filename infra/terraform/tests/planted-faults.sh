@@ -18,6 +18,20 @@ TERRAFORM="${TERRAFORM:-terraform}"
 TFLINT_IMAGE="$(sed -n 's/^TFLINT_IMAGE="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
 SHELLCHECK_IMAGE="$(sed -n 's/^SHELLCHECK_IMAGE="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
 TFLINT_PLUGIN_VOLUME="$(sed -n 's/^TFLINT_PLUGIN_VOLUME="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
+# Terraform and tflint run on a copy of the configuration in .terraform-check/ (git-ignored), never in
+# this directory: .terraform/ may hold the owner's real S3 backend (an init there, even -backend=false,
+# looks for credentials), and terraform.tfvars, which terraform test and tflint load by themselves, would
+# replace the defaults the checks are about. The copy has the .tf files, the lock file, .tflint.hcl and
+# the tests, nothing else.
+CHECK_DIR="$TF_DIR/.terraform-check/config"
+export TF_DATA_DIR="$TF_DIR/.terraform-check/data"
+stage_config() {
+  rm -rf "$CHECK_DIR"
+  mkdir -p "$CHECK_DIR/tests/mocks"
+  cp "$TF_DIR"/*.tf "$TF_DIR/.terraform.lock.hcl" "$TF_DIR/.tflint.hcl" "$CHECK_DIR/"
+  cp "$TF_DIR"/tests/*.tftest.hcl "$CHECK_DIR/tests/"
+  cp "$TF_DIR"/tests/mocks/*.tfmock.hcl "$CHECK_DIR/tests/mocks/"
+}
 export MSYS_NO_PATHCONV=1
 host_path() { (cd "$1" && { pwd -W 2>/dev/null || pwd; }); }
 # terraform test -filter takes the platform's path: with "/" on Windows it finds no file, warns, and passes
@@ -53,7 +67,8 @@ run_check() {
   case "$kind" in
     test)
       local status=0
-      (cd "$TF_DIR" && "$TERRAFORM" test -no-color -filter="tests${SEP}$1.tftest.hcl") >"$out" 2>&1 || status=$?
+      stage_config
+      (cd "$CHECK_DIR" && "$TERRAFORM" test -no-color -filter="tests${SEP}$1.tftest.hcl") >"$out" 2>&1 || status=$?
       # A run of zero tests passes: that is a broken check, never a result
       if ! grep -qE '[1-9][0-9]* (passed|failed)' "$out"; then
         echo "terraform test ran no test for tests${SEP}$1.tftest.hcl:" >&2
@@ -62,11 +77,12 @@ run_check() {
       fi
       return "$status"
       ;;
-    fmt) (cd "$TF_DIR" && "$TERRAFORM" fmt -check -recursive -no-color) >"$out" 2>&1 ;;
-    validate) (cd "$TF_DIR" && "$TERRAFORM" validate -no-color) >"$out" 2>&1 ;;
+    fmt) stage_config && (cd "$CHECK_DIR" && "$TERRAFORM" fmt -check -recursive -no-color) >"$out" 2>&1 ;;
+    validate) stage_config && (cd "$CHECK_DIR" && "$TERRAFORM" validate -no-color) >"$out" 2>&1 ;;
     tflint)
+      stage_config
       docker run --rm -e TFLINT_PLUGIN_DIR=/plugins -v "$TFLINT_PLUGIN_VOLUME:/plugins" \
-        --mount "type=bind,source=$(host_path "$TF_DIR"),target=/data,readonly" -w /data "$TFLINT_IMAGE" --format compact >"$out" 2>&1
+        --mount "type=bind,source=$(host_path "$CHECK_DIR"),target=/data,readonly" -w /data "$TFLINT_IMAGE" --format compact >"$out" 2>&1
       ;;
     shellcheck)
       docker run --rm --mount "type=bind,source=$(host_path "$INFRA_DIR"),target=/mnt,readonly" -w /mnt \
@@ -100,7 +116,8 @@ fault() {
   git checkout -q -- "infra/$file"
 }
 
-(cd "$TF_DIR" && "$TERRAFORM" init -backend=false -input=false -lockfile=readonly >/dev/null)
+stage_config
+(cd "$CHECK_DIR" && "$TERRAFORM" init -backend=false -input=false -lockfile=readonly >/dev/null)
 if ! run_check test network; then
   echo "the unmodified configuration fails its tests: fix that first" >&2
   cat "$out" >&2
@@ -213,6 +230,8 @@ fault "OIDC: no audience condition" terraform/github_oidc.tf \
   '"${local.github_oidc_host}:aud" = "sts.amazonaws.com"
 ' '' \
   'run "oidc_trusts_main_branch_only"... fail' test iam
+fault "OIDC: trust names another provider" terraform/github_oidc.tf   'Federated = data.aws_iam_openid_connect_provider.github.arn'   'Federated = "arn:aws:iam::${local.account_id}:oidc-provider/github.com"'   'run "oidc_trusts_main_branch_only"... fail' test iam
+fault "OIDC: provider audience not checked" terraform/github_oidc.tf   'contains(self.client_id_list, "sts.amazonaws.com")' 'length(self.client_id_list) > 0'   'run "oidc_provider_without_sts_audience_fails"... fail' test iam
 fault "deploy role: SendCommand on *" terraform/github_oidc.tf \
   'Resource = [aws_instance.app.arn, local.run_shell_document]' 'Resource = "*"' \
   'run "deploy_role_rights"... fail' test iam
@@ -272,6 +291,12 @@ fault "check.sh: key pair on the instance" terraform/ec2.tf \
   'monitoring                  = false' 'monitoring                  = false
   key_name                    = "forexedge"' \
   'key pairs and inline security group rules are not allowed' check.sh
+fault "check.sh: OIDC provider owned by the stack" terraform/github_oidc.tf   'data "aws_iam_openid_connect_provider" "github" {'   'resource "aws_iam_openid_connect_provider" "owned" {
+  url            = "https://${local.github_oidc_host}"
+  client_id_list = ["sts.amazonaws.com"]
+}
+
+data "aws_iam_openid_connect_provider" "github" {'   'never a resource' check.sh
 fault "check.sh: terraform test runs no test" terraform/check.sh \
   '"$TERRAFORM" test | tee' '"$TERRAFORM" test -filter=none.tftest.hcl | tee' \
   'terraform test ran no test' check.sh

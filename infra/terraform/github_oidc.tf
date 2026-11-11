@@ -7,10 +7,18 @@ locals {
   run_shell_document    = "arn:aws:ssm:${var.region}::document/AWS-RunShellScript"
 }
 
-# AWS validates GitHub's certificate against its own trust store, so no thumbprint is pinned
-resource "aws_iam_openid_connect_provider" "github" {
-  url            = "https://${local.github_oidc_host}"
-  client_id_list = ["sts.amazonaws.com"]
+# GitHub's OIDC provider already exists in the account and is shared with other projects (an account has
+# one provider per URL). This stack only reads it, so a destroy can never delete it. The plan fails if the
+# provider doesn't accept the audience the trust below requires.
+data "aws_iam_openid_connect_provider" "github" {
+  url = "https://${local.github_oidc_host}"
+
+  lifecycle {
+    postcondition {
+      condition     = contains(self.client_id_list, "sts.amazonaws.com")
+      error_message = "GitHub's OIDC provider in this account must list the audience sts.amazonaws.com."
+    }
+  }
 }
 
 resource "aws_iam_role" "github_deploy" {
@@ -22,7 +30,7 @@ resource "aws_iam_role" "github_deploy" {
     Version = "2012-10-17"
     Statement = [{
       Effect    = "Allow"
-      Principal = { Federated = aws_iam_openid_connect_provider.github.arn }
+      Principal = { Federated = data.aws_iam_openid_connect_provider.github.arn }
       Action    = "sts:AssumeRoleWithWebIdentity"
       Condition = {
         StringEquals = {

@@ -189,9 +189,17 @@ your SSO login; there are no access keys anywhere.
 | `iam_vm.tf` | Role and instance profile `forexedge-ec2`: SSM core, CloudWatch agent, ECR pull on the ten repositories, S3 list/get/put (no delete) on the two buckets |
 | `ecr.tf` | `forexedge/<image>` for the ten compose images: immutable tags, scan on push, last 5 kept |
 | `s3.tf` | `forexedge-results-<account>` and `forexedge-backups-<account>` (versioned, every version gone after 14 days): public access blocked, ACLs off, SSE-S3, TLS only; S3 public access block (account) |
-| `github_oidc.tf` | GitHub OIDC provider; role `forexedge-github-deploy` for `main` of the repository only: ECR push, `ssm:SendCommand` on this instance with `AWS-RunShellScript`, `ssm:GetCommandInvocation` (unused until Phase 4) |
+| `github_oidc.tf` | Role `forexedge-github-deploy` for `main` of the repository only: ECR push, `ssm:SendCommand` on this instance with `AWS-RunShellScript`, `ssm:GetCommandInvocation` (unused until Phase 4). It trusts GitHub's OIDC provider, which is **not** created here (next paragraph) |
 | `monitoring.tf` | SNS topic `forexedge-alerts` → `alert_email`; alarms: CPU > 80% for 15 min, CPU credits < 30, status check, memory > 90%, disk / > 80% |
 | `dlm.tf` | Daily snapshot of the root volume at 20:30 UTC, 7 kept, with its own minimal role |
+
+**GitHub OIDC provider (shared, pre-existing):** the account already has the provider for
+`https://token.actions.githubusercontent.com` (an account has one per URL), shared with other projects.
+This stack reads it with a data source and never creates, changes or destroys it. The plan fails if it is
+missing (`no matching IAM OpenID Connect Provider`) or doesn't list the audience `sts.amazonaws.com`;
+check with `aws iam list-open-id-connect-providers` and `aws iam get-open-id-connect-provider
+--open-id-connect-provider-arn <arn>` (`ClientIDList`). `npm run infra:check` refuses a
+`resource "aws_iam_openid_connect_provider"`.
 
 Phase 4 note: the deploy role can push but not pull. If the GitHub workflow uses ECR as a build cache
 (`--cache-from`), it will need `ecr:BatchGetImage` and `ecr:GetDownloadUrlForLayer` on the same
@@ -250,7 +258,7 @@ export AWS_PROFILE=forexedge && aws sso login
 cd infra/terraform
 cp terraform.tfvars.example terraform.tfvars        # git-ignored; set alert_email (stays out of git)
 terraform init -backend-config="bucket=forexedge-tfstate-$ACCOUNT"
-terraform plan -out=forexedge.tfplan                 # 69 to add on the first run, 0 to change/destroy
+terraform plan -out=forexedge.tfplan                 # 68 to add on the first run, 0 to change/destroy
 terraform apply forexedge.tfplan
 terraform output
 ```
@@ -405,6 +413,8 @@ public access block). To keep them, run `terraform state rm aws_ebs_encryption_b
 aws_s3_account_public_access_block.this` before step 4.
 
 Left behind, by design or by AWS:
+
+- **The GitHub OIDC provider**: shared and pre-existing, only read by this stack (7, `github_oidc.tf`).
 
 - **DLM snapshots**: deleting the policy doesn't delete them. `aws ec2 describe-snapshots --owner-ids self
   --filters Name=tag:forexedge:dlm,Values=daily --query 'Snapshots[].SnapshotId' --output text`, then

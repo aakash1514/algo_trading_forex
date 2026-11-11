@@ -27,6 +27,15 @@ mock_resource "aws_sns_topic" {
   }
 }
 
+# The shared GitHub OIDC provider (read, never created); the IAM tests override its ARN
+mock_data "aws_iam_openid_connect_provider" {
+  defaults = {
+    arn            = "arn:aws:iam::111122223333:oidc-provider/token.actions.githubusercontent.com"
+    url            = "token.actions.githubusercontent.com"
+    client_id_list = ["sts.amazonaws.com"]
+  }
+}
+
 mock_resource "aws_iam_role" {
   defaults = {
     arn = "arn:aws:iam::111122223333:role/forexedge-mock"
