@@ -11,7 +11,9 @@
 #   AWS error        an error other than InvocationDoesNotExist stops at once
 #   time limit       still InProgress at the limit: exits non-zero, prints how to check later
 #   default id       the instance id comes from terraform output
-#   bad name/id      refused before any AWS call
+#   arguments        the arguments after -- reach the script on the host; --timeout sets executionTimeout;
+#                    the AWS CLI runs with PYTHONIOENCODING=utf-8
+#   bad name/id/arg  refused before any AWS call (also a timeout outside 1..7200)
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
@@ -30,6 +32,7 @@ cat >"$work/bin/aws" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 echo "$*" >>"$STUB_DIR/aws.log"
+echo "PYTHONIOENCODING=${PYTHONIOENCODING:-}" >>"$STUB_DIR/aws.env"
 case "$2" in
   send-command)
     for arg in "$@"; do [[ "$arg" == file://* ]] && cp "${arg#file://}" "$STUB_DIR/params.json"; done
@@ -58,14 +61,14 @@ export PATH="$work/bin:$PATH"
 export RUN_ON_HOST_POLL_SECONDS=0
 
 target="$work/hello-host.sh"
-printf '#!/usr/bin/env bash\necho "ran on host"\necho ran >"%s/ran"\n' "$work" >"$target"
+printf '#!/usr/bin/env bash\necho "ran on host"\necho "ran $*" >"%s/ran"\n' "$work" >"$target"
 
 failures=0
 fail() { echo "FAIL  $1" >&2; failures=$((failures + 1)); }
 pass() { echo "ok    $1"; }
 # run <statuses...> -- <args...>: fresh stub state, the script's output in $work/out and its exit code in $rc
 run() {
-  rm -f "$work/aws.log" "$work/calls" "$work/params.json" "$work/ran" "$work/root"/*
+  rm -f "$work/aws.log" "$work/aws.env" "$work/calls" "$work/params.json" "$work/ran" "$work/root"/*
   : >"$work/statuses"
   while [[ "$1" != "--" ]]; do echo "$1" >>"$work/statuses"; shift; done
   shift
@@ -75,13 +78,14 @@ run() {
 has() { grep -qF -- "$1" "$work/out"; }
 
 # The commands of the parameters file, with /root replaced, as one sh script (what AWS-RunShellScript runs)
-# (node gets a Windows path in Git Bash, also with MSYS_NO_PATHCONV=1 as check.sh sets it)
+# (node gets a Windows path in Git Bash, also with MSYS_NO_PATHCONV=1 as check.sh sets it). Fails unless
+# executionTimeout is $1 (default 900).
 host_script() {
   local params="$work/params.json"
   if command -v cygpath >/dev/null 2>&1; then params="$(cygpath -m "$params")"; fi
-  node -e '
+  TIMEOUT="${1:-900}" node -e '
     const p = JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"));
-    if (Object.keys(p).sort().join() !== "commands,executionTimeout" || p.executionTimeout[0] !== "900") process.exit(3);
+    if (Object.keys(p).sort().join() !== "commands,executionTimeout" || p.executionTimeout[0] !== process.env.TIMEOUT) process.exit(3);
     console.log(p.commands.join("\n"));' "$params" | tr -d '\r' | sed "s|/root/|$work/root/|g"
 }
 
@@ -110,9 +114,18 @@ run denied -- "$target" "$ID"
 if [[ $rc -ne 0 ]] && has "AccessDeniedException" && [[ "$(cat "$work/calls")" == 1 ]]; then pass "AWS error stops at once"
 else fail "AWS error (rc $rc)"; fi
 
-RUN_ON_HOST_MAX_SECONDS=0 run InProgress -- "$target" "$ID"
-if [[ $rc -ne 0 ]] && has "still InProgress" && has "get-command-invocation --command-id cmd-1234"; then pass "time limit"
+RUN_ON_HOST_POLL_SECONDS=1 run InProgress -- "$target" "$ID" --timeout 1
+if [[ $rc -ne 0 ]] && has "still InProgress after 1 s" && has "get-command-invocation --command-id cmd-1234"; then pass "time limit"
 else fail "time limit (rc $rc)"; fi
+
+run Success -- "$target" "$ID" --timeout 7200 -- up 0c2311f DOMAIN=forexedge.tech s3://b/transfer/x/
+if [[ $rc -eq 0 ]] && has "hello-host.sh up 0c2311f DOMAIN=forexedge.tech s3://b/transfer/x/ (sha256" \
+  && host_script 7200 >"$work/host.sh" && (cd "$work" && sh host.sh >/dev/null 2>&1) \
+  && [[ "$(cat "$work/ran")" == "ran up 0c2311f DOMAIN=forexedge.tech s3://b/transfer/x/" ]]; then
+  pass "arguments reach the script; --timeout sets executionTimeout"
+else fail "arguments (rc $rc)"; cat "$work/out" >&2; fi
+if [[ -s "$work/aws.env" ]] && ! grep -qv '^PYTHONIOENCODING=utf-8$' "$work/aws.env"; then pass "AWS CLI runs with PYTHONIOENCODING=utf-8"
+else fail "PYTHONIOENCODING"; fi
 
 run Success -- "$target"
 if [[ $rc -eq 0 ]] && grep -q "send-command --instance-ids $ID " "$work/aws.log"; then pass "default instance id from terraform"
@@ -123,6 +136,17 @@ run Success -- "$work/bad name.sh" "$ID"
 if [[ $rc -eq 2 && ! -f "$work/aws.log" ]]; then pass "bad script name refused"; else fail "bad script name (rc $rc)"; fi
 run Success -- "$target" "i-xyz"
 if [[ $rc -eq 2 && ! -f "$work/aws.log" ]]; then pass "bad instance id refused"; else fail "bad instance id (rc $rc)"; fi
+# shellcheck disable=SC2016  # literal $(id): it must be refused, not run
+for bad in 'a b' 'x;id' '$(id)' "it's" 'a"b' '' 'a|b'; do
+  run Success -- "$target" "$ID" -- ok "$bad"
+  if [[ $rc -ne 2 || -f "$work/aws.log" ]]; then fail "bad argument [$bad] not refused (rc $rc)"; continue; fi
+done
+pass "arguments with spaces, quotes or shell characters refused"
+for bad in 0 7201 abc 1e3 -5; do
+  run Success -- "$target" "$ID" --timeout "$bad"
+  if [[ $rc -ne 2 || -f "$work/aws.log" ]]; then fail "timeout [$bad] not refused (rc $rc)"; fi
+done
+pass "timeouts outside 1..7200 refused"
 
 if ((failures > 0)); then echo "run-on-host: $failures failed" >&2; exit 1; fi
 echo "run-on-host: all checks passed"

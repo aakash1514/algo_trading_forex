@@ -12,6 +12,8 @@
 #   6. /opt/forexedge, owned by root, mode 700
 #   7. Instance metadata guard: only ws-gateway's container reaches 169.254.169.254 (right after step 1,
 #      so it is in place before any container runs)
+#   8. AWS CLI v2, exact version (sha256 and AWS's signature checked): the host-side tools of infra/vm
+#      (ECR login, S3 downloads) run on the host with the instance role, never in a container (step 7)
 #
 #   bash setup.sh                       as root, on the host
 #   bash setup.sh --print-imds-guard    prints the guard script it installs (tests; no root needed)
@@ -34,6 +36,14 @@ CWAGENT_BASE_URL="https://amazoncloudwatch-agent.s3.amazonaws.com"
 CWAGENT_KEY_FINGERPRINT="937616F3450B7D806CBD9725D58167303B789C72"
 CWAGENT_CONFIG="/opt/aws/amazon-cloudwatch-agent/etc/forexedge.json"
 CWAGENT_CTL="/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl"
+
+# AWS CLI 2.39.1 (released 2026-10-28). The signing key is the one AWS publishes in the CLI install guide
+# ("Verify the integrity and authenticity of the downloaded zip file"), valid until 2027-07-02: AWS extends
+# it before then, and the monthly check (docs/DEPLOY.md 7.6) replaces it with the guide's new copy
+AWSCLI_VERSION="2.39.1"
+AWSCLI_SHA256="5b6c10e0a8ccdcf30c84bd643fea511f103d257a4787a7cef878691d63169804"
+AWSCLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip"
+AWSCLI_KEY_FINGERPRINT="FB5DB77FD5C118B80511ADA8A6310ACC4672475C"
 
 SWAP_FILE="/swapfile"
 SWAP_SIZE_MB=4096
@@ -302,6 +312,58 @@ if [[ "$cwagent_changed" == true ]] || ! "$CWAGENT_CTL" -a status | grep -q '"st
   log "CloudWatch agent configured and running"
 fi
 
+# ── 8. AWS CLI v2 ────────────────────────────────────────────────────────────
+if [[ "$(/usr/local/bin/aws --version 2>/dev/null | cut -d" " -f1)" != "aws-cli/${AWSCLI_VERSION}" ]]; then
+  if [[ "$(installed_version unzip)" == "" ]]; then
+    apt_update
+    apt-get install -y -q unzip
+  fi
+  work="$(mktemp -d)"
+  curl -fsSL "$AWSCLI_URL" -o "$work/awscli.zip"
+  curl -fsSL "$AWSCLI_URL.sig" -o "$work/awscli.zip.sig"
+  cat >"$work/awscli-key.asc" <<'EOF'
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQINBF2Cr7UBEADJZHcgusOJl7ENSyumXh85z0TRV0xJorM2B/JL0kHOyigQluUG
+ZMLhENaG0bYatdrKP+3H91lvK050pXwnO/R7fB/FSTouki4ciIx5OuLlnJZIxSzx
+PqGl0mkxImLNbGWoi6Lto0LYxqHN2iQtzlwTVmq9733zd3XfcXrZ3+LblHAgEt5G
+TfNxEKJ8soPLyWmwDH6HWCnjZ/aIQRBTIQ05uVeEoYxSh6wOai7ss/KveoSNBbYz
+gbdzoqI2Y8cgH2nbfgp3DSasaLZEdCSsIsK1u05CinE7k2qZ7KgKAUIcT/cR/grk
+C6VwsnDU0OUCideXcQ8WeHutqvgZH1JgKDbznoIzeQHJD238GEu+eKhRHcz8/jeG
+94zkcgJOz3KbZGYMiTh277Fvj9zzvZsbMBCedV1BTg3TqgvdX4bdkhf5cH+7NtWO
+lrFj6UwAsGukBTAOxC0l/dnSmZhJ7Z1KmEWilro/gOrjtOxqRQutlIqG22TaqoPG
+fYVN+en3Zwbt97kcgZDwqbuykNt64oZWc4XKCa3mprEGC3IbJTBFqglXmZ7l9ywG
+EEUJYOlb2XrSuPWml39beWdKM8kzr1OjnlOm6+lpTRCBfo0wa9F8YZRhHPAkwKkX
+XDeOGpWRj4ohOx0d2GWkyV5xyN14p2tQOCdOODmz80yUTgRpPVQUtOEhXQARAQAB
+tCFBV1MgQ0xJIFRlYW0gPGF3cy1jbGlAYW1hem9uLmNvbT6JAlQEEwEIAD4CGwMF
+CwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQT7Xbd/1cEYuAURraimMQrMRnJHXAUC
+akV0ygUJDqP4lQAKCRCmMQrMRnJHXFHjD/9eyZLYcKuQOlLvtqSDtUBiEZf6ZZjM
+i3ygYH8rJNtuToUH+HvSpe819urJCquXhDrlK6N+aqW0hCLtNABJG/vsafIgvIYJ
+hSGgpgtNnQyMV1jViRWqPjbouw8OkYKBThUfT1i2Y+wn58ifs6ODBCmTexWtXspA
+Si+Gt49xDOW0APmbOPnI+a4HJW6tVEo6MWS0WjzpiBayR3d1A4pt4YrPfSdDgpLo
+h2SLQqlRqvvVZJaWBjhkErNFpfsBA06sDcPEOb0G8LBUbR4WOcdvhe5LubJbZuxC
+AG9kNPCVeQP1ixwjgjXKysaxeQ6rv0VzIQgRp6tLVLWhy6AKDNvLjFSsmXZ1Wl08
+Y/RlOHXlzLuQMRE6sR1wOdRxc9TsrNWTGiBK65cvSWOy03JeBkQQ8pesqltiyxI9
+U21kkgiXtTSKNGfKK8pO27D81YANhRqPK7iTp6kuFiY2WtOg90KTMNlIT+Ff85Y2
+b1rHj6Z0SrCkJujhWk3IBPic/wJgz01LEc/OAdUPlby90RJZcIBhSlWhT7mXnXIO
+c0HWlNQrns2s3CTyYwZSiSlYe9ApeLwhjDo8NhbFuCAy61l6O5UsR4AfZxx/rGKv
+2wFb1/RN/P4gNe6vmxZAPjR0AQcwD3tc2McimOLr/22kmPz8IH3I0X7WoSFr0Biz
+E91G7bb0hOb/cA==
+=knv7
+-----END PGP PUBLIC KEY BLOCK-----
+EOF
+  echo "${AWSCLI_SHA256}  $work/awscli.zip" | sha256sum -c --quiet - || die "AWS CLI package checksum mismatch"
+  fingerprint="$(key_fingerprint "$work/awscli-key.asc")"
+  [[ "$fingerprint" == "$AWSCLI_KEY_FINGERPRINT" ]] || die "AWS CLI key has fingerprint '${fingerprint}', expected ${AWSCLI_KEY_FINGERPRINT}"
+  gpg --batch --quiet --yes --dearmor -o "$work/awscli-key.gpg" "$work/awscli-key.asc"
+  gpgv --quiet --keyring "$work/awscli-key.gpg" "$work/awscli.zip.sig" "$work/awscli.zip" 2>/dev/null || die "AWS CLI signature check failed"
+  unzip -q "$work/awscli.zip" -d "$work"
+  # --update replaces an older version in place; the first install creates /usr/local/aws-cli
+  "$work/aws/install" --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update >/dev/null
+  rm -rf "$work"
+  log "installed $(/usr/local/bin/aws --version | cut -d" " -f1)"
+fi
+
 # ── 6. Application directory ────────────────────────────────────────────────
 install -d -o root -g root -m 0700 "$APP_DIR"
 [[ "$(stat -c '%U:%G %a' "$APP_DIR")" == "root:root 700" ]] || {
@@ -309,4 +371,4 @@ install -d -o root -g root -m 0700 "$APP_DIR"
   chmod 0700 "$APP_DIR"
 }
 
-log "done: $(docker --version), $(docker compose version), swap $(swapon --show=SIZE --noheadings "$SWAP_FILE" | tr -d ' '), swappiness $(sysctl -n vm.swappiness), agent ${CWAGENT_PACKAGE_VERSION}, ${APP_DIR} $(stat -c '%U:%G %a' "$APP_DIR"), metadata for ${IMDS_GUARD_WS_GATEWAY_IP} only"
+log "done: $(docker --version), $(docker compose version), swap $(swapon --show=SIZE --noheadings "$SWAP_FILE" | tr -d ' '), swappiness $(sysctl -n vm.swappiness), agent ${CWAGENT_PACKAGE_VERSION}, $(/usr/local/bin/aws --version | cut -d" " -f1), ${APP_DIR} $(stat -c '%U:%G %a' "$APP_DIR"), metadata for ${IMDS_GUARD_WS_GATEWAY_IP} only"
