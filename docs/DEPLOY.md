@@ -16,8 +16,9 @@ or the images: everything comes from `infra/.env.prod` and the domain from `DOMA
 | `tools/ops/bootstrap-prod.ts` | Migrations, instruments, the DB logins, demo users |
 | `npm run data:transfer` | The history: export (dev), import (prod), check |
 | `npm run prod:smoke` | The deployed stack in a browser, over HTTPS, plus memory (laptop stack only) |
-| `.github/workflows/build-images.yml` | Builds the ten images for a commit of `main` and pushes them to ECR (section 8) |
-| `infra/vm/*.sh` | The host: `setup.sh`, `run-on-host.sh`, `stage.sh` (laptop) and `fetch.sh`, `make-env.sh`, `set-secret.sh`, `stack.sh`, `bootstrap.sh`, `check-imds-guard.sh` (sections 7 and 8) |
+| `.github/workflows/build-images.yml` | Builds the ten images for a commit of `main` and pushes them to ECR (sections 8 and 10) |
+| `.github/workflows/ci.yml`, `deploy.yml` | Checks every pull request (job `ci`); builds and deploys every push to `main` (section 10) |
+| `infra/vm/*.sh` | The host: `setup.sh`, `run-on-host.sh`, `stage.sh` (laptop or deploy.yml) and `fetch.sh`, `make-env.sh`, `set-secret.sh`, `stack.sh`, `bootstrap.sh`, `deploy.sh`, `check-imds-guard.sh` (sections 7, 8 and 10) |
 
 ## 1. Settings (`infra/.env.prod`, never committed)
 
@@ -191,7 +192,7 @@ your SSO login; there are no access keys anywhere.
 | `iam_vm.tf` | Role and instance profile `forexedge-ec2`: SSM core, CloudWatch agent, ECR pull on the ten repositories, S3 list/get/put (no delete) on the two buckets |
 | `ecr.tf` | `forexedge/<image>` for the ten compose images: immutable tags, scan on push, last 5 kept |
 | `s3.tf` | `forexedge-results-<account>` and `forexedge-backups-<account>` (versioned, every version gone after 14 days): public access blocked, ACLs off, SSE-S3, TLS only; S3 public access block (account) |
-| `github_oidc.tf` | Role `forexedge-github-deploy` for `main` of the repository only: ECR push, `ssm:SendCommand` on this instance with `AWS-RunShellScript`, `ssm:GetCommandInvocation` (unused until Phase 4). It trusts GitHub's OIDC provider, which is **not** created here (next paragraph) |
+| `github_oidc.tf` | Role `forexedge-github-deploy` for `main` of the repository only: ECR push, `ssm:SendCommand` on this instance with `AWS-RunShellScript`, `ssm:GetCommandInvocation`, `s3:PutObject` on `transfer/*` of the backups bucket only (`stage.sh`; section 10). It trusts GitHub's OIDC provider, which is **not** created here (next paragraph) |
 | `monitoring.tf` | SNS topic `forexedge-alerts` → `alert_email`; alarms: CPU > 80% for 15 min, CPU credits < 30, status check, memory > 90%, disk / > 80% |
 | `dlm.tf` | Daily snapshot of the root volume at 20:30 UTC, 7 kept, with its own minimal role |
 
@@ -203,9 +204,9 @@ check with `aws iam list-open-id-connect-providers` and `aws iam get-open-id-con
 --open-id-connect-provider-arn <arn>` (`ClientIDList`). `npm run infra:check` refuses a
 `resource "aws_iam_openid_connect_provider"`.
 
-Phase 4 note: the deploy role can push but not pull. If the GitHub workflow uses ECR as a build cache
-(`--cache-from`), it will need `ecr:BatchGetImage` and `ecr:GetDownloadUrlForLayer` on the same
-repositories, added then.
+The deploy role can push but not pull: the build cache is GitHub's (`type=gha`). Using ECR as a build cache
+(`--cache-from`) would need `ecr:BatchGetImage` and `ecr:GetDownloadUrlForLayer` on the same repositories,
+added on purpose.
 
 **Versions:** Terraform **1.16.7** exactly (`versions.tf`; `winget install Hashicorp.Terraform --version 1.16.7`),
 hashicorp/aws **6.70.0** with `.terraform.lock.hcl` (Windows, Linux, macOS hashes). A newer version is a
@@ -448,16 +449,22 @@ REGISTRY=$(terraform -chdir=infra/terraform output -raw image_registry)
 RESULTS=$(terraform -chdir=infra/terraform output -raw results_bucket)
 ```
 
-On the host everything lives under `/opt/forexedge` with the repo's layout, so the compose file's relative paths
-work unchanged:
+On the host everything lives under `/opt/forexedge`. Each fetched commit is a release with the repo's layout,
+so the compose file's relative paths work unchanged; the secrets and the history are shared by every release:
 
 | Path | From | Mode |
 |---|---|---|
-| `infra/docker-compose.prod.yml`, `infra/caddy/Caddyfile`, `infra/vm/*.sh` | `stage.sh` + `fetch.sh` | root 600 (scripts 700) |
+| `releases/<sha>/infra/docker-compose.prod.yml`, `…/infra/caddy/Caddyfile`, `…/infra/vm/*.sh` | `stage.sh` + `fetch.sh`; never changed once fetched | root 600 (scripts 700) |
+| `releases/<sha>/infra/.env.prod`, `…/.env.demo-users`, `releases/<sha>/data` | `fetch.sh`: links to the shared files below | links |
+| `releases/<sha>/release` | `fetch.sh`, last: `commit`, `prefix`, `fetched`; `stack.sh`, `bootstrap.sh`, `make-env.sh` and `deploy.sh` refuse a tag without it | root 600 |
+| `current` | `deploy.sh`: link to the running release (section 10) | link |
 | `data/history-transfer/` | `stage.sh --history` + `fetch.sh` | root, directory 755, files 644 (the ops container reads it as `node`) |
-| `staged-commit` | `fetch.sh`: the bundle's commit; `stack.sh`, `bootstrap.sh` and `make-env.sh` refuse any other tag | root 600 |
 | `infra/.env.prod`, `infra/.env.demo-users` | `make-env.sh` (once), `set-secret.sh` | root 600 |
-| `logs/bootstrap-*.log` | `bootstrap.sh` (redacted) | root 600 |
+| `logs/bootstrap-*.log`, `deploys.log` | `bootstrap.sh` (redacted), `deploy.sh` (one line per deploy) | root 600 |
+
+Until the first `deploy.sh` (section 10), the Phase 3 layout is in place instead: the compose file, the
+Caddyfile and the scripts in `/opt/forexedge/infra`, and `/opt/forexedge/staged-commit`. The first deploy
+adopts it as a release.
 
 ### 8.1 Repository variables
 
@@ -522,7 +529,7 @@ bash infra/vm/stage.sh "$TAG" --history
 # next:   bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- forexedge-backups-805496480789 transfer/20261111T093000Z/ <region>
 PREFIX=transfer/20261111T093000Z/          # the printed prefix
 bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- "$BACKUPS" "$PREFIX" ap-south-1
-# fetched 12 files of commit <TAG> (sha256 verified; 6 history files) into /opt/forexedge
+# fetched 12 files of commit <TAG> (sha256 verified; 6 history files) into /opt/forexedge/releases/<TAG>
 ```
 
 12 files: the compose file, the Caddyfile, `stack.sh`, `bootstrap.sh`, `set-secret.sh`, `check-imds-guard.sh`
@@ -567,9 +574,9 @@ A second run refuses (`exists: refusing to overwrite it`): the database will hol
 ```sh
 aws ssm start-session --target "$ID"
 sudo -i
-bash /opt/forexedge/infra/vm/set-secret.sh GROQ_API_KEY
-bash /opt/forexedge/infra/vm/set-secret.sh DEMO_DEMO_EMAIL
-bash /opt/forexedge/infra/vm/set-secret.sh DEMO_DEMO_PASS     # asked twice
+bash /opt/forexedge/current/infra/vm/set-secret.sh GROQ_API_KEY       # before the first deploy.sh:
+bash /opt/forexedge/current/infra/vm/set-secret.sh DEMO_DEMO_EMAIL    # /opt/forexedge/releases/<TAG>/infra/vm/
+bash /opt/forexedge/current/infra/vm/set-secret.sh DEMO_DEMO_PASS     # asked twice
 exit                                                          # root
 exit                                                          # the session
 ```
@@ -618,7 +625,9 @@ curl -sI https://forexedge.tech/login | head -1      # HTTP/2 200 (Caddy got its
 
 `up` refuses while a secret is a placeholder, logs in to ECR with the instance role (token in a temporary
 Docker config, deleted at exit) and fails, naming the apps, if any isn't ready within 3 minutes. Then
-`stack.sh -- ps "$TAG"` lists the containers; `-- down "$TAG"` stops them (the volumes stay).
+`stack.sh -- ps "$TAG"` lists the containers; `-- down "$TAG"` stops them (the volumes stay). On a fresh host
+the first `up` makes the release current (`current -> <TAG> (first start)`); after that `up` accepts only the
+current release's tag, and every later change of release goes through `deploy.sh` (section 10).
 
 ### 8.10 Go-live gate: the metadata guard, three times
 
@@ -691,3 +700,188 @@ No instance hours, no CPU credit charges.
    the credits it earned for 7 days after a stop and gets no launch credits, so after a longer pause it starts
    from 0 and earns 24 an hour (it clears itself, as in 7.3). If the start was for heavy work (a new import),
    switch to unlimited credits first (7.5).
+
+## 10. CI/CD (Phase 4)
+
+Every pull request to `main` is checked by `ci.yml`; every merge into `main` is built and deployed by
+`deploy.yml`. Nothing secret is in either workflow, their logs, the SSM parameters or the SSM output: AWS is
+reached through OIDC (the role trusts `main` only), the four values below are repository variables, and the
+host scripts redact every secret of the env files from what they print.
+
+```text
+pull request ─▶ ci.yml (job `ci`, required to merge)
+                  nx affected lint/typecheck/test/build · Python projects if affected · npm run infra:check
+merge to main ─▶ deploy.yml
+                  build   build-images.yml: the ten images, tagged with the commit, pushed to ECR
+                  deploy  stage.sh <sha> --bucket ...       compose file, Caddyfile, host scripts → s3://<backups>/transfer/<UTC>/
+                          run-on-host.sh fetch.sh           → /opt/forexedge/releases/<sha>/ (sha256 checked)
+                          run-on-host.sh deploy.sh <sha>    backup → migrations → switch → ready, or rollback
+```
+
+A merge that changes only `docs/**` or Markdown files deploys nothing (`paths-ignore`). Actions → deploy →
+Run workflow deploys `main`'s HEAD whatever changed.
+
+### 10.1 Before the first merge (once)
+
+1. **Terraform** (the deploy role may now write `transfer/` of the backups bucket, for `stage.sh`):
+
+   ```sh
+   terraform -chdir=infra/terraform plan     # 0 to add, 1 to change, 0 to destroy
+   terraform -chdir=infra/terraform apply
+   ```
+
+   The one change is `aws_iam_role_policy.github_deploy` updated in place: a new statement `StageConfig`,
+   `s3:PutObject` on `arn:aws:s3:::forexedge-backups-<account>/transfer/*`. If the plan shows anything else,
+   stop. (While the host is paused, add `-var instance_state=stopped`, section 9.)
+
+2. **Two more repository variables** (GitHub → the repository → Settings → Secrets and variables → Actions →
+   the **Variables** tab → New repository variable; not Secrets: neither value is secret):
+
+   ```sh
+   gh variable set AWS_INSTANCE_ID --body "$(terraform -chdir=infra/terraform output -raw instance_id)"
+   gh variable set AWS_BACKUPS_BUCKET --body "$(terraform -chdir=infra/terraform output -raw backups_bucket)"
+   gh variable list        # AWS_BACKUPS_BUCKET, AWS_DEPLOY_ROLE_ARN, AWS_INSTANCE_ID, AWS_REGION
+   ```
+
+3. **Branch protection for `main`**, after `ci` has run once (open the Phase 4 pull request first: GitHub only
+   offers a status check it has seen). GitHub → the repository → **Settings** → **Branches** → **Add classic
+   branch protection rule**:
+   - **Branch name pattern:** `main`
+   - Tick **Require a pull request before merging**. Under it, untick **Require approvals** (you are the only
+     reviewer and can't approve your own pull request).
+   - Tick **Require status checks to pass before merging**, then **Require branches to be up to date before
+     merging**. In **Search for status checks**, type `ci` and pick the check named **ci** (GitHub Actions).
+   - Tick **Do not allow bypassing the above settings** (this is the "include administrators" setting: the
+     rules apply to you too).
+   - Leave the rest as it is (force pushes and deletions stay blocked) → **Create**.
+
+   Check: a pull request shows "Required" next to `ci`, and the merge button stays grey until it passes.
+
+### 10.2 How a deploy works (`infra/vm/deploy.sh`)
+
+On the host, as root, through `run-on-host.sh` (deploy.yml, or by hand from the laptop with the same
+arguments):
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/deploy.sh --timeout 1800 -- "$TAG" "$BACKUPS" [--simulate-failure]
+```
+
+1. **Adopt (first run only).** The Phase 3 layout (compose file, Caddyfile and scripts in
+   `/opt/forexedge/infra`, `staged-commit`) becomes `releases/<that tag>` and `current`, if its commit is
+   `IMAGE_TAG` in `.env.prod` and every running app image has that tag. Files are copied; no container is
+   started, stopped or recreated. Anything inconsistent: refused, nothing changed.
+2. **Refuse** unless `releases/<TAG>/release` (from `fetch.sh`) records commit `<TAG>`.
+3. **Backup.** `pg_dump` of the app tables (the ordinary tables of `public`, without `historical_*` and without
+   hypertables; the continuous aggregates are views and aren't dumped), run inside the database container,
+   gzip, `s3://<backups>/predeploy/<UTC>-<TAG>.sql.gz` with the host's instance role. It prints the size and the
+   table names, never the content. The backups bucket keeps every object 14 days.
+4. **Migrations.** `bootstrap.sh <TAG> --deploy` from the new release: pulls the new ops image and runs
+   `bootstrap-prod.ts` once with `--no-deps` (migrations, instruments, the DB logins, the demo users) while the
+   old release still serves. That is why migrations must be backward compatible (below).
+5. **Switch.** `current` → `releases/<TAG>`; `docker compose up -d --remove-orphans` with that release's
+   compose file (by its real path, so a changed Caddyfile recreates Caddy); every app ready within 3 minutes.
+6. **Rollback** if `up` fails or an app isn't ready: `current` back to the previous release, `up` with the
+   previous release's own compose file and tag, ready check.
+7. **Success:** `IMAGE_TAG` in `.env.prod` set to the tag, a line in `/opt/forexedge/deploys.log`, the Phase 3
+   copies deleted once no container mounts them, the newest 5 releases kept (always `current` and the previous
+   one; the local images of the others removed; ECR also keeps 5 tags per image).
+
+Exit codes and the job summary (Actions → the run → Summary: tag, previous tag, result):
+
+| Exit | `deploy-result` | Meaning |
+|---|---|---|
+| 0 | `deployed` | the new release runs |
+| 1 | (none) | refused, or failed before the switch (backup, migrations): the old release still runs, nothing changed |
+| 3 | `rolled-back` | the new release failed; the previous one runs again |
+| 4 | `rollback-failed` | **ROLLBACK FAILED**: the previous release isn't ready either. Nothing more is tried: 10.5 |
+| run-on-host 3 | (none) | "host paused (instance_state=stopped) or not registered in SSM": resume it (section 9), then Run workflow |
+
+GitHub emails you when a run fails (your notification settings → Actions: "Send notifications for failed
+workflows only"). That email is the alert.
+
+**Migrations roll forward only.** A rollback restores code and config, never the schema: the previous release
+runs against the schema the new release's migrations left. Every migration must therefore work with the
+release before it (expand, then contract in a later release: add a nullable column now, drop the old one only
+once no running release reads it). The pre-deploy dump (10.4) is the way back for data.
+
+### 10.3 Rollback drill
+
+GitHub → the repository → **Actions** → **deploy** (left) → **Run workflow** (right) → Branch: `main` → tick
+**simulate_failure** → **Run workflow**.
+
+It builds (`already pushed` for every image if `main` was deployed already), stages, fetches and runs
+`deploy.sh … --simulate-failure`: the release really goes up, its ready check counts as failed, and the
+previous release comes back. Success looks like this:
+
+- the run ends **red** (the deploy job fails on purpose; you get the failure email)
+- the summary row: `<TAG> | <previous> | rolled back to the previous release`, and "Rollback drill"
+- the deploy step's log, after `--- stdout`: `simulated failure (--simulate-failure)`, `current -> <previous>`,
+  `ready: all 9 apps answer /health/ready with 200`, `rolled back to <previous>`, `deploy-result: rolled-back`
+- the site answers throughout, except for the seconds the containers are recreated:
+  `curl -sI https://forexedge.tech/login | head -1` → `HTTP/2 200`
+
+When `main` is already deployed, `<TAG>` and `<previous>` are the same commit: the drill still exercises
+the failure detection, the switch back, `up` with the previous release's config and the ready check (the host
+tests cover a rollback between two different releases). Afterwards, `deploys.log` has a `rolled back` line.
+
+### 10.4 Restore a pre-deploy dump
+
+The dump holds user data (emails, password hashes): restore it in a Session Manager shell, never through
+`run-on-host.sh` (SSM keeps its output). The table list is in the deploy's log line `backup: … tables: …`.
+
+```sh
+aws s3 ls "s3://$BACKUPS/predeploy/"                           # laptop: the dumps of the last 14 days
+aws ssm start-session --target "$ID"
+sudo -i
+F=20261111T120000Z-<TAG>.sql.gz                                 # the one to restore
+aws s3 cp "s3://<backups bucket>/predeploy/$F" "/root/$F"
+dc() { docker compose -p forexedge -f "$(readlink -f /opt/forexedge/current)/infra/docker-compose.prod.yml" \
+  --env-file /opt/forexedge/infra/.env.prod "$@"; }
+```
+
+1. **Look first, in a scratch database** (the live one is untouched):
+
+   ```sh
+   dc exec -T timescaledb sh -c 'createdb -U "$POSTGRES_USER" restore_check'
+   gunzip -c "/root/$F" | dc exec -T timescaledb sh -c 'psql -X -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d restore_check'
+   dc exec -T timescaledb sh -c 'psql -X -U "$POSTGRES_USER" -d restore_check -c "\dt"'
+   ```
+
+2. **Full undo** (everything written since the dump is lost): stop the apps, keep the database, replace the
+   app tables in one transaction, then start the release:
+
+   ```sh
+   dc stop auth-service market-service domain-service order-service ws-gateway replay-service ml-service research-agent frontend
+   { echo 'DROP TABLE <the tables of the backup line, each as public.name, comma separated> CASCADE;'; gunzip -c "/root/$F"; } |
+     dc exec -T timescaledb sh -c 'psql -X -q -1 -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
+   dc exec -T timescaledb sh -c 'dropdb -U "$POSTGRES_USER" restore_check'
+   rm "/root/$F"
+   exit; exit
+   bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up "<current tag>"     # laptop
+   ```
+
+   `-1` makes it all or nothing. The dump includes the `migrations` table, so the schema goes back to what it
+   was before that deploy: run it with the release that was running then. After a rollback that is the
+   current release. After a successful deploy, the new code expects the new schema, so first revert the merge
+   on `main` and let it deploy (that deploy makes its own, newer dump: restore the older one), then restore.
+   Not rehearsed against production yet; rehearse it on the laptop stack (section 5) before you need it.
+
+### 10.5 If the rollback fails (exit 4)
+
+Nothing more happens automatically; `current` points to the previous release. From the laptop:
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/stack.sh -- ps "<previous>"      # which containers are down
+bash infra/vm/run-on-host.sh infra/vm/stack.sh -- ready "<previous>"   # which apps answer, with their status
+```
+
+Then fix the cause (a migration the old code can't read: restore the dump, 10.4; a host problem: memory,
+disk, Docker) and `stack.sh -- up "<previous>"`.
+
+### 10.6 Actions minutes
+
+The repository is private: GitHub Pro includes 3,000 Linux minutes a month (Settings → Billing and plans →
+Usage shows what is used). Per merge into `main`: the ten build jobs (billed separately, each rounded up to a
+minute) plus the deploy job; per pull request push: the `ci` job. Not measured yet: after the first merge,
+read each job's time on the run's page (or `gh run view <id> --json jobs --jq '.jobs[] | [.name, .startedAt,
+.completedAt]'`) and write the figures here. A docs-only merge costs nothing.
