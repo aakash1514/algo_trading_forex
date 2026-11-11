@@ -389,6 +389,23 @@ month, in a Session Manager shell (`sudo -i`):
    --query 'Snapshots[].[StartTime,State]' --output table` shows 7, the newest from last night.
 6. **Image scan findings:** `aws ecr describe-image-scan-findings --repository-name forexedge/<image>
    --image-id imageTag=<tag>` for the running tag.
+7. **Restore test** (from the laptop; it prints table names and row counts only, so SSM may keep its output):
+
+   ```sh
+   bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- "$BACKUPS"
+   # dump: s3://<backups>/predeploy/20261111T120000Z-<TAG>.sql.gz
+   # table                    rows in dump-restore    rows live now
+   # users                                       5                6
+   # ...
+   # restore-test-result: ok
+   ```
+
+   It restores the newest pre-deploy dump (or the key given after the bucket) into a scratch database
+   `restore_test_<UTC>`, compares each table's rows with the live database (restored <= live is expected; fewer
+   live rows is marked, not a failure) and always drops the scratch database and deletes its copy of the dump.
+   It fails on no dump, a broken or incomplete dump, a restore error, zero tables, a restored table missing
+   live, or no users. Dumps expire after 14 days: with no deploy in that time it fails with "no pre-deploy
+   dump"; run it after the next deploy. Section 10.4.
 
 ### 7.7 Destroy (at exit)
 
@@ -839,13 +856,13 @@ dc() { docker compose -p forexedge -f "$(readlink -f /opt/forexedge/current)/inf
   --env-file /opt/forexedge/infra/.env.prod "$@"; }
 ```
 
-1. **Look first, in a scratch database** (the live one is untouched):
-
-   ```sh
-   dc exec -T timescaledb sh -c 'createdb -U "$POSTGRES_USER" restore_check'
-   gunzip -c "/root/$F" | dc exec -T timescaledb sh -c 'psql -X -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d restore_check'
-   dc exec -T timescaledb sh -c 'psql -X -U "$POSTGRES_USER" -d restore_check -c "\dt"'
-   ```
+1. **Look first, in a scratch database** (the live one is untouched): from the laptop,
+   `bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- "$BACKUPS" predeploy/$F` restores
+   that dump into a scratch database, prints its tables with restored and live row counts, and drops it again
+   (section 7.6). Don't restore by hand into an empty database: `pg_dump -t` leaves out the `uuid-ossp`
+   extension and the enum types the tables use, so that fails (`ERROR: type "public.instruments_type_enum" does
+   not exist`); `restore-test.sh` creates them from the live catalog first. The full undo below doesn't need
+   them: the live database has them.
 
 2. **Full undo** (everything written since the dump is lost): stop the apps, keep the database, replace the
    app tables in one transaction, then start the release:
@@ -854,7 +871,6 @@ dc() { docker compose -p forexedge -f "$(readlink -f /opt/forexedge/current)/inf
    dc stop auth-service market-service domain-service order-service ws-gateway replay-service ml-service research-agent frontend
    { echo 'DROP TABLE <the tables of the backup line, each as public.name, comma separated> CASCADE;'; gunzip -c "/root/$F"; } |
      dc exec -T timescaledb sh -c 'psql -X -q -1 -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
-   dc exec -T timescaledb sh -c 'dropdb -U "$POSTGRES_USER" restore_check'
    rm "/root/$F"
    exit; exit
    bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up "<current tag>"     # laptop

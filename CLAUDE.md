@@ -59,6 +59,8 @@ bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up <full sha>  
 # to main (not docs-only): build-images.yml, stage.sh --bucket, fetch.sh, deploy.sh (backup, migrations, switch,
 # rollback). Rollback drill: Actions > deploy > Run workflow with simulate_failure. By hand, the same as deploy.yml:
 bash infra/vm/run-on-host.sh infra/vm/deploy.sh --timeout 1800 -- <full sha> <backups bucket> [--simulate-failure]
+# Monthly (docs/DEPLOY.md 7.6): newest pre-deploy dump -> scratch DB, restored vs live row counts, always dropped
+bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- <backups bucket> [predeploy/<key>.sql.gz]
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
