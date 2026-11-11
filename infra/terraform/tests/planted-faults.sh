@@ -297,6 +297,12 @@ fault "check.sh: OIDC provider owned by the stack" terraform/github_oidc.tf   'd
 }
 
 data "aws_iam_openid_connect_provider" "github" {'   'never a resource' check.sh
+fault "check.sh: instance does not ignore public IP drift" terraform/ec2.tf \
+  'ignore_changes = [ami, associate_public_ip_address]' 'ignore_changes = [ami]' \
+  'must have associate_public_ip_address in lifecycle ignore_changes' check.sh
+fault "check.sh: instance does not ignore a newer AMI" terraform/ec2.tf \
+  'ignore_changes = [ami, associate_public_ip_address]' 'ignore_changes = [associate_public_ip_address]' \
+  'must have ami in lifecycle ignore_changes' check.sh
 fault "check.sh: terraform test runs no test" terraform/check.sh \
   '"$TERRAFORM" test | tee' '"$TERRAFORM" test -filter=none.tftest.hcl | tee' \
   'terraform test ran no test' check.sh

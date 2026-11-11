@@ -4,7 +4,7 @@
 # deep_check. Fails on the first failing check.
 #
 #   fmt -check, source rules (compose images = ECR, check-compose.mjs, no key pair, no inline SG rules,
-#   no owned OIDC provider),
+#   no owned OIDC provider, the instance ignores AMI and public IP drift),
 #   init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck
 #
 # The metadata guard's end-to-end test (Docker-in-Docker) is separate: npm run infra:imds-test
@@ -88,6 +88,19 @@ if grep -nE '^\s*resource\s+"aws_iam_openid_connect_provider"' ./*.tf >&2; then
   exit 1
 fi
 echo "data source only"
+
+# lifecycle is not in the plan, so terraform test can't see it. Without ami a newer Ubuntu image replaces the
+# instance; without associate_public_ip_address (true in AWS once the Elastic IP is associated) every plan
+# after the first apply replaces it. Either way the database on its root volume goes with it.
+step "aws_instance.app ignores AMI and public IP drift"
+instance_ignored="$(sed -n '/^resource "aws_instance" "app" {/,/^}/s/^ *ignore_changes *= *\[\(.*\)\] *$/\1/p' ec2.tf | tr -d ' ' | tr ',' '\n')"
+for attribute in ami associate_public_ip_address; do
+  if ! grep -qx "$attribute" <<<"$instance_ignored"; then
+    echo "aws_instance.app must have $attribute in lifecycle ignore_changes (a change to it replaces the host and its database)" >&2
+    exit 1
+  fi
+done
+echo "ami, associate_public_ip_address"
 
 cd "$CHECK_DIR"
 
