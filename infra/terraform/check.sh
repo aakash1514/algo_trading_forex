@@ -7,7 +7,8 @@
 #   no owned OIDC provider, the instance ignores AMI and public IP drift),
 #   init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck,
 #   infra/vm/run-on-host.sh and stage.sh against stub aws/terraform commands, the host scripts in Ubuntu
-#   24.04 against stub aws/docker, the GitHub workflows (actionlint, pinned actions, the image matrix = compose)
+#   24.04 against stub aws/docker, the GitHub workflows (actionlint, pinned actions, the image matrix = compose,
+#   the rules for ci.yml)
 #
 # The metadata guard's end-to-end test (Docker-in-Docker) is separate: npm run infra:imds-test
 #

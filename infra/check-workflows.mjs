@@ -2,6 +2,11 @@
 //   - every `uses:` is pinned to a full 40-character commit SHA (a tag can be moved to other code)
 //   - no workflow reads `secrets.` (the deploy role comes from OIDC; its ARN and the region are variables)
 //   - every job has timeout-minutes
+//   - no workflow is triggered by pull_request_target (it runs a pull request with the base's permissions)
+//   - id-token: write appears only where OIDC_WORKFLOWS allows it (top level or job level)
+//   - ci.yml: pull_request to main only, permissions exactly contents: read, no id-token, exactly one job
+//     named `ci` (branch protection requires that check by name) with timeout-minutes, a concurrency group
+//     that cancels; .nvmrc (the Node of CI) equals the images' Node in infra/docker/node.Dockerfile
 //   - build-images.yml: workflow_dispatch only, permissions exactly id-token: write + contents: read, one
 //     concurrency group that never cancels, the job runs only on refs/heads/main, and its matrix equals the
 //     images of infra/docker-compose.prod.yml with the same dockerfile, target and build args
@@ -18,6 +23,8 @@ const YQ_IMAGE = 'mikefarah/yq:4.54.1@sha256:4b3d9475d65571d28cbb19544d3820ec294
 const REPO = resolve(import.meta.dirname, '..');
 const WORKFLOWS = join(REPO, '.github', 'workflows');
 const COMPOSE = join(REPO, 'infra', 'docker-compose.prod.yml');
+// The only workflows that may request GitHub's OIDC token (and so assume the deploy role)
+const OIDC_WORKFLOWS = ['build-images.yml'];
 
 const problems = [];
 
@@ -36,6 +43,10 @@ for (const file of files) {
   const wf = yamlToJson(text);
   workflows[file] = wf;
   if (/\bsecrets\./.test(text)) problems.push(`${file}: reads secrets.* (use OIDC and repository variables)`);
+  if (triggersOf(wf).includes('pull_request_target')) problems.push(`${file}: triggered by pull_request_target`);
+  const idToken = [wf.permissions, ...Object.values(wf.jobs ?? {}).map((j) => j.permissions)]
+    .some((p) => p === 'write-all' || (p && typeof p === 'object' && p['id-token'] === 'write'));
+  if (idToken && !OIDC_WORKFLOWS.includes(file)) problems.push(`${file}: requests id-token: write (only ${OIDC_WORKFLOWS.join(', ')} may)`);
   for (const [jobName, job] of Object.entries(wf.jobs ?? {})) {
     const where = `${file} job ${jobName}`;
     if (job.uses !== undefined) {
@@ -58,13 +69,47 @@ function checkUses(where, uses) {
   }
 }
 
+function triggersOf(wf) {
+  if (typeof wf.on === 'string') return [wf.on];
+  if (Array.isArray(wf.on)) return wf.on;
+  return Object.keys(wf.on ?? {});
+}
+
+// ── ci.yml ───────────────────────────────────────────────────────────────────
+const ci = workflows['ci.yml'];
+if (!ci) {
+  problems.push('ci.yml: missing');
+} else {
+  const f = 'ci.yml';
+  const triggers = triggersOf(ci);
+  if (triggers.join(',') !== 'pull_request') problems.push(`${f}: triggers are ${triggers.join(', ')}; pull_request only`);
+  const branches = ci.on?.pull_request?.branches ?? [];
+  if (JSON.stringify(branches) !== '["main"]') problems.push(`${f}: pull_request branches are ${JSON.stringify(branches)}; exactly [main]`);
+  if (JSON.stringify(ci.permissions ?? {}) !== JSON.stringify({ contents: 'read' })) {
+    problems.push(`${f}: permissions are ${JSON.stringify(ci.permissions ?? {})}; exactly contents: read`);
+  }
+  if (!ci.concurrency?.group || ci.concurrency['cancel-in-progress'] !== true) {
+    problems.push(`${f}: needs a concurrency group with cancel-in-progress: true`);
+  }
+  const jobs = Object.keys(ci.jobs ?? {});
+  if (jobs.join(',') !== 'ci') problems.push(`${f}: jobs are ${jobs.join(', ') || 'none'}; exactly one, named ci (the required status check)`);
+  const job = ci.jobs?.ci;
+  if (job && (job.name ?? 'ci') !== 'ci') problems.push(`${f} job ci: name is ${job.name}; the required status check is ci`);
+  if (job?.permissions !== undefined) problems.push(`${f} job ci: sets its own permissions`);
+}
+
+// .nvmrc (CI's Node) = the Node of the images
+const nvmrc = readFileSync(join(REPO, '.nvmrc'), 'utf8').trim();
+const imageNode = /^ARG NODE_IMAGE=node:(\d+\.\d+\.\d+)-/m.exec(readFileSync(join(REPO, 'infra', 'docker', 'node.Dockerfile'), 'utf8'))?.[1];
+if (!imageNode || nvmrc !== imageNode) problems.push(`.nvmrc is ${nvmrc || 'empty'}, infra/docker/node.Dockerfile has node ${imageNode ?? '(not found)'}`);
+
 // ── build-images.yml ─────────────────────────────────────────────────────────
 const build = workflows['build-images.yml'];
 if (!build) {
   problems.push('build-images.yml: missing');
 } else {
   const f = 'build-images.yml';
-  const triggers = typeof build.on === 'string' ? [build.on] : Object.keys(build.on ?? {});
+  const triggers = triggersOf(build);
   if (triggers.join(',') !== 'workflow_dispatch') problems.push(`${f}: triggers are ${triggers.join(', ')}; workflow_dispatch only`);
   const perms = build.permissions ?? {};
   if (JSON.stringify(sortKeys(perms)) !== JSON.stringify({ contents: 'read', 'id-token': 'write' })) {

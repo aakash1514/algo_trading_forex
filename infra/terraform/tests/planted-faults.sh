@@ -53,10 +53,10 @@ out="$(mktemp)"
 passed=0
 failed=0
 
-# A fault's FILE is relative to infra/, except .github/... (relative to the repository)
+# A fault's FILE is relative to infra/, except .github/... and .nvmrc (relative to the repository)
 repo_path() {
   case "$1" in
-    .github/*) printf '%s' "$1" ;;
+    .github/* | .nvmrc) printf '%s' "$1" ;;
     *) printf 'infra/%s' "$1" ;;
   esac
 }
@@ -433,6 +433,60 @@ fault "actionlint: unknown expression context" "$W" \
 fault "actionlint: shellcheck in a run block" "$W" \
   'echo "ref=${REGISTRY}/forexedge/${IMAGE}:${TAG}" >>"$GITHUB_OUTPUT"' 'echo "ref=${REGISTRY}/forexedge/${IMAGE}:${TAG}" >>$GITHUB_OUTPUT' \
   'SC2086' actionlint
+
+C=.github/workflows/ci.yml
+fault "ci: pull_request_target" "$C" \
+  'on:
+  pull_request:' 'on:
+  pull_request_target:' \
+  'triggered by pull_request_target' workflows
+fault "ci: a push trigger as well" "$C" \
+  'on:
+  pull_request:' 'on:
+  push:
+  pull_request:' \
+  'pull_request only' workflows
+fault "ci: pull requests to any branch" "$C" \
+  '    branches: [main]
+' '' \
+  'exactly [main]' workflows
+fault "ci: contents: write" "$C" \
+  'contents: read' 'contents: write' \
+  'exactly contents: read' workflows
+fault "ci: an OIDC token" "$C" \
+  'permissions:
+  contents: read' 'permissions:
+  contents: read
+  id-token: write' \
+  'ci.yml: requests id-token: write' workflows
+fault "ci: job-level id-token" "$C" \
+  '    timeout-minutes: 60
+' '    timeout-minutes: 60
+    permissions:
+      id-token: write
+' \
+  'ci.yml: requests id-token: write' workflows
+fault "ci: reads a secret" "$C" \
+  '      BASE: origin/main' '      BASE: ${{ secrets.BASE }}' \
+  'ci.yml: reads secrets.*' workflows
+fault "ci: job renamed (required check lost)" "$C" \
+  '    name: ci
+' '    name: checks
+' \
+  'the required status check is ci' workflows
+fault "ci: no job timeout" "$C" \
+  '    timeout-minutes: 60
+' '' \
+  'ci.yml job ci: no timeout-minutes' workflows
+fault "ci: an older run not cancelled" "$C" \
+  'cancel-in-progress: true' 'cancel-in-progress: false' \
+  'cancel-in-progress: true' workflows
+fault "ci: action pinned to a tag" "$C" \
+  'hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1 (2026-05-12)' 'hashicorp/setup-terraform@v4.0.1' \
+  'is not pinned to a full commit SHA' workflows
+fault ".nvmrc differs from the images' Node" .nvmrc \
+  '24.13.1' '24.11.0' \
+  '.nvmrc is 24.11.0' workflows
 
 echo "== host tooling (stage.test.sh, run-on-host.test.sh, host-scripts.test.sh)"
 fault "stage.sh: mismatched tag accepted" vm/stage.sh \
