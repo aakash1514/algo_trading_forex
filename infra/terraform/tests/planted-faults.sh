@@ -349,6 +349,11 @@ fault "check.sh: compose image missing from ECR" terraform/locals.tf \
 ' '' \
   'images differ' check.sh
 
+echo "== memory limits (check-compose.mjs)"
+fault "caddy back to 64 MiB" docker-compose.prod.yml \
+  'mem_limit: 128m' 'mem_limit: 64m' \
+  'caddy: mem_limit 64 MiB, expected 128 MiB' compose
+
 echo "== the metadata guard's network (check-compose.mjs)"
 fault "ws-gateway at another address than the guard's" docker-compose.prod.yml \
   'ipv4_address: 172.30.0.10' 'ipv4_address: 172.30.0.11' \
@@ -467,6 +472,9 @@ fault "set-secret.sh: the value printed" vm/set-secret.sh \
 fault "stack.sh: mismatched tag accepted" vm/stack.sh \
   '[[ "$tag" == "$staged" ]] || die' 'true || die' \
   'FAIL  stack: other tag' host-tests
+fault "fetch.sh: history files root only (600)" vm/fetch.sh \
+  '[[ "$path" == data/history-transfer/* ]] && mode=0644' '[[ "$path" == data/history-transfer/* ]] && mode=0600' \
+  'FAIL  fetch: history modes' host-tests
 fault "bootstrap.sh: mismatched tag accepted" vm/bootstrap.sh \
   '[[ "$tag" == "$staged" ]] || die' 'true || die' \
   'FAIL  bootstrap: other tag' host-tests

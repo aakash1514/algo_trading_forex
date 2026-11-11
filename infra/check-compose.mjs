@@ -1,6 +1,6 @@
 // Checks the production compose file's rules on the resolved configuration (`docker compose config`):
 //   - only caddy publishes ports (80 and 443)
-//   - every long-running service: an exact image tag (not latest), a memory limit, a healthcheck,
+//   - every long-running service: an exact image tag (not latest), its memory limit (MEMORY_MIB), a healthcheck,
 //     restart unless-stopped, json-file logs rotated at 3 x 10 MB
 //   - no service runs Prometheus, Grafana or MinIO, and nothing mounts Bull Board (BULL_BOARD_* unset)
 //   - one bridge network (forexedge_default) whose bridge name, subnet and ws-gateway's fixed address are
@@ -23,7 +23,15 @@ const services = config.services ?? {};
 
 const EXPECTED = ['timescaledb', 'redis', 'kafka', 'auth-service', 'market-service', 'domain-service', 'order-service',
   'ws-gateway', 'replay-service', 'ml-service', 'research-agent', 'frontend', 'caddy'];
+// The memory limit of each service in MiB: a change is deliberate and shows up here (the 3.5 GB budget,
+// docs/DEPLOY.md section 5). Caddy: 54 of 64 MiB measured on the host, hence 128.
+const MEMORY_MIB = {
+  timescaledb: 1024, redis: 160, kafka: 800, 'auth-service': 192, 'market-service': 192, 'domain-service': 192,
+  'order-service': 224, 'ws-gateway': 320, 'replay-service': 288, 'ml-service': 640, 'research-agent': 480,
+  frontend: 192, caddy: 128,
+};
 const problems = [];
+if (Object.keys(MEMORY_MIB).sort().join() !== [...EXPECTED].sort().join()) problems.push('MEMORY_MIB must list exactly the expected services');
 for (const name of EXPECTED) if (!services[name]) problems.push(`${name}: missing`);
 
 for (const [name, s] of Object.entries(services)) {
@@ -42,6 +50,9 @@ for (const [name, s] of Object.entries(services)) {
   if (oneOff) continue;
   if (!s.image || /:latest$|^[^:]+$/.test(s.image.replace(/^[^/]*\/\//, ''))) problems.push(`${name}: image "${s.image}" has no exact tag`);
   if (!s.mem_limit) problems.push(`${name}: no memory limit`);
+  else if (MEMORY_MIB[name] !== undefined && Number(s.mem_limit) !== MEMORY_MIB[name] * 1024 * 1024) {
+    problems.push(`${name}: mem_limit ${Number(s.mem_limit) / 1024 / 1024} MiB, expected ${MEMORY_MIB[name]} MiB`);
+  }
   if (!s.healthcheck || s.healthcheck.disable) problems.push(`${name}: no healthcheck`);
   if (s.restart !== 'unless-stopped') problems.push(`${name}: restart is ${s.restart ?? 'unset'}`);
   const log = s.logging ?? {};

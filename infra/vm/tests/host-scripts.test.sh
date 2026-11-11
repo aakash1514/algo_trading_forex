@@ -180,6 +180,23 @@ if [[ $rc -eq 0 ]] && has "fetched 8 files of commit $COMMIT" \
   && [[ "$(sed -n 1p "$ROOT/staged-commit")" == "commit $COMMIT" ]] && [[ ! -e "$ROOT/.incoming/20261111T093000Z" ]]; then
   pass "fetch: installs a good bundle (root, 600/700) and records the commit"
 else fail "fetch: good bundle (rc $rc)"; show; fi
+# The ops container mounts data/history-transfer and reads it as `node` (uid 1000), never crossing the
+# root-only parents: read from inside the directory, as that uid
+ops_reads() { (cd "$ROOT/data/history-transfer" && setpriv --reuid=1000 --regid=1000 --clear-groups cat manifest.json) >/dev/null 2>&1; }
+history_modes() {
+  [[ "$(stat -c '%U %a' "$ROOT/data/history-transfer")" == "root 755" ]] &&
+    [[ -z "$(find "$ROOT/data/history-transfer" -type f ! -perm 0644)" ]] &&
+    [[ "$(stat -c '%a' "$ROOT/infra/caddy/Caddyfile")" == 600 && "$(stat -c '%a' "$ROOT/data")" == 700 ]]
+}
+if history_modes && ops_reads; then
+  pass "fetch: history dir 755, files 644, readable by the ops user (uid 1000); config stays 600"
+else fail "fetch: history modes"; ls -la "$ROOT/data/history-transfer" >&2; fi
+# A history fetched by the Phase 3 fetch.sh (700/600) is corrected by the next fetch
+chmod 700 "$ROOT/data/history-transfer"
+chmod 600 "$ROOT"/data/history-transfer/*
+t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
+if [[ $rc -eq 0 ]] && history_modes && ops_reads; then pass "fetch: corrects a history installed 700/600"
+else fail "fetch: legacy history modes (rc $rc)"; show; fi
 before="$(cd "$ROOT" && find . -type f -not -path './.incoming/*' | sort | xargs sha256sum)"
 t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
 if [[ $rc -eq 0 && "$(cd "$ROOT" && find . -type f -not -path './.incoming/*' | sort | xargs sha256sum)" == "$before" ]]; then

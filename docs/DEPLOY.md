@@ -342,14 +342,16 @@ bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh
 # ok    ws-gateway (172.30.0.10)                             token received
 # ok    new container of ws-gateway's image on forexedge_default refused
 # ok    auth-service ... (every running Node container)      refused
+# ok    ml-service (python), research-agent (python)         refused
 # ok    new container on Docker's default bridge             refused
-# metadata guard: only ws-gateway reaches 169.254.169.254 (N other containers refused)
+# not probed (neither node nor python): timescaledb redis kafka caddy
+# metadata guard: only ws-gateway reaches 169.254.169.254 (N other containers refused: n node, 2 python)
 ```
 
 The token is never printed. On the laptop, `npm run infra:imds-test` runs the same check against the guard
 setup.sh installs, in Docker-in-Docker with a fake metadata service one routed hop away (as on EC2), and
-plants three faults (no guard, the guard admitting another address, ws-gateway off its address) that must
-each make the check fail.
+plants four faults (no guard, the guard admitting another address, ws-gateway off its address, a check that
+skips the Python containers) that must each make the check fail.
 
 ### 7.5 CPU credits during Phase 3
 
@@ -452,7 +454,7 @@ work unchanged:
 | Path | From | Mode |
 |---|---|---|
 | `infra/docker-compose.prod.yml`, `infra/caddy/Caddyfile`, `infra/vm/*.sh` | `stage.sh` + `fetch.sh` | root 600 (scripts 700) |
-| `data/history-transfer/` | `stage.sh --history` + `fetch.sh` | root 600 |
+| `data/history-transfer/` | `stage.sh --history` + `fetch.sh` | root, directory 755, files 644 (the ops container reads it as `node`) |
 | `staged-commit` | `fetch.sh`: the bundle's commit; `stack.sh`, `bootstrap.sh` and `make-env.sh` refuse any other tag | root 600 |
 | `infra/.env.prod`, `infra/.env.demo-users` | `make-env.sh` (once), `set-secret.sh` | root 600 |
 | `logs/bootstrap-*.log` | `bootstrap.sh` (redacted) | root 600 |
@@ -631,7 +633,8 @@ bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh            # 1. after 
 3. After a reboot: `aws ec2 reboot-instances --instance-ids "$ID"`, `aws ec2 wait instance-status-ok
    --instance-ids "$ID"`, then `stack.sh -- ready "$TAG"` and `check-imds-guard.sh` again.
 
-Each run must end with `metadata guard: only ws-gateway reaches 169.254.169.254 (N other containers refused)`.
+Each run must end with `metadata guard: only ws-gateway reaches 169.254.169.254 (N other containers refused: n
+node, 2 python)`: the Python services (no node in their images) are probed with Python's urllib.
 
 ### 8.11 Smoke test, memory, credits back
 

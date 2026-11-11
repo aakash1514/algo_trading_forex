@@ -50,7 +50,7 @@ npm run prod:smoke                                           # the stack in a br
 # Claude never runs plan/apply or anything against AWS; the owner does, with SSO
 npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck, run-on-host stubs
 bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
-npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
+npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 4 planted faults)
 # First deploy (docs/DEPLOY.md section 8; the owner runs these): images from .github/workflows/build-images.yml
 # (workflow_dispatch on main), then on the laptop stage.sh, and on the host (through run-on-host.sh) fetch.sh,
 # make-env.sh, set-secret.sh (Session Manager shell only), bootstrap.sh, stack.sh <pull|up|down|ps|ready|stats> <tag>

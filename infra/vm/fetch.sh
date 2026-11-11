@@ -10,7 +10,8 @@
 # outside the allowed set (the compose file, the Caddyfile, infra/vm/*.sh, data/history-transfer/*) or a
 # path twice, lacks the compose file or the Caddyfile, when the prefix holds a file the manifest doesn't
 # list, or when any file's sha256 differs. Then each file is installed under /opt/forexedge at its path
-# (root, 600; scripts 700) and staged-commit records the commit, which stack.sh, bootstrap.sh and
+# (root, 600; scripts 700; data/history-transfer 755 with files 644, for the ops container's non-root user)
+# and staged-commit records the commit, which stack.sh, bootstrap.sh and
 # make-env.sh require as IMAGE_TAG. Never touches .env.prod or .env.demo-users. Running it again on the same
 # prefix changes nothing.
 #
@@ -79,9 +80,16 @@ for path in "${paths[@]}"; do
 done
 (cd "$incoming" && sha256sum --check --quiet --strict entries) || die "sha256 mismatch: nothing was installed"
 
+# The history is public market data that the ops container reads as its non-root user (`node`) through a
+# bind mount of data/history-transfer: that directory 755, its files 644. Everything else root only.
+if printf '%s\n' "${paths[@]}" | grep -q '^data/history-transfer/'; then
+  install -d -o root -g root -m 0700 "$ROOT/data"
+  install -d -o root -g root -m 0755 "$ROOT/data/history-transfer"
+fi
 for path in "${paths[@]}"; do
   mode=0600
   [[ "$path" == *.sh ]] && mode=0700
+  [[ "$path" == data/history-transfer/* ]] && mode=0644
   install -D -o root -g root -m "$mode" "$incoming/$path" "$ROOT/$path"
 done
 printf 'commit %s\nprefix %s\n' "$commit" "$prefix" >"$ROOT/staged-commit.tmp"
