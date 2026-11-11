@@ -1,4 +1,4 @@
-# The instance (Group C): IMDSv2, encrypted root, credit mode, termination protection.
+# The instance (Group C): IMDSv2, encrypted root, credit mode, termination protection, running or stopped.
 mock_provider "aws" {
   source = "./tests/mocks"
 }
@@ -56,6 +56,34 @@ run "cpu_credits_follow_variable" {
   assert {
     condition     = aws_instance.app.credit_specification[0].cpu_credits == "unlimited"
     error_message = "cpu_credits must follow the variable."
+  }
+}
+
+run "instance_running_by_default" {
+  assert {
+    condition     = aws_ec2_instance_state.app.state == "running" && aws_ec2_instance_state.app.instance_id == aws_instance.app.id
+    error_message = "The host must be running by default, and the state must be the app instance's."
+  }
+
+  assert {
+    condition     = !aws_ec2_instance_state.app.force
+    error_message = "A stop must be a clean shutdown (force = false): Postgres and Kafka close their files."
+  }
+}
+
+run "instance_stopped_follows_variable" {
+  variables {
+    instance_state = "stopped"
+  }
+
+  assert {
+    condition     = aws_ec2_instance_state.app.state == "stopped" && aws_ec2_instance_state.app.instance_id == aws_instance.app.id
+    error_message = "instance_state = stopped must stop the app instance."
+  }
+
+  assert {
+    condition     = !aws_ec2_instance_state.app.force && aws_instance.app.disable_api_termination
+    error_message = "Pausing must stop cleanly and keep termination protection."
   }
 }
 

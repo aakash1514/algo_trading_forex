@@ -14,6 +14,11 @@ run "defaults_are_valid" {
     condition     = var.region == "ap-south-1" && var.cpu_credits == "standard" && var.enable_termination_protection
     error_message = "Defaults changed: region ap-south-1, cpu_credits standard, termination protection on."
   }
+
+  assert {
+    condition     = var.instance_state == "running"
+    error_message = "The host must be running by default."
+  }
 }
 
 run "rejects_wildcard_repo" {
@@ -30,6 +35,22 @@ run "rejects_unknown_credit_mode" {
     cpu_credits = "burst"
   }
   expect_failures = [var.cpu_credits]
+}
+
+run "rejects_unknown_instance_state" {
+  command = plan
+  variables {
+    instance_state = "paused"
+  }
+  expect_failures = [var.instance_state]
+}
+
+run "rejects_terminated_instance_state" {
+  command = plan
+  variables {
+    instance_state = "terminated"
+  }
+  expect_failures = [var.instance_state]
 }
 
 run "rejects_bad_email" {

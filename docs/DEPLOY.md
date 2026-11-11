@@ -15,7 +15,9 @@ or the images: everything comes from `infra/.env.prod` and the domain from `DOMA
 | `infra/check-compose.mjs` | Enforces the compose rules (ports, limits, healthchecks, restart, logs) |
 | `tools/ops/bootstrap-prod.ts` | Migrations, instruments, the DB logins, demo users |
 | `npm run data:transfer` | The history: export (dev), import (prod), check |
-| `npm run prod:smoke` | The deployed stack in a browser, over HTTPS, plus memory |
+| `npm run prod:smoke` | The deployed stack in a browser, over HTTPS, plus memory (laptop stack only) |
+| `.github/workflows/build-images.yml` | Builds the ten images for a commit of `main` and pushes them to ECR (section 8) |
+| `infra/vm/*.sh` | The host: `setup.sh`, `run-on-host.sh`, `stage.sh` (laptop) and `fetch.sh`, `make-env.sh`, `set-secret.sh`, `stack.sh`, `bootstrap.sh`, `check-imds-guard.sh` (sections 7 and 8) |
 
 ## 1. Settings (`infra/.env.prod`, never committed)
 
@@ -185,7 +187,7 @@ your SSO login; there are no access keys anywhere.
 | File | Creates |
 |---|---|
 | `network.tf` | VPC 10.20.0.0/16, one public subnet (ap-south-1a), internet gateway, the default security group emptied, security group `forexedge-web` (TCP 80/443 and UDP 443 from 0.0.0.0/0 and ::/0; no SSH) |
-| `ec2.tf` | The t3.medium host: Ubuntu 24.04 from Canonical's SSM parameter (later AMIs and the public IP flag the Elastic IP turns on are ignored), IMDSv2 only, hop limit 2, encrypted 40 GB gp3 root, `cpu_credits` standard, termination protection, no key pair; Elastic IP; EBS encryption by default (account) |
+| `ec2.tf` | The t3.medium host: Ubuntu 24.04 from Canonical's SSM parameter (later AMIs and the public IP flag the Elastic IP turns on are ignored), IMDSv2 only, hop limit 2, encrypted 40 GB gp3 root, `cpu_credits` standard, termination protection, no key pair, `instance_state` running or stopped (section 9); Elastic IP; EBS encryption by default (account) |
 | `iam_vm.tf` | Role and instance profile `forexedge-ec2`: SSM core, CloudWatch agent, ECR pull on the ten repositories, S3 list/get/put (no delete) on the two buckets |
 | `ecr.tf` | `forexedge/<image>` for the ten compose images: immutable tags, scan on push, last 5 kept |
 | `s3.tf` | `forexedge-results-<account>` and `forexedge-backups-<account>` (versioned, every version gone after 14 days): public access blocked, ACLs off, SSE-S3, TLS only; S3 public access block (account) |
@@ -288,11 +290,15 @@ bash infra/vm/run-on-host.sh infra/vm/setup.sh     # instance id from `terraform
 ```
 
 It copies the script to `/root/<name>` on the host (root only), checks its sha256 there against the laptop's
-copy, runs it with bash only if they match, polls every 10 s (at most 15 min, the host stops it at the same limit),
-then prints the status, stdout and stderr, and exits non-zero unless the status is `Success`. It needs no `node`
-(in Git Bash `node` may be winpty, which prints "stdout is not a tty" when redirected) and prints nothing but the
-host's output. `npm run infra:check` runs it against stub `aws`/`terraform` commands
-(`infra/vm/tests/run-on-host.test.sh`, with a tampered sha256 that must not run).
+copy, runs it with bash only if they match, polls every 10 s (15 min by default, `--timeout <s>` up to 2 h; the
+host stops it at the same limit), then prints the status, stdout and stderr, and exits non-zero unless the status
+is `Success`. Arguments for the script go after `--` (`run-on-host.sh infra/vm/stack.sh -- ps <tag>`): each must
+match `[A-Za-z0-9._:/@,=+-]+`, and SSM stores them with the command, as it stores the output, so **never pass a
+secret** (secrets are typed on the host with `set-secret.sh`, section 8). It needs no `node` (in Git Bash `node`
+may be winpty, which prints "stdout is not a tty" when redirected), runs the AWS CLI with
+`PYTHONIOENCODING=utf-8` (the Windows CLI otherwise fails on a non-ASCII byte of the host's output) and prints
+nothing but the host's output. `npm run infra:check` runs it against stub `aws`/`terraform` commands
+(`infra/vm/tests/run-on-host.test.sh`, with a tampered sha256 that must not run and arguments that must be refused).
 
 Or interactively (needs the Session Manager plugin for the AWS CLI): `aws ssm start-session --target "$ID"`,
 `sudo -i`, put the file in `/root/setup.sh`, `bash /root/setup.sh`. A second run must print only the final
@@ -302,7 +308,11 @@ What it does: Docker Engine 29.9.2 + Compose 5.6.1 from Docker's apt repository 
 `9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88` checked; packages held), daemon log rotation 3 x 10 MB, a
 4 GB `/swapfile` (swappiness 10), unattended-upgrades for security updates without automatic reboot, the
 CloudWatch agent 1.300073.2 (sha256 and AWS's signature checked) sending `mem_used_percent` and
-`disk_used_percent` for `/`, `/opt/forexedge` (root, 700), and the metadata guard (7.4.1). After it: `forexedge-memory-high` and
+`disk_used_percent` for `/`, `/opt/forexedge` (root, 700), the metadata guard (7.4.1), and the AWS CLI 2.39.1
+(sha256 checked, and AWS's signature against the key AWS publishes in the CLI install guide, fingerprint
+`FB5D B77F D5C1 18B8 0511 ADA8 A631 0ACC 4672 475C`, embedded in the script; valid until 2027-07-02). The CLI is
+for the host-side tools of section 8 (ECR login, S3 downloads): they run on the host with the instance role,
+never in a container, because the guard lets only ws-gateway's container reach the role's credentials. After it: `forexedge-memory-high` and
 `forexedge-disk-high` leave INSUFFICIENT_DATA within a few minutes
 (`aws cloudwatch describe-alarms --alarm-name-prefix forexedge- --query 'MetricAlarms[].[AlarmName,StateValue]'`).
 
@@ -368,6 +378,9 @@ month, in a Session Manager shell (`sudo -i`):
    restarts Docker, so the stack restarts), then `check-imds-guard.sh`.
 3. **CloudWatch agent:** the same for `CWAGENT_BUILD`, `CWAGENT_PACKAGE_VERSION` and `CWAGENT_SHA256` (and the
    signature check in the script).
+3a. **AWS CLI:** the same for `AWSCLI_VERSION` and `AWSCLI_SHA256` in `setup.sh`. Before 2027-07-02 (the key's
+   expiry) replace the embedded key with the copy in AWS's install guide ("Verify the integrity and authenticity
+   of the downloaded zip file"); its fingerprint must stay `FB5DB77FD5C118B80511ADA8A6310ACC4672475C`.
 4. **Security updates applied:** `tail /var/log/unattended-upgrades/unattended-upgrades.log`.
 5. **Snapshots:** `aws ec2 describe-snapshots --owner-ids self --filters Name=tag:forexedge:dlm,Values=daily
    --query 'Snapshots[].[StartTime,State]' --output table` shows 7, the newest from last night.
@@ -413,3 +426,265 @@ Left behind, by design or by AWS:
 - **SSM Run Command and Session Manager history**: kept by AWS, no charge.
 - **An unconfirmed SNS email subscription**, if the link was never clicked: AWS removes it after 3 days.
 - **The A records at the registrar**, and locally `infra/terraform/terraform.tfvars` and `.terraform/`.
+
+## 8. First deploy (Phase 3)
+
+The whole sequence, in order, from Git Bash on the laptop at the repo root with your SSO login
+(`export AWS_PROFILE=forexedge && aws sso login`). Every host step goes through `run-on-host.sh` (7.4) except
+the secrets, which you type in a Session Manager shell. Nothing secret ever goes into git, an image, a workflow
+log, an SSM command's parameters or its output: the scripts print variable names, never values, and
+`stack.sh`/`bootstrap.sh` redact every secret of the env files from what they print.
+
+Before starting: the branch is merged into `main` and checked out (`git checkout main && git pull`), the tree is
+clean, the two A records of 7.3 resolve (`nslookup forexedge.tech 1.1.1.1`), and
+
+```sh
+TAG=$(git rev-parse HEAD)                                  # the commit everything below runs (40 hex)
+ID=$(terraform -chdir=infra/terraform output -raw instance_id)
+BACKUPS=$(terraform -chdir=infra/terraform output -raw backups_bucket)
+REGISTRY=$(terraform -chdir=infra/terraform output -raw image_registry)
+RESULTS=$(terraform -chdir=infra/terraform output -raw results_bucket)
+```
+
+On the host everything lives under `/opt/forexedge` with the repo's layout, so the compose file's relative paths
+work unchanged:
+
+| Path | From | Mode |
+|---|---|---|
+| `infra/docker-compose.prod.yml`, `infra/caddy/Caddyfile`, `infra/vm/*.sh` | `stage.sh` + `fetch.sh` | root 600 (scripts 700) |
+| `data/history-transfer/` | `stage.sh --history` + `fetch.sh` | root 600 |
+| `staged-commit` | `fetch.sh`: the bundle's commit; `stack.sh`, `bootstrap.sh` and `make-env.sh` refuse any other tag | root 600 |
+| `infra/.env.prod`, `infra/.env.demo-users` | `make-env.sh` (once), `set-secret.sh` | root 600 |
+| `logs/bootstrap-*.log` | `bootstrap.sh` (redacted) | root 600 |
+
+### 8.1 Repository variables
+
+GitHub → the repository → Settings → Secrets and variables → Actions → **Variables** (not Secrets: neither
+value is secret, and `npm run infra:check` fails if the workflow reads `secrets.`):
+
+```sh
+gh variable set AWS_DEPLOY_ROLE_ARN --body "$(terraform -chdir=infra/terraform output -raw deploy_role_arn)"
+gh variable set AWS_REGION --body ap-south-1
+gh variable list        # AWS_DEPLOY_ROLE_ARN  arn:aws:iam::805496480789:role/forexedge-github-deploy
+                        # AWS_REGION           ap-south-1
+```
+
+### 8.2 Build the images
+
+```sh
+gh workflow run build-images.yml --ref main
+gh run watch "$(gh run list --workflow build-images.yml --limit 1 --json databaseId --jq '.[0].databaseId')"
+```
+
+Expected: ten jobs (`auth-service` … `ops`), each green, each job summary one row
+`forexedge/<image> | <TAG> | sha256:… | pushed`. The first run has no cache (ml-service's torch and ops take
+longest; not measured yet). Running it again for the same commit gives `already pushed` per image (ECR tags are
+immutable) and stays green; any other push error fails that job. The "already pushed" match (the
+`ImageTagAlreadyExistsException` / "tag invalid … already exists" text) hasn't been seen against ECR yet: check
+it on the first re-run. From the laptop:
+
+```sh
+for r in auth-service market-service domain-service order-service ws-gateway replay-service ml-service \
+         research-agent frontend ops; do
+  aws ecr describe-images --repository-name "forexedge/$r" --image-ids imageTag="$TAG" \
+    --query 'imageDetails[0].[imageTags[0],imageSizeInBytes]' --output text
+done                    # ten lines: <TAG>  <size>
+```
+
+### 8.3 CPU credits unlimited
+
+```sh
+terraform -chdir=infra/terraform apply -var cpu_credits=unlimited    # 0 to add, 1 to change, 0 to destroy
+```
+
+Only `aws_instance.app`'s `credit_specification` changes, in place (7.5). From here to 8.11 the pulls and the
+import can use both vCPUs without dropping to the 20% baseline.
+
+### 8.4 Host setup again (AWS CLI)
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/setup.sh
+```
+
+Expected: `[setup] installed aws-cli/2.39.1`, then the `done:` line, which now names `aws-cli/2.39.1`
+(no other step prints anything: unchanged since 7.4).
+
+### 8.5 Stage and fetch
+
+The history export must be the one `npm run data:transfer -- check` accepts on the dev database.
+
+```sh
+bash infra/vm/stage.sh "$TAG" --history
+# staged 12 files of commit <TAG> (history: true)
+# prefix: transfer/20261111T093000Z/
+# next:   bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- forexedge-backups-805496480789 transfer/20261111T093000Z/ <region>
+PREFIX=transfer/20261111T093000Z/          # the printed prefix
+bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- "$BACKUPS" "$PREFIX" ap-south-1
+# fetched 12 files of commit <TAG> (sha256 verified; 6 history files) into /opt/forexedge
+```
+
+12 files: the compose file, the Caddyfile, `stack.sh`, `bootstrap.sh`, `set-secret.sh`, `check-imds-guard.sh`
+and the 6 files of `data/history-transfer` (about 423 MB). `stage.sh` refuses a tag other than HEAD and a tree
+with changes; `fetch.sh` installs nothing if a sha256 differs, a file isn't in the manifest or a path is outside
+the allowed set. The bundle expires from the bucket after 14 days.
+
+### 8.6 Settings
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/make-env.sh -- DOMAIN=forexedge.tech IMAGE_REGISTRY="$REGISTRY" \
+  IMAGE_TAG="$TAG" S3_BUCKET="$RESULTS" AWS_REGION=ap-south-1 DEMO_USERS=demo
+```
+
+Expected (names only):
+
+```text
+/opt/forexedge/infra/.env.prod (root 600):
+  DOMAIN                 set
+  ...
+  JWT_REFRESH_SECRET     set
+  ...
+  GROQ_API_KEY           placeholder (set-secret.sh)
+  DEMO_USERS             set
+/opt/forexedge/infra/.env.demo-users (root 600):
+  DEMO_DEMO_EMAIL        placeholder (set-secret.sh)
+  DEMO_DEMO_PASS         placeholder (set-secret.sh)
+```
+
+A second run refuses (`exists: refusing to overwrite it`): the database will hold these passwords.
+
+### 8.7 Secrets, typed on the host
+
+1. **Session Manager plugin** for the AWS CLI (once): AWS's "Install the Session Manager plugin for the AWS CLI"
+   page, Windows installer. Check: `session-manager-plugin` prints "The Session Manager plugin was installed
+   successfully".
+2. **Rotate the Groq key** right before: console.groq.com → API Keys → create a new key for production, copy it,
+   and **delete the old key** (it has been on the laptop). If the laptop's `.env` still needs one for
+   development, create a separate key for it.
+3. In the session (the values are read without echo; nothing reaches SSM Run Command):
+
+```sh
+aws ssm start-session --target "$ID"
+sudo -i
+bash /opt/forexedge/infra/vm/set-secret.sh GROQ_API_KEY
+bash /opt/forexedge/infra/vm/set-secret.sh DEMO_DEMO_EMAIL
+bash /opt/forexedge/infra/vm/set-secret.sh DEMO_DEMO_PASS     # asked twice
+exit                                                          # root
+exit                                                          # the session
+```
+
+Each prints `<NAME> set in /opt/forexedge/infra/.env… (replaced the placeholder)`. Demo passwords: 12-32
+characters with a lowercase and an uppercase letter, a digit and one of `@$!%*?&` (letters, digits and those
+only). Keep the demo email and password in your password manager: 8.11 needs them.
+
+### 8.8 Database: bootstrap and history
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/bootstrap.sh --timeout 7200 -- "$TAG"
+```
+
+Expected (one line per step; times are the host's):
+
+```text
+pulled ... / timescaledb, redis, kafka: healthy
+  [bootstrap] migrations: ok (...)
+  [bootstrap] instruments: ok (...)
+  [bootstrap] history loaded failed (exit 1); stopped
+bootstrap-1: stopped at the history check, as expected on an empty database
+history-check: exit 1 ...
+history: not loaded (or not identical): importing
+  ... (the import's last lines: identical to the export, 19,187,987 minutes)
+history-import: ok (...)
+check-only: ok (...)
+validate: ok (...)
+  [bootstrap] ML login: ok ... [bootstrap] demo users: ok ... [bootstrap] done
+bootstrap-2: ok (...)
+bootstrap: done (logs in /opt/forexedge/logs)
+```
+
+It refuses while any secret is a placeholder, and stops at the first failing step with that step's last 20 lines
+(full logs, redacted, in `/opt/forexedge/logs`). The laptop's import took 677 s; on the t3.medium it will take
+longer, hence `--timeout 7200`. Run again, it skips the import (`history: already loaded and identical`).
+
+### 8.9 Start the stack
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up "$TAG"
+# ... waiting for: ...
+# ready: all 9 apps answer /health/ready with 200
+curl -sI https://forexedge.tech/login | head -1      # HTTP/2 200 (Caddy got its Let's Encrypt certificate)
+```
+
+`up` refuses while a secret is a placeholder, logs in to ECR with the instance role (token in a temporary
+Docker config, deleted at exit) and fails, naming the apps, if any isn't ready within 3 minutes. Then
+`stack.sh -- ps "$TAG"` lists the containers; `-- down "$TAG"` stops them (the volumes stay).
+
+### 8.10 Go-live gate: the metadata guard, three times
+
+```sh
+bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh            # 1. after up (expected output: 7.4.1)
+```
+
+2. After a Docker restart, in a Session Manager shell (`aws ssm start-session --target "$ID"`, `sudo -i`):
+   `systemctl restart docker`, `exit`, `exit`; then from the laptop
+   `bash infra/vm/run-on-host.sh infra/vm/stack.sh -- ready "$TAG"` (every container comes back, `restart:
+   unless-stopped`) and `check-imds-guard.sh` again.
+3. After a reboot: `aws ec2 reboot-instances --instance-ids "$ID"`, `aws ec2 wait instance-status-ok
+   --instance-ids "$ID"`, then `stack.sh -- ready "$TAG"` and `check-imds-guard.sh` again.
+
+Each run must end with `metadata guard: only ws-gateway reaches 169.254.169.254 (N other containers refused)`.
+
+### 8.11 Smoke test, memory, credits back
+
+```sh
+read -r VERIFY_EMAIL; read -rs VERIFY_PASSWORD; export VERIFY_EMAIL VERIFY_PASSWORD   # the demo user, kept out of history
+npm run prod:smoke -- --base https://forexedge.tech
+bash infra/vm/run-on-host.sh infra/vm/stack.sh -- stats "$TAG"
+terraform -chdir=infra/terraform apply -var cpu_credits=standard     # 0 to add, 1 to change, 0 to destroy
+```
+
+`prod:smoke` against the deployed site runs sections 1-4 (front door, closed registration and demo login,
+backtest with results from S3, replay with one order) and writes `docs/validation/prod-deploy-run.md` ending
+`All checks pass.`. It doesn't measure memory there (its Docker is the laptop's): `stack.sh -- stats` prints the
+host's `docker stats`, Redis `used_memory` and `free -m` (budget: the stack under 3.5 GB while a replay plays,
+as in section 5). Then standard credits again (unlimited bills surplus credits); expect
+`forexedge-cpu-credits-low` for a few hours after the switch (7.3).
+
+## 9. Pause and resume
+
+Between demos the host can be stopped: compute stops billing, and everything that matters stays (the root volume
+with the database and the history, the Elastic IP and so the DNS records, the instance id, the env files under
+`/opt/forexedge`). `instance_state` (`running` by default, or `stopped`; anything else fails validation)
+drives `aws_ec2_instance_state` in `ec2.tf`. A stop is a clean shutdown (`force = false`): Docker stops every
+container, so Postgres and Kafka close their files.
+
+```sh
+terraform -chdir=infra/terraform apply -var instance_state=stopped   # pause: 0 to add, 1 to change, 0 to destroy
+terraform -chdir=infra/terraform apply -var instance_state=running   # resume: the same, back
+```
+
+**While paused, every `terraform apply` needs `-var instance_state=stopped`** (or the value in
+`terraform.tfvars`): an apply without it starts the host again (the default is `running`).
+
+**Cost while stopped (about $8/month):** the Elastic IP (AWS bills every public IPv4 address by the hour, attached
+or not), the 40 GB gp3 root volume and its 7 daily snapshots, ECR storage (the last 5 tags of each of the ten
+images) and S3 (results, backups for 14 days). These are rough figures: check Cost Explorer after the first month.
+No instance hours, no CPU credit charges.
+
+**After a start:**
+
+1. The stack comes back by itself: Docker starts at boot, the metadata guard runs before it (7.4.1), and every
+   container has `restart: unless-stopped`. Caddy keeps its certificate (volume `caddy_data`).
+2. Check it like after a reboot (8.10), with the running tag (`IMAGE_TAG` in `.env.prod`; `stack.sh -- ps`
+   shows it in the images):
+
+   ```sh
+   bash infra/vm/run-on-host.sh infra/vm/stack.sh -- ready "$TAG"     # ready: all 9 apps ...
+   bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh         # metadata guard: only ws-gateway ...
+   ```
+
+3. **Alarms to expect:** while stopped, the alarms have no data and sit in INSUFFICIENT_DATA without paging
+   (`treat_missing_data = "missing"`). After the start each one sends an OK email as its metric returns
+   (status check, CPU, memory, disk). `forexedge-cpu-credits-low` can fire: a t3 in standard mode keeps
+   the credits it earned for 7 days after a stop and gets no launch credits, so after a longer pause it starts
+   from 0 and earns 24 an hour (it clears itself, as in 7.3). If the start was for heavy work (a new import),
+   switch to unlimited credits first (7.5).

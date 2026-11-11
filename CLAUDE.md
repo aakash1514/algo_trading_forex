@@ -51,6 +51,10 @@ npm run prod:smoke                                           # the stack in a br
 npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck, run-on-host stubs
 bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
 npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
+# First deploy (docs/DEPLOY.md section 8; the owner runs these): images from .github/workflows/build-images.yml
+# (workflow_dispatch on main), then on the laptop stage.sh, and on the host (through run-on-host.sh) fetch.sh,
+# make-env.sh, set-secret.sh (Session Manager shell only), bootstrap.sh, stack.sh <pull|up|down|ps|ready|stats> <tag>
+bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up <full sha>   # args after --, never secret
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
@@ -460,7 +464,17 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 
 - **Step 7 phase 2a (Terraform) is done** (2026-11-10) on branch `step-7-terraform` (not merged): `infra/terraform`
   (VPC, host, IAM, ECR, S3, GitHub OIDC deploy role, alarms, DLM), `infra/vm/setup.sh`, the metadata guard, offline
-  checks with planted faults. Nothing applied yet (the owner runs it). Runbook: `docs/DEPLOY.md` section 7.
+  checks with planted faults. Applied by the owner since (instance, ECR, buckets, deploy role live). Runbook:
+  `docs/DEPLOY.md` section 7.
+- **Step 7 phase 3 prep is done** (2026-11-11) on branch `step-7-phase3` (not merged): the build-images workflow
+  (pinned actions, matrix = compose, immutable tags), the host tooling (AWS CLI on the host, stage/fetch with sha256
+  manifests, make-env/set-secret, stack, bootstrap; every printed secret redacted; tags tied to the staged commit),
+  pause/resume (`instance_state`, section 9), the first-deploy runbook (`docs/DEPLOY.md` section 8). Not run
+  against AWS yet.
+- **Host scripts** (`infra/vm`): anything that runs through SSM Run Command (`run-on-host.sh`) must never take or
+  print a secret: SSM stores parameters and output. Secrets are typed in a Session Manager shell (`set-secret.sh`).
+  Host-side AWS calls run on the host with the instance role, never in a container (the metadata guard).
+  `stack.sh` and `bootstrap.sh` share a block that must stay identical (the host tests compare it).
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.

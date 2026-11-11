@@ -5,8 +5,8 @@
 #
 #   bash infra/terraform/tests/planted-faults.sh        (Docker running; TERRAFORM as in check.sh)
 #
-# Refuses to start with unstaged changes under infra/: every fault is undone with git checkout, which
-# restores the staged (or committed) version.
+# Refuses to start with unstaged changes under infra/ or .github/: every fault is undone with git checkout,
+# which restores the staged (or committed) version.
 # The fault strings are literal Terraform and shell text: ${...} must not expand (SC2016 throughout)
 # shellcheck disable=SC2016
 set -euo pipefail
@@ -16,6 +16,8 @@ INFRA_DIR="$(dirname "$TF_DIR")"
 REPO_DIR="$(dirname "$INFRA_DIR")"
 TERRAFORM="${TERRAFORM:-terraform}"
 TFLINT_IMAGE="$(sed -n 's/^TFLINT_IMAGE="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
+UBUNTU_IMAGE="$(sed -n 's/^UBUNTU_IMAGE="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
+ACTIONLINT_IMAGE="$(sed -n 's/^ACTIONLINT_IMAGE="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
 SHELLCHECK_IMAGE="$(sed -n 's/^SHELLCHECK_IMAGE="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
 TFLINT_PLUGIN_VOLUME="$(sed -n 's/^TFLINT_PLUGIN_VOLUME="\(.*\)"$/\1/p' "$TF_DIR/check.sh")"
 # Terraform and tflint run on a copy of the configuration in .terraform-check/ (git-ignored), never in
@@ -41,23 +43,31 @@ case "$(uname -s)" in
 esac
 
 cd "$REPO_DIR"
-if ! git diff --quiet -- infra/; then
-  echo "unstaged changes under infra/: stage or commit them first (faults are undone with git checkout)" >&2
+if ! git diff --quiet -- infra/ .github/; then
+  echo "unstaged changes under infra/ or .github/: stage or commit them first (faults are undone with git checkout)" >&2
   exit 1
 fi
-trap 'git checkout -q -- infra/' EXIT
+trap 'git checkout -q -- infra/ .github/' EXIT
 
 out="$(mktemp)"
 passed=0
 failed=0
 
-# plant FILE OLD NEW: replace the single occurrence of OLD (relative to infra/)
+# A fault's FILE is relative to infra/, except .github/... (relative to the repository)
+repo_path() {
+  case "$1" in
+    .github/*) printf '%s' "$1" ;;
+    *) printf 'infra/%s' "$1" ;;
+  esac
+}
+
+# plant FILE OLD NEW: replace the single occurrence of OLD
 plant() {
   OLD="$2" NEW="$3" node -e '
     const fs = require("fs"); const f = process.argv[1]; const s = fs.readFileSync(f, "utf8");
     const n = s.split(process.env.OLD).length - 1;
     if (n !== 1) { console.error(`fault not planted: ${n} matches in ${f}`); process.exit(2); }
-    fs.writeFileSync(f, s.replace(process.env.OLD, () => process.env.NEW));' "infra/$1"
+    fs.writeFileSync(f, s.replace(process.env.OLD, () => process.env.NEW));' "$(repo_path "$1")"
 }
 
 # run_check KIND [ARG...]: the check's output goes to $out; returns the check's exit status
@@ -90,6 +100,17 @@ run_check() {
       ;;
     check.sh) bash "$TF_DIR/check.sh" >"$out" 2>&1 ;;
     compose) node infra/check-compose.mjs >"$out" 2>&1 ;;
+    workflows) node infra/check-workflows.mjs >"$out" 2>&1 ;;
+    run-on-host-test) bash infra/vm/tests/run-on-host.test.sh >"$out" 2>&1 ;;
+    stage-test) bash infra/vm/tests/stage.test.sh >"$out" 2>&1 ;;
+    host-tests)
+      docker run --rm --mount "type=bind,source=$(host_path "$REPO_DIR"),target=/repo,readonly" -w /repo \
+        "$UBUNTU_IMAGE" bash infra/vm/tests/host-scripts.test.sh >"$out" 2>&1
+      ;;
+    actionlint)
+      docker run --rm --mount "type=bind,source=$(host_path "$REPO_DIR"),target=/repo,readonly" -w /repo \
+        "$ACTIONLINT_IMAGE" -no-color >"$out" 2>&1
+      ;;
     *)
       echo "unknown check $kind" >&2
       exit 2
@@ -113,7 +134,15 @@ fault() {
     printf 'ok    %-58s caught (%s)\n' "$name" "$expected"
     passed=$((passed + 1))
   fi
-  git checkout -q -- "infra/$file"
+  git checkout -q -- "$(repo_path "$file")"
+}
+
+# fault2 NAME FILE OLD1 NEW1 OLD2 NEW2 EXPECTED KIND [ARG]: a fault that needs two edits of one file
+fault2() {
+  local name="$1" file="$2"
+  plant "$file" "$3" "$4"
+  shift 4
+  fault "$name" "$file" "$@"
 }
 
 stage_config
@@ -166,6 +195,15 @@ fault "cpu_credits default unlimited" terraform/variables.tf \
 fault "cpu_credits hard-coded unlimited" terraform/ec2.tf \
   'cpu_credits = var.cpu_credits' 'cpu_credits = "unlimited"' \
   'run "cpu_credits_standard_by_default"... fail' test compute
+fault "instance_state: an invalid value accepted" terraform/variables.tf \
+  'contains(["running", "stopped"], var.instance_state)' 'length(var.instance_state) > 0' \
+  'run "rejects_unknown_instance_state"... fail' test variables
+fault "instance_state ignored (always running)" terraform/ec2.tf \
+  'state       = var.instance_state' 'state       = "running"' \
+  'run "instance_stopped_follows_variable"... fail' test compute
+fault "instance_state: forced stop" terraform/ec2.tf \
+  'force       = false' 'force       = true' \
+  'run "instance_running_by_default"... fail' test compute
 fault "termination protection hard-coded off" terraform/ec2.tf \
   'disable_api_termination     = var.enable_termination_protection' 'disable_api_termination     = false' \
   'run "termination_protection"... fail' test compute
@@ -334,6 +372,127 @@ fault "a second fixed address (auth-service)" docker-compose.prod.yml \
         ipv4_address: 172.30.0.20
     mem_limit: 192m' \
   'only ws-gateway has a fixed address' compose
+
+echo "== GitHub workflows (check-workflows.mjs, actionlint)"
+W=.github/workflows/build-images.yml
+fault "workflow: action pinned to a tag" "$W" \
+  'docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1' 'docker/setup-buildx-action@v4.4.1' \
+  'is not pinned to a full commit SHA' workflows
+fault "workflow: action pinned to a short SHA" "$W" \
+  'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' 'actions/checkout@3d3c42e' \
+  'is not pinned to a full commit SHA' workflows
+fault "workflow: ops missing from the matrix" "$W" \
+  '          - { image: ops, dockerfile: infra/docker/node.Dockerfile, target: ops, build-args: "" }
+' '' \
+  'ops is missing' workflows
+fault "workflow: an image that compose doesn't have" "$W" \
+  'image: frontend,' 'image: web,' \
+  'web is not a compose image' workflows
+fault "workflow: wrong Dockerfile for ml-service" "$W" \
+  'image: ml-service, dockerfile: infra/docker/python.Dockerfile' 'image: ml-service, dockerfile: infra/docker/node.Dockerfile' \
+  'ml-service is' workflows
+fault "workflow: build arg differs from compose" "$W" \
+  'build-args: "APP=replay-service"' 'build-args: "APP=ws-gateway"' \
+  'replay-service is' workflows
+fault "workflow: target differs from compose" "$W" \
+  'image: frontend, dockerfile: infra/docker/node.Dockerfile, target: frontend' 'image: frontend, dockerfile: infra/docker/node.Dockerfile, target: service' \
+  'frontend is' workflows
+fault "workflow: contents: write" "$W" \
+  'contents: read' 'contents: write' \
+  'exactly id-token: write, contents: read' workflows
+fault "workflow: runs on any branch" "$W" \
+  "    if: github.ref == 'refs/heads/main'
+" '' \
+  "must run only if github.ref == 'refs/heads/main'" workflows
+fault "workflow: push trigger" "$W" \
+  'on:
+  workflow_dispatch:' 'on:
+  push:
+  workflow_dispatch:' \
+  'workflow_dispatch only' workflows
+fault "workflow: cancels a running build" "$W" \
+  'cancel-in-progress: false' 'cancel-in-progress: true' \
+  'cancel-in-progress: false' workflows
+fault "workflow: no job timeout" "$W" \
+  '    timeout-minutes: 45
+' '' \
+  'no timeout-minutes' workflows
+fault "workflow: reads a secret" "$W" \
+  'role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}' 'role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}' \
+  'reads secrets.*' workflows
+fault "actionlint: unknown expression context" "$W" \
+  'TAG: ${{ github.sha }}
+        run: echo' 'TAG: ${{ githb.sha }}
+        run: echo' \
+  'undefined variable "githb"' actionlint
+fault "actionlint: shellcheck in a run block" "$W" \
+  'echo "ref=${REGISTRY}/forexedge/${IMAGE}:${TAG}" >>"$GITHUB_OUTPUT"' 'echo "ref=${REGISTRY}/forexedge/${IMAGE}:${TAG}" >>$GITHUB_OUTPUT' \
+  'SC2086' actionlint
+
+echo "== host tooling (stage.test.sh, run-on-host.test.sh, host-scripts.test.sh)"
+fault "stage.sh: mismatched tag accepted" vm/stage.sh \
+  '[[ "$tag" == "$head" ]] || die' 'true || die' \
+  'FAIL  other tag' stage-test
+fault "stage.sh: dirty tree accepted" vm/stage.sh \
+  '[[ -z "$(git status --porcelain)" ]] || die' 'true || die' \
+  'FAIL  dirty tree' stage-test
+fault "run-on-host.sh: any argument passed to the host" vm/run-on-host.sh \
+  'if [[ ! "$arg" =~ ^[A-Za-z0-9._:/@,=+-]+$ ]]; then' 'if false; then' \
+  'FAIL  bad argument' run-on-host-test
+fault "fetch.sh: sha256 mismatch accepted" vm/fetch.sh \
+  '(cd "$incoming" && sha256sum --check --quiet --strict entries) || die "sha256 mismatch: nothing was installed"' 'true' \
+  'FAIL  fetch: a sha256 mismatch' host-tests
+fault "fetch.sh: a file the manifest doesn't list accepted" vm/fetch.sh \
+  '[[ -z "$extra" ]] || die' 'true || die' \
+  "FAIL  fetch: a file the manifest doesn't list" host-tests
+fault "fetch.sh: any path accepted" vm/fetch.sh \
+  '[[ "$path" =~ $ALLOWED ]] || die' 'true || die' \
+  'FAIL  fetch: a path outside the allowed set' host-tests
+fault2 "make-env.sh: .env.prod overwritten" vm/make-env.sh \
+  '[[ ! -e "$f" ]] || die "$f exists' 'true || die "$f exists' \
+  'ln "$env_tmp" "$ENV_FILE" || die "$ENV_FILE appeared while writing it"' 'mv -f "$env_tmp" "$ENV_FILE"' \
+  'FAIL  make-env: second run overwrote' host-tests
+fault "make-env.sh: a secret printed" vm/make-env.sh \
+  'jwt_refresh="$(random_string 64)"' 'jwt_refresh="$(random_string 64)"; echo "JWT_REFRESH_SECRET=$jwt_refresh"' \
+  'FAIL  make-env: files' host-tests
+fault "make-env.sh: mismatched tag accepted" vm/make-env.sh \
+  '[[ "${arg[IMAGE_TAG]}" == "$staged" ]] || die' 'true || die' \
+  'FAIL  make-env: other tag' host-tests
+fault "set-secret.sh: short demo password accepted" vm/set-secret.sh \
+  '[[ ${#value} -ge 12 && ${#value} -le 32 ]] || die' 'true || die' \
+  'FAIL  set-secret: refusals' host-tests
+fault "set-secret.sh: the value printed" vm/set-secret.sh \
+  'echo "$name set in $file (replaced $previous)"' 'echo "$name set in $file (replaced $previous): $value"' \
+  'FAIL  set-secret: GROQ_API_KEY' host-tests
+fault "stack.sh: mismatched tag accepted" vm/stack.sh \
+  '[[ "$tag" == "$staged" ]] || die' 'true || die' \
+  'FAIL  stack: other tag' host-tests
+fault "bootstrap.sh: mismatched tag accepted" vm/bootstrap.sh \
+  '[[ "$tag" == "$staged" ]] || die' 'true || die' \
+  'FAIL  bootstrap: other tag' host-tests
+fault "stack.sh: a secret printed (no redaction)" vm/stack.sh \
+  'run() { "$@" 2>&1 | redact; }' 'run() { "$@" 2>&1; }' \
+  'FAIL  stack: up' host-tests
+fault "stack.sh: up with placeholders" vm/stack.sh \
+  '    check_no_placeholders
+    ecr_login
+    set_image_tag' '    ecr_login
+    set_image_tag' \
+  'FAIL  stack: placeholders' host-tests
+fault "stack.sh: an env file others can read accepted" vm/stack.sh \
+  '[[ "$(stat -c '"'"'%U %a'"'"' "$f")" == "root 600" ]] || die' 'true || die' \
+  'FAIL  stack: env file mode' host-tests
+fault "stack.sh: readiness ignores a service that stays down" vm/stack.sh \
+  'echo "not ready after ${READY_SECONDS} s: ${pending[*]}" >&2
+      return 1' 'echo "not ready after ${READY_SECONDS} s: ${pending[*]}" >&2
+      return 0' \
+  'FAIL  stack: unready' host-tests
+fault "bootstrap.sh: goes on after a failed step" vm/bootstrap.sh \
+  'step validate tail npm run data:validate ||' 'step validate tail npm run data:validate || true ||' \
+  'FAIL  bootstrap: failing step' host-tests
+fault "bootstrap.sh: shared block drifts from stack.sh" vm/bootstrap.sh \
+  'compose() { docker compose -p forexedge -f' 'compose() { docker compose -p forexedge-old -f' \
+  'FAIL  shared block' host-tests
 
 rm -f "$out"
 printf '\n%d faults caught, %d missed\n' "$passed" "$failed"

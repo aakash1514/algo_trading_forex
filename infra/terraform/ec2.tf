@@ -62,6 +62,15 @@ resource "aws_instance" "app" {
   depends_on = [aws_ebs_encryption_by_default.this]
 }
 
+# Pause and resume (docs/DEPLOY.md section 9): stopping keeps the root volume (the database), the Elastic IP
+# and the instance id; every container comes back by itself on start (restart: unless-stopped). A stop is a
+# clean ACPI shutdown (force = false), so Postgres and Kafka close their files.
+resource "aws_ec2_instance_state" "app" {
+  instance_id = aws_instance.app.id
+  state       = var.instance_state
+  force       = false
+}
+
 resource "aws_eip" "app" {
   domain = "vpc"
 

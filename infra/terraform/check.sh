@@ -6,7 +6,8 @@
 #   fmt -check, source rules (compose images = ECR, check-compose.mjs, no key pair, no inline SG rules,
 #   no owned OIDC provider, the instance ignores AMI and public IP drift),
 #   init (lock file read-only), validate, terraform test, tflint + AWS ruleset, shellcheck,
-#   infra/vm/run-on-host.sh against stub aws/terraform commands
+#   infra/vm/run-on-host.sh and stage.sh against stub aws/terraform commands, the host scripts in Ubuntu
+#   24.04 against stub aws/docker, the GitHub workflows (actionlint, pinned actions, the image matrix = compose)
 #
 # The metadata guard's end-to-end test (Docker-in-Docker) is separate: npm run infra:imds-test
 #
@@ -16,6 +17,8 @@ set -euo pipefail
 
 TERRAFORM_VERSION="1.16.7"
 TFLINT_IMAGE="ghcr.io/terraform-linters/tflint:v0.65.0@sha256:2788f4d4fc663c0e953b011b01bf443fe5bfce7587ee916e588e6057b85d6359"
+ACTIONLINT_IMAGE="rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667"
+UBUNTU_IMAGE="ubuntu:24.04@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852"
 SHELLCHECK_IMAGE="koalaman/shellcheck:v0.11.0@sha256:61862eba1fcf09a484ebcc6feea46f1782532571a34ed51fedf90dd25f925a8d"
 TFLINT_PLUGIN_VOLUME="forexedge-tflint-plugins"
 
@@ -137,7 +140,24 @@ docker run --rm --mount "type=bind,source=$(host_path "$INFRA_DIR"),target=/mnt,
   "$SHELLCHECK_IMAGE" "${scripts[@]}"
 printf 'shellcheck: %s\n' "${scripts[@]}"
 
+# actionlint also runs shellcheck (bundled in its image) over every run: block
+step "GitHub workflows: actionlint"
+docker run --rm --mount "type=bind,source=$(host_path "$INFRA_DIR/.."),target=/repo,readonly" -w /repo \
+  "$ACTIONLINT_IMAGE" -no-color
+echo "actionlint: no issues"
+
+step "GitHub workflows: pinned actions, permissions, image matrix = compose"
+(cd "$INFRA_DIR/.." && node infra/check-workflows.mjs)
+
 step "run-on-host.sh (stub aws and terraform)"
 bash "$INFRA_DIR/vm/tests/run-on-host.test.sh"
+
+step "stage.sh (stub aws and terraform, a throwaway git repository)"
+bash "$INFRA_DIR/vm/tests/stage.test.sh"
+
+# As root in the host's OS (file modes, mawk), from an image pinned by digest
+step "host scripts: fetch, make-env, set-secret, stack, bootstrap (Ubuntu 24.04, stub aws and docker)"
+docker run --rm --mount "type=bind,source=$(host_path "$INFRA_DIR/.."),target=/repo,readonly" -w /repo \
+  "$UBUNTU_IMAGE" bash infra/vm/tests/host-scripts.test.sh
 
 printf '\nAll infrastructure checks passed.\n'
