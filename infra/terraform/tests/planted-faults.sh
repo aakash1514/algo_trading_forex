@@ -676,6 +676,21 @@ fault "deploy.sh: adoption without the IMAGE_TAG check" vm/deploy.sh \
 fault "deploy.sh: legacy files removed while mounted" vm/deploy.sh \
   'grep -qF "$ROOT/infra/caddy/"; then' 'grep -qF "/nonexistent/"; then' \
   'FAIL  deploy: legacy removal' host-tests
+fault "restore-test.sh: scratch DB not dropped on failure" vm/restore-test.sh \
+  'trap restore_cleanup EXIT' 'trap cleanup EXIT' \
+  'FAIL  restore-test: failures' host-tests
+fault "restore-test.sh: zero tables accepted" vm/restore-test.sh \
+  '((${#restored[@]} > 0)) || die "no table restored from $key"' '' \
+  'FAIL  restore-test: failures' host-tests
+fault "restore-test.sh: a table missing live accepted" vm/restore-test.sh \
+  '((${#missing[@]} == 0)) || die' 'true || die' \
+  'FAIL  restore-test: failures' host-tests
+fault "restore-test.sh: pre-creates the types from the live catalog again" vm/restore-test.sh \
+  'if ! gzip -dc "$WORK/dump.sql.gz" |' 'if ! { pg_query "" "SELECT 1 FROM pg_enum"; gzip -dc "$WORK/dump.sql.gz"; } |' \
+  'FAIL  restore-test: failures' host-tests
+fault "deploy.sh: prerequisites omitted from the dump" vm/deploy.sh \
+  '<"$work/prereq.sql"' '</dev/null' \
+  'FAIL  deploy: self-contained dump' host-tests
 fault "bootstrap.sh --deploy: dependencies recreated (no --no-deps)" vm/bootstrap.sh \
   'RUN_FLAGS=(--no-deps)' 'RUN_FLAGS=()' \
   'FAIL  bootstrap --deploy' host-tests

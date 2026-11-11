@@ -389,6 +389,24 @@ month, in a Session Manager shell (`sudo -i`):
    --query 'Snapshots[].[StartTime,State]' --output table` shows 7, the newest from last night.
 6. **Image scan findings:** `aws ecr describe-image-scan-findings --repository-name forexedge/<image>
    --image-id imageTag=<tag>` for the running tag.
+7. **Restore test** (from the laptop; it prints table names and row counts only, so SSM may keep its output):
+
+   ```sh
+   bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- "$BACKUPS"
+   # dump: s3://<backups>/predeploy/20261111T120000Z-<TAG>.sql.gz
+   # table                    rows in dump-restore    rows live now
+   # users                                       5                6
+   # ...
+   # restore-test-result: ok
+   ```
+
+   It restores the newest pre-deploy dump (or the key given after the bucket) into an empty scratch database
+   `restore_test_<UTC>` (nothing copied from the live database: the dump must stand alone), compares each
+   table's rows with the live database (restored <= live is expected; fewer live rows is marked, not a
+   failure) and always drops the scratch database and deletes its copy of the dump. It fails on no dump, a
+   broken, incomplete or not self-contained dump (one made before deploy.sh wrote its prerequisites), a
+   restore error, zero tables, a restored table missing live, or no users. Dumps expire after 14 days: with no deploy in that time it fails with "no pre-deploy
+   dump"; run it after the next deploy. Section 10.4.
 
 ### 7.7 Destroy (at exit)
 
@@ -773,8 +791,11 @@ bash infra/vm/run-on-host.sh infra/vm/deploy.sh --timeout 1800 -- "$TAG" "$BACKU
 2. **Refuse** unless `releases/<TAG>/release` (from `fetch.sh`) records commit `<TAG>`.
 3. **Backup.** `pg_dump` of the app tables (the ordinary tables of `public`, without `historical_*` and without
    hypertables; the continuous aggregates are views and aren't dumped), run inside the database container,
-   gzip, `s3://<backups>/predeploy/<UTC>-<TAG>.sql.gz` with the host's instance role. It prints the size and the
-   table names, never the content. The backups bucket keeps every object 14 days.
+   gzip, `s3://<backups>/predeploy/<UTC>-<TAG>.sql.gz` with the host's instance role. The dump is
+   self-contained: a header line, then what `pg_dump -t` leaves out but the tables need (the extensions of
+   their column types and defaults, e.g. `uuid-ossp`; their enum types and domains, read from the live
+   catalog; each type created only if missing), then pg_dump's output. It prints the size and the table names,
+   never the content. The backups bucket keeps every object 14 days.
 4. **Migrations.** `bootstrap.sh <TAG> --deploy` from the new release: pulls the new ops image and runs
    `bootstrap-prod.ts` once with `--no-deps` (migrations, instruments, the DB logins, the demo users) while the
    old release still serves. That is why migrations must be backward compatible (below).
@@ -839,13 +860,13 @@ dc() { docker compose -p forexedge -f "$(readlink -f /opt/forexedge/current)/inf
   --env-file /opt/forexedge/infra/.env.prod "$@"; }
 ```
 
-1. **Look first, in a scratch database** (the live one is untouched):
-
-   ```sh
-   dc exec -T timescaledb sh -c 'createdb -U "$POSTGRES_USER" restore_check'
-   gunzip -c "/root/$F" | dc exec -T timescaledb sh -c 'psql -X -q -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d restore_check'
-   dc exec -T timescaledb sh -c 'psql -X -U "$POSTGRES_USER" -d restore_check -c "\dt"'
-   ```
+1. **Look first, in a scratch database** (the live one is untouched): from the laptop,
+   `bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- "$BACKUPS" predeploy/$F` restores
+   that dump into an empty scratch database, prints its tables with restored and live row counts, and drops
+   it again (section 7.6). The dump carries its own extensions and enum types (section 10.2, step 3); one made
+   before that (no header line) is refused as not self-contained: it would fail in an empty database
+   (`ERROR: type "public.instruments_type_enum" does not exist`). The full undo below works with either kind:
+   the live database already has the types, and a self-contained dump creates only the missing ones.
 
 2. **Full undo** (everything written since the dump is lost): stop the apps, keep the database, replace the
    app tables in one transaction, then start the release:
@@ -854,7 +875,6 @@ dc() { docker compose -p forexedge -f "$(readlink -f /opt/forexedge/current)/inf
    dc stop auth-service market-service domain-service order-service ws-gateway replay-service ml-service research-agent frontend
    { echo 'DROP TABLE <the tables of the backup line, each as public.name, comma separated> CASCADE;'; gunzip -c "/root/$F"; } |
      dc exec -T timescaledb sh -c 'psql -X -q -1 -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"'
-   dc exec -T timescaledb sh -c 'dropdb -U "$POSTGRES_USER" restore_check'
    rm "/root/$F"
    exit; exit
    bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up "<current tag>"     # laptop

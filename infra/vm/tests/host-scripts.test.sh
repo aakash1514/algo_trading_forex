@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# The host scripts of infra/vm (fetch, make-env, set-secret, stack, bootstrap, deploy) against stub `aws` and
-# `docker` commands, as root in Ubuntu 24.04 (the host's OS: mawk, coreutils, real file modes). No AWS call,
-# no container started. Part of npm run infra:check, which runs it in a container:
+# The host scripts of infra/vm (fetch, make-env, set-secret, stack, bootstrap, deploy, restore-test) against
+# stub `aws` and `docker` commands, as root in Ubuntu 24.04 (the host's OS: mawk, coreutils, real file modes).
+# No AWS call, no container started. Part of npm run infra:check, which runs it in a container:
 #
 #   docker run --rm --mount type=bind,source=<repo>,target=/repo,readonly -w /repo <ubuntu:24.04 by digest> \
 #     bash infra/vm/tests/host-scripts.test.sh
@@ -27,7 +27,11 @@
 #               rollback exits 4; a missing or mismatched release, a failed backup or bootstrap changes
 #               nothing; adoption of the Phase 3 layout touches no container and is refused unless the
 #               running tag is the staged one; legacy copies go once unmounted; the newest 5 releases kept
-#   shared      the blocks shared by stack.sh, bootstrap.sh and deploy.sh are identical
+#   restore-test  the newest pre-deploy dump (or the given key) restored into a scratch database after the
+#               live catalog's extensions and enum types; restored vs live rows; fails on no dump, bad gzip,
+#               an incomplete dump, a restore error (quoted values masked), zero tables, a table missing
+#               live, no users; the scratch database and the file are removed on every exit
+#   shared      the blocks shared by stack.sh, bootstrap.sh, deploy.sh and restore-test.sh are identical
 #   no secret   no secret value or ECR token appears in anything any script printed
 #   no secret   no secret value or ECR token appears in anything any script printed
 set -euo pipefail
@@ -41,6 +45,13 @@ trap 'rm -rf "$work"' EXIT
 export STUB="$work/stub"
 mkdir -p "$work/bin" "$STUB/s3" "$STUB/ready"
 export ECR_TOKEN="ecr-token-0123456789abcdefghij"
+# What deploy.sh's prerequisites query returns for the app tables (the live catalog's, as Postgres prints them)
+cat >"$STUB/prereqs" <<'EOF'
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+DO $prereq$ BEGIN CREATE TYPE public.users_role_enum AS ENUM ('ADMIN', 'TRADER'); EXCEPTION WHEN duplicate_object THEN NULL; END $prereq$;
+DO $prereq$ BEGIN CREATE TYPE public.users_status_enum AS ENUM ('ACTIVE'); EXCEPTION WHEN duplicate_object THEN NULL; END $prereq$;
+EOF
+DUMP_HEADER="$(sed -n 's/^DUMP_HEADER="\(.*\)"$/\1/p' "$VM/deploy.sh")"
 BUCKET="forexedge-backups-123456789012"
 PREFIX="transfer/20261111T093000Z/"
 COMMIT="0c2311f0123456789abcdef0123456789abcdef0"
@@ -118,15 +129,78 @@ case "$1" in
         app="$1"
         if [[ "$app" == redis ]]; then printf 'used_memory_human:2.12M\r\nmaxmemory_human:96.00M\r\n'; exit 0; fi
         if [[ "$app" == timescaledb ]]; then
-          # deploy.sh's backup: timescaledb sh -c '<psql or pg_dump>' sh <args>
-          if [[ "$4" == *psql* ]]; then
-            [[ ! -f "$STUB/fail-psql" ]] || { echo "psql: error: connection refused" >&2; exit 2; }
-            cat "$STUB/tables" 2>/dev/null || printf 'account_summary\norders\nusers\n'
-          else
-            echo "${*:6}" >"$STUB/pgdump.args"
-            [[ ! -f "$STUB/fail-pgdump" ]] || { echo "pg_dump: error: query failed for password $(secret DB_PASS)" >&2; exit 1; }
-            printf -- '-- PostgreSQL database dump\nCOPY public.users (email) FROM stdin;\nrow-only-in-the-dump@example.invalid\n\\.\n-- PostgreSQL database dump complete\n'
-          fi
+          # deploy.sh and restore-test.sh: timescaledb sh -c '<script>' sh <args>; databases in $STUB/pg
+          script="$4"
+          set -- "${@:6}"
+          mkdir -p "$STUB/pg"
+          case "$script" in
+            pg_dump*)
+              echo "$*" >"$STUB/pgdump.args"
+              [[ ! -f "$STUB/fail-pgdump" ]] || { echo "pg_dump: error: query failed for password $(secret DB_PASS)" >&2; exit 1; }
+              # One table that needs the prerequisites (an extension's function, an enum type)
+              printf -- '-- PostgreSQL database dump\nCREATE TABLE public.users (\n    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,\n    role public.users_role_enum NOT NULL\n);\nCOPY public.users (email) FROM stdin;\nrow-only-in-the-dump@example.invalid\n\\.\n-- PostgreSQL database dump complete\n' ;;
+            createdb*)
+              echo "$1" >>"$STUB/pg/created"
+              touch "$STUB/pg/db-$1" ;;
+            dropdb*)
+              [[ ! -f "$STUB/fail-dropdb" ]] || { echo "dropdb: error: database \"$1\" is being accessed by other users" >&2; exit 1; }
+              echo "$1" >>"$STUB/pg/dropped"
+              rm -f "$STUB/pg/db-$1" ;;
+            *'-c "$2"'*)
+              # restore-test.sh's queries: database $1 (empty: the live one), SQL $2. The live catalog's
+              # prerequisites are asked for only by a restore-test.sh that copies them (a planted fault)
+              case "$2" in
+                *pg_enum*) cat "$STUB/prereqs" ;;
+                *query_to_xml*)
+                  if [[ -z "$1" ]]; then cat "$STUB/live-counts" 2>/dev/null || printf 'account_summary|1\norders|7\nusers|3\n'
+                  else cat "$STUB/pg/db-$1"; fi ;;
+                *) echo "unexpected query: $2" >&2; exit 1 ;;
+              esac ;;
+            *'-c "$1"'*)
+              if [[ "$1" == *pg_enum* ]]; then
+                # deploy.sh's prerequisites of the dumped tables
+                echo "$1" >"$STUB/prereq.query"
+                [[ ! -f "$STUB/fail-prereq" ]] || { echo "psql: error: permission denied for $(secret DB_PASS)" >&2; exit 1; }
+                cat "$STUB/prereqs"
+                exit 0
+              fi
+              # deploy.sh's table list
+              [[ ! -f "$STUB/fail-psql" ]] || { echo "psql: error: connection refused" >&2; exit 2; }
+              cat "$STUB/tables" 2>/dev/null || printf 'account_summary\norders\nusers\n' ;;
+            *psql*)
+              # restore-test.sh's restore from stdin into database $1, empty as createdb makes it: a table that
+              # uses uuid_generate_v4() before the extension, or a *_enum type before its CREATE TYPE, is an
+              # error; else the tables of its CREATE TABLEs and the rows of its COPY blocks (name|count, as
+              # restore-test.sh's count query prints them)
+              [[ -f "$STUB/pg/db-$1" ]] || { echo "psql: error: database \"$1\" does not exist" >&2; exit 2; }
+              cat >"$STUB/pg/restore-stdin"
+              if [[ -f "$STUB/fail-restore" ]]; then
+                echo 'psql:<stdin>:41: ERROR:  invalid input syntax for type uuid: "row-only-in-the-dump@example.invalid" at character 9' >&2
+                exit 3
+              fi
+              awk '/CREATE EXTENSION IF NOT EXISTS "uuid-ossp"/ { ext = 1 }
+                /CREATE TYPE public\.[a-z_]+ / { ty = $0; sub(/.*CREATE TYPE public\./, "", ty); sub(/ .*/, "", ty); types[ty] = 1 }
+                /^CREATE TABLE public\./ { t = $3; sub(/^public\./, "", t); n[t] += 0; table = 1 }
+                table {
+                  if ($0 ~ /uuid_generate_v4/ && !ext) { err = "function public.uuid_generate_v4() does not exist"; exit }
+                  rest = $0
+                  while (match(rest, /public\.[a-z_]+_enum/)) {
+                    ty = substr(rest, RSTART + 7, RLENGTH - 7)
+                    if (!(ty in types)) { err = "type \"public." ty "\" does not exist"; exit }
+                    rest = substr(rest, RSTART + RLENGTH)
+                  }
+                  if ($0 ~ /^\);/) table = 0
+                }
+                /^COPY public\./ { t = $2; sub(/^public\./, "", t); copy = 1; next }
+                copy && /^\\\.$/ { copy = 0; next }
+                copy { n[t]++ }
+                END {
+                  if (err != "") { print "psql:<stdin>:" NR ": ERROR:  " err > "/dev/stderr"; exit 3 }
+                  for (t in n) print t "|" n[t]
+                }' "$STUB/pg/restore-stdin" >"$STUB/pg/restored" || exit 3
+              sort "$STUB/pg/restored" >"$STUB/pg/db-$1" ;;
+            *) echo "unexpected database command: $script" >&2; exit 1 ;;
+          esac
           exit 0
         fi
         code="$(cat "$STUB/ready/$app" 2>/dev/null || echo 200)"
@@ -424,12 +498,14 @@ else fail "deploy: apps differ from stack.sh"; diff <(apps_of "$VM/stack.sh") <(
 shared() { sed -n '/^# ── shared with /,/^# ── end of the shared block/p' "$1" | sed 1d; }
 readiness() { sed -n '/^# ── readiness, shared with /,/^# ── end of the readiness block/p' "$1" | sed 1d; }
 if [[ -n "$(shared "$VM/stack.sh")" && "$(shared "$VM/stack.sh")" == "$(shared "$VM/bootstrap.sh")" \
-  && "$(shared "$VM/stack.sh")" == "$(shared "$VM/deploy.sh")" ]]; then
-  pass "shared block identical in stack.sh, bootstrap.sh and deploy.sh"
+  && "$(shared "$VM/stack.sh")" == "$(shared "$VM/deploy.sh")" \
+  && "$(shared "$VM/stack.sh")" == "$(shared "$VM/restore-test.sh")" ]]; then
+  pass "shared block identical in stack.sh, bootstrap.sh, deploy.sh and restore-test.sh"
 else
-  fail "shared block of stack.sh, bootstrap.sh and deploy.sh differs"
+  fail "shared block of stack.sh, bootstrap.sh, deploy.sh and restore-test.sh differs"
   diff <(shared "$VM/stack.sh") <(shared "$VM/bootstrap.sh") >&2 || true
   diff <(shared "$VM/stack.sh") <(shared "$VM/deploy.sh") >&2 || true
+  diff <(shared "$VM/stack.sh") <(shared "$VM/restore-test.sh") >&2 || true
 fi
 if [[ -n "$(readiness "$VM/stack.sh")" && "$(readiness "$VM/stack.sh")" == "$(readiness "$VM/deploy.sh")" ]]; then
   pass "readiness block identical in stack.sh and deploy.sh"
@@ -580,7 +656,7 @@ deploy_root() {
   make_release "$ROOT" "$PREV" 20261101T000000Z
   ln -s "releases/$PREV" "$ROOT/current"
   rm -f "$STUB"/fail-* "$STUB"/unready-* "$STUB/compose.log" "$STUB/run.log" "$STUB/images" "$STUB/images-removed" \
-    "$STUB/mounts" "$STUB/running-images" "$STUB/tables" "$STUB/pgdump.args"
+    "$STUB/mounts" "$STUB/running-images" "$STUB/tables" "$STUB/pgdump.args" "$STUB/prereq.query"
   rm -rf "$STUB/s3/$BUCKET/predeploy"
   touch "$STUB/loaded"
 }
@@ -606,6 +682,18 @@ if [[ $rc -eq 0 ]] && has "deploy-result: deployed" && has "deploy-tag: $COMMIT"
   && [[ -n "$n_dump" && -n "$n_boot" && -n "$n_up" ]] && ((n_dump < n_boot && n_boot < n_up)); then
   pass "deploy: backup, then bootstrap --deploy, then up of the new release by its path; IMAGE_TAG and deploys.log"
 else fail "deploy: success (rc $rc; order $n_dump $n_boot $n_up)"; show; fi
+# The dump stands alone: the header, then the extension and every enum type before the first table
+first_line() { { gzip -dc "$dump" 2>/dev/null || true; } | grep -n -m 1 -E "$1" | cut -d: -f1 || true; }
+n_ext="$(first_line '^CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')"
+n_role="$(first_line 'CREATE TYPE public\.users_role_enum ')"
+n_status="$(first_line 'CREATE TYPE public\.users_status_enum ')"
+n_table="$(first_line '^CREATE TABLE ')"
+if [[ -n "$DUMP_HEADER" && "$({ gzip -dc "$dump" 2>/dev/null || true; } | head -n 1)" == "$DUMP_HEADER" ]] \
+  && [[ -n "$n_ext" && -n "$n_role" && -n "$n_status" && -n "$n_table" ]] && ((n_ext < n_table && n_role < n_table && n_status < n_table)) \
+  && grep -q "^SET search_path = ''; " "$STUB/prereq.query" && grep -qF "IN ('account_summary','orders','users')" "$STUB/prereq.query" \
+  && has "backup: self-contained: 1 extensions, 2 enum types and domains before the tables"; then
+  pass "deploy: the dump is self-contained (header, then the extensions and enum types of the dumped tables, then pg_dump)"
+else fail "deploy: self-contained dump (ext $n_ext, types $n_role $n_status, first table $n_table)"; show; fi
 
 deploy_root drill
 t deploy.sh "$COMMIT" "$BUCKET" --simulate-failure
@@ -652,12 +740,13 @@ if [[ $r1 -eq 1 && "$ok1" == true && $rc -eq 1 ]] && has "release $OTHER records
 else fail "deploy: refusals ($r1 $rc)"; show; fi
 
 bad=0
-for failure in fail-psql fail-pgdump fail-upload empty-tables; do
+for failure in fail-psql fail-prereq fail-pgdump fail-upload empty-tables; do
   deploy_root "backup-$failure"
   if [[ "$failure" == empty-tables ]]; then : >"$STUB/tables"; else touch "$STUB/$failure"; fi
   t deploy.sh "$COMMIT" "$BUCKET"
   case "$failure" in
     fail-psql) expected="could not list the app tables" ;;
+    fail-prereq) expected="could not read the prerequisites of the app tables" ;;
     fail-pgdump) expected="pg_dump failed" ;;
     fail-upload) expected="upload to s3://$BUCKET/predeploy/" ;;
     empty-tables) expected="no app table found" ;;
@@ -669,7 +758,7 @@ for failure in fail-psql fail-pgdump fail-upload empty-tables; do
   fi
 done
 if [[ $bad -eq 0 ]] && grep -q 'query failed for password \*\*\*' "$work/all-output"; then
-  pass "deploy: a failed backup (tables, pg_dump, upload, no table) stops before bootstrap and the switch; stderr redacted"
+  pass "deploy: a failed backup (tables, prerequisites, pg_dump, upload, no table) stops before bootstrap and the switch; stderr redacted"
 else fail "deploy: backup failures"; fi
 
 deploy_root bootstrapfails
@@ -758,6 +847,121 @@ expected_removed="$(printf '%s\n' "$REGISTRY/auth-service:${olds[0]}" "$REGISTRY
 if [[ $rc -eq 0 && "$kept" == "$expected" && "$removed" == "$expected_removed" ]] && has "releases: 6 kept, 2 pruned"; then
   pass "deploy: keeps the newest 5 releases plus the previous one, removes the others and their images"
 else fail "deploy: pruning (rc $rc)"; show; echo "kept: $kept" >&2; echo "removed: $removed" >&2; fi
+
+# ── restore-test ─────────────────────────────────────────────────────────────────────────────────────
+OLD_KEY="predeploy/20261101T120000Z-$PREV.sql.gz"
+NEW_KEY="predeploy/20261111T120000Z-$COMMIT.sql.gz"
+# dump_sql [users rows] [kind]: a dump of three tables (account_summary 2 rows, orders 2, users $1, default
+# 2; row values that must never be printed) as deploy.sh writes it: kind "full" (default) the header and the
+# prerequisites first, "no-prereq" the header without them, "old" neither (a dump made before both)
+dump_sql() {
+  local users="${1:-2}" kind="${2:-full}" i
+  if [[ "$kind" != old ]]; then printf '%s\n' "$DUMP_HEADER"; fi
+  if [[ "$kind" == full ]]; then cat "$STUB/prereqs"; fi
+  printf -- '-- PostgreSQL database dump\nSELECT pg_catalog.set_config('\''search_path'\'', '\'''\'', false);\n'
+  printf 'CREATE TABLE public.%s (\n    id uuid DEFAULT public.uuid_generate_v4() NOT NULL\n);\n' account_summary orders
+  printf 'CREATE TABLE public.users (\n    id uuid DEFAULT public.uuid_generate_v4() NOT NULL,\n    role public.users_role_enum NOT NULL\n);\n'
+  printf 'COPY public.account_summary (id) FROM stdin;\nrow-a1\nrow-a2\n\\.\n'
+  printf 'COPY public.orders (id) FROM stdin;\nrow-only-in-the-dump-o1\nrow-only-in-the-dump-o2\n\\.\n'
+  printf 'COPY public.users (email) FROM stdin;\n'
+  for ((i = 1; i <= users; i++)); do printf 'row-only-in-the-dump-%d@example.invalid\n' "$i"; done
+  printf '\\.\n-- PostgreSQL database dump complete\n'
+}
+# restore_root NAME: deploy_root's host ($PREV current) with an older and a newer dump and a stray object
+restore_root() {
+  deploy_root "restore-$1"
+  rm -rf "$STUB/pg" "$STUB/live-counts"
+  mkdir -p "$STUB/s3/$BUCKET/predeploy"
+  dump_sql | gzip >"$STUB/s3/$BUCKET/$OLD_KEY"
+  dump_sql | gzip >"$STUB/s3/$BUCKET/$NEW_KEY"
+  echo "not a dump" >"$STUB/s3/$BUCKET/predeploy/zz-notes.txt"
+}
+created_db() { cat "$STUB/pg/created" 2>/dev/null || true; }
+# Every scratch database created was dropped, and the temporary directory is gone
+cleaned_up() {
+  [[ "$(created_db)" == "$(cat "$STUB/pg/dropped" 2>/dev/null || true)" ]] && ! compgen -G "$STUB/pg/db-*" >/dev/null &&
+    ! compgen -G "$ROOT/.restore-test.*" >/dev/null
+}
+
+restore_root ok
+t restore-test.sh "$BUCKET"
+restored_first="$(head -n 1 "$STUB/pg/restore-stdin" 2>/dev/null || true)"
+if [[ $rc -eq 0 ]] && has "dump: s3://$BUCKET/$NEW_KEY" && has "restore-test-result: ok" && has "self-contained dump" \
+  && [[ "$(created_db)" =~ ^restore_test_[0-9]{8}_[0-9]{6}$ ]] && has "dropped the scratch database $(created_db)" && cleaned_up \
+  && [[ -n "$DUMP_HEADER" && "$restored_first" == "$DUMP_HEADER" ]] && ! grep -q pg_enum "$STUB/calls.log" \
+  && grep -qE '^table +rows in dump-restore +rows live now$' "$work/out" \
+  && grep -qE '^account_summary +2 +1  \(fewer live rows now\)$' "$work/out" \
+  && grep -qE '^orders +2 +7$' "$work/out" && grep -qE '^users +2 +3$' "$work/out" \
+  && has "restore test: 3 tables restored from s3://$BUCKET/$NEW_KEY, users 2 rows" && ! has "row-only-in-the-dump" \
+  && grep -q "^aws s3 cp --only-show-errors --region $REGION s3://$BUCKET/$NEW_KEY $ROOT/.restore-test." "$STUB/calls.log"; then
+  pass "restore-test: newest dump, only the dump restored (nothing from the live catalog), table of restored vs live rows, scratch DB and file removed"
+else fail "restore-test: success (rc $rc)"; show; fi
+
+restore_root key
+t restore-test.sh "$BUCKET" "$OLD_KEY"
+if [[ $rc -eq 0 ]] && has "dump: s3://$BUCKET/$OLD_KEY" && has "restore-test-result: ok" && cleaned_up; then
+  pass "restore-test: restores the given key"
+else fail "restore-test: given key (rc $rc)"; show; fi
+
+bad=0
+for failure in no-dump not-gzip incomplete old-dump no-prerequisites restore-error zero-tables missing-live no-users drop-fails; do
+  restore_root "$failure"
+  case "$failure" in
+    no-dump) rm -f "$STUB/s3/$BUCKET/$OLD_KEY" "$STUB/s3/$BUCKET/$NEW_KEY"; expected="no pre-deploy dump in s3://$BUCKET/predeploy/" ;;
+    not-gzip) dump_sql >"$STUB/s3/$BUCKET/$NEW_KEY"; expected="$NEW_KEY is not a valid gzip file" ;;
+    incomplete) dump_sql | head -n -1 | gzip >"$STUB/s3/$BUCKET/$NEW_KEY"; expected="$NEW_KEY is incomplete" ;;
+    old-dump)
+      dump_sql 2 old | gzip >"$STUB/s3/$BUCKET/$NEW_KEY"
+      expected="$NEW_KEY: dump is not self-contained (made before commit \"feat(step-7): self-contained pre-deploy dumps\")" ;;
+    no-prerequisites)
+      # The header without the prerequisites: the empty scratch database must refuse it (no copy from live)
+      dump_sql 2 no-prereq | gzip >"$STUB/s3/$BUCKET/$NEW_KEY"
+      expected='function public.uuid_generate_v4() does not exist' ;;
+    restore-error) touch "$STUB/fail-restore"; expected='invalid input syntax for type uuid: "..." at character 9' ;;
+    zero-tables)
+      printf -- '%s\n-- PostgreSQL database dump\n-- PostgreSQL database dump complete\n' "$DUMP_HEADER" | gzip >"$STUB/s3/$BUCKET/$NEW_KEY"
+      expected="no table restored from $NEW_KEY" ;;
+    missing-live) printf 'account_summary|1\nusers|3\n' >"$STUB/live-counts"; expected="restored tables missing from the live database: orders" ;;
+    no-users) dump_sql 0 | gzip >"$STUB/s3/$BUCKET/$NEW_KEY"; expected="users has no rows in the restored dump" ;;
+    drop-fails) touch "$STUB/fail-dropdb"; expected="COULD NOT DROP the scratch database restore_test_" ;;
+  esac
+  t restore-test.sh "$BUCKET"
+  # A database that could not be dropped stays (the stub keeps it); every other failure leaves nothing
+  clean=true
+  if [[ "$failure" != drop-fails ]] && ! cleaned_up; then clean=false; fi
+  if [[ $rc -ne 1 ]] || ! has "$expected" || ! has "restore-test-result: failed" || [[ "$clean" != true ]] \
+    || has "restore-test-result: ok" || has "row-only-in-the-dump" || compgen -G "$ROOT/.restore-test.*" >/dev/null; then
+    bad=1
+    echo "  $failure: rc $rc, clean $clean, created '$(created_db)', dropped '$(cat "$STUB/pg/dropped" 2>/dev/null || true)'" >&2
+    show
+  fi
+done
+if [[ $bad -eq 0 ]]; then
+  pass "restore-test: fails on no dump, bad gzip, incomplete, not self-contained (old, or no prerequisites into the empty DB), restore error (masked), zero tables, missing live, no users, drop failure; always cleans up"
+else fail "restore-test: failures"; fi
+
+# deploy.sh's own dump, restored by restore-test.sh into an empty database
+restore_root chain
+rm -f "$STUB/s3/$BUCKET/$OLD_KEY" "$STUB/s3/$BUCKET/$NEW_KEY"
+t deploy.sh "$COMMIT" "$BUCKET"
+r1=$rc
+t restore-test.sh "$BUCKET"
+if [[ $r1 -eq 0 && $rc -eq 0 ]] && has "dump: s3://$BUCKET/predeploy/" && has "-$COMMIT.sql.gz" && has "self-contained dump"   && grep -qE '^users +1 +3$' "$work/out" && has "restore-test-result: ok" && cleaned_up; then
+  pass "restore-test: restores the dump deploy.sh wrote into an empty database"
+else fail "restore-test: deploy's dump ($r1 $rc)"; show; fi
+if [[ -n "$DUMP_HEADER" && "$(grep '^DUMP_HEADER=' "$VM/deploy.sh")" == "$(grep '^DUMP_HEADER=' "$VM/restore-test.sh")" ]]; then
+  pass "restore-test: the dump header is deploy.sh's"
+else fail "restore-test: DUMP_HEADER differs from deploy.sh's"; fi
+
+restore_root args
+t restore-test.sh forexedge-results-123456789012
+r1=$rc
+t restore-test.sh "$BUCKET" "predeploy/../../etc/passwd"
+r2=$rc
+t restore-test.sh
+if [[ $r1 -eq 1 && $r2 -eq 1 && $rc -eq 2 ]] && ! grep -qE '^(docker|aws)' "$STUB/calls.log"; then
+  pass "restore-test: another bucket or a key that isn't a pre-deploy dump refused before any aws or docker call"
+else fail "restore-test: arguments ($r1 $r2 $rc)"; show; fi
 
 # ── nothing secret printed, by any script ────────────────────────────────────────────────────────────
 leaks=0

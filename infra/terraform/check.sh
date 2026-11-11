@@ -157,7 +157,7 @@ step "stage.sh (stub aws and terraform, a throwaway git repository)"
 bash "$INFRA_DIR/vm/tests/stage.test.sh"
 
 # As root in the host's OS (file modes, mawk), from an image pinned by digest
-step "host scripts: fetch, make-env, set-secret, stack, bootstrap, deploy (Ubuntu 24.04, stub aws and docker)"
+step "host scripts: fetch, make-env, set-secret, stack, bootstrap, deploy, restore-test (Ubuntu 24.04, stub aws and docker)"
 docker run --rm --mount "type=bind,source=$(host_path "$INFRA_DIR/.."),target=/repo,readonly" -w /repo \
   "$UBUNTU_IMAGE" bash infra/vm/tests/host-scripts.test.sh
 
