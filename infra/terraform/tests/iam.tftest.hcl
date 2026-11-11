@@ -119,9 +119,21 @@ run "deploy_role_rights" {
   assert {
     condition = sort(flatten([for s in jsondecode(aws_iam_role_policy.github_deploy.policy).Statement : flatten([s.Action])])) == sort([
       "ecr:GetAuthorizationToken", "ecr:BatchCheckLayerAvailability", "ecr:InitiateLayerUpload", "ecr:UploadLayerPart",
-      "ecr:CompleteLayerUpload", "ecr:PutImage", "ssm:SendCommand", "ssm:GetCommandInvocation",
+      "ecr:CompleteLayerUpload", "ecr:PutImage", "ssm:SendCommand", "ssm:GetCommandInvocation", "s3:PutObject",
     ])
-    error_message = "The deploy role must grant exactly ECR push, SendCommand and GetCommandInvocation."
+    error_message = "The deploy role must grant exactly ECR push, s3:PutObject, SendCommand and GetCommandInvocation."
+  }
+
+  # stage.sh writes the config to transfer/ and nothing else: no read, list or delete anywhere, no other
+  # prefix (predeploy/ holds the database dumps)
+  assert {
+    condition = [for s in jsondecode(aws_iam_role_policy.github_deploy.policy).Statement : s if length([for a in flatten([s.Action]) : a if startswith(a, "s3:")]) > 0] == [{
+      Sid      = "StageConfig"
+      Effect   = "Allow"
+      Action   = "s3:PutObject"
+      Resource = "arn:aws:s3:::forexedge-backups-111122223333/transfer/*"
+    }]
+    error_message = "The deploy role's only S3 right must be s3:PutObject on forexedge-backups-<account>/transfer/*."
   }
 
   assert {

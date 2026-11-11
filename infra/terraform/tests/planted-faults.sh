@@ -287,6 +287,21 @@ fault "deploy role: ECR push on every repository" terraform/github_oidc.tf \
         ]
         Resource = "*"' \
   'run "deploy_role_rights"... fail' test iam
+fault "deploy role: PutObject on the whole backups bucket" terraform/github_oidc.tf \
+  '${local.backups_bucket}/transfer/*"' '${local.backups_bucket}/*"' \
+  'run "deploy_role_rights"... fail' test iam
+fault "deploy role: + s3:GetObject on transfer/" terraform/github_oidc.tf \
+  'Action   = "s3:PutObject"' 'Action   = ["s3:PutObject", "s3:GetObject"]' \
+  'run "deploy_role_rights"... fail' test iam
+fault "deploy role: + s3:DeleteObject in its own statement" terraform/github_oidc.tf \
+  '        Sid      = "StageConfig"' '        Sid      = "Cleanup"
+        Effect   = "Allow"
+        Action   = "s3:DeleteObject"
+        Resource = "arn:aws:s3:::${local.backups_bucket}/transfer/*"
+      },
+      {
+        Sid      = "StageConfig"' \
+  'run "deploy_role_rights"... fail' test iam
 
 echo "== monitoring and snapshots"
 fault "disk alarm at 90%" terraform/monitoring.tf \
