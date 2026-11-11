@@ -5,20 +5,20 @@
 #   bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- <backups-bucket> [predeploy/<UTC>-<tag>.sql.gz]
 #
 #   pick      the given key, else the newest s3://<backups>/predeploy/<UTC>-<tag>.sql.gz (deploy.sh's backup)
-#   download  with the instance role into a temporary file under /opt/forexedge (root, 600); gzip -t and
-#             pg_dump's completion line
-#   create    restore_test_<UTC> in the timescaledb container (its own POSTGRES_USER), with what the dump
-#             needs but doesn't hold: pg_dump -t leaves out the extensions (uuid-ossp) and enum types the
-#             tables use, so they are created from the live catalog first
+#   download  with the instance role into a temporary file under /opt/forexedge (root, 600); gzip -t,
+#             pg_dump's completion line, and deploy.sh's self-contained header as the first line (a dump
+#             made before that commit lacks its extensions and enum types and is refused)
+#   create    restore_test_<UTC>, an empty database, in the timescaledb container (its own POSTGRES_USER):
+#             nothing is copied from the live catalog, the dump must stand alone
 #   restore   psql with ON_ERROR_STOP; errors are shown with every quoted value masked (an error can quote
 #             a row)
 #   compare   table | rows in dump-restore | rows live now. Restored <= live is expected: the live database
 #             has grown since the dump (fewer live rows is marked, not a failure: rows can be deleted)
 #   cleanup   the scratch database is dropped and the file deleted on every exit, failures included
 #
-# Fails (exit 1) on: no dump found, a dump that isn't gzip or is incomplete, a restore error, zero tables
-# restored, a restored table missing from the live database, a users table with no rows, a scratch
-# database that could not be dropped. 2: usage. The last line is "restore-test-result: ok|failed".
+# Fails (exit 1) on: no dump found, a dump that isn't gzip, is incomplete or not self-contained, a restore
+# error, zero tables restored, a restored table missing from the live database, a users table with no rows,
+# a scratch database that could not be dropped. 2: usage. The last line is "restore-test-result: ok|failed".
 # Prints names and counts only, never a row or a secret; what other programs print goes through the same
 # redact as deploy.sh.
 #
@@ -134,6 +134,8 @@ usage() {
   exit 2
 }
 
+# deploy.sh's first line of a self-contained dump (kept identical; the host tests compare the two)
+DUMP_HEADER="-- ForexEdge pre-deploy dump: self-contained (prerequisites from the live catalog, then pg_dump -t)"
 KEY_RE='^predeploy/[0-9]{8}T[0-9]{6}Z-[0-9a-f]{40}\.sql\.gz$'
 WORK=""
 SCRATCH_DB=""
@@ -152,16 +154,6 @@ pg_query() {
   # shellcheck disable=SC2016  # expanded by the container's shell
   compose exec -T timescaledb sh -c 'psql -X -At -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "${1:-$POSTGRES_DB}" -c "$2"' sh "$1" "$2"
 }
-
-# What a dump of single tables (pg_dump -t) doesn't hold: the extensions and the enum types of public, as
-# they are in the live database. One statement per line
-PREREQ_SQL="SELECT format('CREATE EXTENSION IF NOT EXISTS %I WITH SCHEMA public;', extname) FROM pg_extension
-WHERE extname NOT IN ('plpgsql', 'timescaledb', 'timescaledb_toolkit')
-UNION ALL
-SELECT * FROM (SELECT format('CREATE TYPE public.%I AS ENUM (%s);', t.typname,
-                             string_agg(quote_literal(e.enumlabel), ', ' ORDER BY e.enumsortorder))
-               FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace JOIN pg_enum e ON e.enumtypid = t.oid
-               WHERE n.nspname = 'public' GROUP BY t.typname ORDER BY t.typname) types"
 
 # Exact row counts of the ordinary tables of public (name|count); a filter may follow
 COUNT_SQL="SELECT c.relname || '|' || (xpath('/row/n/text()',
@@ -243,12 +235,10 @@ gzip -dc "$WORK/dump.sql.gz" | tail -n 5 | grep -q 'PostgreSQL database dump com
   die "$key is incomplete (no completion line)"
 echo "downloaded $(stat -c %s "$WORK/dump.sql.gz") bytes gzip; gzip and completion line ok"
 
-if ! pg_query "" "$PREREQ_SQL" >"$WORK/prereq.sql" 2>"$WORK/err"; then
-  redact <"$WORK/err" >&2
-  die "could not read the extensions and enum types of the live database"
-fi
-echo "prerequisites from the live catalog: $(grep -c '^CREATE EXTENSION' "$WORK/prereq.sql" || true) extensions," \
-  "$(grep -c '^CREATE TYPE' "$WORK/prereq.sql" || true) enum types"
+first="$(gzip -dc "$WORK/dump.sql.gz" | head -n 1 || true)"
+[[ "$first" == "$DUMP_HEADER" ]] ||
+  die "$key: dump is not self-contained (made before commit \"feat(step-7): self-contained pre-deploy dumps\"): it lacks its extensions and enum types; see docs/DEPLOY.md section 10.4"
+echo "self-contained dump (deploy.sh's header)"
 
 SCRATCH_DB="restore_test_$(date -u +%Y%m%d_%H%M%S)"
 # shellcheck disable=SC2016  # expanded by the container's shell
@@ -259,7 +249,7 @@ fi
 echo "created the scratch database $SCRATCH_DB"
 
 # shellcheck disable=SC2016  # expanded by the container's shell
-if ! { cat "$WORK/prereq.sql"; gzip -dc "$WORK/dump.sql.gz"; } |
+if ! gzip -dc "$WORK/dump.sql.gz" |
   compose exec -T timescaledb sh -c 'psql -X -q -v ON_ERROR_STOP=1 -v VERBOSITY=terse -U "$POSTGRES_USER" -d "$1"' sh "$SCRATCH_DB" \
     >/dev/null 2>"$WORK/err"; then
   # The error lines only, every quoted value masked: an error can quote a row's data

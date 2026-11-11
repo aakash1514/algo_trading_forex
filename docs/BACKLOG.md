@@ -42,3 +42,7 @@ replay-service takes a `reauth`), and `/health/live` + `/health/ready` on every 
     another device (or an API login) replaces it, and the first browser's session ends at its next refresh
     or page load (found by `npm run prod:smoke`). Tabs of one browser are fine (they share the cookie, and
     step 7 serialises their refreshes). Several sessions per user need a token family per device.
+
+research-agent: report 1d/4h bars by trading date (NY 17:00 close), not the bar’s UTC open time (e.g. the 2020 gold high is the 2020-08-07 session, reported as 2020-08-06).
+
+Data licensing: Dukascopy display terms unclear — demo logins only, no public link, until clarified.

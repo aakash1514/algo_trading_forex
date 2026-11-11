@@ -400,11 +400,12 @@ month, in a Session Manager shell (`sudo -i`):
    # restore-test-result: ok
    ```
 
-   It restores the newest pre-deploy dump (or the key given after the bucket) into a scratch database
-   `restore_test_<UTC>`, compares each table's rows with the live database (restored <= live is expected; fewer
-   live rows is marked, not a failure) and always drops the scratch database and deletes its copy of the dump.
-   It fails on no dump, a broken or incomplete dump, a restore error, zero tables, a restored table missing
-   live, or no users. Dumps expire after 14 days: with no deploy in that time it fails with "no pre-deploy
+   It restores the newest pre-deploy dump (or the key given after the bucket) into an empty scratch database
+   `restore_test_<UTC>` (nothing copied from the live database: the dump must stand alone), compares each
+   table's rows with the live database (restored <= live is expected; fewer live rows is marked, not a
+   failure) and always drops the scratch database and deletes its copy of the dump. It fails on no dump, a
+   broken, incomplete or not self-contained dump (one made before deploy.sh wrote its prerequisites), a
+   restore error, zero tables, a restored table missing live, or no users. Dumps expire after 14 days: with no deploy in that time it fails with "no pre-deploy
    dump"; run it after the next deploy. Section 10.4.
 
 ### 7.7 Destroy (at exit)
@@ -790,8 +791,11 @@ bash infra/vm/run-on-host.sh infra/vm/deploy.sh --timeout 1800 -- "$TAG" "$BACKU
 2. **Refuse** unless `releases/<TAG>/release` (from `fetch.sh`) records commit `<TAG>`.
 3. **Backup.** `pg_dump` of the app tables (the ordinary tables of `public`, without `historical_*` and without
    hypertables; the continuous aggregates are views and aren't dumped), run inside the database container,
-   gzip, `s3://<backups>/predeploy/<UTC>-<TAG>.sql.gz` with the host's instance role. It prints the size and the
-   table names, never the content. The backups bucket keeps every object 14 days.
+   gzip, `s3://<backups>/predeploy/<UTC>-<TAG>.sql.gz` with the host's instance role. The dump is
+   self-contained: a header line, then what `pg_dump -t` leaves out but the tables need (the extensions of
+   their column types and defaults, e.g. `uuid-ossp`; their enum types and domains, read from the live
+   catalog; each type created only if missing), then pg_dump's output. It prints the size and the table names,
+   never the content. The backups bucket keeps every object 14 days.
 4. **Migrations.** `bootstrap.sh <TAG> --deploy` from the new release: pulls the new ops image and runs
    `bootstrap-prod.ts` once with `--no-deps` (migrations, instruments, the DB logins, the demo users) while the
    old release still serves. That is why migrations must be backward compatible (below).
@@ -858,11 +862,11 @@ dc() { docker compose -p forexedge -f "$(readlink -f /opt/forexedge/current)/inf
 
 1. **Look first, in a scratch database** (the live one is untouched): from the laptop,
    `bash infra/vm/run-on-host.sh infra/vm/restore-test.sh --timeout 900 -- "$BACKUPS" predeploy/$F` restores
-   that dump into a scratch database, prints its tables with restored and live row counts, and drops it again
-   (section 7.6). Don't restore by hand into an empty database: `pg_dump -t` leaves out the `uuid-ossp`
-   extension and the enum types the tables use, so that fails (`ERROR: type "public.instruments_type_enum" does
-   not exist`); `restore-test.sh` creates them from the live catalog first. The full undo below doesn't need
-   them: the live database has them.
+   that dump into an empty scratch database, prints its tables with restored and live row counts, and drops
+   it again (section 7.6). The dump carries its own extensions and enum types (section 10.2, step 3); one made
+   before that (no header line) is refused as not self-contained: it would fail in an empty database
+   (`ERROR: type "public.instruments_type_enum" does not exist`). The full undo below works with either kind:
+   the live database already has the types, and a self-contained dump creates only the missing ones.
 
 2. **Full undo** (everything written since the dump is lost): stop the apps, keep the database, replace the
    app tables in one transaction, then start the release:

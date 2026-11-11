@@ -8,8 +8,10 @@
 #             commit running) becomes releases/<that tag> and current. Copies only; no container is touched
 #   refuse    unless releases/<IMAGE_TAG>/release (fetch.sh) records commit <IMAGE_TAG>
 #   backup    the app tables (public, not historical_*, not hypertables; aggregates are views and not dumped):
-#             pg_dump in the database container, gzip, s3://<backups>/predeploy/<UTC>-<tag>.sql.gz with the
-#             instance role. Prints the size and the table names, never the content
+#             self-contained: a header line, the extensions, enum types and domains the tables use (from the
+#             live catalog; pg_dump -t leaves them out), then pg_dump in the database container; gzip,
+#             s3://<backups>/predeploy/<UTC>-<tag>.sql.gz with the instance role. Prints the size and the
+#             table names, never the content
 #   migrate   releases/<tag>/infra/vm/bootstrap.sh <tag> --deploy (migrations, logins, demo users) while the
 #             running release still serves: migrations must be backward compatible (CLAUDE.md)
 #   switch    current -> releases/<tag>, up -d with that release's compose file, ready within 3 min
@@ -304,8 +306,68 @@ AND NOT EXISTS (SELECT 1 FROM timescaledb_information.hypertables h
                 WHERE h.hypertable_schema = 'public' AND h.hypertable_name = c.relname)
 ORDER BY 1"
 
+# The first line of every pre-deploy dump that holds its prerequisites (restore-test.sh refuses a dump
+# without it)
+DUMP_HEADER="-- ForexEdge pre-deploy dump: self-contained (prerequisites from the live catalog, then pg_dump -t)"
+
+# What pg_dump -t leaves out but the dumped tables (__TABLES__) need, one statement per line: the
+# extensions their column types and defaults come from (uuid-ossp: uuid_generate_v4()), then their enum
+# types, then their domains, the deepest base first. Run with an empty search_path, so every name is
+# qualified. A type is created only if missing, so the same dump also restores over the live database (the
+# full undo of docs/DEPLOY.md section 10.4 drops the tables, not the types).
+PREREQ_SQL="$(cat <<'SQL'
+WITH RECURSIVE dumped AS (
+  SELECT c.oid FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'public' AND c.relname IN (__TABLES__)
+), types(oid, depth) AS (
+  SELECT CASE WHEN t.typcategory = 'A' THEN t.typelem ELSE t.oid END, 0
+  FROM pg_attribute a JOIN dumped d ON d.oid = a.attrelid JOIN pg_type t ON t.oid = a.atttypid
+  WHERE a.attnum > 0 AND NOT a.attisdropped
+  UNION ALL
+  SELECT CASE WHEN b.typcategory = 'A' THEN b.typelem ELSE b.oid END, types.depth + 1
+  FROM types JOIN pg_type t ON t.oid = types.oid JOIN pg_type b ON b.oid = t.typbasetype
+  WHERE t.typtype = 'd'
+), members AS (
+  SELECT classid, objid, refobjid AS ext FROM pg_depend WHERE deptype = 'e' AND refclassid = 'pg_extension'::regclass
+), exts AS (
+  SELECT m.ext FROM types JOIN members m ON m.classid = 'pg_type'::regclass AND m.objid = types.oid
+  UNION
+  SELECT m.ext FROM pg_attrdef ad JOIN dumped d ON d.oid = ad.adrelid
+  JOIN pg_depend p ON p.classid = 'pg_attrdef'::regclass AND p.objid = ad.oid AND p.refclassid = 'pg_proc'::regclass
+  JOIN members m ON m.classid = 'pg_proc'::regclass AND m.objid = p.refobjid
+), own_types AS (
+  SELECT t.oid, t.typname, t.typtype, n.nspname, max(types.depth) AS depth
+  FROM types JOIN pg_type t ON t.oid = types.oid JOIN pg_namespace n ON n.oid = t.typnamespace
+  WHERE t.typtype IN ('e', 'd') AND n.nspname NOT IN ('pg_catalog', 'information_schema')
+    AND NOT EXISTS (SELECT 1 FROM members m WHERE m.classid = 'pg_type'::regclass AND m.objid = t.oid)
+  GROUP BY t.oid, t.typname, t.typtype, n.nspname
+)
+SELECT stmt FROM (
+  SELECT 0 AS k, 0 AS depth, x.extname AS name,
+         format('CREATE EXTENSION IF NOT EXISTS %I WITH SCHEMA %I;', x.extname, n.nspname) AS stmt
+  FROM (SELECT DISTINCT ext FROM exts) e JOIN pg_extension x ON x.oid = e.ext JOIN pg_namespace n ON n.oid = x.extnamespace
+  UNION ALL
+  SELECT 1, o.depth, o.typname,
+         format('DO $prereq$ BEGIN CREATE TYPE %I.%I AS ENUM (%s); EXCEPTION WHEN duplicate_object THEN NULL; END $prereq$;',
+                o.nspname, o.typname,
+                (SELECT string_agg(quote_literal(e.enumlabel), ', ' ORDER BY e.enumsortorder) FROM pg_enum e WHERE e.enumtypid = o.oid))
+  FROM own_types o WHERE o.typtype = 'e'
+  UNION ALL
+  SELECT 2, o.depth, o.typname,
+         format('DO $prereq$ BEGIN CREATE DOMAIN %I.%I AS %s%s%s%s; EXCEPTION WHEN duplicate_object THEN NULL; END $prereq$;',
+                o.nspname, o.typname, format_type(t.typbasetype, t.typtypmod),
+                CASE WHEN t.typdefault IS NOT NULL THEN ' DEFAULT ' || t.typdefault ELSE '' END,
+                CASE WHEN t.typnotnull THEN ' NOT NULL' ELSE '' END,
+                coalesce((SELECT string_agg(format(' CONSTRAINT %I %s', c.conname, pg_get_constraintdef(c.oid)), '' ORDER BY c.conname)
+                          FROM pg_constraint c WHERE c.contypid = o.oid), ''))
+  FROM own_types o JOIN pg_type t ON t.oid = o.oid WHERE o.typtype = 'd'
+) s
+ORDER BY k, depth DESC, name
+SQL
+)"
+
 backup() {
-  local tag="$1" bucket="$2" region work tables=() dump_args=() name key size
+  local tag="$1" bucket="$2" region work tables=() dump_args=() name key size names
   region="$(env_value AWS_REGION "$ENV_FILE")"
   [[ "$region" =~ ^[a-z]{2}(-[a-z]+)+-[0-9]$ ]] || die "AWS_REGION is not a region: '$region'"
   work="$(mktemp -d)"
@@ -324,9 +386,28 @@ backup() {
   done <"$work/tables"
   # An empty list would dump nothing and look like a backup
   ((${#tables[@]} > 0)) || { rm -rf "$work"; die "backup: no app table found"; }
+  names="$(printf "'%s'," "${tables[@]}")"
   # shellcheck disable=SC2016  # expanded by the container's shell
-  if ! compose exec -T timescaledb sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --no-privileges "$@"' \
-    sh "${dump_args[@]}" 2>"$work/err" | gzip -9 >"$work/dump.sql.gz"; then
+  if ! compose exec -T timescaledb sh -c 'psql -X -q -At -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "$1"' \
+    sh "SET search_path = ''; ${PREREQ_SQL//__TABLES__/${names%,}}" >"$work/prereq.sql" 2>"$work/err"; then
+    redact <"$work/err" >&2
+    rm -rf "$work"
+    die "backup: could not read the prerequisites of the app tables"
+  fi
+  # Only the statements the query writes (a stray line, e.g. a command tag, would break the restore)
+  # shellcheck disable=SC2016  # a literal $prereq$ (SQL dollar quote)
+  if grep -qvE '^(CREATE EXTENSION IF NOT EXISTS |DO \$prereq\$ BEGIN CREATE (TYPE|DOMAIN) )' "$work/prereq.sql"; then
+    rm -rf "$work"
+    die "backup: unexpected line in the prerequisites"
+  fi
+  # One gzip file: the header, the prerequisites, then pg_dump's output
+  # shellcheck disable=SC2016  # expanded by the container's shell
+  if ! {
+    printf '%s\n' "$DUMP_HEADER"
+    tr -d '\r' <"$work/prereq.sql"
+    compose exec -T timescaledb sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --no-privileges "$@"' \
+      sh "${dump_args[@]}"
+  } 2>"$work/err" | gzip -9 >"$work/dump.sql.gz"; then
     redact <"$work/err" >&2
     rm -rf "$work"
     die "backup: pg_dump failed"
@@ -342,8 +423,10 @@ backup() {
     rm -rf "$work"
     die "backup: upload to s3://$bucket/$key failed"
   fi
-  rm -rf "$work"
   echo "backup: s3://$bucket/$key ($size bytes gzip, ${#tables[@]} tables: ${tables[*]})"
+  echo "backup: self-contained: $(grep -c '^CREATE EXTENSION' "$work/prereq.sql" || true) extensions," \
+    "$(grep -cE 'CREATE (TYPE|DOMAIN)' "$work/prereq.sql" || true) enum types and domains before the tables"
+  rm -rf "$work"
 }
 
 # Up with a release's compose file and tag; returns non-zero if up or the ready check fails
