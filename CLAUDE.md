@@ -469,7 +469,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Step 7 phase 3 prep is done** (2026-11-11) on branch `step-7-phase3` (not merged): the build-images workflow
   (pinned actions, matrix = compose, immutable tags), the host tooling (AWS CLI on the host, stage/fetch with sha256
   manifests, make-env/set-secret, stack, bootstrap; every printed secret redacted; tags tied to the staged commit),
-  the first-deploy runbook (`docs/DEPLOY.md` section 8). Not run against AWS yet.
+  pause/resume (`instance_state`, section 9), the first-deploy runbook (`docs/DEPLOY.md` section 8). Not run
+  against AWS yet.
 - **Host scripts** (`infra/vm`): anything that runs through SSM Run Command (`run-on-host.sh`) must never take or
   print a secret: SSM stores parameters and output. Secrets are typed in a Session Manager shell (`set-secret.sh`).
   Host-side AWS calls run on the host with the instance role, never in a container (the metadata guard).

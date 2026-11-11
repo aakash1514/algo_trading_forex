@@ -58,6 +58,17 @@ variable "cpu_credits" {
   }
 }
 
+variable "instance_state" {
+  description = "running, or stopped to pause the host between demos (docs/DEPLOY.md section 9): compute stops billing, the volume, Elastic IP and data stay."
+  type        = string
+  default     = "running"
+
+  validation {
+    condition     = contains(["running", "stopped"], var.instance_state)
+    error_message = "instance_state must be running or stopped."
+  }
+}
+
 variable "root_volume_gb" {
   description = "Size of the root gp3 volume in GiB (it also holds the database)."
   type        = number

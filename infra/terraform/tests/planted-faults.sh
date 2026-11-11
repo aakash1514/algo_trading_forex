@@ -195,6 +195,15 @@ fault "cpu_credits default unlimited" terraform/variables.tf \
 fault "cpu_credits hard-coded unlimited" terraform/ec2.tf \
   'cpu_credits = var.cpu_credits' 'cpu_credits = "unlimited"' \
   'run "cpu_credits_standard_by_default"... fail' test compute
+fault "instance_state: an invalid value accepted" terraform/variables.tf \
+  'contains(["running", "stopped"], var.instance_state)' 'length(var.instance_state) > 0' \
+  'run "rejects_unknown_instance_state"... fail' test variables
+fault "instance_state ignored (always running)" terraform/ec2.tf \
+  'state       = var.instance_state' 'state       = "running"' \
+  'run "instance_stopped_follows_variable"... fail' test compute
+fault "instance_state: forced stop" terraform/ec2.tf \
+  'force       = false' 'force       = true' \
+  'run "instance_running_by_default"... fail' test compute
 fault "termination protection hard-coded off" terraform/ec2.tf \
   'disable_api_termination     = var.enable_termination_protection' 'disable_api_termination     = false' \
   'run "termination_protection"... fail' test compute

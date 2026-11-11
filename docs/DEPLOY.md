@@ -187,7 +187,7 @@ your SSO login; there are no access keys anywhere.
 | File | Creates |
 |---|---|
 | `network.tf` | VPC 10.20.0.0/16, one public subnet (ap-south-1a), internet gateway, the default security group emptied, security group `forexedge-web` (TCP 80/443 and UDP 443 from 0.0.0.0/0 and ::/0; no SSH) |
-| `ec2.tf` | The t3.medium host: Ubuntu 24.04 from Canonical's SSM parameter (later AMIs and the public IP flag the Elastic IP turns on are ignored), IMDSv2 only, hop limit 2, encrypted 40 GB gp3 root, `cpu_credits` standard, termination protection, no key pair; Elastic IP; EBS encryption by default (account) |
+| `ec2.tf` | The t3.medium host: Ubuntu 24.04 from Canonical's SSM parameter (later AMIs and the public IP flag the Elastic IP turns on are ignored), IMDSv2 only, hop limit 2, encrypted 40 GB gp3 root, `cpu_credits` standard, termination protection, no key pair, `instance_state` running or stopped (section 9); Elastic IP; EBS encryption by default (account) |
 | `iam_vm.tf` | Role and instance profile `forexedge-ec2`: SSM core, CloudWatch agent, ECR pull on the ten repositories, S3 list/get/put (no delete) on the two buckets |
 | `ecr.tf` | `forexedge/<image>` for the ten compose images: immutable tags, scan on push, last 5 kept |
 | `s3.tf` | `forexedge-results-<account>` and `forexedge-backups-<account>` (versioned, every version gone after 14 days): public access blocked, ACLs off, SSE-S3, TLS only; S3 public access block (account) |
@@ -648,3 +648,43 @@ backtest with results from S3, replay with one order) and writes `docs/validatio
 host's `docker stats`, Redis `used_memory` and `free -m` (budget: the stack under 3.5 GB while a replay plays,
 as in section 5). Then standard credits again (unlimited bills surplus credits); expect
 `forexedge-cpu-credits-low` for a few hours after the switch (7.3).
+
+## 9. Pause and resume
+
+Between demos the host can be stopped: compute stops billing, and everything that matters stays (the root volume
+with the database and the history, the Elastic IP and so the DNS records, the instance id, the env files under
+`/opt/forexedge`). `instance_state` (`running` by default, or `stopped`; anything else fails validation)
+drives `aws_ec2_instance_state` in `ec2.tf`. A stop is a clean shutdown (`force = false`): Docker stops every
+container, so Postgres and Kafka close their files.
+
+```sh
+terraform -chdir=infra/terraform apply -var instance_state=stopped   # pause: 0 to add, 1 to change, 0 to destroy
+terraform -chdir=infra/terraform apply -var instance_state=running   # resume: the same, back
+```
+
+**While paused, every `terraform apply` needs `-var instance_state=stopped`** (or the value in
+`terraform.tfvars`): an apply without it starts the host again (the default is `running`).
+
+**Cost while stopped (about $8/month):** the Elastic IP (AWS bills every public IPv4 address by the hour, attached
+or not), the 40 GB gp3 root volume and its 7 daily snapshots, ECR storage (the last 5 tags of each of the ten
+images) and S3 (results, backups for 14 days). These are rough figures: check Cost Explorer after the first month.
+No instance hours, no CPU credit charges.
+
+**After a start:**
+
+1. The stack comes back by itself: Docker starts at boot, the metadata guard runs before it (7.4.1), and every
+   container has `restart: unless-stopped`. Caddy keeps its certificate (volume `caddy_data`).
+2. Check it like after a reboot (8.10), with the running tag (`IMAGE_TAG` in `.env.prod`; `stack.sh -- ps`
+   shows it in the images):
+
+   ```sh
+   bash infra/vm/run-on-host.sh infra/vm/stack.sh -- ready "$TAG"     # ready: all 9 apps ...
+   bash infra/vm/run-on-host.sh infra/vm/check-imds-guard.sh         # metadata guard: only ws-gateway ...
+   ```
+
+3. **Alarms to expect:** while stopped, the alarms have no data and sit in INSUFFICIENT_DATA without paging
+   (`treat_missing_data = "missing"`). After the start each one sends an OK email as its metric returns
+   (status check, CPU, memory, disk). `forexedge-cpu-credits-low` can fire: a t3 in standard mode keeps
+   the credits it earned for 7 days after a stop and gets no launch credits, so after a longer pause it starts
+   from 0 and earns 24 an hour (it clears itself, as in 7.3). If the start was for heavy work (a new import),
+   switch to unlimited credits first (7.5).
