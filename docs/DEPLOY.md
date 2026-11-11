@@ -902,6 +902,21 @@ disk, Docker) and `stack.sh -- up "<previous>"`.
 
 The repository is private: GitHub Pro includes 3,000 Linux minutes a month (Settings → Billing and plans →
 Usage shows what is used). Per merge into `main`: the ten build jobs (billed separately, each rounded up to a
-minute) plus the deploy job; per pull request push: the `ci` job. Not measured yet: after the first merge,
-read each job's time on the run's page (or `gh run view <id> --json jobs --jq '.jobs[] | [.name, .startedAt,
-.completedAt]'`) and write the figures here. A docs-only merge costs nothing.
+minute) plus the deploy job; per pull request push: the `ci` job. A docs-only merge costs nothing.
+
+Measured on the runs of 2026-11-11 (job times from `gh run view <id> --json jobs --jq '.jobs[] | [.name,
+.startedAt, .completedAt]'`; billed = each job rounded up to a minute, so the figures are estimates within a
+minute per job; Usage in the billing settings is authoritative):
+
+| Run | Jobs | Job time | Billed (est.) | Wall clock |
+|---|---|---|---|---|
+| `deploy`, merge of PR #14 (43007213642) | 10 builds + deploy | 26.9 min (deploy job 2.0) | 32 min | 5.8 min |
+| `deploy`, merge of PR #15 (43020186369) | 10 builds + deploy | 28.4 min (deploy job 2.2) | 32 min | 6.5 min |
+| `deploy` rollback drill, `simulate_failure` (43008463819), a commit already built | 10 builds + deploy | 13.8 min (deploy job 1.5) | 19 min | 4.0 min |
+| `ci`, pull request (43005672594, 43019690386) | ci | 2.4–2.9 min | 3 min | 2.5–2.9 min |
+| `build-images` by hand (42974576157) | 10 builds | 28.5 min | 34 min | 4.4 min |
+
+So a merge into `main` costs about 32 billed minutes and a pull request push about 3: the 3,000 included
+minutes cover roughly 85 merges a month, each with one pull request push. The ops image is the slowest
+build (3.6–4.2 min); research-agent the fastest (1–1.6 min). A rebuild of a commit whose images exist
+(the drill) costs about 60% as much.

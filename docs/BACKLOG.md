@@ -46,3 +46,5 @@ replay-service takes a `reauth`), and `/health/live` + `/health/ready` on every 
 research-agent: report 1d/4h bars by trading date (NY 17:00 close), not the bar’s UTC open time (e.g. the 2020 gold high is the 2020-08-07 session, reported as 2020-08-06).
 
 Data licensing: Dukascopy display terms unclear — demo logins only, no public link, until clarified.
+
+Nightly DB backups: cron pg_dump of the app tables → s3 backups/nightly/ (same self-contained format as deploy.sh), restore-test.sh option for nightly dumps, CloudWatch alarm if no backup in 26 h. Deferred 2026-11-11: today backups happen only on deploy and expire after 14 days.
