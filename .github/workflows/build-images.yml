@@ -1,0 +1,138 @@
+# Builds the ten images of infra/docker-compose.prod.yml for linux/amd64 and pushes them to ECR, tagged with
+# the commit (docs/DEPLOY.md section 8). Manual only, from main only: the deploy role trusts main's OIDC token
+# and nothing else.
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables; nothing here is a secret):
+#   AWS_DEPLOY_ROLE_ARN   terraform output deploy_role_arn
+#   AWS_REGION            ap-south-1
+#
+# ECR tags are immutable: a re-run of the same commit reports "already pushed" per image (the role can push
+# but not read ECR, so the digest of an earlier push isn't shown); any other push error fails the job.
+# The build cache is GitHub's (type=gha): the role can't pull from ECR, so ECR can't be the cache.
+# The matrix mirrors the compose file's build: blocks; infra/check-workflows.mjs (npm run infra:check) fails
+# when they differ. Every action is pinned to a full commit SHA.
+name: build-images
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: build-images
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { image: auth-service, dockerfile: infra/docker/node.Dockerfile, target: service, build-args: "APP=auth-service" }
+          - { image: market-service, dockerfile: infra/docker/node.Dockerfile, target: service, build-args: "APP=market-service" }
+          - { image: domain-service, dockerfile: infra/docker/node.Dockerfile, target: service, build-args: "APP=domain-service" }
+          - { image: order-service, dockerfile: infra/docker/node.Dockerfile, target: service, build-args: "APP=order-service" }
+          - { image: ws-gateway, dockerfile: infra/docker/node.Dockerfile, target: service, build-args: "APP=ws-gateway" }
+          - { image: replay-service, dockerfile: infra/docker/node.Dockerfile, target: service, build-args: "APP=replay-service" }
+          - { image: ml-service, dockerfile: infra/docker/python.Dockerfile, target: "", build-args: "APP=ml-service\nMODULE=ml_service" }
+          - { image: research-agent, dockerfile: infra/docker/python.Dockerfile, target: "", build-args: "APP=research-agent\nMODULE=research_agent" }
+          - { image: frontend, dockerfile: infra/docker/node.Dockerfile, target: frontend, build-args: "" }
+          - { image: ops, dockerfile: infra/docker/node.Dockerfile, target: ops, build-args: "" }
+    name: ${{ matrix.image }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: forexedge-build-${{ github.run_id }}
+
+      # Logs Docker in to the account's registry and out again in its post step
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+        with:
+          mask-password: "true"
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - id: name
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          IMAGE: ${{ matrix.image }}
+          TAG: ${{ github.sha }}
+        run: echo "ref=${REGISTRY}/forexedge/${IMAGE}:${TAG}" >>"$GITHUB_OUTPUT"
+
+      # Loaded into Docker (one plain linux/amd64 manifest, no attestation index), pushed by the next step
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          target: ${{ matrix.target }}
+          build-args: ${{ matrix.build-args }}
+          platforms: linux/amd64
+          tags: ${{ steps.name.outputs.ref }}
+          load: true
+          push: false
+          provenance: false
+          sbom: false
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,scope=${{ matrix.image }},mode=min
+
+      - name: Push (immutable tag)
+        env:
+          REF: ${{ steps.name.outputs.ref }}
+          IMAGE: ${{ matrix.image }}
+          TAG: ${{ github.sha }}
+        run: |
+          set -uo pipefail
+          log="$RUNNER_TEMP/push.log"
+          # ECR answers a push to an existing immutable tag with ImageTagAlreadyExistsException; Docker
+          # shows it as "tag invalid: The image tag '...' already exists ... cannot be overwritten"
+          already='ImageTagAlreadyExistsException|tag invalid: The image tag .* already exists'
+          if docker push "$REF" >"$log" 2>&1; then
+            cat "$log"
+            digest="$(sed -n 's/.*digest: \(sha256:[0-9a-f]\{64\}\).*/\1/p' "$log" | tail -n 1)"
+            if [[ -z "$digest" ]]; then
+              echo "::error::push of $IMAGE succeeded but printed no digest"
+              exit 1
+            fi
+            result="pushed"
+          elif grep -qE "$already" "$log"; then
+            cat "$log"
+            digest="n/a (the deploy role can't read ECR)"
+            result="already pushed"
+            echo "::notice::$IMAGE:$TAG already pushed (immutable tag)"
+          else
+            cat "$log"
+            echo "::error::push of $IMAGE failed"
+            exit 1
+          fi
+          {
+            echo "| Image | Tag | Digest | Result |"
+            echo "|---|---|---|---|"
+            echo "| forexedge/$IMAGE | \`$TAG\` | \`$digest\` | $result |"
+          } >>"$GITHUB_STEP_SUMMARY"
+
+      - name: Summary (failed)
+        if: failure()
+        env:
+          IMAGE: ${{ matrix.image }}
+          TAG: ${{ github.sha }}
+        run: |
+          {
+            echo "| Image | Tag | Digest | Result |"
+            echo "|---|---|---|---|"
+            echo "| forexedge/$IMAGE | \`$TAG\` | - | **failed** |"
+          } >>"$GITHUB_STEP_SUMMARY"
