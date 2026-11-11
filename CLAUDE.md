@@ -50,11 +50,15 @@ npm run prod:smoke                                           # the stack in a br
 # Claude never runs plan/apply or anything against AWS; the owner does, with SSO
 npm run infra:check                                  # fmt, source rules, validate, terraform test (mocked), tflint, shellcheck, run-on-host stubs
 bash infra/terraform/tests/planted-faults.sh         # every rule's planted fault must be caught (stage changes first)
-npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 3 planted faults)
+npm run infra:imds-test                              # metadata guard in Docker-in-Docker (+ 4 planted faults)
 # First deploy (docs/DEPLOY.md section 8; the owner runs these): images from .github/workflows/build-images.yml
 # (workflow_dispatch on main), then on the laptop stage.sh, and on the host (through run-on-host.sh) fetch.sh,
 # make-env.sh, set-secret.sh (Session Manager shell only), bootstrap.sh, stack.sh <pull|up|down|ps|ready|stats> <tag>
 bash infra/vm/run-on-host.sh infra/vm/stack.sh --timeout 1800 -- up <full sha>   # args after --, never secret
+# CI/CD (docs/DEPLOY.md section 10): ci.yml on every pull request (required check `ci`); deploy.yml on every push
+# to main (not docs-only): build-images.yml, stage.sh --bucket, fetch.sh, deploy.sh (backup, migrations, switch,
+# rollback). Rollback drill: Actions > deploy > Run workflow with simulate_failure. By hand, the same as deploy.yml:
+bash infra/vm/run-on-host.sh infra/vm/deploy.sh --timeout 1800 -- <full sha> <backups bucket> [--simulate-failure]
 
 # DB integration tests run in <DB_NAME>_test, created and migrated per run
 RUN_DB_TESTS=true npx nx test market-data-import --testFile=importer.db.spec.ts
@@ -209,6 +213,11 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - Never store derived columns. `account_summary` stores only balance and margin_used. Open (unrealized) P&L is the sum of the open positions, and equity, free margin and margin level are computed on read (`AccountService`).
 - `account_summary` writes are relative SQL updates only (`balance + :pnl`, `margin_used + :m`). Writing back a row read earlier loses concurrent updates (reproduced; covered by `account-consistency.db.spec.ts`, run with `RUN_DB_TESTS=true`). `AccountInvariantMonitor` logs any drift once a minute.
 - Tick/time-series tables use raw SQL migrations, never ORM sync on hypertables.
+- **Migrations must be backward compatible (expand, then contract over two releases).** `deploy.sh` runs them
+  while the old release still serves, and a rollback restores code and config, never the schema: the previous
+  release must work with the new schema (add a nullable column now, drop the old one in a later release once no
+  running release reads it). The pre-deploy dump (`s3://<backups>/predeploy/`, 14 days) is the undo for data
+  (docs/DEPLOY.md section 10.4).
 - `historical_candles` stores integer points: price = value × 10^price_decimals, volume = value × 10^6, with the
   scale fixed per pair in `historical_price_scale` (EUR/USD and GBP/USD 5, USD/JPY and XAU/USD 3). Convert with
   that table, never with `instruments.pip_size`. Float8 compressed 2.9×, integers 7.7× (decimal floats have noisy low bits).
@@ -466,15 +475,25 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   (VPC, host, IAM, ECR, S3, GitHub OIDC deploy role, alarms, DLM), `infra/vm/setup.sh`, the metadata guard, offline
   checks with planted faults. Applied by the owner since (instance, ECR, buckets, deploy role live). Runbook:
   `docs/DEPLOY.md` section 7.
-- **Step 7 phase 3 prep is done** (2026-11-11) on branch `step-7-phase3` (not merged): the build-images workflow
-  (pinned actions, matrix = compose, immutable tags), the host tooling (AWS CLI on the host, stage/fetch with sha256
-  manifests, make-env/set-secret, stack, bootstrap; every printed secret redacted; tags tied to the staged commit),
-  pause/resume (`instance_state`, section 9), the first-deploy runbook (`docs/DEPLOY.md` section 8). Not run
-  against AWS yet.
+- **Step 7 phase 3 is done** (2026-11-11), merged into main (PR #13): the build-images workflow (pinned actions,
+  matrix = compose, immutable tags), the host tooling (AWS CLI on the host, stage/fetch with sha256 manifests,
+  make-env/set-secret, stack, bootstrap; every printed secret redacted), pause/resume (`instance_state`, section 9),
+  the first-deploy runbook (`docs/DEPLOY.md` section 8). Deployed by the owner: https://forexedge.tech runs
+  cc6614f (`docs/validation/prod-deploy-run.md`).
+- **Step 7 phase 4 (CI/CD) is done** (2026-11-11) on branch `step-7-cicd` (not merged; the AWS side is the owner's:
+  terraform apply, two repository variables, branch protection): `ci.yml` (required check `ci`), `deploy.yml`
+  (build-images.yml reusable, stage.sh --bucket, fetch.sh into releases, deploy.sh with pre-deploy dump, rollback
+  and the drill), the deploy role's `s3:PutObject` on `transfer/*` only. Runbook: `docs/DEPLOY.md` section 10.
 - **Host scripts** (`infra/vm`): anything that runs through SSM Run Command (`run-on-host.sh`) must never take or
   print a secret: SSM stores parameters and output. Secrets are typed in a Session Manager shell (`set-secret.sh`).
   Host-side AWS calls run on the host with the instance role, never in a container (the metadata guard).
-  `stack.sh` and `bootstrap.sh` share a block that must stay identical (the host tests compare it).
+  `stack.sh`, `bootstrap.sh` and `deploy.sh` share a block, and `stack.sh` and `deploy.sh` a readiness block,
+  that must stay identical (the host tests compare them).
+- **Releases on the host:** `/opt/forexedge/releases/<sha>/` (compose file, Caddyfile, scripts; never changed once
+  fetched), `current` -> the running one, secrets (`infra/.env.prod`, `.env.demo-users`) and `data/` shared and
+  linked from each release. Compose always runs with a release's real path, never through `current` (a changed
+  Caddyfile must change the bind mount so compose recreates Caddy). Only `deploy.sh` changes `current` (and
+  `stack.sh up` on a fresh host without one); the newest 5 releases are kept, like ECR's 5 tags.
 
 ### Deferred from the health check
 - `npm audit`: 88 vulnerabilities (7 critical). Don't run `npm audit fix --force`; review upgrades deliberately.

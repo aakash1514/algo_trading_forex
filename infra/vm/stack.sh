@@ -4,18 +4,20 @@
 #   bash infra/vm/run-on-host.sh infra/vm/stack.sh -- <pull|up|down|ps|ready|stats> <IMAGE_TAG>
 #
 #   pull    ECR login with the instance role, pull every image of the tag (ops included)
-#   up      refuses while a secret is still a placeholder; ECR login, sets IMAGE_TAG in .env.prod, up -d,
-#           then ready
+#   up      refuses while a secret is still a placeholder, and a tag other than current's (the first up on
+#           a fresh host makes its tag current); ECR login, sets IMAGE_TAG in .env.prod, up -d, then ready
 #   down    stops and removes the containers (never the volumes: the database stays)
 #   ps      the containers and their state
 #   ready   GET /health/ready inside every app container (docs/DEPLOY.md section 3) until all answer 200;
 #           exits non-zero, naming the ones that don't, after 3 min
 #   stats   memory per container (docker stats), Redis used_memory, the host's memory and swap
 #
-# IMAGE_TAG is the commit staged on the host by stage.sh/fetch.sh (/opt/forexedge/staged-commit): any other
-# tag is refused, so the compose file and the images always come from the same commit.
-# Layout (fetch.sh, make-env.sh): /opt/forexedge/infra/{docker-compose.prod.yml,caddy/Caddyfile,.env.prod,
-# .env.demo-users}. Everything printed goes through redact (every secret value from the two env files
+# IMAGE_TAG must have a release on the host (stage.sh/fetch.sh: /opt/forexedge/releases/<tag>/release), and
+# compose runs with that release's compose file, so the config and the images always come from the same
+# commit. deploy.sh switches releases (with a backup and a rollback); `up` here starts the tag given and
+# doesn't move /opt/forexedge/current. Layout (fetch.sh, make-env.sh): releases/<tag>/infra/{docker-compose.
+# prod.yml,caddy/Caddyfile}, with links to the shared /opt/forexedge/infra/{.env.prod,.env.demo-users} and
+# /opt/forexedge/data. Everything printed goes through redact (every secret value from the two env files
 # becomes ***), because SSM keeps the output. The ECR token goes to a temporary DOCKER_CONFIG, deleted on exit.
 #
 # FOREXEDGE_ROOT, STACK_READY_SECONDS and STACK_READY_POLL_SECONDS override /opt/forexedge, 180 and 5 (tests).
@@ -29,18 +31,20 @@ READY_POLL_SECONDS="${STACK_READY_POLL_SECONDS:-5}"
 NODE_APPS=(auth-service:3000 market-service:3002 domain-service:3003 order-service:3004 ws-gateway:3005 replay-service:3008 frontend:3000)
 PYTHON_APPS=(ml-service:3006 research-agent:3007)
 
-# ── shared with bootstrap.sh (kept identical; the host tests compare the two blocks) ──────────────────
-COMPOSE_FILE="$ROOT/infra/docker-compose.prod.yml"
+# ── shared with bootstrap.sh and deploy.sh (kept identical; the host tests compare the three) ─────────
+# The secrets are shared by every release; each release has its own config (fetch.sh)
 ENV_FILE="$ROOT/infra/.env.prod"
 DEMO_ENV_FILE="$ROOT/infra/.env.demo-users"
-STAGED_FILE="$ROOT/staged-commit"
+RELEASES="$ROOT/releases"
 PLACEHOLDER="__SET_WITH_SET_SECRET__"
+COMPOSE_FILE=""
 DOCKER_CONFIG=""
 
 die() {
   printf '%s: %s\n' "$(basename "$0")" "$*" >&2
   exit 1
 }
+# shellcheck disable=SC2329  # invoked by the EXIT trap
 cleanup() { if [[ -n "$DOCKER_CONFIG" ]]; then rm -rf "$DOCKER_CONFIG"; fi; }
 trap cleanup EXIT
 
@@ -80,13 +84,16 @@ run() { "$@" 2>&1 | redact; }
 
 compose() { docker compose -p forexedge -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"; }
 
-# The tag must be a full commit SHA and the one fetch.sh staged
+# The tag must be a full commit SHA whose release fetch.sh installed (releases/<tag>/release records it).
+# COMPOSE_FILE becomes that release's compose file, always by its real path (never through current), so a
+# new release's bind mounts differ and compose recreates what changed.
 check_tag() {
-  local tag="$1" staged
+  local tag="$1" recorded
   [[ "$tag" =~ ^[0-9a-f]{40}$ ]] || die "IMAGE_TAG must be a full commit SHA (40 hex characters): '$tag'"
-  [[ -f "$STAGED_FILE" ]] || die "nothing staged: $STAGED_FILE is missing (run fetch.sh first)"
-  staged="$(sed -n 's/^commit \([0-9a-f]\{40\}\)$/\1/p' "$STAGED_FILE")"
-  [[ "$tag" == "$staged" ]] || die "IMAGE_TAG $tag is not the staged commit ${staged:-(none)}: stage and fetch that commit first"
+  [[ -f "$RELEASES/$tag/release" ]] || die "no release for $tag: $RELEASES/$tag/release is missing (stage and fetch that commit first)"
+  recorded="$(sed -n 's/^commit \([0-9a-f]\{40\}\)$/\1/p' "$RELEASES/$tag/release")"
+  [[ "$tag" == "$recorded" ]] || die "release $tag records commit ${recorded:-(none)}: fetch that commit again"
+  COMPOSE_FILE="$RELEASES/$tag/infra/docker-compose.prod.yml"
 }
 
 # The env files exist, belong to root and only root can read them
@@ -96,7 +103,7 @@ check_env_files() {
     [[ -f "$f" ]] || die "$f is missing (run make-env.sh first)"
     [[ "$(stat -c '%U %a' "$f")" == "root 600" ]] || die "$f must be owned by root with mode 600, is $(stat -c '%U %a' "$f")"
   done
-  [[ -f "$COMPOSE_FILE" ]] || die "$COMPOSE_FILE is missing (run fetch.sh first)"
+  [[ -n "$COMPOSE_FILE" && -f "$COMPOSE_FILE" ]] || die "compose file ${COMPOSE_FILE:-(none)} is missing (run fetch.sh first)"
 }
 
 # Refuses while any variable of the env files is still a placeholder (names only)
@@ -124,6 +131,7 @@ ecr_login() {
 }
 # ── end of the shared block ──────────────────────────────────────────────────────────────────────────
 
+# ── readiness, shared with deploy.sh (kept identical; the host tests compare the two) ───────────────────
 # One app's /health/ready from inside its container: prints "<app> <status> <body>", exits 0 on 200.
 # (timeout runs an executable, so docker compose is spelled out instead of the compose function)
 probe() {
@@ -177,6 +185,7 @@ set_image_tag() {
   mv "$tmp" "$ENV_FILE"
   echo "IMAGE_TAG in .env.prod: ${current:-(unset)} -> $tag"
 }
+# ── end of the readiness block ─────────────────────────────────────────────────────────────────────────
 
 stats() {
   local ids
@@ -191,6 +200,22 @@ stats() {
     tr -d '\r' | grep -E '^(used_memory_human|used_memory_peak_human|maxmemory_human):'
   echo
   free -m
+}
+
+# up starts the release current points to. On a fresh host (no current and no Phase 3 layout) the first up
+# makes its tag current; after that, changing releases is deploy.sh's job (backup, migrations, rollback).
+check_current() {
+  local tag="$1" target
+  if [[ ! -L "$ROOT/current" ]]; then
+    [[ ! -f "$ROOT/infra/docker-compose.prod.yml" ]] ||
+      die "the Phase 3 layout is still in place: deploy.sh adopts it (docs/DEPLOY.md section 10)"
+    ln -sfn "releases/$tag" "$ROOT/current.tmp"
+    mv -Tf "$ROOT/current.tmp" "$ROOT/current"
+    echo "current -> $tag (first start)"
+    return 0
+  fi
+  target="$(readlink "$ROOT/current")"
+  [[ "${target##*/}" == "$tag" ]] || die "current is ${target##*/}, not $tag: change releases with deploy.sh"
 }
 
 usage() {
@@ -216,6 +241,7 @@ case "$action" in
     ;;
   up)
     check_no_placeholders
+    check_current "$tag"
     ecr_login
     set_image_tag "$tag"
     run compose up -d --remove-orphans --quiet-pull

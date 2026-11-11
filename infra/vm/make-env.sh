@@ -3,7 +3,7 @@
 # /opt/forexedge/infra/.env.demo-users (root, 600). Root, on the host, through SSM (docs/DEPLOY.md section 8):
 #
 #   bash infra/vm/run-on-host.sh infra/vm/make-env.sh -- DOMAIN=forexedge.tech \
-#     IMAGE_REGISTRY=<account>.dkr.ecr.ap-south-1.amazonaws.com/forexedge IMAGE_TAG=<staged commit> \
+#     IMAGE_REGISTRY=<account>.dkr.ecr.ap-south-1.amazonaws.com/forexedge IMAGE_TAG=<fetched commit> \
 #     S3_BUCKET=forexedge-results-<account> AWS_REGION=ap-south-1 DEMO_USERS=demo
 #
 # Refuses if either file exists (it never overwrites: a second run would change every password the database
@@ -20,7 +20,7 @@ set -euo pipefail
 ROOT="${FOREXEDGE_ROOT:-/opt/forexedge}"
 ENV_FILE="$ROOT/infra/.env.prod"
 DEMO_ENV_FILE="$ROOT/infra/.env.demo-users"
-STAGED_FILE="$ROOT/staged-commit"
+RELEASES="$ROOT/releases"
 PLACEHOLDER="__SET_WITH_SET_SECRET__"
 
 die() {
@@ -65,9 +65,11 @@ done
 [[ -z "$(printf '%s\n' "${demo_users[@]}" | tr '[:upper:]' '[:lower:]' | sort | uniq -d)" ]] || die "DEMO_USERS lists a user twice"
 
 [[ "${EUID}" -eq 0 ]] || die "run as root"
-[[ -f "$STAGED_FILE" ]] || die "nothing staged: $STAGED_FILE is missing (run fetch.sh first)"
-staged="$(sed -n 's/^commit \([0-9a-f]\{40\}\)$/\1/p' "$STAGED_FILE")"
-[[ "${arg[IMAGE_TAG]}" == "$staged" ]] || die "IMAGE_TAG ${arg[IMAGE_TAG]} is not the staged commit ${staged:-(none)}"
+[[ "${arg[IMAGE_TAG]}" =~ ^[0-9a-f]{40}$ ]] || die "IMAGE_TAG must be a full commit SHA: '${arg[IMAGE_TAG]}'"
+release_file="$RELEASES/${arg[IMAGE_TAG]}/release"
+[[ -f "$release_file" ]] || die "IMAGE_TAG ${arg[IMAGE_TAG]} has no fetched release ($release_file is missing; run fetch.sh first)"
+recorded="$(sed -n 's/^commit \([0-9a-f]\{40\}\)$/\1/p' "$release_file")"
+[[ "${arg[IMAGE_TAG]}" == "$recorded" ]] || die "release ${arg[IMAGE_TAG]} records commit ${recorded:-(none)}"
 for f in "$ENV_FILE" "$DEMO_ENV_FILE"; do
   [[ ! -e "$f" ]] || die "$f exists: refusing to overwrite it (its passwords are in use; change single values with set-secret.sh)"
 done

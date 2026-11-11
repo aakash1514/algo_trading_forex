@@ -1,0 +1,119 @@
+# Builds and deploys every push to main (docs/DEPLOY.md section 10): the ten images (build-images.yml), then
+# on the host, through SSM with the deploy role: stage.sh (the commit's config to the backups bucket),
+# fetch.sh (into /opt/forexedge/releases/<sha>), deploy.sh (backup, migrations, switch, ready, or rollback).
+#
+# A push that changes only docs/** or Markdown files deploys nothing; Run workflow (workflow_dispatch, main
+# only) deploys main's HEAD whatever changed, and with simulate_failure runs the rollback drill: the new
+# release goes up, its ready check counts as failed, and the previous release comes back (the run ends red,
+# the summary says "rolled back").
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables; nothing here is a secret):
+#   AWS_DEPLOY_ROLE_ARN, AWS_REGION   as for build-images.yml
+#   AWS_INSTANCE_ID                   terraform output instance_id
+#   AWS_BACKUPS_BUCKET                terraform output backups_bucket
+#
+# The deploy role trusts main's OIDC token only (no GitHub Environments: they change the token's subject).
+# One deploy at a time, never cancelled (a cancelled deploy could stop between the switch and the ready
+# check). GitHub's email for a failed run is the alert. Every action is pinned to a full commit SHA.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Rollback drill: treat the new release as not ready and roll back'
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/build-images.yml
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      TAG: ${{ github.sha }}
+      INSTANCE_ID: ${{ vars.AWS_INSTANCE_ID }}
+      BUCKET: ${{ vars.AWS_BACKUPS_BUCKET }}
+      REGION: ${{ vars.AWS_REGION }}
+      SIMULATE: ${{ github.event_name == 'workflow_dispatch' && inputs.simulate_failure }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: forexedge-deploy-${{ github.run_id }}
+
+      # The compose file, the Caddyfile and the host scripts of this commit; no history, nothing secret
+      - name: Stage
+        id: stage
+        run: |
+          set -euo pipefail
+          bash infra/vm/stage.sh "$TAG" --bucket "$BUCKET" | tee "$RUNNER_TEMP/stage.log"
+          prefix="$(sed -n 's/^prefix: *//p' "$RUNNER_TEMP/stage.log")"
+          [[ "$prefix" =~ ^transfer/[0-9]{8}T[0-9]{6}Z/$ ]] || { echo "::error::stage.sh printed no prefix"; exit 1; }
+          echo "prefix=$prefix" >>"$GITHUB_OUTPUT"
+
+      - name: Fetch on the host
+        env:
+          PREFIX: ${{ steps.stage.outputs.prefix }}
+        run: |
+          set -uo pipefail
+          bash infra/vm/run-on-host.sh infra/vm/fetch.sh "$INSTANCE_ID" --timeout 900 -- "$BUCKET" "$PREFIX" "$REGION" 2>&1 |
+            tee "$RUNNER_TEMP/fetch.log"
+
+      - name: Deploy on the host
+        run: |
+          set -uo pipefail
+          args=("$TAG" "$BUCKET")
+          if [[ "$SIMULATE" == true ]]; then args+=(--simulate-failure); fi
+          bash infra/vm/run-on-host.sh infra/vm/deploy.sh "$INSTANCE_ID" --timeout 1800 -- "${args[@]}" 2>&1 |
+            tee "$RUNNER_TEMP/deploy.log"
+
+      - name: Summary
+        if: always()
+        run: |
+          logs=("$RUNNER_TEMP"/fetch.log "$RUNNER_TEMP"/deploy.log)
+          field() { sed -n "s/^deploy-$1: *//p" "$RUNNER_TEMP/deploy.log" 2>/dev/null | tail -n 1; }
+          result="$(field result)"
+          previous="$(field previous)"
+          if grep -qs 'host paused' "${logs[@]}"; then
+            result="host paused (instance_state=stopped): nothing deployed"
+          elif [[ -z "$result" ]]; then
+            result="failed before the switch: nothing changed (see the log)"
+          fi
+          case "$result" in
+            rollback-failed) result="**ROLLBACK FAILED**: the stack needs a person (docs/DEPLOY.md section 10)" ;;
+            rolled-back) result="rolled back to the previous release" ;;
+          esac
+          {
+            echo "| Tag | Previous tag | Result |"
+            echo "|---|---|---|"
+            echo "| \`$TAG\` | \`${previous:-?}\` | $result |"
+            if [[ "$SIMULATE" == true ]]; then echo; echo "Rollback drill (simulate_failure)."; fi
+          } >>"$GITHUB_STEP_SUMMARY"

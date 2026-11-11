@@ -2,11 +2,13 @@
 # Uploads what the host needs from the repository to the backups bucket, for fetch.sh (docs/DEPLOY.md
 # section 8). On the laptop, from the repo root, with your AWS login (e.g. SSO):
 #
-#   bash infra/vm/stage.sh <IMAGE_TAG> [--history]
+#   bash infra/vm/stage.sh <IMAGE_TAG> [--history] [--bucket <backups bucket>]
 #
 # IMAGE_TAG must be the full SHA of HEAD and the working tree clean (git status shows nothing), so the files
 # staged are exactly the commit whose images build-images pushed. Uploads to
-# s3://<backups bucket>/transfer/<UTC yyyymmddThhmmssZ>/ (bucket from `terraform output backups_bucket`):
+# s3://<backups bucket>/transfer/<UTC yyyymmddThhmmssZ>/ (bucket from --bucket, as deploy.yml passes it from
+# a repository variable, else from `terraform output backups_bucket`). The deploy role may only put objects
+# under transfer/ (infra/terraform/github_oidc.tf):
 #
 #   infra/docker-compose.prod.yml, infra/caddy/Caddyfile, the host scripts of infra/vm (HOST_SCRIPTS below)
 #   with --history: every file of data/history-transfer/ (npm run data:transfer -- export; manifest.json
@@ -25,17 +27,22 @@ die() {
   exit 1
 }
 usage() {
-  echo "usage: $0 <IMAGE_TAG> [--history]" >&2
+  echo "usage: $0 <IMAGE_TAG> [--history] [--bucket <backups bucket>]" >&2
   exit 2
 }
 
-[[ $# -ge 1 && $# -le 2 ]] || usage
+[[ $# -ge 1 ]] || usage
 tag="$1"
+shift
 history=false
-if [[ $# -eq 2 ]]; then
-  [[ "$2" == "--history" ]] || usage
-  history=true
-fi
+bucket=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --history) [[ "$history" == false ]] || usage; history=true; shift ;;
+    --bucket) [[ $# -ge 2 && -z "$bucket" ]] || usage; bucket="$2"; shift 2 ;;
+    *) usage ;;
+  esac
+done
 [[ -f infra/docker-compose.prod.yml ]] || die "run from the repo root"
 [[ "$tag" =~ ^[0-9a-f]{40}$ ]] || die "IMAGE_TAG must be a full commit SHA (40 hex characters): '$tag'"
 head="$(git rev-parse HEAD)"
@@ -52,7 +59,7 @@ for f in "${files[@]}"; do
   [[ "$(basename "$f")" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]*$ ]] || die "file name fetch.sh would refuse: $f"
 done
 
-bucket="$(terraform -chdir=infra/terraform output -raw backups_bucket | tr -d '\r')"
+if [[ -z "$bucket" ]]; then bucket="$(terraform -chdir=infra/terraform output -raw backups_bucket | tr -d '\r')"; fi
 [[ "$bucket" =~ ^forexedge-backups-[0-9]{12}$ ]] || die "not the backups bucket: '$bucket'"
 prefix="transfer/$(date -u +%Y%m%dT%H%M%SZ)/"
 

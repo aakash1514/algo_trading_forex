@@ -319,7 +319,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on: [frontend, auth-service, market-service, domain-service, order-service, ws-gateway, replay-service, ml-service, research-agent]
-    mem_limit: 64m
+    mem_limit: 128m
     healthcheck:
       test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:2019/config/']
       interval: 30s

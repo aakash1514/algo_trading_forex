@@ -1,4 +1,4 @@
-# GitHub Actions deploys (Phase 4; unused until then) through OIDC: no access keys anywhere. The role
+# GitHub Actions builds and deploys (deploy.yml, build-images.yml) through OIDC: no access keys anywhere. The role
 # trusts exactly one subject, this repository's main branch. A workflow that uses a GitHub Environment
 # sends repo:<repo>:environment:<name> instead and is refused until this trust is changed on purpose.
 locals {
@@ -68,6 +68,14 @@ resource "aws_iam_role_policy" "github_deploy" {
           "ecr:PutImage",
         ]
         Resource = local.ecr_repository_arns
+      },
+      {
+        # deploy.yml runs stage.sh: the commit's compose file, Caddyfile and host scripts go to transfer/ for
+        # fetch.sh. Write only, that prefix only: no read, list or delete, and never the dumps in predeploy/
+        Sid      = "StageConfig"
+        Effect   = "Allow"
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::${local.backups_bucket}/transfer/*"
       },
       {
         # SendCommand authorizes both the target and the document: this instance, AWS-RunShellScript only

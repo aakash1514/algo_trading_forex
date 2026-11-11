@@ -7,7 +7,9 @@
 # root). The script is copied to /root/<name> on the host (mode 600), its sha256 is checked there against the
 # laptop's copy, and only then is it run with bash, with the <arg>s given after --. The command is polled every
 # 10 s, for at most --timeout seconds (default 900, at most 7200; the host stops it at the same limit), then
-# its status, stdout and stderr are printed. Exits non-zero unless the status is Success.
+# its status, stdout and stderr are printed. Exits non-zero unless the status is Success: 3 when the
+# instance can't take commands ("host paused (instance_state=stopped) or not registered in SSM"), 2 for bad
+# arguments, 1 otherwise. SSM keeps only the first 24,000 characters of the script's stdout.
 #
 # SSM stores the arguments with the command (and its output): never pass a secret. Each argument must match
 # [A-Za-z0-9._:/@,=+-]+, so it needs no quoting on the host and no escaping in the JSON.
@@ -101,9 +103,20 @@ printf '{"commands":["set -e","umask 077","echo %s | base64 -d > /root/%s","echo
 params_arg="$params"
 if command -v cygpath >/dev/null 2>&1; then params_arg="$(cygpath -m "$params")"; fi
 
-command_id="$(aws ssm send-command --instance-ids "$instance_id" --document-name AWS-RunShellScript \
+send_err="$(mktemp)"
+trap 'rm -f "$params" "$send_err"' EXIT
+if ! command_id="$(aws ssm send-command --instance-ids "$instance_id" --document-name AWS-RunShellScript \
   --comment "forexedge $name $sum" --parameters "file://$params_arg" \
-  --query Command.CommandId --output text | tr -d '\r')"
+  --query Command.CommandId --output text 2>"$send_err" | tr -d '\r')" || [[ -z "$command_id" ]]; then
+  # SSM answers InvalidInstanceId for an instance that is stopped or whose agent isn't registered
+  if grep -q InvalidInstanceId "$send_err"; then
+    echo "host paused (instance_state=stopped) or not registered in SSM: $instance_id can't run commands" >&2
+    echo "  resume it: terraform -chdir=infra/terraform apply -var instance_state=running (docs/DEPLOY.md section 9)" >&2
+    exit 3
+  fi
+  cat "$send_err" >&2
+  exit 1
+fi
 echo "command $command_id: $name${script_args[*]:+ ${script_args[*]}} (sha256 $sum) on $instance_id"
 
 invocation() {

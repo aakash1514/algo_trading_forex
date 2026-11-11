@@ -1,25 +1,34 @@
 #!/usr/bin/env bash
-# The host scripts of infra/vm (fetch, make-env, set-secret, stack, bootstrap) against stub `aws` and `docker`
-# commands, as root in Ubuntu 24.04 (the host's OS: mawk, coreutils, real file modes). No AWS call, no
-# container started. Part of npm run infra:check, which runs it in a container:
+# The host scripts of infra/vm (fetch, make-env, set-secret, stack, bootstrap, deploy) against stub `aws` and
+# `docker` commands, as root in Ubuntu 24.04 (the host's OS: mawk, coreutils, real file modes). No AWS call,
+# no container started. Part of npm run infra:check, which runs it in a container:
 #
 #   docker run --rm --mount type=bind,source=<repo>,target=/repo,readonly -w /repo <ubuntu:24.04 by digest> \
 #     bash infra/vm/tests/host-scripts.test.sh
 #
-#   fetch       installs a good bundle (root, 600/700, staged-commit); refuses a sha256 mismatch, a file the
-#               manifest doesn't list, a path outside the allowed set, a manifest without its commit; again
-#               on the same prefix changes nothing
-#   make-env    refuses a tag other than the staged one and bad arguments; writes every variable the compose
+#   fetch       installs a good bundle as releases/<commit> (root, 600/700, the record last, links to the
+#               shared secrets and data), the history shared (755/644, readable by uid 1000); refuses a sha256
+#               mismatch, a file the manifest doesn't list, a path outside the allowed set, a manifest without
+#               its commit, a changed release; again on the same prefix changes nothing
+#   make-env    refuses a tag without a fetched release and bad arguments; writes every variable the compose
 #               file requires, random distinct secrets, root 600, placeholders for GROQ_API_KEY and the demo
 #               users; prints no value; a second run refuses and leaves both files as they were
 #   set-secret  replaces only its own variable, single-quoted, root 600; refuses unknown names, a short or
 #               weak password, two different entries, a bad email, a quote; never prints the value
-#   stack       refuses a tag other than the staged one, placeholders, an env file readable by others; up
-#               logs in with the token on stdin, redacts a secret the stack prints, waits for /health/ready;
-#               a service that stays unready fails after the limit, named; the apps it probes = compose
+#   stack       refuses a tag without a release (or a release recording another commit), placeholders, an env
+#               file readable by others; up logs in with the token on stdin, redacts a secret the stack
+#               prints, waits for /health/ready; a service that stays unready fails after the limit, named;
+#               the apps it probes = compose
 #   bootstrap   the whole sequence on an empty database; again on a loaded one (no import); stops at the
-#               first failure with the step's last lines; prints no secret
-#   shared      the block shared by stack.sh and bootstrap.sh is identical in both
+#               first failure with the step's last lines; prints no secret; --deploy: the ops image only,
+#               --no-deps, no service touched
+#   deploy      backup -> bootstrap --deploy -> switch -> up by the release's path; the drill and real
+#               failures roll back with the previous release's compose file and tag (exit 3); a failed
+#               rollback exits 4; a missing or mismatched release, a failed backup or bootstrap changes
+#               nothing; adoption of the Phase 3 layout touches no container and is refused unless the
+#               running tag is the staged one; legacy copies go once unmounted; the newest 5 releases kept
+#   shared      the blocks shared by stack.sh, bootstrap.sh and deploy.sh are identical
+#   no secret   no secret value or ECR token appears in anything any script printed
 #   no secret   no secret value or ECR token appears in anything any script printed
 set -euo pipefail
 
@@ -53,6 +62,13 @@ case "${pos[0]} ${pos[1]}" in
   "ecr get-login-password") printf '%s\n' "$ECR_TOKEN" ;;
   "s3 cp")
     src="${pos[2]}" dst="${pos[3]}"
+    if [[ "$dst" == s3://* ]]; then
+      # An upload (deploy.sh's pre-deploy dump)
+      [[ ! -f "$STUB/fail-upload" ]] || { echo "upload failed: An error occurred (AccessDenied) when calling the PutObject operation" >&2; exit 1; }
+      mkdir -p "$(dirname "$STUB/s3/${dst#s3://}")"
+      cp "$src" "$STUB/s3/${dst#s3://}"
+      exit 0
+    fi
     [[ "$src" == s3://* && -f "$STUB/s3/${src#s3://}" ]] || { echo "fatal error: An error occurred (404) when calling the HeadObject operation: Key not found" >&2; exit 1; }
     cp "$STUB/s3/${src#s3://}" "$dst" ;;
   "s3 ls")
@@ -69,13 +85,22 @@ set -euo pipefail
 echo "docker $*" >>"$STUB/calls.log"
 case "$1" in
   login) cat >"$STUB/login-stdin"; echo "WARNING! Your credentials are stored unencrypted"; echo "Login Succeeded" ;;
-  ps) printf 'c1\nc2\n' ;;
+  ps)
+    # The images of the running containers (deploy.sh's adoption), else container ids
+    if [[ "$*" == *'{{.Image}}'* ]]; then cat "$STUB/running-images" 2>/dev/null || true; else printf 'c1\nc2\n'; fi ;;
+  inspect) cat "$STUB/mounts" 2>/dev/null || echo "/opt/forexedge/releases/x/infra/caddy/Caddyfile" ;;
+  image)
+    case "$2" in
+      ls) cat "$STUB/images" 2>/dev/null || true ;;
+      rm) echo "$3" >>"$STUB/images-removed" ;;
+    esac ;;
   stats) printf 'NAME MEM USAGE / LIMIT CPU %%\nforexedge-redis-1 11MiB / 160MiB 0.5%%\n' ;;
   compose)
     shift
     envf=""
+    cf=""
     while [[ $# -gt 0 ]]; do
-      case "$1" in -p | -f | --profile) shift 2 ;; --env-file) envf="$2"; shift 2 ;; *) break ;; esac
+      case "$1" in -p | --profile) shift 2 ;; -f) cf="$2"; shift 2 ;; --env-file) envf="$2"; shift 2 ;; *) break ;; esac
     done
     sub="$1"
     shift
@@ -83,6 +108,8 @@ case "$1" in
     case "$sub" in
       pull | down | ps) echo "$sub: ok" ;;
       up)
+        echo "up ${cf#"$FOREXEDGE_ROOT"/} ${IMAGE_TAG:-}" >>"$STUB/compose.log"
+        [[ ! -f "$STUB/fail-up-${IMAGE_TAG:-}" ]] || { echo "Error response from daemon: manifest unknown"; exit 1; }
         # As a real stack can: a container's command line with a password in it
         echo "redis-1  redis-server --requirepass $(secret REDIS_PASS)"
         echo "up: ok" ;;
@@ -90,14 +117,29 @@ case "$1" in
         [[ "$1" == -T ]] && shift
         app="$1"
         if [[ "$app" == redis ]]; then printf 'used_memory_human:2.12M\r\nmaxmemory_human:96.00M\r\n'; exit 0; fi
+        if [[ "$app" == timescaledb ]]; then
+          # deploy.sh's backup: timescaledb sh -c '<psql or pg_dump>' sh <args>
+          if [[ "$4" == *psql* ]]; then
+            [[ ! -f "$STUB/fail-psql" ]] || { echo "psql: error: connection refused" >&2; exit 2; }
+            cat "$STUB/tables" 2>/dev/null || printf 'account_summary\norders\nusers\n'
+          else
+            echo "${*:6}" >"$STUB/pgdump.args"
+            [[ ! -f "$STUB/fail-pgdump" ]] || { echo "pg_dump: error: query failed for password $(secret DB_PASS)" >&2; exit 1; }
+            printf -- '-- PostgreSQL database dump\nCOPY public.users (email) FROM stdin;\nrow-only-in-the-dump@example.invalid\n\\.\n-- PostgreSQL database dump complete\n'
+          fi
+          exit 0
+        fi
         code="$(cat "$STUB/ready/$app" 2>/dev/null || echo 200)"
+        [[ ! -f "$STUB/unready-${IMAGE_TAG:-}" ]] || code=503
         echo "$app $code {\"status\":\"ok\",\"checks\":[\"db\"]}"
         [[ "$code" == 200 ]] ;;
       run)
-        while [[ "$1" == --rm || "$1" == -T ]]; do shift; done
+        flags=""
+        while [[ "$1" == -* ]]; do flags+=" $1"; shift; done
         shift # ops
         cmd="$*"
         echo "$cmd" >>"$STUB/ops.log"
+        echo "run$flags $cmd" >>"$STUB/run.log"
         case "$cmd" in
           *bootstrap-prod.ts)
             echo "[bootstrap] migrations ..."
@@ -171,27 +213,61 @@ manifest_edit() { sed -i "$1" "$STUB/s3/$BUCKET/${PREFIX}manifest.sha256"; }
 make_bundle "$COMMIT"
 new_root fetch
 t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
-if [[ $rc -eq 0 ]] && has "fetched 8 files of commit $COMMIT" \
-  && [[ "$(stat -c '%U %a' "$ROOT/infra/docker-compose.prod.yml")" == "root 600" ]] \
-  && [[ "$(stat -c '%U %a' "$ROOT/infra/vm/stack.sh")" == "root 700" ]] \
-  && [[ "$(stat -c '%a' "$ROOT")" == 700 ]] \
-  && cmp -s "$REPO_DIR/infra/caddy/Caddyfile" "$ROOT/infra/caddy/Caddyfile" \
+REL="releases/$COMMIT"
+if [[ $rc -eq 0 ]] && has "fetched 8 files of commit $COMMIT" && has "into $ROOT/$REL" \
+  && [[ "$(stat -c '%U %a' "$ROOT/$REL/infra/docker-compose.prod.yml")" == "root 600" ]] \
+  && [[ "$(stat -c '%U %a' "$ROOT/$REL/infra/vm/stack.sh")" == "root 700" ]] \
+  && [[ "$(stat -c '%a' "$ROOT")" == 700 && "$(stat -c '%a' "$ROOT/releases")" == 700 && "$(stat -c '%a' "$ROOT/$REL")" == 700 ]] \
+  && cmp -s "$REPO_DIR/infra/caddy/Caddyfile" "$ROOT/$REL/infra/caddy/Caddyfile" \
   && [[ -f "$ROOT/data/history-transfer/historical_candles_EURUSD.csv.gz" ]] \
-  && [[ "$(sed -n 1p "$ROOT/staged-commit")" == "commit $COMMIT" ]] && [[ ! -e "$ROOT/.incoming/20261111T093000Z" ]]; then
-  pass "fetch: installs a good bundle (root, 600/700) and records the commit"
-else fail "fetch: good bundle (rc $rc)"; show; fi
+  && [[ "$(readlink "$ROOT/$REL/infra/.env.prod")" == ../../../infra/.env.prod ]] \
+  && [[ "$(readlink "$ROOT/$REL/infra/.env.demo-users")" == ../../../infra/.env.demo-users ]] \
+  && [[ "$(readlink "$ROOT/$REL/data")" == ../../data && -f "$ROOT/$REL/data/history-transfer/manifest.json" ]] \
+  && [[ "$(sed -n 1p "$ROOT/$REL/release")" == "commit $COMMIT" && "$(sed -n 2p "$ROOT/$REL/release")" == "prefix $PREFIX" ]] \
+  && grep -qE '^fetched [0-9]{8}T[0-9]{6}Z$' "$ROOT/$REL/release" && [[ "$(stat -c '%a' "$ROOT/$REL/release")" == 600 ]] \
+  && [[ ! -e "$ROOT/current" && ! -e "$ROOT/staged-commit" && ! -e "$ROOT/infra/docker-compose.prod.yml" ]] \
+  && [[ ! -e "$ROOT/.incoming/20261111T093000Z" ]]; then
+  pass "fetch: installs the config as releases/<commit> (root, 600/700, links to the shared secrets and data), the history shared"
+else fail "fetch: good bundle (rc $rc)"; show; find "$ROOT" >&2; fi
+# The ops container mounts data/history-transfer and reads it as `node` (uid 1000), never crossing the
+# root-only parents: read from inside the directory, as that uid
+ops_reads() { (cd "$ROOT/data/history-transfer" && setpriv --reuid=1000 --regid=1000 --clear-groups cat manifest.json) >/dev/null 2>&1; }
+history_modes() {
+  [[ "$(stat -c '%U %a' "$ROOT/data/history-transfer")" == "root 755" ]] &&
+    [[ -z "$(find "$ROOT/data/history-transfer" -type f ! -perm 0644)" ]] &&
+    [[ "$(stat -c '%a' "$ROOT/$REL/infra/caddy/Caddyfile")" == 600 && "$(stat -c '%a' "$ROOT/data")" == 700 ]]
+}
+if history_modes && ops_reads; then
+  pass "fetch: history dir 755, files 644, readable by the ops user (uid 1000); config stays 600"
+else fail "fetch: history modes"; ls -la "$ROOT/data/history-transfer" >&2; fi
+# A history fetched by the Phase 3 fetch.sh (700/600) is corrected by the next fetch
+chmod 700 "$ROOT/data/history-transfer"
+chmod 600 "$ROOT"/data/history-transfer/*
+t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
+if [[ $rc -eq 0 ]] && history_modes && ops_reads; then pass "fetch: corrects a history installed 700/600"
+else fail "fetch: legacy history modes (rc $rc)"; show; fi
 before="$(cd "$ROOT" && find . -type f -not -path './.incoming/*' | sort | xargs sha256sum)"
 t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
 if [[ $rc -eq 0 && "$(cd "$ROOT" && find . -type f -not -path './.incoming/*' | sort | xargs sha256sum)" == "$before" ]]; then
   pass "fetch: again on the same prefix changes nothing"
 else fail "fetch: idempotent (rc $rc)"; show; fi
 
-# Each refusal: on a fresh root nothing may be installed, and staged-commit must not exist
+# A release is never changed: the same commit with another config file is refused, the release untouched
+dir="$STUB/s3/$BUCKET/$PREFIX"
+printf '# changed\n' >>"$dir/infra/caddy/Caddyfile"
+(cd "$dir" && { echo "# commit $COMMIT"; find infra data -type f | sort | xargs sha256sum; } >manifest.sha256)
+t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
+if [[ $rc -ne 0 ]] && has "release $COMMIT exists with a different infra/caddy/Caddyfile" \
+  && cmp -s "$REPO_DIR/infra/caddy/Caddyfile" "$ROOT/$REL/infra/caddy/Caddyfile"; then
+  pass "fetch: refuses to change a fetched release"
+else fail "fetch: changed release (rc $rc)"; show; fi
+
+# Each refusal: on a fresh root nothing may be installed: no release, no history
 refused() {
   local what="$1" expected="$2"
   new_root refused
   t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
-  if [[ $rc -ne 0 ]] && has "$expected" && [[ ! -e "$ROOT/staged-commit" && ! -e "$ROOT/infra" ]]; then
+  if [[ $rc -ne 0 ]] && has "$expected" && [[ ! -e "$ROOT/releases" && ! -e "$ROOT/data" ]]; then
     pass "fetch: refuses $what, installs nothing"
   else fail "fetch: $what (rc $rc)"; show; fi
 }
@@ -232,8 +308,8 @@ t fetch.sh "$BUCKET" "$PREFIX" "$REGION"
 ENV_ARGS=(DOMAIN=forexedge.tech IMAGE_REGISTRY=123456789012.dkr.ecr.ap-south-1.amazonaws.com/forexedge
   S3_BUCKET=forexedge-results-123456789012 AWS_REGION=ap-south-1 "DEMO_USERS=demo,demo_two")
 t make-env.sh "${ENV_ARGS[@]}" "IMAGE_TAG=$OTHER"
-if [[ $rc -ne 0 ]] && has "is not the staged commit" && [[ ! -e "$ROOT/infra/.env.prod" ]]; then
-  pass "make-env: refuses a tag other than the staged commit"
+if [[ $rc -ne 0 ]] && has "has no fetched release" && [[ ! -e "$ROOT/infra/.env.prod" ]]; then
+  pass "make-env: refuses a tag without a fetched release"
 else fail "make-env: other tag (rc $rc)"; show; fi
 bad=0
 for a in DOMAIN=forexedge DEMO_USERS=de "DEMO_USERS=demo,DEMO" IMAGE_REGISTRY=evil.example.com/forexedge S3_BUCKET=other NOPE=1; do
@@ -336,24 +412,46 @@ else fail "set-secret: demo users"; show; fi
 # ── stack ────────────────────────────────────────────────────────────────────────────────────────────
 # shellcheck disable=SC2016  # literal ${...} in the pattern
 compose_apps="$(sed -n 's|^ *image: \${IMAGE_REGISTRY:-forexedge}/\([a-z-]*\):\${IMAGE_TAG:-local}$|\1|p' "$REPO_DIR/infra/docker-compose.prod.yml" | grep -vx ops | sort)"
-stack_apps="$(sed -n 's/^\(NODE_APPS\|PYTHON_APPS\)=(\(.*\))$/\2/p' "$VM/stack.sh" | tr ' ' '\n' | cut -d: -f1 | sort)"
+apps_of() { sed -n 's/^\(NODE_APPS\|PYTHON_APPS\)=(\(.*\))$/\2/p' "$1" | tr ' ' '\n' | sort; }
+stack_apps="$(apps_of "$VM/stack.sh" | cut -d: -f1)"
 if [[ -n "$compose_apps" && "$compose_apps" == "$stack_apps" ]]; then pass "stack: probes every app of the compose file ($(wc -l <<<"$stack_apps"))"
 else fail "stack: apps differ from compose"; diff <(echo "$compose_apps") <(echo "$stack_apps") >&2 || true; fi
+if [[ -n "$(apps_of "$VM/deploy.sh")" && "$(apps_of "$VM/deploy.sh")" == "$(apps_of "$VM/stack.sh")" ]]; then
+  pass "deploy: probes the same apps and ports as stack.sh"
+else fail "deploy: apps differ from stack.sh"; diff <(apps_of "$VM/stack.sh") <(apps_of "$VM/deploy.sh") >&2 || true; fi
 
+# The blocks each self-contained script copies (the first line names the other files, so it is left out)
 shared() { sed -n '/^# ── shared with /,/^# ── end of the shared block/p' "$1" | sed 1d; }
-if [[ -n "$(shared "$VM/stack.sh")" && "$(shared "$VM/stack.sh")" == "$(shared "$VM/bootstrap.sh")" ]]; then
-  pass "shared block identical in stack.sh and bootstrap.sh"
-else fail "shared block of stack.sh and bootstrap.sh differs"; diff <(shared "$VM/stack.sh") <(shared "$VM/bootstrap.sh") >&2 || true; fi
+readiness() { sed -n '/^# ── readiness, shared with /,/^# ── end of the readiness block/p' "$1" | sed 1d; }
+if [[ -n "$(shared "$VM/stack.sh")" && "$(shared "$VM/stack.sh")" == "$(shared "$VM/bootstrap.sh")" \
+  && "$(shared "$VM/stack.sh")" == "$(shared "$VM/deploy.sh")" ]]; then
+  pass "shared block identical in stack.sh, bootstrap.sh and deploy.sh"
+else
+  fail "shared block of stack.sh, bootstrap.sh and deploy.sh differs"
+  diff <(shared "$VM/stack.sh") <(shared "$VM/bootstrap.sh") >&2 || true
+  diff <(shared "$VM/stack.sh") <(shared "$VM/deploy.sh") >&2 || true
+fi
+if [[ -n "$(readiness "$VM/stack.sh")" && "$(readiness "$VM/stack.sh")" == "$(readiness "$VM/deploy.sh")" ]]; then
+  pass "readiness block identical in stack.sh and deploy.sh"
+else fail "readiness block of stack.sh and deploy.sh differs"; diff <(readiness "$VM/stack.sh") <(readiness "$VM/deploy.sh") >&2 || true; fi
 
 : >"$STUB/calls.log"
 t stack.sh up "$OTHER"
-if [[ $rc -ne 0 ]] && has "is not the staged commit" && ! grep -q '^docker' "$STUB/calls.log"; then
-  pass "stack: refuses a tag other than the staged commit, before any docker call"
+if [[ $rc -ne 0 ]] && has "no release for $OTHER" && ! grep -q '^docker' "$STUB/calls.log"; then
+  pass "stack: refuses a tag without a release, before any docker call"
 else fail "stack: other tag (rc $rc)"; show; fi
 t bootstrap.sh "$OTHER"
-if [[ $rc -ne 0 ]] && has "is not the staged commit" && ! grep -q '^docker' "$STUB/calls.log"; then
-  pass "bootstrap: refuses a tag other than the staged commit, before any docker call"
+if [[ $rc -ne 0 ]] && has "no release for $OTHER" && ! grep -q '^docker' "$STUB/calls.log"; then
+  pass "bootstrap: refuses a tag without a release, before any docker call"
 else fail "bootstrap: other tag (rc $rc)"; show; fi
+# A release directory whose record names another commit (copied by hand, say) is refused too
+mkdir -p "$ROOT/releases/$OTHER"
+printf 'commit %s\nprefix x\n' "$COMMIT" >"$ROOT/releases/$OTHER/release"
+t stack.sh ps "$OTHER"
+if [[ $rc -ne 0 ]] && has "release $OTHER records commit $COMMIT" && ! grep -q '^docker' "$STUB/calls.log"; then
+  pass "stack: refuses a release whose record names another commit"
+else fail "stack: release record (rc $rc)"; show; fi
+rm -rf "${ROOT:?}/releases/$OTHER"
 
 cp "$E" "$work/env.saved"
 sed -i "s|^GROQ_API_KEY=.*|GROQ_API_KEY=__SET_WITH_SET_SECRET__|" "$E"
@@ -376,6 +474,27 @@ if [[ $rc -eq 0 ]] && has "ready: all 9 apps answer /health/ready with 200" && h
   && ! grep -qF "$ECR_TOKEN" "$STUB/calls.log"; then
   pass "stack: up logs in (token on stdin only), redacts a secret the stack prints, waits until ready"
 else fail "stack: up (rc $rc)"; show; fi
+# The first up on a fresh host makes its release current; after that up accepts only current's tag, and a
+# Phase 3 layout without current is left to deploy.sh's adoption
+first_ok=false
+if has "current -> $COMMIT (first start)" && [[ "$(readlink "$ROOT/current")" == "releases/$COMMIT" ]]; then first_ok=true; fi
+mkdir -p "$ROOT/releases/$OTHER"
+cp -a "$ROOT/releases/$COMMIT/infra" "$ROOT/releases/$OTHER/"
+printf 'commit %s\nprefix x\nfetched 20261111T000000Z\n' "$OTHER" >"$ROOT/releases/$OTHER/release"
+: >"$STUB/calls.log"
+t stack.sh up "$OTHER"
+r1=$rc
+other_ok=false
+if has "current is $COMMIT, not $OTHER: change releases with deploy.sh" && ! grep -q '^docker' "$STUB/calls.log"; then other_ok=true; fi
+rm -rf "${ROOT:?}/releases/$OTHER"
+mv "$ROOT/current" "$work/current.saved"
+cp "$ROOT/releases/$COMMIT/infra/docker-compose.prod.yml" "$ROOT/infra/docker-compose.prod.yml"
+t stack.sh up "$COMMIT"
+rm -f "$ROOT/infra/docker-compose.prod.yml"
+mv "$work/current.saved" "$ROOT/current"
+if [[ "$first_ok" == true && $r1 -ne 0 && "$other_ok" == true && $rc -ne 0 ]] && has "the Phase 3 layout is still in place"; then
+  pass "stack: the first up makes its release current; then only current's tag; a Phase 3 layout is left to deploy.sh"
+else fail "stack: current release ($first_ok $r1 $other_ok $rc)"; show; fi
 
 echo 503 >"$STUB/ready/ml-service"
 t stack.sh ready "$COMMIT"
@@ -418,6 +537,227 @@ if [[ $rc -ne 0 ]] && has "bootstrap failed before the history check" && [[ "$(w
   pass "bootstrap: a failure before the history check stops everything"
 else fail "bootstrap: migrations failing (rc $rc)"; show; fi
 rm -f "$STUB/fail-migrations"
+
+# bootstrap --deploy (deploy.sh, before the switch): the ops image only, bootstrap-prod.ts once with
+# --no-deps, nothing started, recreated or stopped, no history step
+touch "$STUB/loaded"
+: >"$STUB/calls.log"
+rm -f "$STUB/run.log" "$STUB/compose.log"
+t bootstrap.sh "$COMMIT" --deploy
+if [[ $rc -eq 0 ]] && has "deploy: ok" && has "bootstrap --deploy: done" \
+  && [[ "$(cat "$STUB/run.log")" == "run --rm -T --no-deps npx ts-node --transpile-only tools/ops/bootstrap-prod.ts" ]] \
+  && grep -qE '^docker compose .* pull --quiet ops$' "$STUB/calls.log" && [[ ! -e "$STUB/compose.log" ]] \
+  && ! grep -qE '^docker compose .* (up|down|stop|restart|rm)( |$)' "$STUB/calls.log"; then
+  pass "bootstrap --deploy: pulls ops, runs bootstrap-prod.ts once with --no-deps, touches no service"
+else fail "bootstrap --deploy (rc $rc)"; show; cat "$STUB/run.log" >&2 || true; fi
+rm -f "$STUB/loaded"
+t bootstrap.sh "$COMMIT" --deploy
+r1=$rc
+touch "$STUB/loaded"
+t bootstrap.sh "$COMMIT" --history
+if [[ $r1 -ne 0 && $rc -eq 2 ]]; then pass "bootstrap --deploy: fails when bootstrap-prod.ts fails; an unknown flag is a usage error"
+else fail "bootstrap --deploy failure/usage ($r1 $rc)"; fi
+
+# ── deploy ───────────────────────────────────────────────────────────────────────────────────────────
+PREV="2222222222222222222222222222222222222222"
+REGISTRY="123456789012.dkr.ecr.ap-south-1.amazonaws.com/forexedge"
+ENV_ROOT="$ROOT" # every secret set, $COMMIT fetched
+# make_release ROOT TAG FETCHED: a release as fetch.sh leaves it, with $COMMIT's config
+make_release() {
+  local r="$1/releases/$2"
+  mkdir -p "$r"
+  cp -a "$ENV_ROOT/releases/$COMMIT/infra" "$r/"
+  ln -sfn ../../data "$r/data"
+  printf 'commit %s\nprefix transfer/20261101T000000Z/\nfetched %s\n' "$2" "$3" >"$r/release"
+}
+# deploy_root NAME: $PREV runs (current, IMAGE_TAG), $COMMIT is fetched; every injected failure cleared
+deploy_root() {
+  new_root "deploy-$1"
+  install -d -m 0700 "$ROOT" "$ROOT/infra" "$ROOT/releases"
+  install -m 0600 "$ENV_ROOT/infra/.env.prod" "$ENV_ROOT/infra/.env.demo-users" "$ROOT/infra/"
+  sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$PREV/" "$ROOT/infra/.env.prod"
+  cp -a "$ENV_ROOT/releases/$COMMIT" "$ROOT/releases/"
+  make_release "$ROOT" "$PREV" 20261101T000000Z
+  ln -s "releases/$PREV" "$ROOT/current"
+  rm -f "$STUB"/fail-* "$STUB"/unready-* "$STUB/compose.log" "$STUB/run.log" "$STUB/images" "$STUB/images-removed" \
+    "$STUB/mounts" "$STUB/running-images" "$STUB/tables" "$STUB/pgdump.args"
+  rm -rf "$STUB/s3/$BUCKET/predeploy"
+  touch "$STUB/loaded"
+}
+current_is() { [[ "$(readlink "$ROOT/current")" == "releases/$1" ]]; }
+env_tag() { sed -n 's/^IMAGE_TAG=//p' "$ROOT/infra/.env.prod"; }
+up_line() { echo "up releases/$1/infra/docker-compose.prod.yml $1"; }
+no_switch() { current_is "$PREV" && [[ ! -e "$STUB/compose.log" ]] && [[ "$(env_tag)" == "$PREV" ]]; }
+
+deploy_root ok
+t deploy.sh "$COMMIT" "$BUCKET"
+dump="$(find "$STUB/s3/$BUCKET/predeploy" -name "*-$COMMIT.sql.gz" 2>/dev/null)"
+n_dump="$(grep -n 'timescaledb sh -c pg_dump' "$STUB/calls.log" | cut -d: -f1 | head -1)"
+n_boot="$(grep -n ' run --rm -T --no-deps ops' "$STUB/calls.log" | cut -d: -f1 | head -1)"
+n_up="$(grep -n ' up -d ' "$STUB/calls.log" | cut -d: -f1 | head -1)"
+if [[ $rc -eq 0 ]] && has "deploy-result: deployed" && has "deploy-tag: $COMMIT" && has "deploy-previous: $PREV" \
+  && current_is "$COMMIT" && [[ "$(cat "$STUB/compose.log")" == "$(up_line "$COMMIT")" ]] \
+  && [[ "$(env_tag)" == "$COMMIT" && "$(stat -c '%U %a' "$ROOT/infra/.env.prod")" == "root 600" ]] \
+  && grep -q " $COMMIT deployed (previous $PREV)$" "$ROOT/deploys.log" \
+  && [[ -n "$dump" && "$(wc -l <<<"$dump")" -eq 1 ]] && gzip -dc "$dump" | grep -q 'PostgreSQL database dump complete' \
+  && has "backup: s3://$BUCKET/predeploy/" && has "bytes gzip, 3 tables: account_summary orders users" \
+  && ! has "row-only-in-the-dump" \
+  && [[ "$(cat "$STUB/pgdump.args")" == "-t public.account_summary -t public.orders -t public.users" ]] \
+  && [[ -n "$n_dump" && -n "$n_boot" && -n "$n_up" ]] && ((n_dump < n_boot && n_boot < n_up)); then
+  pass "deploy: backup, then bootstrap --deploy, then up of the new release by its path; IMAGE_TAG and deploys.log"
+else fail "deploy: success (rc $rc; order $n_dump $n_boot $n_up)"; show; fi
+
+deploy_root drill
+t deploy.sh "$COMMIT" "$BUCKET" --simulate-failure
+if [[ $rc -eq 3 ]] && has "simulated failure" && has "rolled back to $PREV" && has "deploy-result: rolled-back" \
+  && current_is "$PREV" && [[ "$(cat "$STUB/compose.log")" == "$(up_line "$COMMIT")"$'\n'"$(up_line "$PREV")" ]] \
+  && [[ "$(env_tag)" == "$PREV" ]] && grep -q " $COMMIT rolled back to $PREV$" "$ROOT/deploys.log"; then
+  pass "deploy --simulate-failure: real up, then the previous release up with ITS compose file and tag; exit 3"
+else fail "deploy: simulated failure (rc $rc)"; show; cat "$STUB/compose.log" >&2; fi
+
+deploy_root unready
+touch "$STUB/unready-$COMMIT"
+t deploy.sh "$COMMIT" "$BUCKET"
+r1=$rc
+ok1=false
+if has "not ready after 2 s" && current_is "$PREV"; then ok1=true; fi
+deploy_root upfails
+touch "$STUB/fail-up-$COMMIT"
+t deploy.sh "$COMMIT" "$BUCKET"
+if [[ $r1 -eq 3 && "$ok1" == true && $rc -eq 3 ]] && has "up of $COMMIT failed" && has "rolled back to $PREV" \
+  && current_is "$PREV" && [[ "$(tail -n 1 "$STUB/compose.log")" == "$(up_line "$PREV")" ]]; then
+  pass "deploy: a release that stays unready, or whose up fails, is rolled back (exit 3)"
+else fail "deploy: real failures ($r1 $rc)"; show; fi
+
+deploy_root rollbackfails
+touch "$STUB/unready-$COMMIT" "$STUB/unready-$PREV"
+t deploy.sh "$COMMIT" "$BUCKET"
+if [[ $rc -eq 4 ]] && has "ROLLBACK FAILED" && has "deploy-result: rollback-failed" && current_is "$PREV" \
+  && grep -q " $COMMIT ROLLBACK FAILED (previous $PREV)$" "$ROOT/deploys.log" \
+  && [[ "$(grep -c '^up ' "$STUB/compose.log")" -eq 2 ]]; then
+  pass "deploy: a rollback that fails too exits 4 with ROLLBACK FAILED and tries nothing more"
+else fail "deploy: rollback failure (rc $rc)"; show; fi
+
+deploy_root refused
+t deploy.sh "$OTHER" "$BUCKET"
+r1=$rc
+ok1=false
+if has "no release for $OTHER"; then ok1=true; fi
+mkdir -p "$ROOT/releases/$OTHER"
+printf 'commit %s\nprefix x\nfetched 20261111T000000Z\n' "$COMMIT" >"$ROOT/releases/$OTHER/release"
+t deploy.sh "$OTHER" "$BUCKET"
+if [[ $r1 -eq 1 && "$ok1" == true && $rc -eq 1 ]] && has "release $OTHER records commit $COMMIT" && no_switch \
+  && ! grep -q '^docker' "$STUB/calls.log"; then
+  pass "deploy: refuses a tag without a release, or whose release records another commit, before any docker call"
+else fail "deploy: refusals ($r1 $rc)"; show; fi
+
+bad=0
+for failure in fail-psql fail-pgdump fail-upload empty-tables; do
+  deploy_root "backup-$failure"
+  if [[ "$failure" == empty-tables ]]; then : >"$STUB/tables"; else touch "$STUB/$failure"; fi
+  t deploy.sh "$COMMIT" "$BUCKET"
+  case "$failure" in
+    fail-psql) expected="could not list the app tables" ;;
+    fail-pgdump) expected="pg_dump failed" ;;
+    fail-upload) expected="upload to s3://$BUCKET/predeploy/" ;;
+    empty-tables) expected="no app table found" ;;
+  esac
+  if [[ $rc -ne 1 ]] || ! has "$expected" || ! no_switch || [[ -e "$STUB/run.log" ]]; then
+    bad=1
+    echo "  $failure: rc $rc" >&2
+    show
+  fi
+done
+if [[ $bad -eq 0 ]] && grep -q 'query failed for password \*\*\*' "$work/all-output"; then
+  pass "deploy: a failed backup (tables, pg_dump, upload, no table) stops before bootstrap and the switch; stderr redacted"
+else fail "deploy: backup failures"; fi
+
+deploy_root bootstrapfails
+rm -f "$STUB/loaded"
+t deploy.sh "$COMMIT" "$BUCKET"
+if [[ $rc -eq 1 ]] && has "bootstrap --deploy failed: nothing switched, $PREV still runs" && no_switch; then
+  pass "deploy: a failed bootstrap --deploy stops before the switch"
+else fail "deploy: bootstrap failure (rc $rc)"; show; fi
+
+deploy_root args
+t deploy.sh "$COMMIT" forexedge-results-123456789012
+r1=$rc
+t deploy.sh "$COMMIT" "$BUCKET" --simulate
+if [[ $r1 -eq 1 && $rc -eq 2 ]] && no_switch && ! grep -q '^docker' "$STUB/calls.log"; then
+  pass "deploy: another bucket refused, an unknown flag is a usage error"
+else fail "deploy: arguments ($r1 $rc)"; fi
+
+# Adoption: the Phase 3 layout (config in /opt/forexedge/infra, staged-commit) with $PREV running
+legacy_root() {
+  deploy_root "$1"
+  rm -rf "${ROOT:?}/current" "${ROOT:?}/releases/$PREV"
+  mkdir -p "$ROOT/infra/caddy" "$ROOT/infra/vm"
+  cp "$ENV_ROOT/releases/$COMMIT/infra/docker-compose.prod.yml" "$ROOT/infra/"
+  cp "$ENV_ROOT/releases/$COMMIT/infra/caddy/Caddyfile" "$ROOT/infra/caddy/"
+  cp "$ENV_ROOT/releases/$COMMIT"/infra/vm/*.sh "$ROOT/infra/vm/"
+  printf 'commit %s\nprefix transfer/20261111T093000Z/\n' "$PREV" >"$ROOT/staged-commit"
+  printf '%s\n' "$REGISTRY/auth-service:$PREV" "$REGISTRY/frontend:$PREV" timescale/timescaledb:2.27.0-pg16 caddy:2.10.2-alpine \
+    >"$STUB/running-images"
+  echo "$ROOT/infra/caddy/Caddyfile" >"$STUB/mounts"
+}
+legacy_root adopt
+touch "$STUB/fail-pgdump"
+t deploy.sh "$COMMIT" "$BUCKET"
+if [[ $rc -eq 1 ]] && has "adopted the running deployment $PREV as releases/$PREV (no container touched)" && current_is "$PREV" \
+  && [[ "$(sed -n 1p "$ROOT/releases/$PREV/release")" == "commit $PREV" ]] \
+  && cmp -s "$ROOT/infra/docker-compose.prod.yml" "$ROOT/releases/$PREV/infra/docker-compose.prod.yml" \
+  && cmp -s "$ROOT/infra/caddy/Caddyfile" "$ROOT/releases/$PREV/infra/caddy/Caddyfile" \
+  && [[ "$(readlink "$ROOT/releases/$PREV/infra/.env.prod")" == ../../../infra/.env.prod ]] \
+  && grep -q " $PREV adopted$" "$ROOT/deploys.log" \
+  && ! grep -qE '^docker compose .* (up|down|stop|restart|rm|run)( |$)' "$STUB/calls.log"; then
+  pass "deploy: adopts the running Phase 3 deployment as a release (copies, no container touched)"
+else fail "deploy: adoption (rc $rc)"; show; fi
+rm -f "$STUB/fail-pgdump"
+t deploy.sh "$COMMIT" "$BUCKET"
+r1=$rc
+ok1=false
+if has "deploy-result: deployed" && has "legacy files kept: a container still mounts" && [[ -f "$ROOT/infra/caddy/Caddyfile" ]]; then ok1=true; fi
+echo "$ROOT/releases/$COMMIT/infra/caddy/Caddyfile" >"$STUB/mounts"
+t deploy.sh "$COMMIT" "$BUCKET"
+if [[ $r1 -eq 0 && "$ok1" == true && $rc -eq 0 ]] && has "deploy-previous: $COMMIT" && has "removed the Phase 3 copies" \
+  && [[ ! -e "$ROOT/infra/docker-compose.prod.yml" && ! -e "$ROOT/infra/caddy" && ! -e "$ROOT/infra/vm" && ! -e "$ROOT/staged-commit" ]] \
+  && [[ -f "$ROOT/infra/.env.prod" && -f "$ROOT/infra/.env.demo-users" && -d "$ROOT/releases/$PREV" ]]; then
+  pass "deploy: the legacy copies stay while mounted, then go; the same tag again rolls forward onto itself"
+else fail "deploy: legacy removal ($r1 $rc)"; show; fi
+
+legacy_root adopt-refused
+printf '%s\n' "$REGISTRY/auth-service:$PREV" "$REGISTRY/frontend:$OTHER" >"$STUB/running-images"
+t deploy.sh "$COMMIT" "$BUCKET"
+r1=$rc
+ok1=false
+if has "cannot adopt: running images are not all $PREV: $REGISTRY/frontend:$OTHER"; then ok1=true; fi
+legacy_root adopt-refused-tag
+sed -i "s/^IMAGE_TAG=.*/IMAGE_TAG=$OTHER/" "$ROOT/infra/.env.prod"
+t deploy.sh "$COMMIT" "$BUCKET"
+if [[ $r1 -eq 1 && "$ok1" == true && $rc -eq 1 ]] && has "is not IMAGE_TAG $OTHER" && [[ ! -e "$ROOT/current" && ! -e "$ROOT/releases/$PREV" ]] \
+  && ! grep -qE '^docker compose .* (up|down|stop|restart|rm|run)( |$)' "$STUB/calls.log"; then
+  pass "deploy: refuses to adopt when the running images or IMAGE_TAG are not the staged commit"
+else fail "deploy: adoption refusals ($r1 $rc)"; show; fi
+
+# Pruning: the newest 5 by fetch time, and always current and the previous release, however old
+deploy_root prune
+rm -rf "${ROOT:?}/releases/$PREV"
+make_release "$ROOT" "$PREV" 20250101T000000Z
+olds=()
+for i in 1 2 3 4 5 6; do
+  t_old="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa$i"
+  olds+=("$t_old")
+  make_release "$ROOT" "$t_old" "2026100${i}T000000Z"
+  printf '%s\n' "$REGISTRY/auth-service:$t_old" "$REGISTRY/ops:$t_old" >>"$STUB/images"
+done
+t deploy.sh "$COMMIT" "$BUCKET"
+kept="$(find "$ROOT/releases" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort)"
+expected="$(printf '%s\n' "$COMMIT" "${olds[5]}" "${olds[4]}" "${olds[3]}" "${olds[2]}" "$PREV" | sort)"
+removed="$(sort "$STUB/images-removed" 2>/dev/null || true)"
+expected_removed="$(printf '%s\n' "$REGISTRY/auth-service:${olds[0]}" "$REGISTRY/ops:${olds[0]}" "$REGISTRY/auth-service:${olds[1]}" "$REGISTRY/ops:${olds[1]}" | sort)"
+if [[ $rc -eq 0 && "$kept" == "$expected" && "$removed" == "$expected_removed" ]] && has "releases: 6 kept, 2 pruned"; then
+  pass "deploy: keeps the newest 5 releases plus the previous one, removes the others and their images"
+else fail "deploy: pruning (rc $rc)"; show; echo "kept: $kept" >&2; echo "removed: $removed" >&2; fi
 
 # ── nothing secret printed, by any script ────────────────────────────────────────────────────────────
 leaks=0

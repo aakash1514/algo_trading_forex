@@ -1,0 +1,100 @@
+# Checks every pull request to main (docs/DEPLOY.md section 10). Branch protection requires the job `ci`,
+# so its name is fixed (infra/check-workflows.mjs fails if it changes).
+#
+# No AWS, no secrets, no OIDC token, read-only repository token: the code of a pull request runs here, so
+# it gets nothing it could leak or misuse. pull_request (never pull_request_target, which would run with
+# the base repository's permissions).
+#
+#   1. nx affected -t lint typecheck test build against origin/main (the Node projects; the Nx cache in
+#      actions/cache)
+#   2. ml-service and research-agent, only when affected: venv from the Linux locks with hash checking
+#      (nx setup), then ruff, mypy --strict and pytest (the default suites never call the LLM or the DB)
+#   3. npm run infra:check: Terraform 1.16.7, terraform test against mocks, tflint, shellcheck, the host
+#      scripts in Ubuntu 24.04 with stub aws/docker, actionlint and check-workflows (Docker is on the runner)
+#
+# A new push to the same pull request cancels the run in progress. Every action is pinned to a full commit
+# SHA of a release at least 14 days old.
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ci:
+    name: ci
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      BASE: origin/main
+    steps:
+      # The whole history, so that origin/main and the merge base exist for nx affected
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      # .nvmrc = the images' Node (infra/docker/node.Dockerfile; check-workflows compares them)
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0 (2026-10-08)
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0 (2026-06-26)
+        with:
+          path: .nx/cache
+          key: nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: nx-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - name: Node projects (nx affected)
+        run: npx nx affected -t lint typecheck test build --base="$BASE" --head=HEAD --parallel=2 --exclude=ml-service,research-agent
+
+      - name: Python projects affected?
+        id: python
+        run: |
+          set -euo pipefail
+          projects="$(npx nx show projects --affected --base="$BASE" --head=HEAD --json |
+            node -e 'const p = JSON.parse(require("fs").readFileSync(0, "utf8")); console.log(p.filter((n) => n === "ml-service" || n === "research-agent").join(","))')"
+          echo "projects=$projects" >>"$GITHUB_OUTPUT"
+          echo "affected Python projects: ${projects:-none}"
+
+      # The images' Python (infra/docker/python.Dockerfile)
+      - if: steps.python.outputs.projects != ''
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0 (2026-10-22)
+        with:
+          python-version: '3.12.10'
+
+      - if: steps.python.outputs.projects != ''
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0 (2026-06-26)
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('apps/*/requirements.linux.lock', 'apps/*/requirements-dev.lock') }}
+
+      - name: Python projects (venv from the Linux locks, ruff, mypy, pytest)
+        if: steps.python.outputs.projects != ''
+        env:
+          PROJECTS: ${{ steps.python.outputs.projects }}
+        run: |
+          npx nx run-many -t setup -p "$PROJECTS" --parallel=1
+          npx nx run-many -t lint typecheck test -p "$PROJECTS" --parallel=1
+
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1 (2026-05-12)
+        with:
+          terraform_version: 1.16.7
+          terraform_wrapper: false
+
+      - name: Infrastructure checks (npm run infra:check)
+        run: npm run infra:check

@@ -11,32 +11,40 @@
 #   4. validate         data:validate (FRED fixings, gold extremes)
 #   5. bootstrap        every step: the ML, research and replay logins, the demo users
 #
+#   bash infra/vm/run-on-host.sh infra/vm/bootstrap.sh -- <IMAGE_TAG> --deploy     (deploy.sh runs it)
+#
+#   --deploy            on a loaded database, while the running release serves: pulls the tag's ops image,
+#                       runs bootstrap-prod.ts once (migrations, logins, demo users) with --no-deps; never
+#                       starts, recreates or stops a service, and skips the history steps 2-4
+#
 # Stops at the first failure. Idempotent: on a database that is already complete every step passes and
-# changes nothing. Refuses a tag other than the staged commit and any secret still a placeholder (the demo
-# users need theirs). Each step's full output goes to /opt/forexedge/logs/bootstrap-<time>-<step>.log (root
+# changes nothing. Refuses a tag without a fetched release (releases/<tag>) and any secret still a
+# placeholder (the demo users need theirs). Each step's full output goes to /opt/forexedge/logs/bootstrap-<time>-<step>.log (root
 # only), redacted like everything printed; the output shows one line per step (the [bootstrap] lines for
 # steps 1 and 5, the last 3 lines for the others) and the last 20 lines of a step that fails.
 #
-# Self-contained (run-on-host.sh sends one file): the block shared with stack.sh is a copy, and the host
-# tests fail if the two differ. FOREXEDGE_ROOT overrides /opt/forexedge (tests).
+# Self-contained (run-on-host.sh sends one file): the block shared with stack.sh and deploy.sh is a copy,
+# and the host tests fail if the three differ. FOREXEDGE_ROOT overrides /opt/forexedge (tests).
 set -euo pipefail
 
 ROOT="${FOREXEDGE_ROOT:-/opt/forexedge}"
 HISTORY_DIR="$ROOT/data/history-transfer"
 LOG_DIR="$ROOT/logs"
 
-# ── shared with stack.sh (kept identical; the host tests compare the two blocks) ──────────────────
-COMPOSE_FILE="$ROOT/infra/docker-compose.prod.yml"
+# ── shared with stack.sh and deploy.sh (kept identical; the host tests compare the three) ───────────
+# The secrets are shared by every release; each release has its own config (fetch.sh)
 ENV_FILE="$ROOT/infra/.env.prod"
 DEMO_ENV_FILE="$ROOT/infra/.env.demo-users"
-STAGED_FILE="$ROOT/staged-commit"
+RELEASES="$ROOT/releases"
 PLACEHOLDER="__SET_WITH_SET_SECRET__"
+COMPOSE_FILE=""
 DOCKER_CONFIG=""
 
 die() {
   printf '%s: %s\n' "$(basename "$0")" "$*" >&2
   exit 1
 }
+# shellcheck disable=SC2329  # invoked by the EXIT trap
 cleanup() { if [[ -n "$DOCKER_CONFIG" ]]; then rm -rf "$DOCKER_CONFIG"; fi; }
 trap cleanup EXIT
 
@@ -76,13 +84,16 @@ run() { "$@" 2>&1 | redact; }
 
 compose() { docker compose -p forexedge -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"; }
 
-# The tag must be a full commit SHA and the one fetch.sh staged
+# The tag must be a full commit SHA whose release fetch.sh installed (releases/<tag>/release records it).
+# COMPOSE_FILE becomes that release's compose file, always by its real path (never through current), so a
+# new release's bind mounts differ and compose recreates what changed.
 check_tag() {
-  local tag="$1" staged
+  local tag="$1" recorded
   [[ "$tag" =~ ^[0-9a-f]{40}$ ]] || die "IMAGE_TAG must be a full commit SHA (40 hex characters): '$tag'"
-  [[ -f "$STAGED_FILE" ]] || die "nothing staged: $STAGED_FILE is missing (run fetch.sh first)"
-  staged="$(sed -n 's/^commit \([0-9a-f]\{40\}\)$/\1/p' "$STAGED_FILE")"
-  [[ "$tag" == "$staged" ]] || die "IMAGE_TAG $tag is not the staged commit ${staged:-(none)}: stage and fetch that commit first"
+  [[ -f "$RELEASES/$tag/release" ]] || die "no release for $tag: $RELEASES/$tag/release is missing (stage and fetch that commit first)"
+  recorded="$(sed -n 's/^commit \([0-9a-f]\{40\}\)$/\1/p' "$RELEASES/$tag/release")"
+  [[ "$tag" == "$recorded" ]] || die "release $tag records commit ${recorded:-(none)}: fetch that commit again"
+  COMPOSE_FILE="$RELEASES/$tag/infra/docker-compose.prod.yml"
 }
 
 # The env files exist, belong to root and only root can read them
@@ -92,7 +103,7 @@ check_env_files() {
     [[ -f "$f" ]] || die "$f is missing (run make-env.sh first)"
     [[ "$(stat -c '%U %a' "$f")" == "root 600" ]] || die "$f must be owned by root with mode 600, is $(stat -c '%U %a' "$f")"
   done
-  [[ -f "$COMPOSE_FILE" ]] || die "$COMPOSE_FILE is missing (run fetch.sh first)"
+  [[ -n "$COMPOSE_FILE" && -f "$COMPOSE_FILE" ]] || die "compose file ${COMPOSE_FILE:-(none)} is missing (run fetch.sh first)"
 }
 
 # Refuses while any variable of the env files is still a placeholder (names only)
@@ -129,7 +140,7 @@ step() {
   log="$LOG_DIR/bootstrap-${LOG_STAMP}-${name}.log"
   started=$SECONDS
   status=0
-  compose --profile ops run --rm -T ops "$@" 2>&1 | redact >"$log" || status=$?
+  compose --profile ops run --rm -T "${RUN_FLAGS[@]}" ops "$@" 2>&1 | redact >"$log" || status=$?
   if [[ "$summary" == bootstrap ]]; then
     grep '^\[bootstrap\]' "$log" | sed "s/^/  /" || true
   else
@@ -149,19 +160,40 @@ fail_with_log() {
   die "$2"
 }
 
-[[ $# -eq 1 ]] || {
-  echo "usage: $0 <IMAGE_TAG>" >&2
+usage() {
+  echo "usage: $0 <IMAGE_TAG> [--deploy]" >&2
   exit 2
 }
+[[ $# -ge 1 && $# -le 2 ]] || usage
+deploy=false
+if [[ $# -eq 2 ]]; then
+  [[ "$2" == "--deploy" ]] || usage
+  deploy=true
+fi
 [[ "${EUID}" -eq 0 ]] || die "run as root"
 check_tag "$1"
 check_env_files
 check_no_placeholders
-[[ -f "$HISTORY_DIR/manifest.json" ]] || die "$HISTORY_DIR/manifest.json is missing (stage.sh --history, then fetch.sh)"
 export IMAGE_TAG="$1"
 install -d -o root -g root -m 0700 "$LOG_DIR"
 LOG_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
+RUN_FLAGS=()
 
+# --deploy (deploy.sh, before the switch): the running stack is left alone. Only the new release's ops image
+# is pulled, and it runs with --no-deps (compose would otherwise recreate a dependency whose config changed
+# in the new release). The database is already loaded, so bootstrap-prod.ts runs once, all its steps
+# (migrations, instruments, history loaded, the logins, the demo users); no history check or validation.
+if [[ "$deploy" == true ]]; then
+  RUN_FLAGS=(--no-deps)
+  ecr_login
+  run compose --profile ops pull --quiet ops
+  step deploy bootstrap npx ts-node --transpile-only tools/ops/bootstrap-prod.ts ||
+    fail_with_log "$LOG_DIR/bootstrap-${LOG_STAMP}-deploy.log" "bootstrap failed"
+  echo "bootstrap --deploy: done (log in $LOG_DIR)"
+  exit 0
+fi
+
+[[ -f "$HISTORY_DIR/manifest.json" ]] || die "$HISTORY_DIR/manifest.json is missing (stage.sh --history, then fetch.sh)"
 ecr_login
 run compose --profile ops pull --quiet ops timescaledb redis kafka
 run compose up -d --wait --quiet-pull timescaledb redis kafka
