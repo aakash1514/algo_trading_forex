@@ -34,7 +34,7 @@ Every variable is documented in `.env.example`. Production needs:
 | `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET` | Long random strings, different from each other |
 | `STORAGE=s3`, `AWS_REGION`, `S3_BUCKET` | Backtest results; credentials from the instance role (never keys) |
 | `GROQ_API_KEY` | research-agent's LLM (free tier) |
-| Optional | `MARKET_FEED` (default `none`), `REGISTRATION_ENABLED` (default `false`), `COOKIE_SECURE` (default `true`), `RESEARCH_DAILY_LIMIT` (20), `FEED_LIVE_MAX_AGE_S` (10), `JWT_*_EXPIRES` |
+| Optional | `MARKET_FEED` (default `none`), `REGISTRATION_ENABLED` (default `false`), `DEMO_REQUEST_URL` (unset; an https:// link for the login page's demo-access card), `COOKIE_SECURE` (default `true`), `RESEARCH_DAILY_LIMIT` (20), `FEED_LIVE_MAX_AGE_S` (10), `JWT_*_EXPIRES` |
 
 Demo users go in `infra/.env.demo-users` (also ignored by git): `DEMO_USERS=demo` in `.env.prod`, then
 `DEMO_DEMO_EMAIL=...` and `DEMO_DEMO_PASS=...` (≥ 12 characters, the sign-up rules). Nothing logs them.

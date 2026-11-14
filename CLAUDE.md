@@ -167,6 +167,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   it at its next connect. `refreshSession()` holds a Web Lock across tabs (refresh tokens rotate). A failed
   refresh ends the session as `sessionExpired` ("Session expired, please log in"), never a reconnect loop.
 - `REGISTRATION_ENABLED` (unset = closed): the Register link and page follow `GET /api/auth/config` at runtime.
+- **Demo access (step 8a):** while sign-up is closed, /login shows a "Demo access" card (`DemoAccessCard`) linking
+  to `DEMO_REQUEST_URL` (auth-service, optional, returned as `demoRequestUrl` by `/api/auth/config`), and /register
+  redirects to /login. Only an absolute https:// URL is used, checked on both sides (auth-service drops anything
+  else with a startup warning, the card refuses a non-https href); without one the card has no link.
 - Instrument symbols use OANDA format (`EUR_USD`).
 - **Research page (`/research`, step 5b):** `askResearch` is a mutation with a 100 s timeout and no retry wrapper
   (every call spends free LLM quota); one request in flight; the question limit (3-500 code points) mirrors

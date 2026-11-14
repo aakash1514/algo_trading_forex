@@ -3,6 +3,7 @@
 //   - every long-running service: an exact image tag (not latest), its memory limit (MEMORY_MIB), a healthcheck,
 //     restart unless-stopped, json-file logs rotated at 3 x 10 MB
 //   - no service runs Prometheus, Grafana or MinIO, and nothing mounts Bull Board (BULL_BOARD_* unset)
+//   - auth-service alone gets DEMO_REQUEST_URL (optional: empty, or an absolute https:// URL)
 //   - one bridge network (forexedge_default) whose bridge name, subnet and ws-gateway's fixed address are
 //     those of the host's metadata guard (infra/vm/setup.sh); no other fixed address, no network_mode
 // Fails on an empty or partial service list (an empty check proves nothing).
@@ -46,6 +47,7 @@ for (const [name, s] of Object.entries(services)) {
   if (/minio/i.test(s.image ?? '') && files.length === 1) problems.push(`${name}: MinIO is not part of production`);
   for (const key of Object.keys(s.environment ?? {})) {
     if (/^BULL_BOARD_/.test(key)) problems.push(`${name}: ${key} would mount Bull Board`);
+    if (key === 'DEMO_REQUEST_URL' && name !== 'auth-service') problems.push(`${name}: DEMO_REQUEST_URL is auth-service's alone`);
   }
   if (oneOff) continue;
   if (!s.image || /:latest$|^[^:]+$/.test(s.image.replace(/^[^/]*\/\//, ''))) problems.push(`${name}: image "${s.image}" has no exact tag`);
@@ -60,6 +62,11 @@ for (const [name, s] of Object.entries(services)) {
     problems.push(`${name}: logs not rotated at 3 x 10m`);
   }
 }
+
+// ── The login page's demo-request link: optional, but always passed through (auth-service checks it again) ──
+const demoUrl = services['auth-service']?.environment?.DEMO_REQUEST_URL;
+if (demoUrl === undefined || demoUrl === null) problems.push('auth-service: DEMO_REQUEST_URL is not passed (${DEMO_REQUEST_URL:-})');
+else if (demoUrl !== '' && !/^https:\/\/[^\s]+$/i.test(demoUrl)) problems.push('auth-service: DEMO_REQUEST_URL must be empty or an absolute https:// URL');
 
 // ── The metadata guard's network: only ws-gateway's fixed address may reach 169.254.169.254 ──
 const setup = readFileSync(new URL('./vm/setup.sh', import.meta.url), 'utf8');
