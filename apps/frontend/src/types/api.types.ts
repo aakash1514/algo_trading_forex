@@ -26,6 +26,12 @@ export interface AuthResponse {
   user: AuthUser;
 }
 
+// GET /api/auth/config (public)
+export interface AuthConfig {
+  registrationEnabled: boolean;
+  demoRequestUrl: string | null;
+}
+
 // Market
 export interface TickPrice {
   pair: string;

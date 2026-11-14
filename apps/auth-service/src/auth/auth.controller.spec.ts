@@ -42,7 +42,7 @@ describe('AuthController: registration switch and refresh cookie', () => {
   afterEach(async () => { await app?.close(); app = undefined; });
 
   it('REGISTRATION_ENABLED unset: sign-up is 403 for a valid or an invalid body, and config says closed', async () => {
-    const s = await start({ REGISTRATION_ENABLED: undefined });
+    const s = await start({ REGISTRATION_ENABLED: undefined, DEMO_REQUEST_URL: undefined });
     app = s.app;
     for (const body of [VALID, { email: 'not-an-email' }]) {
       const res = await post(s.url, 'register', body);
@@ -50,16 +50,31 @@ describe('AuthController: registration switch and refresh cookie', () => {
       expect((await res.json()).message).toBe('Registration is closed');
     }
     expect(s.auth.register).not.toHaveBeenCalled();
-    expect(await (await fetch(`${s.url}/api/auth/config`)).json()).toEqual({ registrationEnabled: false });
+    expect(await (await fetch(`${s.url}/api/auth/config`)).json()).toEqual({ registrationEnabled: false, demoRequestUrl: null });
   });
 
   it('REGISTRATION_ENABLED=true: sign-up works and validation still applies', async () => {
-    const s = await start({ REGISTRATION_ENABLED: 'true' });
+    const s = await start({ REGISTRATION_ENABLED: 'true', DEMO_REQUEST_URL: undefined });
     app = s.app;
     expect((await post(s.url, 'register', VALID)).status).toBe(201);
     expect((await post(s.url, 'register', { ...VALID, password: 'short' })).status).toBe(400);
     expect(s.auth.register).toHaveBeenCalledTimes(1);
-    expect(await (await fetch(`${s.url}/api/auth/config`)).json()).toEqual({ registrationEnabled: true });
+    expect(await (await fetch(`${s.url}/api/auth/config`)).json()).toEqual({ registrationEnabled: true, demoRequestUrl: null });
+  });
+
+  it('config returns DEMO_REQUEST_URL when it is https, and null (service still up) when it is not', async () => {
+    const ok = await start({ REGISTRATION_ENABLED: 'false', DEMO_REQUEST_URL: 'https://www.linkedin.com/in/someone/' });
+    app = ok.app;
+    expect(await (await fetch(`${ok.url}/api/auth/config`)).json())
+      .toEqual({ registrationEnabled: false, demoRequestUrl: 'https://www.linkedin.com/in/someone/' });
+    await app.close();
+    for (const bad of ['javascript:alert(1)', 'http://www.linkedin.com/in/someone/', 'not a url']) {
+      const s = await start({ REGISTRATION_ENABLED: 'false', DEMO_REQUEST_URL: bad });
+      app = s.app;
+      expect(await (await fetch(`${s.url}/api/auth/config`)).json()).toEqual({ registrationEnabled: false, demoRequestUrl: null });
+      await app.close();
+    }
+    app = undefined;
   });
 
   it('an invalid REGISTRATION_ENABLED fails at startup', async () => {

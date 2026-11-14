@@ -1,5 +1,5 @@
 import { baseApi } from './base.api';
-import type { LoginRequest, RegisterRequest, AuthResponse, AuthUser } from '../../types/api.types';
+import type { LoginRequest, RegisterRequest, AuthResponse, AuthUser, AuthConfig } from '../../types/api.types';
 import { API_BASE } from '../../lib/constants';
 
 export const authApi = baseApi.injectEndpoints({
@@ -18,8 +18,9 @@ export const authApi = baseApi.injectEndpoints({
         body,
       }),
     }),
-    // Public: whether sign-up is open on this deployment (auth-service REGISTRATION_ENABLED)
-    getAuthConfig: build.query<{ registrationEnabled: boolean }, void>({
+    // Public: whether sign-up is open on this deployment (auth-service REGISTRATION_ENABLED), and where
+    // to ask for a demo login while it is closed (DEMO_REQUEST_URL: an https:// URL or null)
+    getAuthConfig: build.query<AuthConfig, void>({
       query: () => `${API_BASE.AUTH}/auth/config`,
     }),
     getMe: build.query<AuthUser, void>({

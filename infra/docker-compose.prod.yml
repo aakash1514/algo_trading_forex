@@ -145,6 +145,7 @@ services:
       JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES:-15m}
       JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES:-7d}
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+      DEMO_REQUEST_URL: ${DEMO_REQUEST_URL:-}
       COOKIE_SECURE: ${COOKIE_SECURE:-true}
     depends_on: { timescaledb: { condition: service_healthy }, redis: { condition: service_healthy } }
     mem_limit: 192m

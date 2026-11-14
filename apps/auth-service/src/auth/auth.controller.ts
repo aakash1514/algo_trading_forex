@@ -17,6 +17,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { RegistrationOpenGuard } from './guards/registration-open.guard';
 import { cookieSecure } from '@forexedge/common';
+import { demoRequestUrl } from './demo-request-url';
 
 // The refresh-token cookie. secure from COOKIE_SECURE (default true in production, HTTPS only);
 // sameSite lax: the app and its API share one origin, so the cookie never has to travel cross-site,
@@ -32,6 +33,8 @@ export class AuthController {
     sameSite: 'lax' as const,
     path: REFRESH_COOKIE_PATH,
   };
+  // DEMO_REQUEST_URL, read once: an absolute https:// URL or null (anything else dropped with a warning)
+  private readonly demoRequestUrl = demoRequestUrl();
 
   constructor(
     private readonly authService: AuthService,
@@ -39,10 +42,10 @@ export class AuthController {
   ) {}
 
   // Public: what the login and register pages may offer (read at runtime, so one frontend build
-  // serves an open or a closed deployment)
+  // serves an open or a closed deployment). demoRequestUrl: where to ask for a demo login, or null.
   @Get('config')
   getConfig() {
-    return { registrationEnabled: this.registration.open };
+    return { registrationEnabled: this.registration.open, demoRequestUrl: this.demoRequestUrl };
   }
 
   @Post('register')
