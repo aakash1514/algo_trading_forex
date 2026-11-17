@@ -179,7 +179,7 @@ docker builder prune -f
 :: Quit Docker Desktop first (tray icon -> Quit), then:
 wsl --shutdown
 diskpart
-  select vdisk file="C:\Users\AAKASH DEVKAR\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
+  select vdisk file="C:\Users\<you>\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
   attach vdisk readonly
   compact vdisk
   detach vdisk
