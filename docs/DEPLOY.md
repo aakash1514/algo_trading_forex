@@ -492,7 +492,7 @@ value is secret, and `npm run infra:check` fails if the workflow reads `secrets.
 ```sh
 gh variable set AWS_DEPLOY_ROLE_ARN --body "$(terraform -chdir=infra/terraform output -raw deploy_role_arn)"
 gh variable set AWS_REGION --body ap-south-1
-gh variable list        # AWS_DEPLOY_ROLE_ARN  arn:aws:iam::805496480789:role/forexedge-github-deploy
+gh variable list        # AWS_DEPLOY_ROLE_ARN  arn:aws:iam::<account-id>:role/forexedge-github-deploy
                         # AWS_REGION           ap-south-1
 ```
 
@@ -544,7 +544,7 @@ The history export must be the one `npm run data:transfer -- check` accepts on t
 bash infra/vm/stage.sh "$TAG" --history
 # staged 12 files of commit <TAG> (history: true)
 # prefix: transfer/20261111T093000Z/
-# next:   bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- forexedge-backups-805496480789 transfer/20261111T093000Z/ <region>
+# next:   bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- forexedge-backups-<account-id> transfer/20261111T093000Z/ <region>
 PREFIX=transfer/20261111T093000Z/          # the printed prefix
 bash infra/vm/run-on-host.sh infra/vm/fetch.sh --timeout 1800 -- "$BACKUPS" "$PREFIX" ap-south-1
 # fetched 12 files of commit <TAG> (sha256 verified; 6 history files) into /opt/forexedge/releases/<TAG>
