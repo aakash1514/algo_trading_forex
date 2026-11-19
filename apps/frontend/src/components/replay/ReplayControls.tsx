@@ -14,7 +14,12 @@ const ON = 'border-accent-blue/40 bg-accent-blue/10 text-accent-blue';
 // calls come from useReplayActions (shared with the keyboard shortcuts): every button is
 // disabled while a command waits for its acknowledgement, during a 10-bar step, and while
 // the socket isn't connected. The title shows each button's key.
-export function ReplayControls({ socket, actions }: { socket: ReplaySocket; actions: ReplayActions }) {
+export function ReplayControls({ socket, actions, helpOpen, onToggleHelp }: {
+  socket: ReplaySocket;
+  actions: ReplayActions;
+  helpOpen: boolean;
+  onToggleHelp: () => void;
+}) {
   const session = useAppSelector((s) => s.replay.session);
   const connection = useAppSelector((s) => s.replay.connection);
   const error = useAppSelector((s) => s.replay.error);
@@ -68,6 +73,11 @@ export function ReplayControls({ socket, actions }: { socket: ReplaySocket; acti
           </button>
         ))}
       </div>
+
+      <button type="button" data-testid="replay-shortcuts" aria-expanded={helpOpen} onClick={onToggleHelp}
+        title="Keyboard shortcuts (?)" className={cn(BUTTON, helpOpen ? ON : OFF)}>
+        Shortcuts ?
+      </button>
 
       <div className="ml-auto flex items-center gap-2 text-[12px]">
         {connection === 'failed' && (

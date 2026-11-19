@@ -1,18 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAppDispatch } from '../../store';
 import { useEndReplaySessionMutation } from '../../store/api/replay.api';
 import { sessionEnded } from '../../store/slices/replay.slice';
 import { replayErrorMessage } from '../../lib/replay';
 
 // "End session" with a confirmation on the page (no browser dialog): ending closes the
-// open positions at the replay clock's price and cancels pending orders.
+// open positions at the replay clock's price and cancels pending orders. Esc cancels the
+// question (the "Keep replaying" handler); nothing but the button confirms.
 export function EndSession({ openPositions, pendingOrders }: { openPositions: number; pendingOrders: number }) {
   const dispatch = useAppDispatch();
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [end, { isLoading }] = useEndReplaySessionMutation();
+
+  const cancel = useCallback(() => setConfirming(false), []);
+  useEffect(() => {
+    if (!confirming || isLoading) return; // "Keep replaying" is disabled while ending
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !e.isComposing) cancel();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [confirming, isLoading, cancel]);
 
   async function confirm() {
     setError(null);
@@ -45,7 +56,7 @@ export function EndSession({ openPositions, pendingOrders }: { openPositions: nu
           className="px-3 py-1.5 rounded bg-accent-red text-white font-medium disabled:opacity-40">
           {isLoading ? 'Ending…' : 'Yes, end the session'}
         </button>
-        <button type="button" onClick={() => setConfirming(false)} disabled={isLoading}
+        <button type="button" onClick={cancel} disabled={isLoading} title="Keep replaying (Esc)"
           className="px-3 py-1.5 rounded border border-terminal-border text-terminal-muted hover:text-[#e2e4e9]">
           Keep replaying
         </button>
