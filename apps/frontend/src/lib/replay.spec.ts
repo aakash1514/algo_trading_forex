@@ -1,5 +1,5 @@
 import {
-  centsToDecimal, decimalToCents, decimalToPoints, endSummary, formatReplayTime, formatUsd, PAUSE_MESSAGES,
+  adjacentSpeed, centsToDecimal, decimalToCents, decimalToPoints, endSummary, formatReplayTime, formatUsd, PAUSE_MESSAGES,
   replayErrorMessage, startingBalanceFromInput, startTimeFromInputs, statusMessage, validateOrder,
 } from './replay';
 import { PAUSE_REASONS, type ReplayPosition, type ReplaySession } from '../types/replay.types';
@@ -31,6 +31,21 @@ describe('replay start inputs', () => {
     expect(startingBalanceFromInput('100')).toEqual({ ok: true, value: 100 });
     expect(startingBalanceFromInput('10000000.00')).toEqual({ ok: true, value: 10_000_000 });
     for (const bad of ['99.99', '10000000.01', '1.234', '', 'abc', '-500']) expect(startingBalanceFromInput(bad).ok).toBe(false);
+  });
+});
+
+describe('replay speeds', () => {
+  it('faster is the next shorter time per bar, slower the next longer one, from the middle', () => {
+    expect(adjacentSpeed(1000, 'faster')).toBe(500);
+    expect(adjacentSpeed(1000, 'slower')).toBe(2000);
+  });
+
+  it('stops at both ends (no wrap), and has no neighbour for a speed it does not offer', () => {
+    expect(adjacentSpeed(500, 'faster')).toBeNull();
+    expect(adjacentSpeed(500, 'slower')).toBe(1000);
+    expect(adjacentSpeed(2000, 'slower')).toBeNull();
+    expect(adjacentSpeed(2000, 'faster')).toBe(1000);
+    expect(adjacentSpeed(750, 'faster')).toBeNull();
   });
 });
 

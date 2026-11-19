@@ -5,7 +5,9 @@ says when.
 
 ## Replay (steps 6b-1 and 6b-2)
 
-1. **Keyboard shortcuts.** Space = play/pause, right arrow = step, and so on. The controls are buttons only today.
+Done on branch `replay-improvements` (2026-11-20): keyboard shortcuts on the Replay page (Space, →, Shift+→
+for 10 bars, ↑/↓ speed, B/S preselect the order side without placing an order, ? help, Esc). It was item 1.
+
 2. **Calendar events on the replay chart.** Needs historical calendar data for 2010–2022, which ForexEdge doesn't
    have (the calendar holds upcoming events only, from FOMC, ECB and Forex Factory).
 3. **Detailed replay statistics.** Win rate, drawdown, average trade and so on. The end-of-session summary has the

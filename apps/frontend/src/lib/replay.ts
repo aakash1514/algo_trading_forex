@@ -22,6 +22,15 @@ export const REPLAY_SPEEDS = [
   { ms: 1000, label: '1 s' },
   { ms: 2000, label: '2 s' },
 ] as const;
+export type ReplaySpeedMs = (typeof REPLAY_SPEEDS)[number]['ms'];
+
+// The next speed the replay offers: faster = a shorter time per bar. Null at either end
+// (no wrap) and for a speed the list doesn't hold.
+export function adjacentSpeed(currentMs: number, direction: 'faster' | 'slower'): ReplaySpeedMs | null {
+  const i = REPLAY_SPEEDS.findIndex((s) => s.ms === currentMs);
+  if (i < 0) return null;
+  return REPLAY_SPEEDS[direction === 'faster' ? i - 1 : i + 1]?.ms ?? null;
+}
 
 export const PAUSE_MESSAGES: Record<PauseReason, string> = {
   USER: 'Paused',

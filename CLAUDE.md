@@ -188,7 +188,13 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   `update` for a bar event; a bar of another timeframe is ignored. Money and prices stay decimal strings (USD
   formatted from cents as BigInt). Each open position's P&L is computed with `@forexedge/trading-sim`'s
   `markToMarketCents` at the current bar's close (the server sends only the total; a test checks the rows add up
-  to `unrealizedPnlUsd`). On /replay the Topbar hides the live ticker and shows "Historical replay". Component
+  to `unrealizedPnlUsd`). On /replay the Topbar hides the live ticker and shows "Historical replay".
+  **Shortcuts** (`useReplayShortcuts`, window listener while the replay screen is mounted): Space, → (Shift+→ = 10
+  single steps, each after the previous ack; replay-service has no step count), ↑/↓ speed (no wrap), B/S (only
+  `prepare(side)` on the order panel: side + focus Lots, never submit), ?, Esc (help; End-session cancel). Keys
+  call the buttons' own handlers from `useReplayActions` (one instance per screen), so a disabled button's key is a
+  no-op; ignored in fields/forms/dialogs, with Ctrl/Meta/Alt, isComposing, repeat, or unless a command can go out.
+  Component
   tests use recorded replay-service bodies and socket events (`components/replay/__fixtures__`, written by
   `record-frontend-fixtures.ts`, sha256 in its manifest).
 

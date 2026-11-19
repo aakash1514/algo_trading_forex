@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useImperativeHandle, useRef, useState, type FormEvent, type Ref } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { usePlaceReplayOrderMutation } from '../../store/api/replay.api';
 import { accountReceived, positionsReceived } from '../../store/slices/replay.slice';
@@ -12,21 +12,40 @@ const FIELD = 'w-full bg-terminal-elevated border border-terminal-border rounded
   + 'tabular-nums placeholder:text-terminal-muted/40 focus:outline-none focus:border-accent-blue';
 const LABEL = 'block text-[9px] text-terminal-muted uppercase tracking-wider mb-1';
 
+export type OrderSide = 'BUY' | 'SELL';
+
+// What the keyboard shortcuts (B/S) may do with the form: choose the side and put the
+// cursor in Lots. There is deliberately no way to submit from outside: an order is
+// placed only by clicking the form's own button.
+export interface OrderPanelHandle {
+  prepare: (side: OrderSide) => void;
+}
+
 // A market order at the replay clock. The prices shown are the clock minute's close
 // (the current bar's close); the order fills at the next minute's open, so it is
 // Pending until the clock moves on (play or step).
-export function ReplayOrderPanel() {
+export function ReplayOrderPanel({ ref }: { ref?: Ref<OrderPanelHandle> }) {
   const dispatch = useAppDispatch();
   const session = useAppSelector((s) => s.replay.session);
   const bar = useAppSelector((s) => s.replay.currentBar);
   const decimals = useAppSelector((s) => s.replay.priceDecimals);
-  const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
+  const [side, setSide] = useState<OrderSide>('BUY');
   const [lots, setLots] = useState('0.10');
   const [stopLoss, setStopLoss] = useState('');
   const [takeProfit, setTakeProfit] = useState('');
   const [problem, setProblem] = useState<string | null>(null);
   const [placed, setPlaced] = useState(false);
   const [place, { isLoading }] = usePlaceReplayOrderMutation();
+  const lotsRef = useRef<HTMLInputElement>(null);
+  // The Buy/Sell buttons and the B/S keys
+  const chooseSide = useCallback((s: OrderSide) => setSide(s), []);
+  useImperativeHandle(ref, () => ({
+    prepare(s: OrderSide) {
+      chooseSide(s);
+      lotsRef.current?.focus();
+      lotsRef.current?.select();
+    },
+  }), [chooseSide]);
   const clock = session?.clockTime;
   // "Order placed" is about the minute it was placed at
   useEffect(() => setPlaced(false), [clock]);
@@ -71,7 +90,8 @@ export function ReplayOrderPanel() {
       </div>
       <div className="grid grid-cols-2 gap-1.5" role="group" aria-label="Side">
         {(['BUY', 'SELL'] as const).map((s) => (
-          <button key={s} type="button" aria-pressed={side === s} onClick={() => setSide(s)}
+          <button key={s} type="button" aria-pressed={side === s} onClick={() => chooseSide(s)}
+            title={s === 'BUY' ? 'Buy (B)' : 'Sell (S)'}
             className={cn('py-1.5 rounded text-[12px] font-medium border transition-all',
               s === 'BUY'
                 ? (side === s ? 'bg-accent-green text-[#0a1a0f] border-accent-green' : 'text-accent-green border-accent-green/20 hover:bg-accent-green/10')
@@ -82,7 +102,7 @@ export function ReplayOrderPanel() {
       </div>
       <div>
         <label htmlFor="replay-lots" className={LABEL}>Lots</label>
-        <input id="replay-lots" inputMode="decimal" value={lots} onChange={(e) => setLots(e.target.value)} className={FIELD} />
+        <input id="replay-lots" ref={lotsRef} inputMode="decimal" value={lots} onChange={(e) => setLots(e.target.value)} className={FIELD} />
       </div>
       <div className="grid grid-cols-2 gap-1.5">
         <div>
