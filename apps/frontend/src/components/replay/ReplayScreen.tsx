@@ -2,6 +2,7 @@
 
 import { useAppSelector } from '../../store';
 import type { ReplaySocket } from '../../hooks/useReplaySocket';
+import { useReplayActions } from '../../hooks/useReplayActions';
 import { PAIR_DISPLAY } from '../../lib/constants';
 import { formatReplayTime } from '../../lib/replay';
 import { EndSession } from './EndSession';
@@ -16,6 +17,7 @@ import { ReplayPositions } from './ReplayPositions';
 export function ReplayScreen({ socket }: { socket: ReplaySocket }) {
   const session = useAppSelector((s) => s.replay.session);
   const account = useAppSelector((s) => s.replay.account);
+  const actions = useReplayActions(socket);
   if (!session || !account) return null;
 
   return (
@@ -34,7 +36,7 @@ export function ReplayScreen({ socket }: { socket: ReplaySocket }) {
           <EndSession openPositions={account.openPositions} pendingOrders={account.pendingOrders} />
         </div>
       </div>
-      <ReplayControls socket={socket} />
+      <ReplayControls socket={socket} actions={actions} />
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 flex flex-col min-w-0 border-r border-terminal-border">
           <ReplayChart />

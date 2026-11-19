@@ -117,3 +117,10 @@ export interface PlaceOrderRequest {
 }
 
 export type CommandAck<T = unknown> = { ok: true; result: T } | { ok: false; error: string };
+
+// The result of a 'step' (replay-service playback.service.ts StepResult)
+export interface StepResult {
+  session: ReplaySession;
+  minutes: number;              // M1 minutes processed
+  endOfData: boolean;
+}
