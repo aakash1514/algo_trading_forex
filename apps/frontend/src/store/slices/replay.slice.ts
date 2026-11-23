@@ -16,6 +16,9 @@ export type ReplayConnection = 'connecting' | 'connected' | 'reconnecting' | 'fa
 //              the previous current bar is complete and joins the history
 //   positions  upserted by id (the same update twice changes nothing)
 //   account, status   replaced
+// An ENDED session opened from "My replays" is shown read-only from the server's answer
+// (readOnly: no socket state replaces it until the user leaves it). switchedAway: another
+// tab opened a different session, so this one was paused and its commands are refused.
 export interface ReplaySliceState {
   connection: ReplayConnection;
   loaded: boolean;               // a 'state' (with or without a session) has arrived
@@ -31,6 +34,8 @@ export interface ReplaySliceState {
   error: string | null;
   summary: EndSummary | null;    // set when the session ends
   calendar: { covered: boolean; events: Record<string, CalendarEvent> };
+  readOnly: boolean;             // an ENDED session being viewed
+  switchedAway: boolean;         // the user opened another session (in another tab)
 }
 
 // The history kept in memory while playing; a reload gets the server's 500 again
@@ -51,6 +56,8 @@ const initialState: ReplaySliceState = {
   error: null,
   summary: null,
   calendar: { covered: false, events: {} },
+  readOnly: false,
+  switchedAway: false,
 };
 
 const replaySlice = createSlice({
@@ -72,6 +79,8 @@ const replaySlice = createSlice({
       state.loaded = true;
       state.stateVersion += 1;
       state.error = null;
+      state.readOnly = false;
+      state.switchedAway = false;
       if (!s) {
         Object.assign(state, {
           session: null, account: null, bars: [], currentBar: null, positions: {}, stateWasCapped: false,
@@ -90,6 +99,21 @@ const replaySlice = createSlice({
       };
       state.stateWasCapped = s.positions.filter((p) => p.status === 'CLOSED' || p.status === 'CANCELLED').length
         >= RECENT_CLOSED_CAP;
+    },
+    // An ENDED session from "My replays", read-only
+    endedViewOpened(state, action: PayloadAction<ReplayState>) {
+      replaySlice.caseReducers.stateReceived(state, action);
+      state.readOnly = true;
+    },
+    // Back from the ended view: the socket sends the current session's state next
+    endedViewClosed(state) {
+      state.readOnly = false;
+      state.loaded = false;
+    },
+    // The user opened (or created) a session: a page showing another live session says so
+    switchedReceived(state, action: PayloadAction<{ openedSessionId: string }>) {
+      if (state.session && !state.readOnly && state.session.status !== 'ENDED'
+        && state.session.id !== action.payload.openedSessionId) state.switchedAway = true;
     },
     barReceived(state, action: PayloadAction<BarEvent>) {
       const { sessionId, timeframe, clockTime, bar } = action.payload;
@@ -155,7 +179,7 @@ const replaySlice = createSlice({
 });
 
 export const {
-  connectionChanged, stateReceived, stateUpdated, barReceived, calendarReceived, accountReceived, positionsReceived, statusReceived,
+  connectionChanged, stateReceived, stateUpdated, endedViewOpened, endedViewClosed, switchedReceived, barReceived, calendarReceived, accountReceived, positionsReceived, statusReceived,
   endOfDataReceived, sessionEnded, summaryDismissed, commandStarted, commandFinished, errorReceived, replayReset,
 } = replaySlice.actions;
 export default replaySlice.reducer;

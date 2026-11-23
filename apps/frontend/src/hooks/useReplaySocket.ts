@@ -6,12 +6,13 @@ import { io, type Socket } from 'socket.io-client';
 import { useAppDispatch, type RootState } from '../store';
 import {
   accountReceived, barReceived, calendarReceived, commandFinished, commandStarted, connectionChanged, endOfDataReceived, errorReceived,
-  positionsReceived, replayReset, sessionEnded, stateReceived, stateUpdated, statusReceived,
+  positionsReceived, replayReset, sessionEnded, stateReceived, stateUpdated, statusReceived, switchedReceived,
 } from '../store/slices/replay.slice';
 import { REPLAY_SOCKET_PATH, REPLAY_WS_URL } from '../lib/constants';
 import { AUTH_EXPIRED_EVENT, REAUTH_EVENT, renewSessionForSocket } from '../lib/socket-auth';
 import type {
   BarEvent, CalendarMessage, CommandAck, EndedSession, EndOfDataEvent, ReplayAccount, ReplayPosition, ReplaySession, ReplayState,
+  SwitchedEvent,
 } from '../types/replay.types';
 
 export const COMMAND_TIMEOUT_MS = 10_000;
@@ -124,6 +125,8 @@ export function useReplaySocket(): ReplaySocket {
       refreshedSinceConnect = false;
       if (awaitingConnectState) {
         awaitingConnectState = false;
+        // an ENDED session is being viewed: it stays until the user leaves it (then a resync)
+        if (store.getState().replay.readOnly) return;
         dispatch(stateReceived(payload.session ? (payload as ReplayState) : null));
       } else if (payload.session) {
         dispatch(stateUpdated(payload as ReplayState));
@@ -136,6 +139,7 @@ export function useReplaySocket(): ReplaySocket {
     socket.on('status', (payload: ReplaySession) => dispatch(statusReceived(payload)));
     socket.on('endOfData', (payload: EndOfDataEvent) => dispatch(endOfDataReceived(payload)));
     socket.on('ended', (payload: EndedSession) => dispatch(sessionEnded(payload)));
+    socket.on('switched', (payload: SwitchedEvent) => dispatch(switchedReceived(payload)));
 
     return () => {
       unsubscribe();

@@ -1,7 +1,7 @@
 /** @jest-environment ./test/jsdom-with-fetch.cjs */
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import type { CommandAck, ReplaySession, ReplayState, StepResult } from '../../types/replay.types';
-import { fixture, openScreen, page, rest, serve, setupReplayPage, STATE_PAUSED } from './__harness__/page';
+import { fixture, openScreen, page, rest, serve, setupReplayPage, STATE_PAUSED, writes } from './__harness__/page';
 
 // The Replay page's keyboard shortcuts through the real page, store and socket hook
 // (__harness__/page.tsx): what each key sends to replay-service, or must not send.
@@ -158,7 +158,7 @@ describe('replay shortcuts: typing and the order form', () => {
       expect(document.activeElement).toBe(screen.getByLabelText('Lots'));
       expect((document.activeElement as HTMLElement).getAttribute('type')).not.toBe('submit');
       await act(async () => undefined);
-      expect(page.calls).toEqual(createOnly()); // no order request
+      expect(writes()).toEqual(createOnly()); // no order request
       expect(page.socket.sent).toEqual([]);
     });
 });

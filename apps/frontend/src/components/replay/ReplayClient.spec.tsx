@@ -3,7 +3,7 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { store } from '../../store';
 import type { BarEvent, ReplayState } from '../../types/replay.types';
 import { mockChart } from './__harness__/mocks';
-import { fixture, openScreen, page, raw, renderPage, rest, serve, setupReplayPage, STATE_PAUSED } from './__harness__/page';
+import { fixture, openScreen, page, raw, renderPage, rest, serve, setupReplayPage, STATE_PAUSED, writes } from './__harness__/page';
 
 // The Replay page through the real store, RTK Query and socket hook (__harness__/page.tsx).
 
@@ -25,12 +25,12 @@ describe('Replay page: start, resume, end', () => {
     fireEvent.change(screen.getByLabelText('Starting balance (USD)'), { target: { value: '50' } });
     fireEvent.click(screen.getByRole('button', { name: 'Start replay' }));
     expect(screen.getByTestId('replay-start-error').textContent).toBe('The starting balance must be between $100 and $10,000,000');
-    expect(page.calls).toEqual([]);
+    expect(writes()).toEqual([]);
   });
 
   it('creates the session from the form and opens it paused, with the REPLAY badge and the replay clock', async () => {
     await openScreen();
-    expect(page.calls).toEqual([{ method: 'POST', url: 'http://localhost/api/replay/sessions',
+    expect(writes()).toEqual([{ method: 'POST', url: 'http://localhost/api/replay/sessions',
       body: { instrument: 'EUR_USD', startTime: '2022-03-01T09:30Z', timeframe: '1h', startingBalance: 10000 } }]);
     expect(page.socket.connects).toBe(1); // connected again for the new session's state
     expect(screen.getByTestId('replay-badge').textContent).toBe('REPLAY');
@@ -164,7 +164,7 @@ describe('Replay page: orders and positions', () => {
     fireEvent.change(screen.getByLabelText('Lots'), { target: { value: '100.5' } });
     fireEvent.click(screen.getByRole('button', { name: 'Buy 100.5 lots' }));
     expect(screen.getByTestId('replay-order-error').textContent).toBe('Lots must be between 0.01 and 100, with at most 2 decimals');
-    expect(page.calls).toHaveLength(1); // the create only
+    expect(writes()).toHaveLength(1); // the create only
 
     serve(rest('POST', `/${STATE_PAUSED.session.id}/orders`, 'order-400-margin', 400));
     fireEvent.change(screen.getByLabelText('Lots'), { target: { value: '100' } });

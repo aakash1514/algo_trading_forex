@@ -12,12 +12,13 @@ import type { ReplaySocket } from './useReplaySocket';
 // Shift+→ and the "Step 10" button
 export const STEP_MANY_BARS = 10;
 
-type CommandState = Pick<ReplaySliceState, 'connection' | 'loaded' | 'session' | 'pendingCommand'>;
+type CommandState = Pick<ReplaySliceState, 'connection' | 'loaded' | 'session' | 'pendingCommand' | 'switchedAway' | 'readOnly'>;
 
-// A command can go out: connected, a live session, nothing waiting for its acknowledgement
+// A command can go out: connected, a live session that is still the user's current one,
+// nothing waiting for its acknowledgement
 function commandAllowed(r: CommandState): boolean {
   return r.connection === 'connected' && r.loaded && r.session !== null && r.session.status !== 'ENDED'
-    && r.pendingCommand === null;
+    && !r.readOnly && !r.switchedAway && r.pendingCommand === null;
 }
 
 function stepAllowed(r: CommandState): boolean {
@@ -53,6 +54,8 @@ export function useReplayActions(socket: ReplaySocket): ReplayActions {
   const loaded = useAppSelector((s) => s.replay.loaded);
   const session = useAppSelector((s) => s.replay.session);
   const pending = useAppSelector((s) => s.replay.pendingCommand);
+  const switchedAway = useAppSelector((s) => s.replay.switchedAway);
+  const readOnly = useAppSelector((s) => s.replay.readOnly);
   const [steppingMany, setSteppingMany] = useState(false);
   const runningRef = useRef(false);
   const aliveRef = useRef(true);
@@ -102,7 +105,7 @@ export function useReplayActions(socket: ReplaySocket): ReplayActions {
   const setTimeframe = useCallback((timeframe: Timeframe) => send('setTimeframe', { timeframe }), [send]);
 
   return useMemo(() => {
-    const now = { connection, loaded, session, pendingCommand: pending };
+    const now = { connection, loaded, session, pendingCommand: pending, switchedAway, readOnly };
     const ready = commandAllowed(now) && !steppingMany;
     return {
       ready,
@@ -115,6 +118,6 @@ export function useReplayActions(socket: ReplaySocket): ReplayActions {
       canSlower: ready && adjacentSpeed(speedMs, 'slower') !== null,
       playPause, step, stepMany, setSpeed, faster, slower, setTimeframe,
     };
-  }, [connection, loaded, session, pending, steppingMany, playing, speedMs,
+  }, [connection, loaded, session, pending, switchedAway, readOnly, steppingMany, playing, speedMs,
     playPause, step, stepMany, setSpeed, faster, slower, setTimeframe]);
 }

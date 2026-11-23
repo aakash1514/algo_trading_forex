@@ -75,14 +75,15 @@ function useClosedTradePages(sessionId: string | undefined, active: boolean) {
 
 // Pending orders and open positions (with live P&L at the clock), and the closed
 // trades (the state's latest, then pages on demand). A Close is pending until the next minute.
-export function ReplayPositions() {
+// readOnly (an ENDED session): the closed trades and statistics only, nothing to act on.
+export function ReplayPositions({ readOnly = false }: { readOnly?: boolean }) {
   const dispatch = useAppDispatch();
   const session = useAppSelector((s) => s.replay.session);
   const bar = useAppSelector((s) => s.replay.currentBar);
   const decimals = useAppSelector((s) => s.replay.priceDecimals);
   const live = useAppSelector(selectLiveReplayPositions);
   const closed = useAppSelector(selectClosedReplayPositions);
-  const [tab, setTab] = useState<'open' | 'closed' | 'stats'>('open');
+  const [tab, setTab] = useState<'open' | 'closed' | 'stats'>(readOnly ? 'closed' : 'open');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cancelOrder] = useCancelReplayOrderMutation();
@@ -118,7 +119,7 @@ export function ReplayPositions() {
     <div className="h-full flex flex-col">
       <div className="flex border-b border-terminal-border bg-terminal-surface shrink-0" role="tablist">
         {([['open', `Open & pending (${live.length})`], ['closed', `Closed trades (${allClosed.length}${pages.hasMore ? '+' : ''})`],
-          ['stats', 'Statistics']] as const).map(([key, label]) => (
+          ['stats', 'Statistics']] as const).filter(([key]) => !readOnly || key !== 'open').map(([key, label]) => (
           <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setTab(key)}
             className={cn('px-4 py-2 text-[10px] font-medium uppercase tracking-wider border-b-2',
               tab === key ? 'text-accent-blue border-accent-blue' : 'text-terminal-muted border-transparent hover:text-[#e2e4e9]')}>
