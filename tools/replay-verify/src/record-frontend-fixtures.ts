@@ -61,7 +61,7 @@ async function main(): Promise<void> {
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     const text = await r.text();
-    return { status: r.status, text, json: JSON.parse(text) };
+    return { status: r.status, text, json: text ? JSON.parse(text) : null };
   };
   // A socket whose events are kept in order; next(event) waits for one not yet taken
   const connect = async () => {
@@ -226,6 +226,45 @@ async function main(): Promise<void> {
   await rest('POST', `/sessions/${last}/end`);
   c.close();
 
+  // ── My replays: several sessions, switching, rename, delete ──
+  // a title with markup: the page must show it as text
+  const a = await rest('POST', '/sessions', { instrument: 'GBP_USD', startTime: '2019-12-12T21:00Z', timeframe: '15m', title: '<b>UK election</b> & GBP' });
+  if (a.status !== 201) throw new Error(`session a: ${a.text}`);
+  const b = await rest('POST', '/sessions', { instrument: 'XAU_USD', startTime: '2020-03-09T08:00Z', timeframe: '1h' });
+  if (b.status !== 201) throw new Error(`session b: ${b.text}`);
+  c = await connect();
+  save('state-before-switch', 'socket', "'state' on connect: the latest created session (XAU/USD), before another is opened", json(c.state));
+  c.queue.length = 0;
+  const openedA = await rest('POST', `/sessions/${a.json.id}/open`);
+  save('open-200-paused', 'rest', 'POST /sessions/:id/open of a paused session: its state, now the current one', openedA.text, openedA.status);
+  save('switched', 'socket', "'switched' to the tab still showing the other session", json(await c.next('switched')));
+  c.close();
+  const openedEnded = await rest('POST', `/sessions/${s1}/open`);
+  save('open-200-ended', 'rest', 'POST /sessions/:id/open of an ENDED session: read-only state up to its end', openedEnded.text, openedEnded.status);
+  const openMissing = await rest('POST', `/sessions/${randomUUID()}/open`);
+  save('open-404', 'rest', 'POST /sessions/:id/open of a session the user does not own', openMissing.text, openMissing.status);
+
+  const renamed = await rest('PATCH', `/sessions/${b.json.id}`, { title: '  Gold, March 2020 crash  ' });
+  save('rename-200', 'rest', 'PATCH /sessions/:id with a title (trimmed by the server)', renamed.text, renamed.status);
+  const tooLong = await rest('PATCH', `/sessions/${b.json.id}`, { title: 'x'.repeat(61) });
+  save('rename-400-too-long', 'rest', 'PATCH /sessions/:id with 61 characters', tooLong.text, tooLong.status);
+  const notEnded = await rest('DELETE', `/sessions/${a.json.id}`);
+  save('delete-409-paused', 'rest', 'DELETE /sessions/:id of a paused session', notEnded.text, notEnded.status);
+  const deleted = await rest('DELETE', `/sessions/${jpy}`);
+  save('delete-204', 'rest', 'DELETE /sessions/:id of an ENDED session (no body)', deleted.text, deleted.status);
+
+  // 21 sessions in all (4 ended, USD/JPY deleted, a, b and 16 more): a second page (20 a page)
+  for (let i = 0; i < 16; i++) {
+    const r = await rest('POST', '/sessions', { instrument: 'EUR_USD', startTime: `2021-0${(i % 9) + 1}-15T12:00Z`, timeframe: '1h' });
+    if (r.status !== 201) throw new Error(`filler session: ${r.text}`);
+  }
+  await rest('POST', `/sessions/${a.json.id}/open`);
+  const list1 = await rest('GET', '/sessions');
+  save('sessions-200-page1', 'rest', 'GET /sessions: the first 20 of 21 sessions, last opened first', list1.text, list1.status);
+  if (list1.json.sessions.length !== 20 || !list1.json.nextCursor) throw new Error('expected a full first page with a cursor');
+  const list2 = await rest('GET', `/sessions?cursor=${list1.json.nextCursor}`);
+  save('sessions-200-page2', 'rest', 'GET /sessions?cursor=: the last one', list2.text, list2.status);
+
   const sorted = Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));
   writeFileSync(join(OUT, 'manifest.json'), `${JSON.stringify({ commit, user: `replayfixture_${id}@example.com`, fixtures: sorted }, null, 1)}\n`);
   writeFileSync(join(OUT, 'README.md'), readme(`replayfixture_${id}@example.com`, sorted));
@@ -252,7 +291,9 @@ function readme(user: string, fixtures: Record<string, Entry>): string {
     'its SL; a short 0.2 closed manually; a cancelled order; ended with a short open), USD/JPY from 2016-06-23 22:00',
     'UTC on 1h (a long and a short open on the Brexit-vote night), EUR/USD from 2022-03-16 17:58 UTC on 1m across',
     'the FOMC decision at 18:00 (calendar; 21 trades closed in one minute for paging, a 22nd later; statistics), and',
-    'EUR/USD from 2022-12-30 20:30 UTC stepped to the end of the history.',
+    'EUR/USD from 2022-12-30 20:30 UTC stepped to the end of the history. My replays: GBP/USD (a title with markup)',
+    'and XAU/USD sessions, opened and switched, renamed, a paused one refused for deletion and the USD/JPY one deleted,',
+    'then 16 more EUR/USD sessions for a second list page.',
     '',
     '| File | Kind | What | HTTP | Recorded (UTC) | sha256 |',
     '|---|---|---|---|---|---|',
