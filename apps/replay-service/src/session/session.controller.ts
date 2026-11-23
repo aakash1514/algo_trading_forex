@@ -21,24 +21,33 @@ export class ReplaySessionController {
     private readonly trades: ReplayTradesService,
   ) {}
 
-  // POST /api/replay/sessions — 201, or 409 { activeSessionId } while one is active
+  // POST /api/replay/sessions — 201 PAUSED, the user's current session; a playing session
+  // pauses first
   @Post()
   create(@Req() req: AuthenticatedRequest, @Body() dto: CreateSessionDto) {
-    return this.sessions.create(req.user.id, dto);
+    return this.playback.createAndOpen(req.user.id, () => this.sessions.create(req.user.id, dto));
   }
 
-  // GET /api/replay/sessions/active — 404 when there is none
+  // GET /api/replay/sessions/active — the current session (latest opened, not ENDED); 404 when there is none
   @Get('active')
   getActive(@Req() req: AuthenticatedRequest) {
     return this.sessions.getActive(req.user.id);
   }
 
-  // POST /api/replay/sessions/active/end — closes open positions at the clock price
-  // (its timer stops and the user's sockets get 'ended')
-  @Post('active/end')
+  // POST /api/replay/sessions/:id/open — the session's full state; a playing session pauses
+  // first. An unended one becomes the current one (PAUSED); an ENDED one is read-only.
+  @Post(':id/open')
   @HttpCode(HttpStatus.OK)
-  async end(@Req() req: AuthenticatedRequest) {
-    const ended = await this.sessions.end(req.user.id);
+  open(@Req() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string) {
+    return this.playback.open(req.user.id, id);
+  }
+
+  // POST /api/replay/sessions/:id/end — closes open positions at the clock price
+  // (its timer stops and the user's sockets get 'ended')
+  @Post(':id/end')
+  @HttpCode(HttpStatus.OK)
+  async end(@Req() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string) {
+    const ended = await this.sessions.end(req.user.id, id);
     this.playback.forget(ended.session.id);
     this.emitter.toUser(req.user.id, 'ended', ended, new Date(ended.session.clockTime));
     return ended;

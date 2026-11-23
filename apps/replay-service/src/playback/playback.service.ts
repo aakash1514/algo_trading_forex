@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Not, Repository } from 'typeorm';
 import { assertUserId } from '@forexedge/common';
@@ -12,6 +12,9 @@ import { currentBar, nextBarMinutes } from '../history/replay-bars';
 import { PairContext } from '../history/replay-history';
 import { calendarCurrencies, calendarEvents } from '../history/replay-calendar';
 import { accountView } from '../session/account.view';
+import {
+  currentSession, isSessionId, liveSession, NO_SUCH_SESSION, OTHER_SESSION_OPENED, userLockKey,
+} from '../session/current-session';
 import { barView } from '../session/bar.view';
 import { positionView } from '../session/position.view';
 import { REPLAY_TIMEFRAMES } from '../session/replay-window';
@@ -24,6 +27,13 @@ export const REPLAY_SPEEDS_MS = [500, 1000, 2000] as const;
 
 // A command the session's state doesn't allow (the socket answers { ok: false, error })
 export class ReplayCommandError extends Error {}
+
+// The user switched sessions: the sessions that were playing are paused, and a tab still
+// showing another session says so (it may open its own session again)
+export interface SwitchedEvent {
+  pausedSessionIds: string[];
+  openedSessionId: string;
+}
 
 export interface StepResult {
   session: SessionView;
@@ -40,6 +50,12 @@ export interface StepResult {
 //   step     one bar while PAUSED
 //   speed    500, 1000 or 2000 ms per bar, nothing else
 //   frame    the chart's timeframe (one of the aggregates'); sends the full state again
+//
+// Every command names its session (owner-scoped, not ENDED). play, step, speed and frame
+// also need it to be the user's current session (the latest opened one); pause doesn't.
+// At most one session per user plays: play, open and create run under the user's lock,
+// and opening or creating a session pauses the playing one first (reason USER). The
+// unique index replay_sessions_one_playing_per_user backs this up in the database.
 //
 // Never playing without a client: the last socket leaving pauses the session, a
 // (re)connecting socket always finds it PAUSED, and a boot pauses every PLAYING session.
@@ -88,48 +104,48 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
 
   // ── Commands ──
 
-  play(userId: string): Promise<SessionView> {
-    return this.withSession(userId, async (s, ctx) => {
+  play(userId: string, sessionId: unknown): Promise<SessionView> {
+    return this.lock.run(userLockKey(userId), () => this.withSession(userId, sessionId, true, async (s, ctx) => {
       if (s.clockTime.getTime() >= ctx.lastTime.getTime()) {
         throw new ReplayCommandError(`End of data: the ${s.pair} history ends at ${ctx.lastTime.toISOString()}`);
       }
       if (s.status !== 'PLAYING') await this.setStatus(s, 'PLAYING', null);
       this.schedule(s.id, userId, s.speedMs);
       return this.announce(s, ctx);
-    });
+    }));
   }
 
-  pause(userId: string): Promise<SessionView> {
-    return this.withSession(userId, async (s, ctx) => {
+  pause(userId: string, sessionId: unknown): Promise<SessionView> {
+    return this.withSession(userId, sessionId, false, async (s, ctx) => {
       this.cancelTimer(s.id);
       if (s.status === 'PLAYING') await this.setStatus(s, 'PAUSED', 'USER');
       return this.announce(s, ctx);
     });
   }
 
-  step(userId: string): Promise<StepResult> {
-    return this.withSession(userId, async (s, ctx) => {
+  step(userId: string, sessionId: unknown): Promise<StepResult> {
+    return this.withSession(userId, sessionId, true, async (s, ctx) => {
       if (s.status === 'PLAYING') throw new ReplayCommandError('Pause before stepping');
       return this.advance(s, ctx);
     });
   }
 
-  setSpeed(userId: string, speedMs: unknown): Promise<SessionView> {
+  setSpeed(userId: string, sessionId: unknown, speedMs: unknown): Promise<SessionView> {
     if (typeof speedMs !== 'number' || !(REPLAY_SPEEDS_MS as readonly number[]).includes(speedMs)) {
       return Promise.reject(new ReplayCommandError('speedMs must be 500, 1000 or 2000 (milliseconds per bar)'));
     }
-    return this.withSession(userId, async (s, ctx) => {
+    return this.withSession(userId, sessionId, true, async (s, ctx) => {
       await this.sessions.update({ id: s.id }, { speedMs });
       s.speedMs = speedMs;
       return this.announce(s, ctx);
     });
   }
 
-  setTimeframe(userId: string, timeframe: unknown): Promise<ReplayState> {
+  setTimeframe(userId: string, sessionId: unknown, timeframe: unknown): Promise<ReplayState> {
     if (typeof timeframe !== 'string' || !(REPLAY_TIMEFRAMES as readonly string[]).includes(timeframe)) {
       return Promise.reject(new ReplayCommandError(`timeframe must be one of ${REPLAY_TIMEFRAMES.join(', ')}`));
     }
-    return this.withSession(userId, async (s) => {
+    return this.withSession(userId, sessionId, true, async (s) => {
       await this.sessions.update({ id: s.id }, { timeframe });
       s.timeframe = timeframe;
       const state = await this.state.state(await this.reload(s));
@@ -138,13 +154,68 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  // A socket connected: the session is paused (never auto-play) and its full state
-  // returned. With another socket of the user already connected (otherSockets), the
+  // ── Switching sessions (REST) ──
+
+  // Opens one of the user's sessions. The playing session (if any) pauses first. An
+  // unended session becomes the current one and comes back PAUSED where it stopped (never
+  // auto-play); the user's sockets get 'switched'. An ENDED one is read-only: only its
+  // place in the list moves. Returns the session's full state as of its clock.
+  open(userId: string, sessionId: string): Promise<ReplayState> {
+    assertUserId(userId);
+    return this.lock.run(userLockKey(userId), async () => {
+      const target = await this.sessions.findOne({ where: { id: sessionId, userId } });
+      if (!target) throw new NotFoundException('No such replay session');
+      const paused = await this.pausePlaying(userId, 'USER');
+      return this.lock.run(target.id, async () => {
+        await this.sessions.update({ id: target.id, userId }, { lastOpenedAt: new Date() });
+        const s = await this.reload(target);
+        if (s.status !== 'ENDED') {
+          const switched: SwitchedEvent = { pausedSessionIds: paused, openedSessionId: s.id };
+          this.emitter.toUser(userId, 'switched', switched, s.clockTime);
+        }
+        return this.state.state(s);
+      });
+    });
+  }
+
+  // A new session, under the user's lock: the playing session pauses first, then `create`
+  // inserts the session (the latest opened, so the current one), then the user's sockets
+  // get 'switched'
+  createAndOpen(userId: string, create: () => Promise<SessionView>): Promise<SessionView> {
+    assertUserId(userId);
+    return this.lock.run(userLockKey(userId), async () => {
+      const paused = await this.pausePlaying(userId, 'USER');
+      const created = await create();
+      const switched: SwitchedEvent = { pausedSessionIds: paused, openedSessionId: created.id };
+      this.emitter.toUser(userId, 'switched', switched, new Date(created.clockTime));
+      return created;
+    });
+  }
+
+  // Pauses every PLAYING session of the user, each under its own lock with its timer
+  // cancelled and a status event sent; returns their ids
+  private async pausePlaying(userId: string, reason: ReplayPauseReason): Promise<string[]> {
+    const paused: string[] = [];
+    for (const found of await this.sessions.find({ where: { userId, status: 'PLAYING' } })) {
+      await this.lock.run(found.id, async () => {
+        this.cancelTimer(found.id);
+        const result = await this.sessions.update({ id: found.id, userId, status: 'PLAYING' }, { status: 'PAUSED', pauseReason: reason });
+        if (!result.affected) return;
+        paused.push(found.id);
+        const s = await this.reload(found);
+        this.emitter.toUser(userId, 'status', sessionView(s, (await this.pairs.get(s.pair)).lastTime), s.clockTime);
+      });
+    }
+    return paused;
+  }
+
+  // A socket connected: the user's current session is paused (never auto-play) and its
+  // full state returned. With another socket of the user already connected (otherSockets), the
   // reason becomes OTHER_TAB and every socket is told; alone, a playing session pauses
   // as DISCONNECT (its previous socket is gone) and a paused one keeps its reason.
   async connected(userId: string, otherSockets: boolean): Promise<ReplayState | null> {
     assertUserId(userId);
-    const found = await this.sessions.findOne({ where: { userId, status: Not('ENDED') } });
+    const found = await currentSession(this.sessions, userId);
     if (!found) return null;
     return this.lock.run(found.id, async () => {
       const s = await this.sessions.findOne({ where: { id: found.id, userId, status: Not('ENDED') } });
@@ -164,12 +235,12 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
   // The user's last socket left: pause and save now
   async lastSocketLeft(userId: string): Promise<void> {
     assertUserId(userId);
-    const found = await this.sessions.findOne({ where: { userId, status: Not('ENDED') } });
-    if (!found) return;
-    await this.lock.run(found.id, async () => {
-      this.cancelTimer(found.id);
-      await this.sessions.update({ id: found.id, userId, status: 'PLAYING' }, { status: 'PAUSED', pauseReason: 'DISCONNECT' });
-    });
+    for (const found of await this.sessions.find({ where: { userId, status: 'PLAYING' } })) {
+      await this.lock.run(found.id, async () => {
+        this.cancelTimer(found.id);
+        await this.sessions.update({ id: found.id, userId, status: 'PLAYING' }, { status: 'PAUSED', pauseReason: 'DISCONNECT' });
+      });
+    }
   }
 
   // The session ended (REST): no timer may touch it again
@@ -221,7 +292,7 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     if (changed.length > 0) {
       this.emitter.toUser(saved.userId, 'positions', changed.map((p) => positionView(p, ctx.priceDecimals)), saved.clockTime);
     }
-    this.emitter.toUser(saved.userId, 'account', accountView(saved.balance, live, last, ctx), saved.clockTime);
+    this.emitter.toUser(saved.userId, 'account', accountView(saved.id, saved.balance, live, last, ctx), saved.clockTime);
     // Calendar events the step passed: after the previous clock, up to the new one
     const passed = await calendarEvents(this.dataSource, calendarCurrencies(saved.pair), timeframe,
       { after: previousClock, from: null, upTo: saved.clockTime });
@@ -301,14 +372,17 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
 
   // ── Helpers ──
 
-  private async withSession<T>(userId: string, work: (s: ReplaySessionEntity, ctx: PairContext) => Promise<T>): Promise<T> {
+  // The named session under its lock: the user's, not ENDED, and with requireCurrent the
+  // user's current one. A stale tab's command is refused, never redirected.
+  private async withSession<T>(
+    userId: string, sessionId: unknown, requireCurrent: boolean, work: (s: ReplaySessionEntity, ctx: PairContext) => Promise<T>,
+  ): Promise<T> {
     assertUserId(userId);
-    const found = await this.sessions.findOne({ where: { userId, status: Not('ENDED') } });
-    if (!found) throw new ReplayCommandError('No active replay session');
-    return this.lock.run(found.id, async () => {
-      const s = await this.sessions.findOne({ where: { id: found.id, userId, status: Not('ENDED') } });
-      if (!s) throw new ReplayCommandError('No active replay session');
-      return work(s, await this.pairs.get(s.pair));
+    if (!isSessionId(sessionId)) throw new ReplayCommandError(NO_SUCH_SESSION);
+    return this.lock.run(sessionId, async () => {
+      const { session, refused } = await liveSession(this.sessions, userId, sessionId, requireCurrent);
+      if (refused || !session) throw new ReplayCommandError(refused === 'not-current' ? OTHER_SESSION_OPENED : NO_SUCH_SESSION);
+      return work(session, await this.pairs.get(session.pair));
     });
   }
 

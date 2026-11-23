@@ -3,7 +3,7 @@
 // services connected as a login with forexedge_replay's grants (test/replay-test-db.ts).
 // Skipped unless RUN_DB_TESTS=true:
 //   RUN_DB_TESTS=true npx nx test replay-service --testFile=session.db.spec.ts --skip-nx-cache
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { closeQuote, entryFill, tradeMoney } from '@forexedge/trading-sim';
 import { ReplaySessionEntity } from '@forexedge/database';
 import { createReplayTestDb, EURUSD_2022_01_03, ReplayTestDb, XAUUSD_2022_01_03 } from '../../test/replay-test-db';
@@ -74,9 +74,9 @@ run('replay sessions (real DB, real history, replay login)', () => {
     expect(session).toMatchObject({
       instrument: 'EUR_USD', status: 'PAUSED', pauseReason: null, speedMs: 1000, timeframe: '1h', endOfData: false,
       startTime: '2022-01-03T09:30:00.000Z', clockTime: expected?.toISOString(),
-      startingBalance: '10000.00', balance: '10000.00', endedAt: null,
+      startingBalance: '10000.00', balance: '10000.00', endedAt: null, title: 'EUR/USD · 1h · 2022-01-03',
     });
-    await service.end(userId);
+    await service.end(userId, session.id);
   });
 
   it('a weekend start jumps to the next traded minute', async () => {
@@ -86,7 +86,7 @@ run('replay sessions (real DB, real history, replay login)', () => {
     expect(new Date(expected as Date).getTime()).toBeGreaterThanOrEqual(Date.parse('2022-01-03T00:00Z'));
     expect(session.clockTime).toBe(expected?.toISOString());
     expect([session.startingBalance, session.balance]).toEqual(['2500.50', '2500.50']);
-    await service.end(userId);
+    await service.end(userId, session.id);
   });
 
   it('a start after the last traded minute sits on it, at the end of the data', async () => {
@@ -95,41 +95,44 @@ run('replay sessions (real DB, real history, replay login)', () => {
     const [{ t }] = await db.admin.query(`SELECT max(time) AS t FROM historical_candles WHERE pair = 'EUR/USD'`);
     expect(session.clockTime).toBe(new Date(t).toISOString());
     expect(session.endOfData).toBe(true);
-    await service.end(userId);
+    await service.end(userId, session.id);
   });
 
-  it('allows one active session per user: 409 with the active id', async () => {
+  it('keeps several sessions: a second create is the current one, the first stays PAUSED', async () => {
     const userId = await db.createUser();
     const first = await create(userId);
-    const err = await create(userId, { instrument: 'XAU_USD' }).catch((e) => e);
-    expect(err).toBeInstanceOf(ConflictException);
-    expect(err.getResponse()).toMatchObject({ statusCode: 409, activeSessionId: first.id });
+    const second = await create(userId, { instrument: 'XAU_USD' });
+    expect(second.id).not.toBe(first.id);
+    expect(Date.parse(second.lastOpenedAt)).toBeGreaterThanOrEqual(Date.parse(first.lastOpenedAt));
+    expect((await service.getActive(userId)).id).toBe(second.id);
+    const rows: { id: string; status: string }[] = await db.admin.query(
+      `SELECT id, status FROM replay_sessions WHERE user_id = $1 ORDER BY last_opened_at, id`, [userId]);
+    expect(rows.map((r) => r.status)).toEqual(['PAUSED', 'PAUSED']);
+    // ending the current one makes the other one current again
+    await service.end(userId, second.id);
     expect((await service.getActive(userId)).id).toBe(first.id);
-    await service.end(userId);
+    await service.end(userId, first.id);
   });
 
-  it('two creates at once: the partial unique index lets exactly one through', async () => {
+  it('two creates at once both succeed as PAUSED sessions', async () => {
     const userId = await db.createUser();
-    const results = await Promise.allSettled([create(userId), create(userId), create(userId)]);
-    const created = results.filter((r) => r.status === 'fulfilled');
-    const refused = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
-    expect(created).toHaveLength(1);
-    expect(refused).toHaveLength(2);
-    for (const r of refused) expect(r.reason).toBeInstanceOf(ConflictException);
-    const [{ n }] = await db.admin.query(
-      `SELECT count(*)::int AS n FROM replay_sessions WHERE user_id = $1 AND status <> 'ENDED'`, [userId]);
-    expect(n).toBe(1);
-    await service.end(userId);
+    const results = await Promise.all([create(userId), create(userId), create(userId)]);
+    expect(new Set(results.map((r) => r.id)).size).toBe(3);
+    const [{ n, playing }] = await db.admin.query(
+      `SELECT count(*)::int AS n, count(*) FILTER (WHERE status = 'PLAYING')::int AS playing
+         FROM replay_sessions WHERE user_id = $1 AND status <> 'ENDED'`, [userId]);
+    expect([n, playing]).toEqual([3, 0]);
+    for (const r of results) await service.end(userId, r.id);
   });
 
   it('another user never sees or ends my session (404)', async () => {
     const owner = await db.createUser();
     const other = await db.createUser();
-    await create(owner);
+    const mine = await create(owner);
     await expect(service.getActive(other)).rejects.toBeInstanceOf(NotFoundException);
-    await expect(service.end(other)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.end(other, mine.id)).rejects.toBeInstanceOf(NotFoundException);
     expect((await service.getActive(owner)).status).toBe('PAUSED');
-    await service.end(owner);
+    await service.end(owner, mine.id);
   });
 
   it('ending closes open positions at the clock minute close (SESSION_END) and cancels pending orders', async () => {
@@ -149,7 +152,7 @@ run('replay sessions (real DB, real history, replay login)', () => {
     await insert('SELL', 'OPEN', entryFill('SELL', fill));
     await insert('BUY', 'PENDING', null);
 
-    const ended = await service.end(userId);
+    const ended = await service.end(userId, session.id);
 
     const atClock = await minuteAt(db.admin, 'EUR/USD', clock);
     const spec = { pair: 'EUR/USD', units: 10_000, priceDecimals: 5, pipPoints: 10 };
@@ -178,8 +181,9 @@ run('replay sessions (real DB, real history, replay login)', () => {
 
     // Ended: no active session, ending again is a 404, and a new one can start
     await expect(service.getActive(userId)).rejects.toBeInstanceOf(NotFoundException);
-    await expect(service.end(userId)).rejects.toBeInstanceOf(NotFoundException);
-    expect((await create(userId)).status).toBe('PAUSED');
-    await service.end(userId);
+    await expect(service.end(userId, session.id)).rejects.toBeInstanceOf(NotFoundException);
+    const next = await create(userId);
+    expect(next.status).toBe('PAUSED');
+    await service.end(userId, next.id);
   });
 });

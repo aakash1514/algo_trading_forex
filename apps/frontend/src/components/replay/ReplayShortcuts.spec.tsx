@@ -41,7 +41,7 @@ describe('replay shortcuts: playback', () => {
   it('→ steps one bar while paused', async () => {
     await openScreen();
     expect(press('ArrowRight')).toBe(false);
-    expect(page.socket.sent).toEqual([expect.objectContaining({ name: 'step', body: {} })]);
+    expect(page.socket.sent).toEqual([expect.objectContaining({ name: 'step', body: { sessionId: STATE_PAUSED.session.id } })]);
   });
 
   it('Shift+→ steps 10 bars, one after another, like the Step 10 button', async () => {
@@ -182,14 +182,14 @@ describe('replay shortcuts: help and Esc', () => {
 
   it('Esc cancels the End-session question and never ends the session; other keys wait while it is open', async () => {
     await openScreen();
-    serve(rest('POST', '/active/end', 'end-200', 200));
+    serve(rest('POST', `/${STATE_PAUSED.session.id}/end`, 'end-200', 200));
     fireEvent.click(screen.getByRole('button', { name: 'End session' }));
     expect(screen.getByTestId('replay-end-confirm')).toBeTruthy();
     for (const key of [' ', 'ArrowRight', 'b']) expect(press(key)).toBe(true);
     press('Escape');
     expect(screen.queryByTestId('replay-end-confirm')).toBeNull();
     await act(async () => undefined);
-    expect(page.calls.some((c) => c.url.endsWith('/active/end'))).toBe(false);
+    expect(page.calls.some((c) => c.url.endsWith('/end'))).toBe(false);
     expect(page.socket.sent).toEqual([]);
     await waitFor(() => expect(screen.getByRole('button', { name: 'End session' })).toBeTruthy());
   });

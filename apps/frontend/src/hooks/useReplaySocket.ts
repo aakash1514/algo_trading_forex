@@ -6,7 +6,7 @@ import { io, type Socket } from 'socket.io-client';
 import { useAppDispatch, type RootState } from '../store';
 import {
   accountReceived, barReceived, calendarReceived, commandFinished, commandStarted, connectionChanged, endOfDataReceived, errorReceived,
-  positionsReceived, replayReset, sessionEnded, stateReceived, statusReceived,
+  positionsReceived, replayReset, sessionEnded, stateReceived, stateUpdated, statusReceived,
 } from '../store/slices/replay.slice';
 import { REPLAY_SOCKET_PATH, REPLAY_WS_URL } from '../lib/constants';
 import { AUTH_EXPIRED_EVENT, REAUTH_EVENT, renewSessionForSocket } from '../lib/socket-auth';
@@ -20,10 +20,10 @@ const RECONNECT_ATTEMPTS = 10;
 export type ReplayCommand = 'play' | 'pause' | 'step' | 'setSpeed' | 'setTimeframe';
 
 export interface ReplaySocket {
-  // Sends a command and waits for its acknowledgement; the page's controls stay
-  // disabled meanwhile (replay.pendingCommand)
+  // Sends a command for the session this page shows ({ sessionId, ...body }) and waits for
+  // its acknowledgement; the page's controls stay disabled meanwhile (replay.pendingCommand)
   command: (name: ReplayCommand, body?: Record<string, unknown>) => Promise<CommandAck>;
-  // Connects again to get a fresh 'state' (after creating a session, or a 409)
+  // Connects again to get a fresh 'state' (after creating a session)
   resync: () => void;
   // Starts over after the reconnect attempts ran out
   retry: () => void;
@@ -43,7 +43,9 @@ export interface ReplaySocket {
 // across tabs, the refresh token rotates) and connects again with the new token; if the
 // refresh fails the session is over (the login page says so) and nothing reconnects.
 // The server always sends a PAUSED state on connect, and nothing here ever sends
-// 'play' by itself.
+// 'play' by itself. That first 'state' after a connect (sent to this socket only) shows
+// the user's current session; a later 'state' is a broadcast (a timeframe change) and only
+// updates the session this page already shows. Every command names that session.
 export function useReplaySocket(): ReplaySocket {
   const dispatch = useAppDispatch();
   const store = useStore<RootState>();
@@ -84,7 +86,11 @@ export function useReplaySocket(): ReplaySocket {
       }
     });
 
-    socket.on('connect', () => dispatch(connectionChanged('connected')));
+    let awaitingConnectState = true;
+    socket.on('connect', () => {
+      awaitingConnectState = true;
+      dispatch(connectionChanged('connected'));
+    });
     socket.on('disconnect', (reason) => {
       // 'io client disconnect': this page closed it (leaving, or a resync)
       // 'io server disconnect': closed by the server: its token expired (authExpired came
@@ -116,7 +122,12 @@ export function useReplaySocket(): ReplaySocket {
 
     socket.on('state', (payload: ReplayState | { session: null }) => {
       refreshedSinceConnect = false;
-      dispatch(stateReceived(payload.session ? (payload as ReplayState) : null));
+      if (awaitingConnectState) {
+        awaitingConnectState = false;
+        dispatch(stateReceived(payload.session ? (payload as ReplayState) : null));
+      } else if (payload.session) {
+        dispatch(stateUpdated(payload as ReplayState));
+      }
     });
     socket.on('bar', (payload: BarEvent) => dispatch(barReceived(payload)));
     socket.on('calendar', (payload: CalendarMessage) => dispatch(calendarReceived(payload)));
@@ -146,13 +157,14 @@ export function useReplaySocket(): ReplaySocket {
     dispatch(commandStarted(name));
     let ack: CommandAck;
     try {
-      ack = await socket.timeout(COMMAND_TIMEOUT_MS).emitWithAck(name, body ?? {});
+      const sessionId = store.getState().replay.session?.id;
+      ack = await socket.timeout(COMMAND_TIMEOUT_MS).emitWithAck(name, { ...body, sessionId });
     } catch {
       ack = { ok: false, error: 'The replay service did not answer in time' };
     }
     dispatch(commandFinished(ack.ok ? null : ack.error));
     return ack;
-  }, [dispatch]);
+  }, [dispatch, store]);
 
   const resync = useCallback(() => {
     socketRef.current?.disconnect().connect();

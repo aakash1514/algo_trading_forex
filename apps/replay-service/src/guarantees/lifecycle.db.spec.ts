@@ -20,8 +20,14 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     return { userId, token: accessToken(userId) };
   };
   const create = (token: string, over: Record<string, unknown> = {}) =>
-    http<{ id: string; clockTime: string; activeSessionId?: string }>(app.url, token, 'POST', '/sessions',
+    http<{ id: string; clockTime: string; status: string }>(app.url, token, 'POST', '/sessions',
       { instrument: 'EUR_USD', startTime: '2022-01-03T09:00Z', timeframe: '1m', ...over });
+  // Ends the user's current session through its own route
+  const endCurrent = async (token: string) => {
+    const active = await http<{ id: string }>(app.url, token, 'GET', '/sessions/active');
+    expect(active.status).toBe(200);
+    expect((await http(app.url, token, 'POST', `/sessions/${active.body.id}/end`)).status).toBe(200);
+  };
   const stored = (id: string) => db.admin.getRepository(ReplaySessionEntity).findOneByOrFail({ id });
   const waitFor = async (check: () => Promise<boolean>, timeoutMs = 5_000) => {
     for (const until = Date.now() + timeoutMs; Date.now() < until; await sleep(50)) if (await check()) return true;
@@ -38,16 +44,34 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     await db?.close();
   });
 
-  it('one active session per user: 409 with the active session id', async () => {
+  it('a second create is 201 and the current session; the routes without a session id are gone', async () => {
     const { token } = await user();
     const first = await create(token);
     expect(first.status).toBe(201);
     const second = await create(token, { instrument: 'EUR_USD', startTime: '2022-01-03T12:00Z' });
-    expect(second.status).toBe(409);
-    expect(second.body.activeSessionId).toBe(first.body.id);
-    expect((await http(app.url, token, 'POST', '/sessions/active/end')).status).toBe(200);
-    expect((await create(token)).status).toBe(201);
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    expect([second.status, second.body.status]).toEqual([201, 'PAUSED']);
+    expect((await http<{ id: string }>(app.url, token, 'GET', '/sessions/active')).body.id).toBe(second.body.id);
+    for (const path of ['/sessions/active/end', '/sessions/active/orders']) {
+      expect((await http(app.url, token, 'POST', path, { side: 'BUY', lots: 0.1 })).status).toBe(400); // 'active' is not a UUID
+    }
+    expect((await http(app.url, token, 'POST', `/sessions/${first.body.id}/end`)).status).toBe(200);
+    expect((await http(app.url, token, 'POST', `/sessions/${second.body.id}/end`)).status).toBe(200);
+    expect((await http(app.url, token, 'GET', '/sessions/active')).status).toBe(404);
+  });
+
+  it('a command without its session id, or with another user’s, is refused', async () => {
+    const one = await user();
+    const two = await user();
+    const { body: theirs } = await create(two.token);
+    await create(one.token);
+    const a = await connectClient(app.url, one.token);
+    for (const body of [{}, { sessionId: 'active' }, { sessionId: theirs.id }]) {
+      expect(await a.command('step', body)).toEqual({ ok: false, error: 'No such replay session, or it has ended' });
+    }
+    expect((await stored(theirs.id)).clockTime.toISOString()).toBe(theirs.clockTime);
+    await a.close();
+    await endCurrent(one.token);
+    await endCurrent(two.token);
   });
 
   it('a socket without a valid token is refused', async () => {
@@ -61,8 +85,8 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     const { token } = await user();
     const { body: session } = await create(token);
     const a = await connectClient(app.url, token);
-    expect((await a.command('setSpeed', { speedMs: 500 })).ok).toBe(true);
-    expect((await a.command('play')).ok).toBe(true);
+    expect((await a.command('setSpeed', { sessionId: session.id, speedMs: 500 })).ok).toBe(true);
+    expect((await a.command('play', { sessionId: session.id })).ok).toBe(true);
     await a.next('bar');
     expect((await stored(session.id)).status).toBe('PLAYING');
     await a.close();
@@ -81,7 +105,7 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     expect(b.events.filter((e) => e.event === 'bar')).toEqual([]);
     expect((await stored(session.id)).clockTime.getTime()).toBe(clock);
     await b.close();
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
   });
 
   it('an expiring token without a reauth: authExpired, disconnected, a playing replay paused as DISCONNECT', async () => {
@@ -89,8 +113,8 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     const token = accessToken(userId, 3); // expires in 2-3 s (exp has whole seconds)
     const { body: session } = await create(token);
     const a = await connectClient(app.url, token);
-    expect((await a.command('setSpeed', { speedMs: 500 })).ok).toBe(true);
-    expect((await a.command('play')).ok).toBe(true);
+    expect((await a.command('setSpeed', { sessionId: session.id, speedMs: 500 })).ok).toBe(true);
+    expect((await a.command('play', { sessionId: session.id })).ok).toBe(true);
     await a.next('bar');
     const disconnected = new Promise<void>((resolve) => a.socket.once('disconnect', () => resolve()));
     await a.next('authExpired', 5_000);
@@ -98,7 +122,7 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     expect(await waitFor(async () => (await stored(session.id)).status === 'PAUSED')).toBe(true);
     expect((await stored(session.id)).pauseReason).toBe('DISCONNECT');
     const fresh = accessToken(userId);
-    await http(app.url, fresh, 'POST', '/sessions/active/end');
+    await endCurrent(fresh);
   });
 
   it('a reauth with the same user\'s fresh token keeps the socket; another user\'s token is refused', async () => {
@@ -116,21 +140,21 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     expect(a.socket.connected).toBe(true);
     expect(a.events.map((e) => e.event)).not.toContain('authExpired');
     await a.close();
-    await http(app.url, accessToken(userId), 'POST', '/sessions/active/end');
+    await endCurrent(accessToken(userId));
   });
 
   it('a second tab: connecting pauses, and only the last socket leaving pauses a replay played again', async () => {
     const { token } = await user();
     const { body: session } = await create(token);
     const a = await connectClient(app.url, token);
-    await a.command('setSpeed', { speedMs: 500 });
-    await a.command('play');
+    await a.command('setSpeed', { sessionId: session.id, speedMs: 500 });
+    await a.command('play', { sessionId: session.id });
     const toldA = a.next('status');
     const b = await connectClient(app.url, token);
     expect(b.state).toMatchObject({ session: { status: 'PAUSED', pauseReason: 'OTHER_TAB' } });
     expect(await toldA).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
     expect(await stored(session.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
-    expect(await a.command('play')).toMatchObject({ ok: true, result: { status: 'PLAYING', pauseReason: null } });
+    expect(await a.command('play', { sessionId: session.id })).toMatchObject({ ok: true, result: { status: 'PLAYING', pauseReason: null } });
     expect((await stored(session.id)).pauseReason).toBeNull();
     await b.close();
     await sleep(300);
@@ -138,25 +162,25 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     await a.close();
     expect(await waitFor(async () => (await stored(session.id)).status === 'PAUSED')).toBe(true);
     expect((await stored(session.id)).pauseReason).toBe('DISCONNECT');
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
   });
 
   it('a user only receives their own session', async () => {
     const one = await user();
     const two = await user();
-    await create(one.token);
+    const { body: session } = await create(one.token);
     await create(two.token);
     const a = await connectClient(app.url, one.token);
     const b = await connectClient(app.url, two.token);
-    expect((await a.command('step')).ok).toBe(true);
+    expect((await a.command('step', { sessionId: session.id })).ok).toBe(true);
     await sleep(300);
     expect(a.events.filter((e) => e.event === 'bar')).toHaveLength(1);
     expect(b.events.filter((e) => e.event !== 'state')).toEqual([]);
     expect((b.state as { session: { id: string } }).session.id).not.toBe((a.state as { session: { id: string } }).session.id);
     await a.close();
     await b.close();
-    await http(app.url, one.token, 'POST', '/sessions/active/end');
-    await http(app.url, two.token, 'POST', '/sessions/active/end');
+    await endCurrent(one.token);
+    await endCurrent(two.token);
   });
 
   it('accepts only 500, 1000 and 2000 ms per bar over the socket', async () => {
@@ -164,15 +188,15 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     const { body: session } = await create(token);
     const c = await connectClient(app.url, token);
     for (const speedMs of [750, 250, 3000, 0, -500, 0.5, 1, 2, '1000', null, undefined, 1000.5]) {
-      const ack = await c.command('setSpeed', { speedMs });
+      const ack = await c.command('setSpeed', { sessionId: session.id, speedMs });
       expect(ack).toEqual({ ok: false, error: 'speedMs must be 500, 1000 or 2000 (milliseconds per bar)' });
     }
     expect((await stored(session.id)).speedMs).toBe(1000);
     for (const speedMs of [500, 2000, 1000]) {
-      expect(await c.command('setSpeed', { speedMs })).toMatchObject({ ok: true, result: { speedMs } });
+      expect(await c.command('setSpeed', { sessionId: session.id, speedMs })).toMatchObject({ ok: true, result: { speedMs } });
     }
     await c.close();
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
   });
 
   it('a second tab on a session paused by the user: OTHER_TAB replaces USER and the first tab is told', async () => {
@@ -180,8 +204,8 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     const { body: session } = await create(token);
     const a = await connectClient(app.url, token);
     expect(a.state).toMatchObject({ session: { status: 'PAUSED', pauseReason: null } }); // never played
-    await a.command('play');
-    expect(await a.command('pause')).toMatchObject({ ok: true, result: { status: 'PAUSED', pauseReason: 'USER' } });
+    await a.command('play', { sessionId: session.id });
+    expect(await a.command('pause', { sessionId: session.id })).toMatchObject({ ok: true, result: { status: 'PAUSED', pauseReason: 'USER' } });
     expect((await stored(session.id)).pauseReason).toBe('USER');
     const toldA = a.next('status');
     const b = await connectClient(app.url, token);
@@ -192,7 +216,7 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     await a.close();
     await sleep(300);
     expect(await stored(session.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'OTHER_TAB' });
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
     expect(await stored(session.id)).toMatchObject({ status: 'ENDED', pauseReason: null });
   });
 
@@ -209,27 +233,27 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     } finally {
       await second.close();
     }
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
   });
 
   it('cancel: a PENDING order only, its margin released; 409 once filled', async () => {
     const { token } = await user();
-    await create(token);
+    const { body: session } = await create(token);
     const c = await connectClient(app.url, token);
     const placed = await http<{ position: { id: string }; account: { marginUsed: string } }>(
-      app.url, token, 'POST', '/sessions/active/orders', { side: 'BUY', lots: 0.1 });
+      app.url, token, 'POST', `/sessions/${session.id}/orders`, { side: 'BUY', lots: 0.1 });
     expect(placed.status).toBe(201);
     expect(placed.body.account.marginUsed).not.toBe('0.00');
     const cancelled = await http<{ position: { status: string }; account: { marginUsed: string } }>(
-      app.url, token, 'POST', `/sessions/active/orders/${placed.body.position.id}/cancel`);
+      app.url, token, 'POST', `/sessions/${session.id}/orders/${placed.body.position.id}/cancel`);
     expect([cancelled.status, cancelled.body.position.status, cancelled.body.account.marginUsed]).toEqual([200, 'CANCELLED', '0.00']);
-    expect((await http(app.url, token, 'POST', `/sessions/active/orders/${placed.body.position.id}/cancel`)).status).toBe(409);
-    const filled = await http<{ position: { id: string } }>(app.url, token, 'POST', '/sessions/active/orders', { side: 'SELL', lots: 0.1 });
-    await c.command('step');
-    const late = await http<{ message: string }>(app.url, token, 'POST', `/sessions/active/orders/${filled.body.position.id}/cancel`);
+    expect((await http(app.url, token, 'POST', `/sessions/${session.id}/orders/${placed.body.position.id}/cancel`)).status).toBe(409);
+    const filled = await http<{ position: { id: string } }>(app.url, token, 'POST', `/sessions/${session.id}/orders`, { side: 'SELL', lots: 0.1 });
+    await c.command('step', { sessionId: session.id });
+    const late = await http<{ message: string }>(app.url, token, 'POST', `/sessions/${session.id}/orders/${filled.body.position.id}/cancel`);
     expect([late.status, late.body.message]).toEqual([409, 'The order has already filled']);
     await c.close();
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
   });
 
   // A real minute where a long's SL and TP are both inside one minute: EUR/USD
@@ -252,17 +276,17 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     expect(m.l1 > sl && m.h1 < tp && m.o1 > sl && m.o1 < tp && m.o2 > sl && m.o2 < tp).toBe(true);
 
     const { token } = await user();
-    await create(token, { startTime: '2022-01-03T13:41Z' });
+    const { body: session } = await create(token, { startTime: '2022-01-03T13:41Z' });
     const c = await connectClient(app.url, token);
-    const placed = await http<{ position: { id: string } }>(app.url, token, 'POST', '/sessions/active/orders',
+    const placed = await http<{ position: { id: string } }>(app.url, token, 'POST', `/sessions/${session.id}/orders`,
       { side: 'BUY', lots: 0.1, stopLoss: sl / 1e5, takeProfit: tp / 1e5 });
     expect(placed.status).toBe(201);
-    expect((await c.command('step')).ok).toBe(true); // 13:42: fills, no exit
-    expect((await c.command('step')).ok).toBe(true); // 13:43: both levels inside the minute
+    expect((await c.command('step', { sessionId: session.id })).ok).toBe(true); // 13:42: fills, no exit
+    expect((await c.command('step', { sessionId: session.id })).ok).toBe(true); // 13:43: both levels inside the minute
     const [p] = await db.admin.query('SELECT * FROM replay_positions WHERE id = $1', [placed.body.position.id]);
     expect([p.status, new Date(p.entry_time).toISOString(), p.entry_points]).toEqual(['CLOSED', '2022-01-03T13:42:00.000Z', p.entry_points]);
     expect([p.exit_reason, new Date(p.exit_time).toISOString(), p.exit_points]).toEqual(['SL', '2022-01-03T13:43:00.000Z', sl]);
     await c.close();
-    await http(app.url, token, 'POST', '/sessions/active/end');
+    await endCurrent(token);
   });
 });

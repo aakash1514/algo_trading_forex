@@ -40,25 +40,9 @@ describe('Replay page: start, resume, end', () => {
     expect(page.socket.sent.map((s) => s.name)).not.toContain('play'); // never plays by itself
   });
 
-  it('a 409 shows the resume card of the active session; Resume opens it', async () => {
-    serve(rest('POST', '', 'create-409', 409));
-    const active = fixture<ReplayState>('state-open-positions');
-    page.socket.onConnect = () => page.socket.open(active);
-    renderPage();
-    page.socket.open(fixture('state-no-session'));
-    fireEvent.change(screen.getByLabelText('Start date (UTC)'), { target: { value: '2015-06-01' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Start replay' }));
-    const card = await screen.findByTestId('replay-resume-card');
-    const values = within(card).getAllByRole('definition').map((d) => d.textContent);
-    expect(values).toEqual(['EUR/USD', '2022-03-01 09:43 UTC', '$9,994.50', '2']);
-    expect(active.account).toMatchObject({ equity: '9994.50', openPositions: 2 });
-    fireEvent.click(within(card).getByRole('button', { name: 'Resume' }));
-    expect(screen.getByTestId('replay-status').textContent).toBe('Paused');
-  });
-
   it('ending asks on the page, then shows the summary and goes back to the start form', async () => {
     await openScreen(fixture('state-closed-trades'));
-    serve(rest('POST', '/active/end', 'end-200', 200));
+    serve(rest('POST', `/${fixture<ReplayState>('state-closed-trades').session.id}/end`, 'end-200', 200));
     fireEvent.click(screen.getByRole('button', { name: 'End session' }));
     expect(screen.getByTestId('replay-end-confirm').textContent)
       .toContain('Your 1 open position will be closed at the current replay price');
@@ -117,7 +101,7 @@ describe('Replay page: playback', () => {
     expect(screen.getByTestId('replay-command-error').textContent).toBe('Replay command failed');
 
     fireEvent.click(screen.getByRole('button', { name: '0.5 s' }));
-    expect(page.socket.sent[1]).toMatchObject({ name: 'setSpeed', body: { speedMs: 500 } });
+    expect(page.socket.sent[1]).toMatchObject({ name: 'setSpeed', body: { sessionId: STATE_PAUSED.session.id, speedMs: 500 } });
     fireEvent.click(screen.getByRole('button', { name: '4h' }));
     expect(page.socket.sent).toHaveLength(2); // still waiting for the speed's acknowledgement
   });
@@ -182,7 +166,7 @@ describe('Replay page: orders and positions', () => {
     expect(screen.getByTestId('replay-order-error').textContent).toBe('Lots must be between 0.01 and 100, with at most 2 decimals');
     expect(page.calls).toHaveLength(1); // the create only
 
-    serve(rest('POST', '/active/orders', 'order-400-margin', 400));
+    serve(rest('POST', `/${STATE_PAUSED.session.id}/orders`, 'order-400-margin', 400));
     fireEvent.change(screen.getByLabelText('Lots'), { target: { value: '100' } });
     fireEvent.click(screen.getByRole('button', { name: 'Buy 100 lots' }));
     await waitFor(() => expect(screen.getByTestId('replay-order-error').textContent)
@@ -192,7 +176,7 @@ describe('Replay page: orders and positions', () => {
 
   it('a placed order is Pending with Cancel; filled it is Open with its live P&L; a close is pending', async () => {
     await openScreen();
-    serve(rest('POST', '/active/orders', 'order-201-pending', 201));
+    serve(rest('POST', `/${STATE_PAUSED.session.id}/orders`, 'order-201-pending', 201));
     fireEvent.click(screen.getByRole('button', { name: 'Buy 0.10 lots' }));
     const row = await screen.findByTestId('replay-position-row');
     expect(within(row).getAllByRole('cell')[0].textContent).toBe('Pending · fills at the next minute\'s open');
@@ -208,7 +192,7 @@ describe('Replay page: orders and positions', () => {
     expect(pnl.every((t) => /^[+-]\$\d+\.\d{2}$/.test(t ?? ''))).toBe(true);
 
     const short = open.positions.find((p) => p.side === 'SELL' && p.status === 'OPEN');
-    serve({ method: 'POST', path: `/active/positions/${short?.id}/close`, status: 200, body: raw('close-200') });
+    serve({ method: 'POST', path: `/${STATE_PAUSED.session.id}/positions/${short?.id}/close`, status: 200, body: raw('close-200') });
     const shortRow = rows.find((r) => within(r).queryByText('SHORT')) as HTMLElement;
     fireEvent.click(within(shortRow).getByRole('button', { name: 'Close' }));
     await waitFor(() => expect(within(shortRow).getAllByRole('cell')[0].textContent).toBe('Closing at the next minute\'s open'));

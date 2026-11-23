@@ -11,7 +11,7 @@ import { StartForm } from './StartForm';
 
 // The Replay page. The socket's first 'state' says whether the user has an active
 // session: none -> the start form; one -> the resume card, then the replay screen.
-// Creating a session (or a 409 because one exists) connects again for its state.
+// Creating a session connects again for its state (it is now the user's current one).
 export function ReplayClient() {
   const dispatch = useAppDispatch();
   const socket = useReplaySocket();
@@ -37,10 +37,7 @@ export function ReplayClient() {
       : <p role="status" className="text-[12px] text-terminal-muted">Connecting to the replay service…</p>;
   } else if (!hasSession) {
     body = (
-      <StartForm
-        onCreated={() => { setOpened(true); socket.resync(); }}
-        onConflict={() => { setOpened(false); socket.resync(); }}
-      />
+      <StartForm onCreated={() => { setOpened(true); socket.resync(); }} />
     );
   } else if (!opened) {
     body = <ResumeCard onResume={() => setOpened(true)} />;

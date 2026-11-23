@@ -11,6 +11,9 @@ import { ReplayEmitter } from './replay-emitter';
 
 export type CommandAck<T> = { ok: true; result: T } | { ok: false; error: string };
 
+// A command's body as the client sent it (validated by PlaybackService)
+type CommandBody = { sessionId?: unknown } | undefined;
+
 // Socket.IO namespace /replay (CORS in main.ts's adapter). A socket authenticates with
 // the access token in handshake.auth.token and joins room user:<id>: a user only ever
 // receives their own session. On connect it gets the full state, always PAUSED.
@@ -80,29 +83,30 @@ export class ReplayGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     return { ok: true, result: { expiresAt: new Date(verified.expiresAtMs).toISOString() } };
   }
 
+  // Every command names its session: { sessionId, ... }
   @SubscribeMessage('play')
-  play(@ConnectedSocket() socket: Socket) {
-    return this.command(socket, (userId) => this.playback.play(userId));
+  play(@ConnectedSocket() socket: Socket, @MessageBody() body: CommandBody) {
+    return this.command(socket, (userId) => this.playback.play(userId, body?.sessionId));
   }
 
   @SubscribeMessage('pause')
-  pause(@ConnectedSocket() socket: Socket) {
-    return this.command(socket, (userId) => this.playback.pause(userId));
+  pause(@ConnectedSocket() socket: Socket, @MessageBody() body: CommandBody) {
+    return this.command(socket, (userId) => this.playback.pause(userId, body?.sessionId));
   }
 
   @SubscribeMessage('step')
-  step(@ConnectedSocket() socket: Socket) {
-    return this.command(socket, (userId) => this.playback.step(userId));
+  step(@ConnectedSocket() socket: Socket, @MessageBody() body: CommandBody) {
+    return this.command(socket, (userId) => this.playback.step(userId, body?.sessionId));
   }
 
   @SubscribeMessage('setSpeed')
-  setSpeed(@ConnectedSocket() socket: Socket, @MessageBody() body: { speedMs?: unknown } | undefined) {
-    return this.command(socket, (userId) => this.playback.setSpeed(userId, body?.speedMs));
+  setSpeed(@ConnectedSocket() socket: Socket, @MessageBody() body: CommandBody & { speedMs?: unknown }) {
+    return this.command(socket, (userId) => this.playback.setSpeed(userId, body?.sessionId, body?.speedMs));
   }
 
   @SubscribeMessage('setTimeframe')
-  setTimeframe(@ConnectedSocket() socket: Socket, @MessageBody() body: { timeframe?: unknown } | undefined) {
-    return this.command(socket, (userId) => this.playback.setTimeframe(userId, body?.timeframe));
+  setTimeframe(@ConnectedSocket() socket: Socket, @MessageBody() body: CommandBody & { timeframe?: unknown }) {
+    return this.command(socket, (userId) => this.playback.setTimeframe(userId, body?.sessionId, body?.timeframe));
   }
 
   private async command<T>(socket: Socket, run: (userId: string) => Promise<T>): Promise<CommandAck<T>> {

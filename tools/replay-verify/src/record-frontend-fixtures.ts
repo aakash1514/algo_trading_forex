@@ -75,8 +75,10 @@ async function main(): Promise<void> {
       }
       throw new Error(`no ${event} within ${timeoutMs} ms`);
     };
-    const ack = (cmd: string, body?: unknown) => new Promise<{ ok: boolean; error?: string }>((ok) => socket.emit(cmd, body ?? {}, ok));
     const state = (await next('state')) as State;
+    // every command names the session this socket was given
+    const ack = (cmd: string, body?: object) => new Promise<{ ok: boolean; error?: string }>(
+      (ok) => socket.emit(cmd, { sessionId: state.session?.id, ...body }, ok));
     return { socket, queue, next, ack, state, close: () => socket.disconnect() };
   };
   const json = (payload: unknown) => JSON.stringify(payload);
@@ -88,8 +90,7 @@ async function main(): Promise<void> {
   save('state-no-session', 'socket', "'state' on connect without a session", json(c.state));
   const created = await rest('POST', '/sessions', { instrument: 'EUR_USD', startTime: '2022-03-01T09:30Z', timeframe: '1m', startingBalance: 10000 });
   save('create-201', 'rest', 'POST /sessions {EUR_USD, 2022-03-01T09:30Z, 1m, 10000}', created.text, created.status);
-  const again = await rest('POST', '/sessions', { instrument: 'XAU_USD', startTime: '2015-06-01T08:00Z', timeframe: '1h', startingBalance: 10000 });
-  save('create-409', 'rest', 'POST /sessions while one is active', again.text, again.status);
+  const s1 = created.json.id as string;
   c.close();
 
   c = await connect();
@@ -103,19 +104,19 @@ async function main(): Promise<void> {
   const { bar: clockBar } = bar as { bar: Bar };
   const d = c.state.priceDecimals;
 
-  const buy = await rest('POST', '/sessions/active/orders',
+  const buy = await rest('POST', `/sessions/${s1}/orders`,
     { side: 'BUY', lots: 0.1, stopLoss: Number(level(clockBar, -100, d)), takeProfit: Number(level(clockBar, 100, d)) });
   save('order-201-pending', 'rest', 'POST /orders BUY 0.1 lots, SL bid-100 points, TP bid+100 points', buy.text, buy.status);
   save('positions-pending', 'socket', "'positions' after the order", json(await c.next('positions')));
   save('account-after-order', 'socket', "'account' after the order", json(await c.next('account')));
-  const sell = await rest('POST', '/sessions/active/orders', { side: 'SELL', lots: 0.2 });
+  const sell = await rest('POST', `/sessions/${s1}/orders`, { side: 'SELL', lots: 0.2 });
   if (sell.status !== 201) throw new Error(`sell: ${sell.text}`);
-  const wrong = await rest('POST', '/sessions/active/orders', { side: 'BUY', lots: 0.1, stopLoss: Number(level(clockBar, 50, d)) });
+  const wrong = await rest('POST', `/sessions/${s1}/orders`, { side: 'BUY', lots: 0.1, stopLoss: Number(level(clockBar, 50, d)) });
   save('order-400-sl-side', 'rest', 'POST /orders BUY with the stop loss above the bid', wrong.text, wrong.status);
-  const margin = await rest('POST', '/sessions/active/orders', { side: 'BUY', lots: 100 });
+  const margin = await rest('POST', `/sessions/${s1}/orders`, { side: 'BUY', lots: 100 });
   save('order-400-margin', 'rest', 'POST /orders BUY 100 lots on 10,000 USD', margin.text, margin.status);
-  const toCancel = await rest('POST', '/sessions/active/orders', { side: 'BUY', lots: 0.05 });
-  const cancelled = await rest('POST', `/sessions/active/orders/${toCancel.json.position.id}/cancel`);
+  const toCancel = await rest('POST', `/sessions/${s1}/orders`, { side: 'BUY', lots: 0.05 });
+  const cancelled = await rest('POST', `/sessions/${s1}/orders/${toCancel.json.position.id}/cancel`);
   save('cancel-200', 'rest', 'POST /orders/:id/cancel of a pending order', cancelled.text, cancelled.status);
   c.queue.length = 0;
 
@@ -125,7 +126,7 @@ async function main(): Promise<void> {
   c = await connect();
   save('state-open-positions', 'socket', "'state' with a long and a short open", json(c.state));
 
-  const closing = await rest('POST', `/sessions/active/positions/${sell.json.position.id}/close`);
+  const closing = await rest('POST', `/sessions/${s1}/positions/${sell.json.position.id}/close`);
   save('close-200', 'rest', 'POST /positions/:id/close (pending until the next minute)', closing.text, closing.status);
   c.queue.length = 0;
   await c.ack('step');
@@ -141,13 +142,13 @@ async function main(): Promise<void> {
   save('status-paused-user', 'socket', "'status' after pause (USER)", json(await c.next('status', 10_000,
     (p) => (p as { pauseReason?: string }).pauseReason === 'USER')));
 
-  await rest('POST', '/sessions/active/orders', { side: 'SELL', lots: 0.3 });
+  await rest('POST', `/sessions/${s1}/orders`, { side: 'SELL', lots: 0.3 });
   await c.ack('step');
   c.close();
   c = await connect();
   save('state-closed-trades', 'socket', "'state' with two closed trades and an open short", json(c.state));
-  const ended = await rest('POST', '/sessions/active/end');
-  save('end-200', 'rest', 'POST /sessions/active/end with one position open', ended.text, ended.status);
+  const ended = await rest('POST', `/sessions/${s1}/end`);
+  save('end-200', 'rest', 'POST /sessions/:id/end with one position open', ended.text, ended.status);
   save('ended', 'socket', "'ended' after the end", json(await c.next('ended')));
   c.close();
 
@@ -170,13 +171,13 @@ async function main(): Promise<void> {
   // 21 trades closed in one minute: a full first page with a cursor, then one more
   const opened: string[] = [];
   for (let i = 0; i < 21; i++) {
-    const o = await rest('POST', '/sessions/active/orders', { side: i % 2 === 0 ? 'BUY' : 'SELL', lots: 0.01 });
+    const o = await rest('POST', `/sessions/${sid}/orders`, { side: i % 2 === 0 ? 'BUY' : 'SELL', lots: 0.01 });
     if (o.status !== 201) throw new Error(`order: ${o.text}`);
     opened.push(o.json.position.id);
   }
   for (let i = 0; i < 5; i++) await c.ack('step');
   for (const pid of opened) {
-    const r = await rest('POST', `/sessions/active/positions/${pid}/close`);
+    const r = await rest('POST', `/sessions/${sid}/positions/${pid}/close`);
     if (r.status !== 200) throw new Error(`close: ${r.text}`);
   }
   await c.ack('step');
@@ -184,9 +185,9 @@ async function main(): Promise<void> {
   save('trades-200-page1', 'rest', 'GET /sessions/:id/trades: 20 of 21 trades closed in one minute', page1.text, page1.status);
   const page2 = await rest('GET', `/sessions/${sid}/trades?cursor=${page1.json.nextCursor}`);
   save('trades-200-page2', 'rest', 'GET /sessions/:id/trades?cursor=: the last of the 21', page2.text, page2.status);
-  const later = await rest('POST', '/sessions/active/orders', { side: 'BUY', lots: 0.02 });
+  const later = await rest('POST', `/sessions/${sid}/orders`, { side: 'BUY', lots: 0.02 });
   await c.ack('step');
-  await rest('POST', `/sessions/active/positions/${later.json.position.id}/close`);
+  await rest('POST', `/sessions/${sid}/positions/${later.json.position.id}/close`);
   c.queue.length = 0;
   await c.ack('step');
   save('positions-closed-later', 'socket', "'positions' from the step that closed a 22nd trade, after the pages were loaded",
@@ -195,24 +196,24 @@ async function main(): Promise<void> {
   save('stats-200', 'rest', 'GET /sessions/:id/stats after the 22 trades', stats.text, stats.status);
   const missing = await rest('GET', `/sessions/${randomUUID()}/trades`);
   save('trades-404', 'rest', 'GET /sessions/:id/trades of a session the user does not own', missing.text, missing.status);
-  await rest('POST', '/sessions/active/end');
+  await rest('POST', `/sessions/${sid}/end`);
   c.close();
 
   // ── USD/JPY: P&L converted at the price ──
-  await rest('POST', '/sessions', { instrument: 'USD_JPY', startTime: '2016-06-23T22:00Z', timeframe: '1h', startingBalance: 25000 });
+  const jpy = (await rest('POST', '/sessions', { instrument: 'USD_JPY', startTime: '2016-06-23T22:00Z', timeframe: '1h', startingBalance: 25000 })).json.id as string;
   c = await connect();
-  await rest('POST', '/sessions/active/orders', { side: 'BUY', lots: 0.5 });
-  await rest('POST', '/sessions/active/orders', { side: 'SELL', lots: 0.3 });
+  await rest('POST', `/sessions/${jpy}/orders`, { side: 'BUY', lots: 0.5 });
+  await rest('POST', `/sessions/${jpy}/orders`, { side: 'SELL', lots: 0.3 });
   await c.ack('step');
   await c.ack('step');
   c.close();
   c = await connect();
   save('state-usdjpy-open-positions', 'socket', "'state' of USD/JPY (2016-06-24, Brexit vote night) with a long and a short open", json(c.state));
-  await rest('POST', '/sessions/active/end');
+  await rest('POST', `/sessions/${jpy}/end`);
   c.close();
 
   // ── The end of the history ──
-  await rest('POST', '/sessions', { instrument: 'EUR_USD', startTime: '2022-12-30T20:30Z', timeframe: '1h', startingBalance: 10000 });
+  const last = (await rest('POST', '/sessions', { instrument: 'EUR_USD', startTime: '2022-12-30T20:30Z', timeframe: '1h', startingBalance: 10000 })).json.id as string;
   c = await connect();
   c.queue.length = 0;
   for (let i = 0; i < 5; i++) if (!(await c.ack('step')).ok) break;
@@ -222,7 +223,7 @@ async function main(): Promise<void> {
   c.close();
   c = await connect();
   save('state-end-of-data', 'socket', "'state' on reconnect at the end of the data", json(c.state));
-  await rest('POST', '/sessions/active/end');
+  await rest('POST', `/sessions/${last}/end`);
   c.close();
 
   const sorted = Object.fromEntries(Object.entries(manifest).sort(([a], [b]) => a.localeCompare(b)));

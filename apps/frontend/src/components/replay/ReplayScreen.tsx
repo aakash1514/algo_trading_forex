@@ -42,7 +42,7 @@ export function ReplayScreen({ socket }: { socket: ReplaySocket }) {
         </span>
         <span className="text-[11px] text-terminal-muted">Historical Dukascopy data · bid candles</span>
         <div className="ml-auto">
-          <EndSession openPositions={account.openPositions} pendingOrders={account.pendingOrders} />
+          <EndSession sessionId={session.id} openPositions={account.openPositions} pendingOrders={account.pendingOrders} />
         </div>
       </div>
       <ReplayControls socket={socket} actions={actions} helpOpen={helpOpen} onToggleHelp={toggleHelp} />

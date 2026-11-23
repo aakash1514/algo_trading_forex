@@ -164,9 +164,11 @@ ended row shows no order panel or controls, a title with markup renders as text.
 ## 5. Groups (one commit each)
 
 1. Migration + entity (+ grants checks in `create-replay-db-user.ts`, `session.db.spec.ts`).
-2. replay-service: current session, `open`, create without 409, one playing. DB suite run once.
+2. replay-service: current session, `open`, create without 409, one playing, every command named by its session;
+   in the same commit the clients that call it (frontend wiring, `replay:verify`, `replay:e2e`, the fixture recorder,
+   fixtures re-recorded), so no commit leaves the page or the tools on removed routes. DB suite run once.
 3. replay-service: list, rename, delete. DB suite run once.
-4. tools: `replay:e2e` steps, fixture recorder (new bodies recorded from a real run).
+4. tools: the recorder records the list/rename/delete/open bodies (re-recorded from a real run).
 5. Frontend: API + types, My replays list, rename, delete dialog.
 6. Frontend: open/switch, ended read-only view, "My replays" button.
 7. Docs: CLAUDE.md replay rules (the one-session rule rewritten), BACKLOG (ended sessions kept on purpose + delete

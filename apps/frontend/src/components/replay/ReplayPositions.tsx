@@ -149,13 +149,13 @@ export function ReplayPositions() {
                     <td className={cn(TD, 'font-medium')} data-testid="replay-position-pnl"><Money cents={pnl(p)} /></td>
                     <td className={TD}>
                       {p.status === 'PENDING' ? (
-                        <button type="button" disabled={busyId === p.id} onClick={() => act(p.id, cancelOrder)}
+                        <button type="button" disabled={busyId === p.id} onClick={() => act(p.id, (id) => cancelOrder({ sessionId: session.id, id }))}
                           className="text-[10px] px-2 py-1 rounded border border-terminal-border text-terminal-muted hover:text-[#e2e4e9] disabled:opacity-40">
                           Cancel
                         </button>
                       ) : (
                         <button type="button" disabled={busyId === p.id || p.exitRequestedAt !== null || session.endOfData}
-                          onClick={() => act(p.id, closePosition)}
+                          onClick={() => act(p.id, (id) => closePosition({ sessionId: session.id, id }))}
                           className="text-[10px] px-2 py-1 rounded border border-accent-red/30 text-accent-red hover:bg-accent-red/10 disabled:opacity-40">
                           Close
                         </button>

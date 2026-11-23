@@ -7,6 +7,7 @@ export type PauseReason = (typeof PAUSE_REASONS)[number];
 
 export interface ReplaySession {
   id: string;
+  title: string;               // the user's title, or the auto name 'EUR/USD · 1m · 2022-03-16'
   instrument: string;          // 'EUR_USD'
   startTime: string;
   clockTime: string;           // the last processed M1 minute (UTC)
@@ -20,9 +21,12 @@ export interface ReplaySession {
   createdAt: string;
   updatedAt: string;
   endedAt: string | null;
+  lastOpenedAt: string;
 }
 
+// Every account and position event names its session: a tab ignores another session's
 export interface ReplayAccount {
+  sessionId: string;
   clockTime: string;
   balance: string;
   unrealizedPnlUsd: string;
@@ -50,6 +54,7 @@ export interface ReplayBar {
 
 export interface ReplayPosition {
   id: string;
+  sessionId: string;
   side: 'BUY' | 'SELL';
   lots: string;
   units: number;

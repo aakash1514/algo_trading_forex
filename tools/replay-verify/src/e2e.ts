@@ -24,7 +24,7 @@ interface Position {
 }
 
 // The API's views, as far as this run reads them
-interface Session { id: string; status: string; clockTime: string; balance: string; activeSessionId?: string }
+interface Session { id: string; status: string; clockTime: string; balance: string }
 interface Bar { time: string; lastMinute: string | null; bid: { close: string }; ask: { close: string } }
 interface State { session: Session; bars: Bar[]; currentBar: Bar }
 interface Account { equity: string; freeMargin: string }
@@ -67,7 +67,8 @@ async function main(): Promise<void> {
     const events: Received[] = [];
     socket.onAny((event: string, payload: unknown) => events.push({ event, payload, at: Date.now() }));
     const state = await new Promise<State>((ok, fail) => { socket.once('state', ok); socket.once('connect_error', fail); });
-    const ack = (cmd: string, body?: unknown) => new Promise<Ack>((ok) => socket.emit(cmd, body ?? {}, ok));
+    // every command names the session the socket was given
+    const ack = (cmd: string, body?: object) => new Promise<Ack>((ok) => socket.emit(cmd, { sessionId: state.session.id, ...body }, ok));
     return { socket, events, state, ack };
   };
 
@@ -84,7 +85,12 @@ async function main(): Promise<void> {
     `${created.body.status}, balance ${created.body.balance}`);
   check(created.status === 201 && created.body.status === 'PAUSED', 'created PAUSED');
   const again = await rest<Session>('POST', '/sessions', { instrument: 'XAU_USD', startTime: start, timeframe: '1h' });
-  check(again.status === 409 && again.body.activeSessionId === created.body.id, `a second create is 409 with the active id (HTTP ${again.status})`);
+  check(again.status === 201 && (await rest<Session>('GET', '/sessions/active')).body.id === again.body.id,
+    `a second create is 201 and the current session (HTTP ${again.status})`);
+  check((await rest<Session>('POST', `/sessions/${again.body.id}/end`)).status === 200, 'the second session ends by its id');
+  const reopened = await rest<{ session: Session }>('POST', `/sessions/${created.body.id}/open`);
+  check(reopened.status === 200 && reopened.body.session.id === created.body.id && reopened.body.session.status === 'PAUSED',
+    'opening the first session again: it is current and PAUSED');
 
   let c = await connect();
   log(`Socket state on connect: ${c.state.session.status}, clock ${c.state.session.clockTime}, ${c.state.bars.length} history bars, ` +
@@ -127,7 +133,7 @@ async function main(): Promise<void> {
   const sl = Number((bid - 0.0010).toFixed(5));
   const tp = Number((bid + 0.0010).toFixed(5));
   log(`Clock ${st.body.clockTime}, bid close ${lastBar.bid.close}: BUY 0.1 lot, SL ${sl.toFixed(5)}, TP ${tp.toFixed(5)}`);
-  const placed = await rest<{ position: Position; account: Account }>('POST', '/sessions/active/orders', { side: 'BUY', lots: 0.1, stopLoss: sl, takeProfit: tp });
+  const placed = await rest<{ position: Position; account: Account }>('POST', `/sessions/${created.body.id}/orders`, { side: 'BUY', lots: 0.1, stopLoss: sl, takeProfit: tp });
   log(`POST /orders: HTTP ${placed.status}, ${placed.body.position.status}, placed at ${placed.body.position.placedAt}, margin ` +
     `$${placed.body.position.marginUsd}; account equity ${placed.body.account.equity}, free margin ${placed.body.account.freeMargin}`);
   check(placed.status === 201 && placed.body.position.status === 'PENDING', 'the order is PENDING until the next minute');
@@ -186,7 +192,7 @@ async function main(): Promise<void> {
   log('');
 
   log('## 5. End the session');
-  const ended = await rest<Ended>('POST', '/sessions/active/end');
+  const ended = await rest<Ended>('POST', `/sessions/${created.body.id}/end`);
   await sleep(300);
   log(`POST /end: HTTP ${ended.status}, ${ended.body.session.status}, balance ${ended.body.session.balance}, ` +
     `${ended.body.closed.length} closed and ${ended.body.cancelled.length} cancelled at the end; socket got 'ended': ` +

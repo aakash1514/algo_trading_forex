@@ -13,13 +13,12 @@ const FIELD = 'w-full rounded border border-terminal-border bg-terminal-bg px-2.
 const LABEL = 'block text-[10px] font-medium text-terminal-muted uppercase tracking-wider mb-1';
 
 interface StartFormProps {
-  onCreated: () => void;   // the session exists (PAUSED): open it
-  onConflict: () => void;  // 409: a session is already active: show it
+  onCreated: () => void;   // the session exists (PAUSED, the user's current one): open it
 }
 
 // A new replay: pair, a start in UTC inside the imported history, balance and the
 // chart's timeframe. Inputs are checked here first (the server checks them again).
-export function StartForm({ onCreated, onConflict }: StartFormProps) {
+export function StartForm({ onCreated }: StartFormProps) {
   const [instrument, setInstrument] = useState<string>(REPLAY_PAIRS[0]);
   const [date, setDate] = useState('');
   const [time, setTime] = useState('00:00');
@@ -37,7 +36,6 @@ export function StartForm({ onCreated, onConflict }: StartFormProps) {
     setProblem(null);
     const result = await create({ instrument, startTime: start.value, timeframe, startingBalance: amount.value });
     if ('data' in result) return onCreated();
-    if ((result.error as { status?: unknown }).status === 409) return onConflict();
     setProblem(replayErrorMessage(result.error));
   }
 

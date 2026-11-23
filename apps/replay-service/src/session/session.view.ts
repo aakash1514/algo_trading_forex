@@ -1,10 +1,12 @@
 import { ReplaySessionEntity } from '@forexedge/database';
+import { autoTitle } from './current-session';
 import { pairToInstrument } from './replay-window';
 
 // A session as the API and the socket send it. endOfData is derived: the clock is on
 // the pair's last imported minute.
 export interface SessionView {
   id: string;
+  title: string;          // the user's title, or the auto name 'EUR/USD · 1m · 2022-03-16'
   instrument: string;     // 'EUR_USD'
   startTime: string;
   clockTime: string;      // the last processed M1 minute
@@ -18,11 +20,13 @@ export interface SessionView {
   createdAt: string;
   updatedAt: string;
   endedAt: string | null;
+  lastOpenedAt: string;
 }
 
 export function sessionView(session: ReplaySessionEntity, lastTime: Date): SessionView {
   return {
     id: session.id,
+    title: session.title ?? autoTitle(session.pair, session.timeframe, session.startTime),
     instrument: pairToInstrument(session.pair),
     startTime: session.startTime.toISOString(),
     clockTime: session.clockTime.toISOString(),
@@ -36,5 +40,6 @@ export function sessionView(session: ReplaySessionEntity, lastTime: Date): Sessi
     createdAt: session.createdAt.toISOString(),
     updatedAt: session.updatedAt.toISOString(),
     endedAt: session.endedAt ? session.endedAt.toISOString() : null,
+    lastOpenedAt: session.lastOpenedAt.toISOString(),
   };
 }

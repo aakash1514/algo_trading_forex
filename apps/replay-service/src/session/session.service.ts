@@ -1,6 +1,4 @@
-import {
-  ConflictException, Injectable, NotFoundException, UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Not, Repository } from 'typeorm';
 import { assertUserId } from '@forexedge/common';
@@ -11,12 +9,11 @@ import { closeAtMinuteClose } from '../engine/replay-engine';
 import { SessionLock } from '../engine/session-lock';
 import { PairContextService } from '../history/pair-context.service';
 import { firstMinuteAtOrAfter, lastMinuteAtOrBefore, minuteAt } from '../history/replay-history';
+import { autoTitle, currentSession, NO_SUCH_SESSION } from './current-session';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { positionView, PositionView } from './position.view';
 import { DEFAULT_STARTING_BALANCE, instrumentToPair, parseStartTime } from './replay-window';
 import { sessionView, SessionView } from './session.view';
-
-const ONE_ACTIVE_INDEX = 'replay_sessions_one_active_per_user';
 
 export interface EndedSession {
   session: SessionView;
@@ -24,8 +21,9 @@ export interface EndedSession {
   cancelled: PositionView[];  // pending orders that never filled
 }
 
-// Replay sessions: one active (not ENDED) session per user. Every query is scoped
-// by the owner, so another user's session is simply not found.
+// Replay sessions. A user keeps several; the current one is the latest opened that isn't
+// ENDED (current-session.ts). Every query is scoped by the owner, so another user's
+// session is simply not found.
 @Injectable()
 export class ReplaySessionService {
   constructor(
@@ -35,9 +33,10 @@ export class ReplaySessionService {
     private readonly lock: SessionLock,
   ) {}
 
+  // A new session, PAUSED and the latest opened (so the user's current one). Run it through
+  // PlaybackService.createAndOpen, which pauses a playing session first.
   async create(userId: string, dto: CreateSessionDto): Promise<SessionView> {
     assertUserId(userId);
-    await this.refuseIfActive(userId);
     const pair = instrumentToPair(dto.instrument);
     const start = parseStartTime(dto.startTime);
     const ctx = await this.pairs.get(pair).catch((err) => {
@@ -51,49 +50,32 @@ export class ReplaySessionService {
     if (!clock) throw new UnprocessableEntityException(`No historical data for ${pair}`);
 
     const balance = centsToDecimal(BigInt(Math.round((dto.startingBalance ?? DEFAULT_STARTING_BALANCE) * 100)));
-    try {
-      const saved = await this.sessions.save(this.sessions.create({
-        userId, pair, startTime: start, clockTime: clock, status: 'PAUSED', pauseReason: null, speedMs: 1000,
-        timeframe: dto.timeframe, startingBalance: balance, balance, endedAt: null,
-      }));
-      return sessionView(await this.sessions.findOneByOrFail({ id: saved.id, userId }), ctx.lastTime);
-    } catch (err) {
-      // Two creates at once: the partial unique index lets only one through
-      if ((err as { constraint?: string }).constraint === ONE_ACTIVE_INDEX) {
-        await this.refuseIfActive(userId);
-      }
-      throw err;
-    }
+    const saved = await this.sessions.save(this.sessions.create({
+      userId, pair, startTime: start, clockTime: clock, status: 'PAUSED', pauseReason: null, speedMs: 1000,
+      timeframe: dto.timeframe, startingBalance: balance, balance, endedAt: null,
+      title: autoTitle(pair, dto.timeframe, start), lastOpenedAt: new Date(),
+    }));
+    return sessionView(await this.sessions.findOneByOrFail({ id: saved.id, userId }), ctx.lastTime);
   }
 
+  // The user's current session (read only)
   async getActive(userId: string): Promise<SessionView> {
-    const session = await this.requireActive(userId);
+    const session = await currentSession(this.sessions, userId);
+    if (!session) throw new NotFoundException('No active replay session');
     return sessionView(session, (await this.pairs.get(session.pair)).lastTime);
   }
 
-  // The user's session that is not ENDED, or null
-  async findActive(userId: string): Promise<ReplaySessionEntity | null> {
-    assertUserId(userId);
-    return this.sessions.findOne({ where: { userId, status: Not('ENDED') } });
-  }
-
-  async requireActive(userId: string): Promise<ReplaySessionEntity> {
-    const session = await this.findActive(userId);
-    if (!session) throw new NotFoundException('No active replay session');
-    return session;
-  }
-
-  // Ends the active session: pending orders are cancelled, open positions close at the
+  // Ends the named session (the user's, not ENDED; it needn't be the current one): pending orders are cancelled, open positions close at the
   // clock minute's close (a long at the bid, a short at the ask; reason SESSION_END),
   // all in one transaction under the session lock.
-  async end(userId: string): Promise<EndedSession> {
-    const active = await this.requireActive(userId);
-    const ctx = await this.pairs.get(active.pair);
-    return this.lock.run(active.id, () => this.dataSource.transaction(async (manager) => {
+  async end(userId: string, sessionId: string): Promise<EndedSession> {
+    assertUserId(userId);
+    return this.lock.run(sessionId, () => this.dataSource.transaction(async (manager) => {
       const session = await manager.findOne(ReplaySessionEntity, {
-        where: { id: active.id, userId, status: Not('ENDED') }, lock: { mode: 'pessimistic_write' },
+        where: { id: sessionId, userId, status: Not('ENDED') }, lock: { mode: 'pessimistic_write' },
       });
-      if (!session) throw new NotFoundException('No active replay session');
+      if (!session) throw new NotFoundException(NO_SUCH_SESSION);
+      const ctx = await this.pairs.get(session.pair);
 
       const now = new Date();
       const pending = await manager.find(ReplayPositionEntity, { where: { sessionId: session.id, status: 'PENDING' }, order: { createdAt: 'ASC', id: 'ASC' } });
@@ -128,14 +110,5 @@ export class ReplaySessionService {
     await manager.query(
       `UPDATE replay_sessions SET balance = balance + $2::numeric, status = 'ENDED', pause_reason = NULL, ended_at = $3, updated_at = $3
         WHERE id = $1`, [sessionId, centsToDecimal(cents), now]);
-  }
-
-  private async refuseIfActive(userId: string): Promise<void> {
-    const active = await this.findActive(userId);
-    if (active) {
-      throw new ConflictException({
-        statusCode: 409, error: 'Conflict', message: 'You already have an active replay session', activeSessionId: active.id,
-      });
-    }
   }
 }

@@ -1,96 +1,88 @@
 {
- "commit": "8b62ad2",
- "user": "replayfixture_137f9cb7@example.com",
+ "commit": "74fc24e",
+ "user": "replayfixture_9ece0d3f@example.com",
  "fixtures": {
   "account-after-order": {
    "file": "account-after-order.json",
    "kind": "socket",
    "what": "'account' after the order",
-   "recorded_at": "2026-11-23T05:24:44.811Z",
-   "sha256": "3d1daf2ee11e062e975f2cf647d50ba98e7acd31c798d2cf86de4d6cde0b5a97"
+   "recorded_at": "2026-11-23T07:49:33.004Z",
+   "sha256": "6fd4ef3c758f77a38d6a2384bf43411b2cc6ebde39a9d26ebf665eae373e01df"
   },
   "bar-1m": {
    "file": "bar-1m.json",
    "kind": "socket",
    "what": "'bar' after a step on 1m",
-   "recorded_at": "2026-11-23T05:24:44.596Z",
-   "sha256": "b9b7d91ab190df179d52042be1b78398257482325026b730d0405fc6318dd33d"
+   "recorded_at": "2026-11-23T07:49:32.841Z",
+   "sha256": "138f69611b1ad2b832bd49dddc66d7b7cfe09bf1251a23f1c880b6778d3acb97"
   },
   "calendar-fomc": {
    "file": "calendar-fomc.json",
    "kind": "socket",
    "what": "'calendar' from the step that reached the 18:00 FOMC decision",
-   "recorded_at": "2026-11-23T05:24:59.945Z",
-   "sha256": "17c0d75796a6923ddbcae6e46efcd82b471df6383ca4f03eead82af1458263b0"
+   "recorded_at": "2026-11-23T07:49:42.999Z",
+   "sha256": "d4d07c7c936214b5478751a87c6c085f5ff9e804ac9f303e2b97e4a85c6d0c43"
   },
   "cancel-200": {
    "file": "cancel-200.json",
    "kind": "rest",
    "what": "POST /orders/:id/cancel of a pending order",
    "status": 200,
-   "recorded_at": "2026-11-23T05:24:45.347Z",
-   "sha256": "051c2f930dfec0e61e4e0440e65717fc4a6964be1eb205c4d5fb90e5b1e59e8d"
+   "recorded_at": "2026-11-23T07:49:33.560Z",
+   "sha256": "86252238fbbd10473c9f4e662348f36151537a2a65d74a2340bfd21a9cc396f6"
   },
   "close-200": {
    "file": "close-200.json",
    "kind": "rest",
    "what": "POST /positions/:id/close (pending until the next minute)",
    "status": 200,
-   "recorded_at": "2026-11-23T05:24:50.706Z",
-   "sha256": "0665868877d8e6dc75229e486e0390872000472eabb783c520f6c8fe88a0da94"
+   "recorded_at": "2026-11-23T07:49:37.320Z",
+   "sha256": "a27690d5a85df87aa1970db7a214e8c9b9372654ea3c567218b03788d6584664"
   },
   "create-201": {
    "file": "create-201.json",
    "kind": "rest",
    "what": "POST /sessions {EUR_USD, 2022-03-01T09:30Z, 1m, 10000}",
    "status": 201,
-   "recorded_at": "2026-11-23T05:24:41.214Z",
-   "sha256": "f436abe10de79ef0525493726cc9be2e59d07bdf662fb92baa353367caf3810e"
-  },
-  "create-409": {
-   "file": "create-409.json",
-   "kind": "rest",
-   "what": "POST /sessions while one is active",
-   "status": 409,
-   "recorded_at": "2026-11-23T05:24:41.235Z",
-   "sha256": "c117648c7cd45d0dcb8716323e890c4a2258993dcd31df645f409fd9e0fe0be4"
+   "recorded_at": "2026-11-23T07:49:26.448Z",
+   "sha256": "6da6d9accb676afe5ac228165e6c3e3b38b2ec77ebd013eebd4a654ebea3e897"
   },
   "end-200": {
    "file": "end-200.json",
    "kind": "rest",
-   "what": "POST /sessions/active/end with one position open",
+   "what": "POST /sessions/:id/end with one position open",
    "status": 200,
-   "recorded_at": "2026-11-23T05:24:56.341Z",
-   "sha256": "5118b912e2a778b2f90dfec731ecb9c0e62d5f3332071d84287f617d5c3182f6"
+   "recorded_at": "2026-11-23T07:49:41.676Z",
+   "sha256": "b5588425e98abca006ed7bc24839637d9e29743357ae4fbb791ae3f4a755b292"
   },
   "end-of-data": {
    "file": "end-of-data.json",
    "kind": "socket",
    "what": "'endOfData' at the pair's last minute",
-   "recorded_at": "2026-11-23T05:25:20.069Z",
-   "sha256": "51d6ab75b8b9973a00676615186e833397e14c88fb42ba281cefbecb7e4ab19e"
+   "recorded_at": "2026-11-23T07:49:53.613Z",
+   "sha256": "cbebc4e6c590316edb6ac997e9c1852c2590a02b00a4b0ce81fa5afb4812e656"
   },
   "ended": {
    "file": "ended.json",
    "kind": "socket",
    "what": "'ended' after the end",
-   "recorded_at": "2026-11-23T05:24:56.344Z",
-   "sha256": "5118b912e2a778b2f90dfec731ecb9c0e62d5f3332071d84287f617d5c3182f6"
+   "recorded_at": "2026-11-23T07:49:41.679Z",
+   "sha256": "b5588425e98abca006ed7bc24839637d9e29743357ae4fbb791ae3f4a755b292"
   },
   "order-201-pending": {
    "file": "order-201-pending.json",
    "kind": "rest",
    "what": "POST /orders BUY 0.1 lots, SL bid-100 points, TP bid+100 points",
    "status": 201,
-   "recorded_at": "2026-11-23T05:24:44.805Z",
-   "sha256": "030fd4ffeade8c5c2328d02250e7ab4fb7288ad5048997b8ed4c2985e37f2c9b"
+   "recorded_at": "2026-11-23T07:49:32.997Z",
+   "sha256": "12c2a02c1913b0c29efedaa1c88b1278201e3a9c18f74947272362eb90f27ace"
   },
   "order-400-margin": {
    "file": "order-400-margin.json",
    "kind": "rest",
    "what": "POST /orders BUY 100 lots on 10,000 USD",
    "status": 400,
-   "recorded_at": "2026-11-23T05:24:45.017Z",
+   "recorded_at": "2026-11-23T07:49:33.299Z",
    "sha256": "8802eeb12888fc491b78054b06b0adb6d4b4fe5dfbce168ea273da403457f31f"
   },
   "order-400-sl-side": {
@@ -98,152 +90,152 @@
    "kind": "rest",
    "what": "POST /orders BUY with the stop loss above the bid",
    "status": 400,
-   "recorded_at": "2026-11-23T05:24:44.953Z",
+   "recorded_at": "2026-11-23T07:49:33.220Z",
    "sha256": "7ec8bd3e727a30f7394c0670ec643ac27b0257e214000af650cbf7f319c0f273"
   },
   "positions-closed-later": {
    "file": "positions-closed-later.json",
    "kind": "socket",
    "what": "'positions' from the step that closed a 22nd trade, after the pages were loaded",
-   "recorded_at": "2026-11-23T05:25:13.325Z",
-   "sha256": "c0430dbdd98c43531b86fc634710ae7d57389ec673768ffa94317924e231950a"
+   "recorded_at": "2026-11-23T07:49:51.434Z",
+   "sha256": "5674c3dd99bede359743be985c4382c4b708d249e66ed37a9f16bbf1c9745c61"
   },
   "positions-closed-level": {
    "file": "positions-closed-level.json",
    "kind": "socket",
    "what": "'positions' when the long closed at its SL or TP while playing",
-   "recorded_at": "2026-11-23T05:24:54.061Z",
-   "sha256": "9ac688aa85ec5bb17894c4c4366504eca4ff0d6b55b0c2564a767501815790be"
+   "recorded_at": "2026-11-23T07:49:40.364Z",
+   "sha256": "d2a63774e88de55b2f3bde07068875c6e6489c47787d1f5cfddceff0213429c3"
   },
   "positions-closed-manual": {
    "file": "positions-closed-manual.json",
    "kind": "socket",
    "what": "'positions' from the step that closed the short (MANUAL)",
-   "recorded_at": "2026-11-23T05:24:51.114Z",
-   "sha256": "86774998bd53485f79a645ce6082ad67cb2eef48001f0f7f61e48007ef90175f"
+   "recorded_at": "2026-11-23T07:49:37.628Z",
+   "sha256": "01bbb56a4f5a5af93a216e5072c53f988b09e4ceec1cb4e3787fdace8b373c03"
   },
   "positions-filled": {
    "file": "positions-filled.json",
    "kind": "socket",
    "what": "'positions' from the step that filled both orders",
-   "recorded_at": "2026-11-23T05:24:45.563Z",
-   "sha256": "385af117c53c6d5365d42b638a979f706c2815deb35f236f0a7946b36f15a246"
+   "recorded_at": "2026-11-23T07:49:33.766Z",
+   "sha256": "4258c49d4956b715eee25f81c65747d52664d87b5e5b6f415ec3088130066efa"
   },
   "positions-pending": {
    "file": "positions-pending.json",
    "kind": "socket",
    "what": "'positions' after the order",
-   "recorded_at": "2026-11-23T05:24:44.808Z",
-   "sha256": "53ff5ad9d8671e03c9accefddd7f5fd3949b8a7ebd65b6558f363a703c154716"
+   "recorded_at": "2026-11-23T07:49:33.000Z",
+   "sha256": "d8eb60d0ed2a7901b175283801a5bb58f074c611ad1011ebfac646f16726aa2a"
   },
   "state-calendar-after": {
    "file": "state-calendar-after.json",
    "kind": "socket",
    "what": "'state' at 18:00 with the FOMC decision",
-   "recorded_at": "2026-11-23T05:25:00.535Z",
-   "sha256": "b82cee93ebd53fb049123a484cc9ec9458f8fa5784cbd97f1360722181ea218a"
+   "recorded_at": "2026-11-23T07:49:44.117Z",
+   "sha256": "bf723b2290ca6fe0ab8996e7d55dc8538acff2a13d7e765b127ed4435a3d0490"
   },
   "state-calendar-before": {
    "file": "state-calendar-before.json",
    "kind": "socket",
    "what": "'state' at 17:58 before the FOMC decision at 18:00 (calendar covered, no event yet)",
-   "recorded_at": "2026-11-23T05:24:59.648Z",
-   "sha256": "523f3e7b252fe78d5dfad289405fa68e18c7690a7da61ed856176b86ecdbad63"
+   "recorded_at": "2026-11-23T07:49:42.480Z",
+   "sha256": "5043ee87d02828ea505b7de749c20f45a9106bddbaf4e5291469e7f6d0800b51"
   },
   "state-closed-trades": {
    "file": "state-closed-trades.json",
    "kind": "socket",
    "what": "'state' with two closed trades and an open short",
-   "recorded_at": "2026-11-23T05:24:56.151Z",
-   "sha256": "6599ff6621dd4cfa95d95e5d853c6e5fe01c1dd9d5d5762a6bb6c1d14123590c"
+   "recorded_at": "2026-11-23T07:49:41.468Z",
+   "sha256": "f38078fd524ac60d402e52342b6652955ac335e374fddb5a6523772cd7f3796f"
   },
   "state-end-of-data": {
    "file": "state-end-of-data.json",
    "kind": "socket",
    "what": "'state' on reconnect at the end of the data",
-   "recorded_at": "2026-11-23T05:25:20.285Z",
-   "sha256": "c78dd0e91d579f74ce01f0cb8ce3f65361d8fb67078c07ac88a9a9c2e9a3ddef"
+   "recorded_at": "2026-11-23T07:49:53.817Z",
+   "sha256": "68fe8c842864f019b1f5e0cb989f5155d61b116f72915e2ad3e2f1c3bb87cbf0"
   },
   "state-no-session": {
    "file": "state-no-session.json",
    "kind": "socket",
    "what": "'state' on connect without a session",
-   "recorded_at": "2026-11-23T05:24:41.165Z",
+   "recorded_at": "2026-11-23T07:49:19.105Z",
    "sha256": "bda339da8bd567ff70e6c0353b141536dd5b18d603e699a479305f4b17f3a3fd"
   },
   "state-open-positions": {
    "file": "state-open-positions.json",
    "kind": "socket",
    "what": "'state' with a long and a short open",
-   "recorded_at": "2026-11-23T05:24:50.591Z",
-   "sha256": "6662a3d7c9e19cfcc647ff307d8b0b04c647c6221537d26fc30e3c7acb5d6f69"
+   "recorded_at": "2026-11-23T07:49:37.086Z",
+   "sha256": "81be38057702c210e0506909d021bf00b981c62d382166ae38d1e8735b6ff063"
   },
   "state-paused": {
    "file": "state-paused.json",
    "kind": "socket",
    "what": "'state' on connect: the new session, PAUSED",
-   "recorded_at": "2026-11-23T05:24:42.308Z",
-   "sha256": "dcb40146f9c8d4456755a4282d2334d3f175bb628727170446864bc98b0a69af"
+   "recorded_at": "2026-11-23T07:49:29.075Z",
+   "sha256": "1a0aa3c5414991a0746a20940cbedda1670760bed0d9a114082f589f9fbb84e8"
   },
   "state-usdjpy-open-positions": {
    "file": "state-usdjpy-open-positions.json",
    "kind": "socket",
    "what": "'state' of USD/JPY (2016-06-24, Brexit vote night) with a long and a short open",
-   "recorded_at": "2026-11-23T05:25:18.729Z",
-   "sha256": "f26436c5403f9e1120f6081a38f93cabbbf4308d1ec9c2409a4530a073815b4f"
+   "recorded_at": "2026-11-23T07:49:52.675Z",
+   "sha256": "42380f3335480218c8136b1c60bd3e0d8c5292446d650be668c09e1ccdd8b064"
   },
   "stats-200": {
    "file": "stats-200.json",
    "kind": "rest",
    "what": "GET /sessions/:id/stats after the 22 trades",
    "status": 200,
-   "recorded_at": "2026-11-23T05:25:13.356Z",
-   "sha256": "becbdfc2371b0129e6ffdf3691dc335ef321ee94403b447a2a1095b427d7fa1f"
+   "recorded_at": "2026-11-23T07:49:51.454Z",
+   "sha256": "6cf1298b0313813e58432e54ab031c79496a2706c3d28f28ecf581ecf180b247"
   },
   "stats-200-empty": {
    "file": "stats-200-empty.json",
    "kind": "rest",
    "what": "GET /sessions/:id/stats before any trade",
    "status": 200,
-   "recorded_at": "2026-11-23T05:24:59.676Z",
+   "recorded_at": "2026-11-23T07:49:42.527Z",
    "sha256": "83ae4d7783088b739285245b62d45a81a0d1b50d938d4d9ec08df0623aec75e6"
   },
   "status-end-of-data": {
    "file": "status-end-of-data.json",
    "kind": "socket",
    "what": "'status' at the end of the data (END_OF_DATA)",
-   "recorded_at": "2026-11-23T05:25:20.072Z",
-   "sha256": "56d38e1341ac0a78e2dbec98004b52cf90fc3128985043a448d877805ea9bf6b"
+   "recorded_at": "2026-11-23T07:49:53.616Z",
+   "sha256": "cbe61c0fa7e0e09b82e33302a03d293dda78ba2f4b19840d37943ebaab6ff9f5"
   },
   "status-paused-user": {
    "file": "status-paused-user.json",
    "kind": "socket",
    "what": "'status' after pause (USER)",
-   "recorded_at": "2026-11-23T05:24:54.157Z",
-   "sha256": "189b28b943e4f5481622560cd9162f4154ea1c42ee0df0d90c0beb3211e58758"
+   "recorded_at": "2026-11-23T07:49:40.392Z",
+   "sha256": "2ea5543654a7413775e27cd891c8215064f806018ef3f99063e9ce17bfc29362"
   },
   "trades-200-page1": {
    "file": "trades-200-page1.json",
    "kind": "rest",
    "what": "GET /sessions/:id/trades: 20 of 21 trades closed in one minute",
    "status": 200,
-   "recorded_at": "2026-11-23T05:25:12.282Z",
-   "sha256": "ab89dfe354b140c690484ad011fae269d8c36aef104a46d2f4031b624fd076a2"
+   "recorded_at": "2026-11-23T07:49:50.999Z",
+   "sha256": "e77e964054645f2c59f0ebccefce73571e55fb47fc109c2b7ffa249c5bac7df7"
   },
   "trades-200-page2": {
    "file": "trades-200-page2.json",
    "kind": "rest",
    "what": "GET /sessions/:id/trades?cursor=: the last of the 21",
    "status": 200,
-   "recorded_at": "2026-11-23T05:25:12.335Z",
-   "sha256": "38629f95842938a6d8a00be1f8de27e8e12ff906ed8e6daadcaf4622662c7081"
+   "recorded_at": "2026-11-23T07:49:51.041Z",
+   "sha256": "44a21dc2aacf5e2c246d780ebde07b55574a53a6edc672be5edf1401632cb7ab"
   },
   "trades-404": {
    "file": "trades-404.json",
    "kind": "rest",
    "what": "GET /sessions/:id/trades of a session the user does not own",
    "status": 404,
-   "recorded_at": "2026-11-23T05:25:13.377Z",
+   "recorded_at": "2026-11-23T07:49:51.470Z",
    "sha256": "62eb2ea9ab188a54b5df06f99bdf22d1996736c4d158f585a4f6850e674a2c2c"
   }
  }
