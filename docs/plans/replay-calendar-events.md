@@ -46,7 +46,7 @@ exactly like the bars). The browser never recomputes buckets.
 | `replay-state.service.ts` | `calendar: { covered, events }` in the state |
 | `playback.service.ts` | after a step's bar: `calendar` with the events the step passed (none → nothing sent) |
 | `apps/replay-service/test/replay-test-db.ts` | loads the real FOMC/ECB events through domain-service's parsers over its recorded official pages (test code, like the importer import) |
-| `tools/market-data/import/src/fixtures/EURUSD-2022-01-26-fomc.csv` (new) | verbatim Dukascopy excerpt 17:00-21:00 UTC around the FOMC decision at 19:00 (README updated with the command) |
+| `apps/replay-service/test/replay-test-db.ts` (`local` excerpts) | the minutes 17:00-21:00 UTC around the 2022-01-26 FOMC decision, cut at run time from the local Dukascopy export (`data/raw/jforex`, gitignored): no provider rows are committed; the spec is skipped without the export |
 | frontend `types/replay.types.ts`, `replay.slice.ts`, `useReplaySocket.ts` | `calendar` in the state, the `calendar` event merged by id |
 | frontend `ReplayChart.tsx` + `ReplayCalendarBar.tsx` (new) | markers, hover card, Medium toggle, "No calendar data for this period" |
 | `record-frontend-fixtures.ts` | records a state and a `calendar` event around the 2022-03-16 18:00 FOMC decision |

@@ -12,7 +12,8 @@
 // Test code only: the importer, the seed and the calendar parsers are application code, so these imports
 // cross a project boundary on purpose (lint exception below, nowhere else).
 import { randomBytes } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Client } from 'pg';
 import { DataSource } from 'typeorm';
@@ -36,13 +37,37 @@ const CALENDAR_PAGES = join(REPO_ROOT, 'apps/domain-service/src/economic-calenda
 export interface HistoryExcerpt {
   symbol: string;  // EURUSD
   pair: string;    // EUR/USD
-  file: string;    // in FIXTURES
+  file: string;    // in FIXTURES, or with `local` the year's export in RAW_EXPORTS
   range: { start: Date; end: Date };
+  // Cut from the local Dukascopy export at run time instead of a committed fixture: the
+  // provider's rows are not redistributed, so the repository holds no new excerpt
+  local?: true;
 }
 
-// Wednesday 2022-01-26, 17:00-21:00 UTC: the minutes around the FOMC decision at 19:00 UTC
+// The JForex exports (gitignored, data/raw/jforex/<SYMBOL>/<YEAR>.csv; tools/market-data/jforex)
+export const RAW_EXPORTS = join(REPO_ROOT, 'data/raw/jforex');
+
+// The local export a `local` excerpt needs is present (a spec using one is skipped otherwise)
+export function hasLocalExport(e: HistoryExcerpt): boolean {
+  return existsSync(join(RAW_EXPORTS, e.file));
+}
+
+// The export's header and the rows in the excerpt's range, unchanged, into a temporary file
+function cutLocalExcerpt(e: HistoryExcerpt): string {
+  const [header, ...rows] = readFileSync(join(RAW_EXPORTS, e.file), 'utf8').split(/\r?\n/);
+  const from = e.range.start.getTime();
+  const to = e.range.end.getTime();
+  const kept = rows.filter((r) => { const t = Number(r.slice(0, r.indexOf(','))); return t >= from && t < to; });
+  if (kept.length === 0) throw new Error(`no rows of ${e.file} in the excerpt's range`);
+  const out = join(mkdtempSync(join(tmpdir(), 'replay-excerpt-')), `${e.symbol}.csv`);
+  writeFileSync(out, `${[header, ...kept].join('\n')}\n`);
+  return out;
+}
+
+// Wednesday 2022-01-26, 17:00-21:00 UTC: the minutes around the FOMC decision at 19:00 UTC,
+// cut from the local 2022 export at run time (not committed)
 export const EURUSD_2022_01_26_FOMC: HistoryExcerpt = {
-  symbol: 'EURUSD', pair: 'EUR/USD', file: 'EURUSD-2022-01-26-fomc.csv',
+  symbol: 'EURUSD', pair: 'EUR/USD', file: 'EURUSD/2022.csv', local: true,
   range: { start: new Date('2022-01-26T17:00Z'), end: new Date('2022-01-26T21:00Z') },
 };
 
@@ -88,7 +113,8 @@ export async function createReplayTestDb(excerpts: HistoryExcerpt[]): Promise<Re
     for (const e of excerpts) {
       const result = await importPairRange(client, {
         symbol: e.symbol, pair: e.pair, year: e.range.start.getUTCFullYear(),
-        file: join(FIXTURES, e.file), sourceFile: `tools/market-data/import/src/fixtures/${e.file}`, range: e.range,
+        file: e.local ? cutLocalExcerpt(e) : join(FIXTURES, e.file),
+        sourceFile: e.local ? `data/raw/jforex/${e.file}` : `tools/market-data/import/src/fixtures/${e.file}`, range: e.range,
       });
       if (!(result.importedRows > 0)) throw new Error(`no rows imported from ${e.file}`);
     }

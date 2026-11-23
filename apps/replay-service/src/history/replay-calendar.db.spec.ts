@@ -1,10 +1,12 @@
 // Calendar events on the replay chart against a real database: <DB_NAME>_test with the
-// real EUR/USD minutes around the FOMC decision of 2022-01-26 19:00 UTC and the real
-// FOMC and ECB events (domain-service's parsers over its recorded official pages), read
-// as a login with forexedge_replay's grants. Skipped unless RUN_DB_TESTS=true:
+// real EUR/USD minutes around the FOMC decision of 2022-01-26 19:00 UTC (cut at run time
+// from the local Dukascopy export, data/raw/jforex/EURUSD/2022.csv, which is not in the
+// repository: the spec is skipped without it) and the real FOMC and ECB events
+// (domain-service's parsers over its recorded official pages), read as a login with
+// forexedge_replay's grants. Skipped unless RUN_DB_TESTS=true:
 //   RUN_DB_TESTS=true npx nx test replay-service --testFile=replay-calendar.db.spec.ts --skip-nx-cache
 import { HistoricalTimeframe, ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
-import { createReplayTestDb, EURUSD_2022_01_26_FOMC, ReplayTestDb } from '../../test/replay-test-db';
+import { createReplayTestDb, EURUSD_2022_01_26_FOMC, hasLocalExport, ReplayTestDb } from '../../test/replay-test-db';
 import { SessionLock } from '../engine/session-lock';
 import { PlaybackService } from '../playback/playback.service';
 import { ReplayEmitter } from '../playback/replay-emitter';
@@ -13,7 +15,10 @@ import { ReplaySessionService } from '../session/session.service';
 import { PairContextService } from './pair-context.service';
 import { calendarCovered, calendarCurrencies, calendarEvents } from './replay-calendar';
 
-const run = process.env['RUN_DB_TESTS'] === 'true' ? describe : describe.skip;
+const run = process.env['RUN_DB_TESTS'] === 'true' && hasLocalExport(EURUSD_2022_01_26_FOMC) ? describe : describe.skip;
+if (process.env['RUN_DB_TESTS'] === 'true' && !hasLocalExport(EURUSD_2022_01_26_FOMC)) {
+  console.warn(`replay-calendar.db.spec skipped: no local export data/raw/jforex/${EURUSD_2022_01_26_FOMC.file}`);
+}
 
 class RecordingEmitter extends ReplayEmitter {
   readonly events: { event: string; payload: unknown; clock: Date }[] = [];
