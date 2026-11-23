@@ -387,7 +387,8 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   - Tests use real minutes only: `test/replay-test-db.ts` loads the importer's real fixtures into `<DB_NAME>_test`
     with the real instruments seed and the real FOMC/ECB events (domain-service's parsers over its recorded official
     pages; these are the only cross-project imports, test code) and connects as a temporary login with the replay
-    grants; `test/replay-app.ts` runs the real AppModule in-process.
+    grants; `test/replay-app.ts` runs the real AppModule in-process. Never commit new provider rows: an excerpt a
+    new test needs is cut at run time from the local export (`local: true`, spec skipped without it).
   - **Calendar on the chart** (`history/replay-calendar.ts`): events with `scheduled_at <= clock` only (HIGH and
     MEDIUM, the pair's currencies, metals dropped), in the `state` (first bar to clock) and in a `calendar` event
     after a step (previous clock, new clock]; never filtered in the browser, so a future event or its actual never
