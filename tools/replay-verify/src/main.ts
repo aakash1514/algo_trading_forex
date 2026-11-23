@@ -10,7 +10,9 @@
 // first minute of the backtester's fill bar; the last trade is closed by ending the
 // session at the end of the data (the backtester's END_OF_DATA at the last close).
 // Every trade's side, entry/exit bar, fill points, exit reason and net USD cents, and
-// the totals, must be equal. Writes docs/validation/replay-equivalence.md; exits 1 on
+// the totals, must be equal. Then the session's statistics (GET .../sessions/:id/stats)
+// must equal the independent SQL of stats-sql.ts on the same replay_positions, field by
+// field to the cent. Writes docs/validation/replay-equivalence.md; exits 1 on
 // any difference or empty input.
 //
 //   npm run replay:verify -- [--pairs EUR_USD,XAU_USD,USD_JPY]
@@ -26,6 +28,7 @@ import { join, resolve } from 'node:path';
 import { Client } from 'pg';
 import { io, Socket } from 'socket.io-client';
 import { compareTrades, Comparison, ReplayedTrade } from './compare';
+import { compareStats, STATS_FIELDS, STATS_SQL, StatsDifference, statsFromRow, StatsRecord } from './stats-sql';
 import { parseVerifiedReport, VerifiedRun } from './verified-report';
 
 const REPO_ROOT = resolve(__dirname, '../../..');
@@ -131,6 +134,7 @@ interface PairResult {
   finalBalance: string;
   replayed: ReplayedTrade[];
   comparison: Comparison;
+  stats: { api: Record<string, unknown>; sql: StatsRecord; differences: StatsDifference[]; ok: boolean };
 }
 
 // A command's acknowledgement, or an error: a socket that went away must fail the run, not hang it
@@ -217,9 +221,15 @@ async function replayPair(db: Client, replayUrl: string, tokens: Tokens, pair: s
       comparison.ok = false;
       comparison.mismatches.push({ trade: 0, field: 'final balance', verified: expectedBalance, replayed: ended.session.balance });
     }
+    // Statistics: the API against the independent SQL, on every closed trade of the session
+    const apiStats = await api.call<Record<string, unknown>>('GET', `/sessions/${session.id}/stats`);
+    const sqlStats = statsFromRow((await db.query(STATS_SQL, [session.id])).rows[0]);
+    const differences = compareStats(apiStats, sqlStats);
+    const statsOk = differences.length === 0 && sqlStats.trades === verified.length && verified.length > 0;
     return {
       pair, sessionId: session.id, steps, seconds: Math.round((Date.now() - started) / 1000),
       finalBalance: ended.session.balance, replayed, comparison,
+      stats: { api: apiStats, sql: sqlStats, differences, ok: statsOk },
     };
   } finally {
     stopRenewals();
@@ -248,6 +258,19 @@ function report(run: VerifiedRun, results: PairResult[], user: string, commit: s
       `${usd(c.verifiedNetCents)} / ${usd(c.replayedNetCents)} | ${r.finalBalance} | ` +
       `${c.ok ? `**match** (${c.compared} trades)` : '**DIFFERS**'} |`);
   }
+  lines.push('');
+  lines.push('## Statistics', '');
+  lines.push('The statistics of each session from replay-service (`GET /api/replay/sessions/:id/stats`, BigInt cents in ' +
+    'TypeScript) against an independent SQL query on the same `replay_positions` rows (`tools/replay-verify/src/' +
+    'stats-sql.ts`: window functions, Postgres `round(numeric, 2)`), compared field by field as text. Max drawdown ' +
+    'is on the closed-trade balance.', '');
+  lines.push(`| Field | ${results.map((r) => `${r.pair} API | ${r.pair} SQL`).join(' | ')} |`);
+  lines.push(`|---|${results.map(() => '---|---|').join('')}`);
+  const cell = (v: unknown) => (v === null ? '—' : String(v));
+  for (const f of STATS_FIELDS) {
+    lines.push(`| ${f} | ${results.map((r) => `${cell(r.stats.api[f])} | ${cell(r.stats.sql[f])}`).join(' | ')} |`);
+  }
+  lines.push(`| **Result** | ${results.map((r) => (r.stats.ok ? '**equal** | **equal** | ' : `**DIFFERS** (${r.stats.differences.length}) | | `)).join('')}`);
   lines.push('');
   for (const r of results) {
     lines.push(`## ${r.pair}`, '');
@@ -294,6 +317,8 @@ async function main(): Promise<void> {
       results.push(r);
       console.log(`${instrument}: ${r.comparison.compared} trades compared in ${r.steps} steps (${r.seconds} s), ` +
         `net ${usd(r.comparison.replayedNetCents)} USD: ${r.comparison.ok ? 'MATCH' : 'DIFFERS'}`);
+      console.log(`${instrument}: statistics ${r.stats.ok ? 'EQUAL to the SQL' : 'DIFFER from the SQL'}` +
+        (r.stats.differences.length ? `: ${r.stats.differences.map((d) => `${d.field} api=${d.api} sql=${d.sql}`).join(', ')}` : ''));
     }
     const commit = execSync('git rev-parse --short HEAD', { cwd: REPO_ROOT }).toString().trim();
     writeFileSync(o.report, report(run, results, user, commit, o.verified.slice(REPO_ROOT.length + 1).replace(/\\/g, '/')));
@@ -302,7 +327,7 @@ async function main(): Promise<void> {
     tokensInUse?.stop();
     await db.end();
   }
-  if (results.length === 0 || results.some((r) => !r.comparison.ok)) process.exit(1);
+  if (results.length === 0 || results.some((r) => !r.comparison.ok || !r.stats.ok)) process.exit(1);
 }
 
 main().catch((err) => {

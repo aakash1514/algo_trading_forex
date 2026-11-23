@@ -5,13 +5,13 @@ import { useStore } from 'react-redux';
 import { io, type Socket } from 'socket.io-client';
 import { useAppDispatch, type RootState } from '../store';
 import {
-  accountReceived, barReceived, commandFinished, commandStarted, connectionChanged, endOfDataReceived, errorReceived,
+  accountReceived, barReceived, calendarReceived, commandFinished, commandStarted, connectionChanged, endOfDataReceived, errorReceived,
   positionsReceived, replayReset, sessionEnded, stateReceived, statusReceived,
 } from '../store/slices/replay.slice';
 import { REPLAY_SOCKET_PATH, REPLAY_WS_URL } from '../lib/constants';
 import { AUTH_EXPIRED_EVENT, REAUTH_EVENT, renewSessionForSocket } from '../lib/socket-auth';
 import type {
-  BarEvent, CommandAck, EndedSession, EndOfDataEvent, ReplayAccount, ReplayPosition, ReplaySession, ReplayState,
+  BarEvent, CalendarMessage, CommandAck, EndedSession, EndOfDataEvent, ReplayAccount, ReplayPosition, ReplaySession, ReplayState,
 } from '../types/replay.types';
 
 export const COMMAND_TIMEOUT_MS = 10_000;
@@ -119,6 +119,7 @@ export function useReplaySocket(): ReplaySocket {
       dispatch(stateReceived(payload.session ? (payload as ReplayState) : null));
     });
     socket.on('bar', (payload: BarEvent) => dispatch(barReceived(payload)));
+    socket.on('calendar', (payload: CalendarMessage) => dispatch(calendarReceived(payload)));
     socket.on('account', (payload: ReplayAccount) => dispatch(accountReceived(payload)));
     socket.on('positions', (payload: ReplayPosition[]) => dispatch(positionsReceived(payload)));
     socket.on('status', (payload: ReplaySession) => dispatch(statusReceived(payload)));

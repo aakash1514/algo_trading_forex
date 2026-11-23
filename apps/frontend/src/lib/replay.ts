@@ -22,6 +22,15 @@ export const REPLAY_SPEEDS = [
   { ms: 1000, label: '1 s' },
   { ms: 2000, label: '2 s' },
 ] as const;
+export type ReplaySpeedMs = (typeof REPLAY_SPEEDS)[number]['ms'];
+
+// The next speed the replay offers: faster = a shorter time per bar. Null at either end
+// (no wrap) and for a speed the list doesn't hold.
+export function adjacentSpeed(currentMs: number, direction: 'faster' | 'slower'): ReplaySpeedMs | null {
+  const i = REPLAY_SPEEDS.findIndex((s) => s.ms === currentMs);
+  if (i < 0) return null;
+  return REPLAY_SPEEDS[direction === 'faster' ? i - 1 : i + 1]?.ms ?? null;
+}
 
 export const PAUSE_MESSAGES: Record<PauseReason, string> = {
   USER: 'Paused',
@@ -36,6 +45,17 @@ export function statusMessage(session: Pick<ReplaySession, 'status' | 'pauseReas
   if (session.endOfData) return PAUSE_MESSAGES.END_OF_DATA;
   if (session.status === 'PLAYING') return 'Playing';
   return session.pauseReason ? PAUSE_MESSAGES[session.pauseReason] : 'Paused';
+}
+
+// Closed trades from the socket (the store) and from loaded pages, one per id (the
+// store's copy wins: it is the newest), in the server's order: exit time, then id, newest first
+export function mergeClosedTrades(fromStore: ReplayPosition[], fromPages: ReplayPosition[]): ReplayPosition[] {
+  const byId = new Map<string, ReplayPosition>();
+  for (const p of fromPages) byId.set(p.id, p);
+  for (const p of fromStore) byId.set(p.id, p);
+  return [...byId.values()]
+    .filter((p) => p.status === 'CLOSED')
+    .sort((a, b) => (b.exitTime ?? '').localeCompare(a.exitTime ?? '') || b.id.localeCompare(a.id));
 }
 
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };

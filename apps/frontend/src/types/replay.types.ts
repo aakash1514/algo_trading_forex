@@ -68,6 +68,35 @@ export interface ReplayPosition {
   cancelledAt: string | null;
 }
 
+// An economic calendar event the replay clock has reached (replay-service
+// history/replay-calendar.ts): never one after the clock
+export interface CalendarEvent {
+  id: string;
+  time: string;                 // when it was scheduled (UTC)
+  barTime: string;              // the start of the session-timeframe bar that holds it
+  title: string;                // the source's wording
+  currency: string;
+  impact: 'HIGH' | 'MEDIUM';
+  source: string;               // FOMC, ECB or the third-party export
+  timeSource: 'official' | 'expected' | 'third_party';
+  actual: string | null;
+  forecast: string | null;
+  previous: string | null;
+}
+
+export interface ReplayCalendar {
+  covered: boolean;             // false: no calendar data for this period
+  events: CalendarEvent[];      // from the first bar shown to the clock, oldest first
+}
+
+// The socket's 'calendar' after a step: the events the step passed
+export interface CalendarMessage {
+  sessionId: string;
+  timeframe: string;
+  clockTime: string;
+  events: CalendarEvent[];
+}
+
 // The socket's 'state': everything as of the clock
 export interface ReplayState {
   session: ReplaySession;
@@ -76,6 +105,7 @@ export interface ReplayState {
   bars: ReplayBar[];            // completed bars before the current one (up to 500)
   currentBar: ReplayBar;
   positions: ReplayPosition[];  // pending and open, then the latest 50 closed/cancelled
+  calendar: ReplayCalendar;
 }
 
 export interface BarEvent {
@@ -95,6 +125,32 @@ export interface EndedSession {
   session: ReplaySession;
   closed: ReplayPosition[];     // closed at the clock (SESSION_END)
   cancelled: ReplayPosition[];  // pending orders that never filled
+}
+
+// GET /sessions/:id/trades: closed trades newest first (exit time, then id), 20 a page
+export interface TradesPage {
+  trades: ReplayPosition[];
+  nextCursor: string | null;    // null on the last page
+}
+
+// GET /sessions/:id/stats (replay-service session/replay-stats.ts): from every closed
+// trade of the session; null where undefined (no trades, no wins, no losses)
+export interface ReplayStats {
+  trades: number;
+  wins: number;
+  losses: number;
+  breakeven: number;
+  winRatePct: string | null;
+  netPnlUsd: string;
+  grossProfitUsd: string;
+  grossLossUsd: string;
+  profitFactor: string | null;  // null without a loss
+  averageWinUsd: string | null;
+  averageLossUsd: string | null;
+  largestWinUsd: string | null;
+  largestLossUsd: string | null;
+  maxDrawdownUsd: string;       // on the closed-trade balance
+  maxDrawdownPct: string;
 }
 
 export interface OrderResult {
@@ -117,3 +173,10 @@ export interface PlaceOrderRequest {
 }
 
 export type CommandAck<T = unknown> = { ok: true; result: T } | { ok: false; error: string };
+
+// The result of a 'step' (replay-service playback.service.ts StepResult)
+export interface StepResult {
+  session: ReplaySession;
+  minutes: number;              // M1 minutes processed
+  endOfData: boolean;
+}

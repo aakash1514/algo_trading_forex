@@ -21,10 +21,13 @@ describe('replay page fixtures', () => {
   });
 
   it('cover the REST cases and socket events the page handles', () => {
-    expect(entries.filter((e) => e.kind === 'rest').map((e) => e.status).sort()).toEqual([200, 200, 200, 201, 201, 400, 400, 409]);
+    expect(entries.filter((e) => e.kind === 'rest').map((e) => e.status).sort())
+      .toEqual([200, 200, 200, 200, 200, 200, 200, 201, 201, 400, 400, 404, 409]);
     expect(Object.keys(manifest.fixtures)).toEqual(expect.arrayContaining([
       'state-no-session', 'state-paused', 'bar-1m', 'positions-pending', 'account-after-order', 'positions-filled',
-      'status-paused-user', 'end-of-data', 'state-end-of-data', 'ended',
+      'status-paused-user', 'end-of-data', 'state-end-of-data', 'ended', 'state-calendar-before', 'calendar-fomc',
+      'state-calendar-after', 'trades-200-page1', 'trades-200-page2', 'positions-closed-later', 'stats-200',
+      'stats-200-empty', 'trades-404',
     ]));
   });
 });

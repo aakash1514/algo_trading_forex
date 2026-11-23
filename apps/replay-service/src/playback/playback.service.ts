@@ -10,6 +10,7 @@ import { SessionLock } from '../engine/session-lock';
 import { PairContextService } from '../history/pair-context.service';
 import { currentBar, nextBarMinutes } from '../history/replay-bars';
 import { PairContext } from '../history/replay-history';
+import { calendarCurrencies, calendarEvents } from '../history/replay-calendar';
 import { accountView } from '../session/account.view';
 import { barView } from '../session/bar.view';
 import { positionView } from '../session/position.view';
@@ -180,8 +181,9 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
   // ── Stepping ──
 
   // Processes the next bar's minutes in order through the engine, saves positions,
-  // balance and clock in one transaction, then sends the bar, the account and the
-  // positions that changed. At the end of the data a PLAYING session pauses.
+  // balance and clock in one transaction, then sends the bar, the account, the
+  // positions that changed and the calendar events the step passed. At the end of the
+  // data a PLAYING session pauses.
   private async advance(s: ReplaySessionEntity, ctx: PairContext): Promise<StepResult> {
     const timeframe = s.timeframe as HistoricalTimeframe;
     const minutes = await nextBarMinutes(this.dataSource, s.pair, timeframe, s.clockTime);
@@ -199,6 +201,7 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
     const changed = entities.filter((e) => changedIds.has(e.id))
       .map((e) => applyEngine(e, engine.find((p) => p.id === e.id) as (typeof engine)[number]));
     const clock = minutes[minutes.length - 1].time;
+    const previousClock = s.clockTime;
 
     await this.dataSource.transaction(async (manager) => {
       if (changed.length > 0) await manager.save(changed);
@@ -219,6 +222,14 @@ export class PlaybackService implements OnModuleInit, OnModuleDestroy {
       this.emitter.toUser(saved.userId, 'positions', changed.map((p) => positionView(p, ctx.priceDecimals)), saved.clockTime);
     }
     this.emitter.toUser(saved.userId, 'account', accountView(saved.balance, live, last, ctx), saved.clockTime);
+    // Calendar events the step passed: after the previous clock, up to the new one
+    const passed = await calendarEvents(this.dataSource, calendarCurrencies(saved.pair), timeframe,
+      { after: previousClock, from: null, upTo: saved.clockTime });
+    if (passed.length > 0) {
+      this.emitter.toUser(saved.userId, 'calendar', {
+        sessionId: saved.id, timeframe, clockTime: saved.clockTime.toISOString(), events: passed,
+      }, saved.clockTime);
+    }
 
     const atEnd = saved.clockTime.getTime() >= ctx.lastTime.getTime();
     if (atEnd) await this.endOfData(saved, ctx);

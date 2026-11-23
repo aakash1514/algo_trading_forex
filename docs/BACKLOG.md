@@ -5,16 +5,19 @@ says when.
 
 ## Replay (steps 6b-1 and 6b-2)
 
-1. **Keyboard shortcuts.** Space = play/pause, right arrow = step, and so on. The controls are buttons only today.
-2. **Calendar events on the replay chart.** Needs historical calendar data for 2010–2022, which ForexEdge doesn't
-   have (the calendar holds upcoming events only, from FOMC, ECB and Forex Factory).
-3. **Detailed replay statistics.** Win rate, drawdown, average trade and so on. The end-of-session summary has the
-   balance change, net P&L and the number of trades only.
-4. **Paged closed-trade history.** The socket's state carries only the last 50 closed or cancelled entries, so the
-   page lists those, and the end summary marks the trade count "+" when the state was at that cap. Needs a paginated
-   trades endpoint on replay-service.
+Done on branch `replay-improvements`: keyboard shortcuts (2026-11-20, was item 1); calendar events on the replay
+chart, paged closed-trade history and replay statistics (2026-11-23, were items 2-4; plans in `docs/plans/`).
+
+2. **Calendar history before 2021.** The replay chart marks only the events `economic_events` holds: inside the
+   replay history (2010-2022) that is the FOMC decisions of 2021-2022 (the Fed's calendar page starts in 2021; ECB
+   rows start in 2026-12). Earlier periods say "No calendar data for this period". More needs a licensed historical
+   calendar source; nothing may be backfilled by hand.
 5. **No stop-out in replay.** As in the backtester, equity can fall below the margin in use. A stop-out rule would
    break the verified equivalence with the backtester, so it needs its own verification.
+13. **Replay ack types (StepResult) are duplicated in frontend replay.types.ts; move to a shared lib so a server-side
+    shape change breaks the build.** Today `StepResult` (replay-service `playback.service.ts`) and `CommandAck`
+    (`replay.gateway.ts`) are copied by hand into `apps/frontend/src/types/replay.types.ts`; the frontend tests type
+    their acks against the copy, so a change on the server side alone compiles and passes.
 
 ## Deployment (step 7)
 
