@@ -1,9 +1,12 @@
-// Closed-trade paging through the real replay-service (HTTP + socket)
+// Closed-trade paging and statistics through the real replay-service (HTTP + socket)
 // against a real database: <DB_NAME>_test with the real EUR/USD minutes of 2022-01-03,
-// trades made by placing, stepping and closing like a user. Skipped unless RUN_DB_TESTS=true:
+// trades made by placing, stepping and closing like a user. Statistics are compared to
+// the independent SQL of tools/replay-verify (stats-sql.ts). Skipped unless RUN_DB_TESTS=true:
 //   RUN_DB_TESTS=true npx nx test replay-service --testFile=trades.db.spec.ts --skip-nx-cache
 import { createReplayTestDb, EURUSD_2022_01_03, ReplayTestDb } from '../../test/replay-test-db';
 import { accessToken, connectClient, http, ReplayApp, ReplayClient, startReplayApp } from '../../test/replay-app';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import { compareStats, STATS_SQL, statsFromRow } from '../../../../tools/replay-verify/src/stats-sql';
 import type { PositionView } from './position.view';
 import type { TradesPage } from './trades.service';
 
@@ -11,7 +14,7 @@ const run = process.env['RUN_DB_TESTS'] === 'true' ? describe : describe.skip;
 
 const BATCH = 25;
 
-run('closed trades (real DB, real minutes, replay login)', () => {
+run('closed trades and statistics (real DB, real minutes, replay login)', () => {
   jest.setTimeout(300_000);
   let db: ReplayTestDb;
   let app: ReplayApp;
@@ -109,16 +112,37 @@ run('closed trades (real DB, real minutes, replay login)', () => {
     expect((await allPages()).ids).toEqual(await closedInOrder());
   });
 
-  it('an empty session has no closed trades', async () => {
+  it('statistics from every closed trade equal the independent SQL, to the cent', async () => {
+    const res = await get<Record<string, unknown>>(owner, `/sessions/${sessionId}/stats`);
+    expect(res.status).toBe(200);
+    const [row] = await db.admin.query(STATS_SQL, [sessionId]);
+    const sql = statsFromRow(row);
+    expect(sql.trades).toBe(BATCH + 1);
+    expect(sql.wins).toBeGreaterThan(0);   // both kinds present: every ratio is defined
+    expect(sql.losses).toBeGreaterThan(0);
+    expect(compareStats(res.body, sql)).toEqual([]);
+  });
+
+  it('an empty session: zeros and nulls, no error', async () => {
     const created = await http<{ id: string }>(app.url, as(other), 'POST', '/sessions',
       { instrument: 'EUR_USD', startTime: '2022-01-03T12:00Z', timeframe: '1m', startingBalance: 5000 });
     expect(created.status).toBe(201);
+    const res = await get<Record<string, unknown>>(other, `/sessions/${created.body.id}/stats`);
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      trades: 0, wins: 0, losses: 0, breakeven: 0, winRatePct: null, netPnlUsd: '0.00', grossProfitUsd: '0.00',
+      grossLossUsd: '0.00', profitFactor: null, averageWinUsd: null, averageLossUsd: null, largestWinUsd: null,
+      largestLossUsd: null, maxDrawdownUsd: '0.00', maxDrawdownPct: '0.00',
+    });
+    const [row] = await db.admin.query(STATS_SQL, [created.body.id]);
+    expect(compareStats(res.body, statsFromRow(row))).toEqual([]);
     const trades = await get<TradesPage>(other, `/sessions/${created.body.id}/trades`);
     expect(trades.body).toEqual({ trades: [], nextCursor: null });
   });
 
-  it('another user’s session is a 404; a bad id or cursor is a 400', async () => {
+  it('another user’s session is a 404 for trades and statistics; a bad id or cursor is a 400', async () => {
     expect((await get(other, `/sessions/${sessionId}/trades`)).status).toBe(404);
+    expect((await get(other, `/sessions/${sessionId}/stats`)).status).toBe(404);
     expect((await get(owner, `/sessions/00000000-0000-4000-8000-000000000000/trades`)).status).toBe(404);
     expect((await get(owner, `/sessions/not-a-uuid/trades`)).status).toBe(400);
     expect((await get(owner, `/sessions/${sessionId}/trades?cursor=bm90LWpzb24`)).status).toBe(400);

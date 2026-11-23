@@ -50,4 +50,10 @@ export class ReplaySessionController {
   closedTrades(@Req() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string, @Query('cursor') cursor?: string) {
     return this.trades.closedTrades(req.user.id, id, cursor);
   }
+
+  // GET /api/replay/sessions/:id/stats — from every closed trade of the session
+  @Get(':id/stats')
+  stats(@Req() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string) {
+    return this.trades.stats(req.user.id, id);
+  }
 }

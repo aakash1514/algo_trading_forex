@@ -3,8 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { assertUserId } from '@forexedge/common';
 import { ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
+import { decimalToCents } from '../engine/booking';
 import { PairContextService } from '../history/pair-context.service';
 import { positionView, PositionView } from './position.view';
+import { replayStats, ReplayStats } from './replay-stats';
 
 export const TRADES_PAGE_SIZE = 20;
 
@@ -36,7 +38,7 @@ export function decodeCursor(raw: string): Cursor {
   return { t, id };
 }
 
-// The closed-trade history of one of the user's replay sessions (active
+// The closed-trade history and statistics of one of the user's replay sessions (active
 // or ended). Every query is scoped by the owner: another user's session is a 404.
 @Injectable()
 export class ReplayTradesService {
@@ -70,6 +72,19 @@ export class ReplayTradesService {
       nextCursor: rows.length > TRADES_PAGE_SIZE && last?.exitTime
         ? encodeCursor({ t: last.exitTime.toISOString(), id: last.id }) : null,
     };
+  }
+
+  // From every closed trade of the session, in close order
+  async stats(userId: string, sessionId: string): Promise<ReplayStats> {
+    const session = await this.owned(userId, sessionId);
+    const rows: { realized_pnl_usd: string }[] = await this.dataSource.query(
+      `SELECT p.realized_pnl_usd
+         FROM replay_positions p
+         JOIN replay_sessions s ON s.id = p.session_id AND s.user_id = $2
+        WHERE p.session_id = $1 AND p.status = 'CLOSED'
+        ORDER BY p.exit_time, p.id`, [sessionId, userId]);
+    return replayStats(rows.map((r) => ({ pnlCents: decimalToCents(r.realized_pnl_usd) })),
+      decimalToCents(session.startingBalance));
   }
 
   private async owned(userId: string, sessionId: string): Promise<ReplaySessionEntity> {
