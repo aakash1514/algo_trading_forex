@@ -12,6 +12,7 @@ import { cn } from '../../lib/cn';
 import { centsToDecimal, formatReplayTime, formatUsd, mergeClosedTrades, replayErrorMessage } from '../../lib/replay';
 import { openPnlCents } from '../../lib/replay-money';
 import type { OrderResult, ReplayPosition } from '../../types/replay.types';
+import { ReplayStatsPanel } from './ReplayStatsPanel';
 
 const TH = 'text-left px-3 py-2 text-[10px] text-terminal-muted uppercase tracking-wider font-medium whitespace-nowrap';
 const TD = 'px-3 py-1.5 tabular-nums whitespace-nowrap';
@@ -81,7 +82,7 @@ export function ReplayPositions() {
   const decimals = useAppSelector((s) => s.replay.priceDecimals);
   const live = useAppSelector(selectLiveReplayPositions);
   const closed = useAppSelector(selectClosedReplayPositions);
-  const [tab, setTab] = useState<'open' | 'closed'>('open');
+  const [tab, setTab] = useState<'open' | 'closed' | 'stats'>('open');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [cancelOrder] = useCancelReplayOrderMutation();
@@ -116,7 +117,8 @@ export function ReplayPositions() {
   return (
     <div className="h-full flex flex-col">
       <div className="flex border-b border-terminal-border bg-terminal-surface shrink-0" role="tablist">
-        {([['open', `Open & pending (${live.length})`], ['closed', `Closed trades (${allClosed.length}${pages.hasMore ? '+' : ''})`]] as const).map(([key, label]) => (
+        {([['open', `Open & pending (${live.length})`], ['closed', `Closed trades (${allClosed.length}${pages.hasMore ? '+' : ''})`],
+          ['stats', 'Statistics']] as const).map(([key, label]) => (
           <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setTab(key)}
             className={cn('px-4 py-2 text-[10px] font-medium uppercase tracking-wider border-b-2',
               tab === key ? 'text-accent-blue border-accent-blue' : 'text-terminal-muted border-transparent hover:text-[#e2e4e9]')}>
@@ -129,7 +131,7 @@ export function ReplayPositions() {
         {tab === 'closed' && pages.error && (
           <p role="alert" data-testid="replay-trades-error" className="px-3 pt-2 text-accent-red">{pages.error}</p>
         )}
-        {tab === 'open' ? (
+        {tab === 'stats' ? <ReplayStatsPanel sessionId={session.id} /> : tab === 'open' ? (
           live.length === 0 ? <p className="p-4 text-terminal-muted">No open positions or pending orders</p> : (
             <table className="w-full" data-testid="replay-open-positions">
               <thead><tr className="border-b border-terminal-border">
