@@ -5,10 +5,21 @@ import { act } from '@testing-library/react';
 //   jest.mock('lightweight-charts', () => jest.requireActual('./__harness__/mocks').chartLibrary);
 //   jest.mock('socket.io-client', () => ({ io: () => jest.requireActual('./__harness__/mocks').sockets.current }));
 
-export const mockChart = { setData: [] as unknown[][], update: [] as { time: number; close: number }[] };
+type CrosshairHandler = (param: { time?: number; point?: { x: number; y: number } }) => void;
+// What the page drew: candles (setData, update), every marker list it set, and the
+// crosshair handler it subscribed (a test calls it to hover a bar)
+export const mockChart = {
+  setData: [] as unknown[][],
+  update: [] as { time: number; close: number }[],
+  markers: [] as { time: number; text: string; color: string }[][],
+  crosshair: null as CrosshairHandler | null,
+};
 
 export const chartLibrary = {
   CandlestickSeries: {},
+  createSeriesMarkers: () => ({
+    setMarkers: (m: { time: number; text: string; color: string }[]) => mockChart.markers.push(m),
+  }),
   ColorType: { Solid: 'solid' },
   createChart: () => ({
     addSeries: () => ({
@@ -17,6 +28,8 @@ export const chartLibrary = {
       applyOptions: () => undefined,
     }),
     applyOptions: () => undefined,
+    subscribeCrosshairMove: (h: CrosshairHandler) => { mockChart.crosshair = h; },
+    unsubscribeCrosshairMove: () => { mockChart.crosshair = null; },
     remove: () => undefined,
     timeScale: () => ({ setVisibleLogicalRange: () => undefined }),
   }),

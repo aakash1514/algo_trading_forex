@@ -1,7 +1,7 @@
 import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { endSummary, RECENT_CLOSED_CAP, type EndSummary } from '../../lib/replay';
 import type {
-  BarEvent, EndedSession, EndOfDataEvent, ReplayAccount, ReplayBar, ReplayPosition, ReplaySession, ReplayState,
+  BarEvent, CalendarEvent, CalendarMessage, EndedSession, EndOfDataEvent, ReplayAccount, ReplayBar, ReplayPosition, ReplaySession, ReplayState,
 } from '../../types/replay.types';
 
 export type ReplayConnection = 'connecting' | 'connected' | 'reconnecting' | 'failed' | 'closed';
@@ -27,6 +27,7 @@ export interface ReplaySliceState {
   pendingCommand: string | null; // a socket command waiting for its acknowledgement
   error: string | null;
   summary: EndSummary | null;    // set when the session ends
+  calendar: { covered: boolean; events: Record<string, CalendarEvent> };
 }
 
 // The history kept in memory while playing; a reload gets the server's 500 again
@@ -46,6 +47,7 @@ const initialState: ReplaySliceState = {
   pendingCommand: null,
   error: null,
   summary: null,
+  calendar: { covered: false, events: {} },
 };
 
 const replaySlice = createSlice({
@@ -65,6 +67,7 @@ const replaySlice = createSlice({
       if (!s) {
         Object.assign(state, {
           session: null, account: null, bars: [], currentBar: null, positions: {}, stateWasCapped: false,
+          calendar: initialState.calendar,
         });
         return;
       }
@@ -74,6 +77,9 @@ const replaySlice = createSlice({
       state.bars = s.bars;
       state.currentBar = s.currentBar;
       state.positions = Object.fromEntries(s.positions.map((p) => [p.id, p]));
+      state.calendar = {
+        covered: s.calendar.covered, events: Object.fromEntries(s.calendar.events.map((e) => [e.id, e])),
+      };
       state.stateWasCapped = s.positions.filter((p) => p.status === 'CLOSED' || p.status === 'CANCELLED').length
         >= RECENT_CLOSED_CAP;
     },
@@ -88,6 +94,13 @@ const replaySlice = createSlice({
       }
       if (!current || bar.time >= current.time) state.currentBar = bar;
       state.session.clockTime = clockTime;
+    },
+    // Events a step passed; one for another session or the old timeframe is ignored
+    calendarReceived(state, action: PayloadAction<CalendarMessage>) {
+      const { sessionId, timeframe, events } = action.payload;
+      if (!state.session || state.session.id !== sessionId || state.session.timeframe !== timeframe) return;
+      for (const e of events) state.calendar.events[e.id] = e;
+      if (events.length > 0) state.calendar.covered = true;
     },
     accountReceived(state, action: PayloadAction<ReplayAccount>) {
       if (state.session) state.account = action.payload;
@@ -109,6 +122,7 @@ const replaySlice = createSlice({
       state.summary = endSummary(session, knownClosed, closed, state.stateWasCapped);
       Object.assign(state, {
         session: null, account: null, bars: [], currentBar: null, positions: {}, stateWasCapped: false, pendingCommand: null,
+        calendar: initialState.calendar,
       });
     },
     summaryDismissed(state) {
@@ -132,7 +146,7 @@ const replaySlice = createSlice({
 });
 
 export const {
-  connectionChanged, stateReceived, barReceived, accountReceived, positionsReceived, statusReceived,
+  connectionChanged, stateReceived, barReceived, calendarReceived, accountReceived, positionsReceived, statusReceived,
   endOfDataReceived, sessionEnded, summaryDismissed, commandStarted, commandFinished, errorReceived, replayReset,
 } = replaySlice.actions;
 export default replaySlice.reducer;
@@ -146,6 +160,11 @@ export const selectLiveReplayPositions = createSelector(selectPositionMap, (posi
   Object.values(positions)
     .filter((p) => p.status === 'PENDING' || p.status === 'OPEN')
     .sort((a, b) => a.placedAt.localeCompare(b.placedAt) || a.id.localeCompare(b.id)));
+
+// Calendar events the clock has reached, oldest first
+export const selectReplayCalendarEvents = createSelector(
+  (s: { replay: ReplaySliceState }) => s.replay.calendar.events,
+  (events) => Object.values(events).sort((a, b) => a.time.localeCompare(b.time) || a.id.localeCompare(b.id)));
 
 // Closed trades, newest first (cancelled orders never traded and aren't listed)
 export const selectClosedReplayPositions = createSelector(selectPositionMap, (positions) =>

@@ -9,7 +9,7 @@
 //   npx ts-node --transpile-only --project tools/replay-verify/tsconfig.app.json \
 //     tools/replay-verify/src/record-frontend-fixtures.ts
 import { execSync } from 'node:child_process';
-import { createHash, randomBytes } from 'node:crypto';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { io, Socket } from 'socket.io-client';
@@ -151,6 +151,53 @@ async function main(): Promise<void> {
   save('ended', 'socket', "'ended' after the end", json(await c.next('ended')));
   c.close();
 
+  // ── EUR/USD, 2022-03-16 17:58 UTC on 1m: the FOMC decision at 18:00, trade paging, statistics ──
+  const fomc = await rest('POST', '/sessions', { instrument: 'EUR_USD', startTime: '2022-03-16T17:58Z', timeframe: '1m', startingBalance: 10000 });
+  if (fomc.status !== 201) throw new Error(`fomc session: ${fomc.text}`);
+  const sid = fomc.json.id as string;
+  c = await connect();
+  save('state-calendar-before', 'socket', "'state' at 17:58 before the FOMC decision at 18:00 (calendar covered, no event yet)", json(c.state));
+  const empty = await rest('GET', `/sessions/${sid}/stats`);
+  save('stats-200-empty', 'rest', 'GET /sessions/:id/stats before any trade', empty.text, empty.status);
+  c.queue.length = 0;
+  await c.ack('step'); // 17:59
+  if (c.queue.some((e) => e.event === 'calendar')) throw new Error('a calendar event before its time');
+  await c.ack('step'); // 18:00
+  save('calendar-fomc', 'socket', "'calendar' from the step that reached the 18:00 FOMC decision", json(await c.next('calendar')));
+  c.close();
+  c = await connect();
+  save('state-calendar-after', 'socket', "'state' at 18:00 with the FOMC decision", json(c.state));
+  // 21 trades closed in one minute: a full first page with a cursor, then one more
+  const opened: string[] = [];
+  for (let i = 0; i < 21; i++) {
+    const o = await rest('POST', '/sessions/active/orders', { side: i % 2 === 0 ? 'BUY' : 'SELL', lots: 0.01 });
+    if (o.status !== 201) throw new Error(`order: ${o.text}`);
+    opened.push(o.json.position.id);
+  }
+  for (let i = 0; i < 5; i++) await c.ack('step');
+  for (const pid of opened) {
+    const r = await rest('POST', `/sessions/active/positions/${pid}/close`);
+    if (r.status !== 200) throw new Error(`close: ${r.text}`);
+  }
+  await c.ack('step');
+  const page1 = await rest('GET', `/sessions/${sid}/trades`);
+  save('trades-200-page1', 'rest', 'GET /sessions/:id/trades: 20 of 21 trades closed in one minute', page1.text, page1.status);
+  const page2 = await rest('GET', `/sessions/${sid}/trades?cursor=${page1.json.nextCursor}`);
+  save('trades-200-page2', 'rest', 'GET /sessions/:id/trades?cursor=: the last of the 21', page2.text, page2.status);
+  const later = await rest('POST', '/sessions/active/orders', { side: 'BUY', lots: 0.02 });
+  await c.ack('step');
+  await rest('POST', `/sessions/active/positions/${later.json.position.id}/close`);
+  c.queue.length = 0;
+  await c.ack('step');
+  save('positions-closed-later', 'socket', "'positions' from the step that closed a 22nd trade, after the pages were loaded",
+    json(await c.next('positions')));
+  const stats = await rest('GET', `/sessions/${sid}/stats`);
+  save('stats-200', 'rest', 'GET /sessions/:id/stats after the 22 trades', stats.text, stats.status);
+  const missing = await rest('GET', `/sessions/${randomUUID()}/trades`);
+  save('trades-404', 'rest', 'GET /sessions/:id/trades of a session the user does not own', missing.text, missing.status);
+  await rest('POST', '/sessions/active/end');
+  c.close();
+
   // ── USD/JPY: P&L converted at the price ──
   await rest('POST', '/sessions', { instrument: 'USD_JPY', startTime: '2016-06-23T22:00Z', timeframe: '1h', startingBalance: 25000 });
   c = await connect();
@@ -192,7 +239,7 @@ function readme(user: string, fixtures: Record<string, Entry>): string {
     '',
     'Real replay-service responses and socket events, recorded by',
     '`tools/replay-verify/src/record-frontend-fixtures.ts` against the running auth-service and replay-service and the',
-    `imported Dukascopy history, at commit \`${commit}\` (step 6b-2), as the throwaway user \`${user}\` (deleted`,
+    `imported Dukascopy history, at commit \`${commit}\`, as the throwaway user \`${user}\` (deleted`,
     'afterwards with `tools/ops/delete-verification-users.ts`). Nothing here is written or edited by hand; this README',
     'is written by the recorder too.',
     '',
@@ -202,8 +249,9 @@ function readme(user: string, fixtures: Record<string, Entry>): string {
     '',
     'Sessions: EUR/USD from 2022-03-01 09:30 UTC on 1m (a long 0.1 lot with SL/TP 100 points from the bid, closed by',
     'its SL; a short 0.2 closed manually; a cancelled order; ended with a short open), USD/JPY from 2016-06-23 22:00',
-    'UTC on 1h (a long and a short open on the Brexit-vote night), and EUR/USD from 2022-12-30 20:30 UTC stepped to',
-    'the end of the history.',
+    'UTC on 1h (a long and a short open on the Brexit-vote night), EUR/USD from 2022-03-16 17:58 UTC on 1m across',
+    'the FOMC decision at 18:00 (calendar; 21 trades closed in one minute for paging, a 22nd later; statistics), and',
+    'EUR/USD from 2022-12-30 20:30 UTC stepped to the end of the history.',
     '',
     '| File | Kind | What | HTTP | Recorded (UTC) | sha256 |',
     '|---|---|---|---|---|---|',

@@ -41,6 +41,8 @@ export function setupReplayPage() {
     page.socket = sockets.current;
     mockChart.setData = [];
     mockChart.update = [];
+    mockChart.markers = [];
+    mockChart.crosshair = null;
     page.routes = [];
     page.calls = [];
     store.dispatch(setCredentials({ accessToken: 'tok', user: { id: 'u1' } as never }));
