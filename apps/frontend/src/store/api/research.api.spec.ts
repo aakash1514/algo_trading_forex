@@ -16,6 +16,12 @@ async function ask(question: string) {
   return result;
 }
 
+// The request's error; a result without one fails the test here
+function errorOf(result: Awaited<ReturnType<typeof ask>>) {
+  if (!('error' in result) || !result.error) throw new Error('expected the request to fail');
+  return result.error;
+}
+
 describe('askResearch', () => {
   // fetchBaseQuery's timeout timer outlives a fast response; fake timers keep it out of the worker
   beforeEach(() => {
@@ -51,7 +57,7 @@ describe('askResearch', () => {
     const spy = jest.spyOn(global, 'fetch').mockRejectedValue(new TypeError('Failed to fetch'));
     const result = await ask('Which pair moved most in 2020?');
     expect(spy).toHaveBeenCalledTimes(1);
-    expect('error' in result && askErrorKind(result.error)).toBe('network');
+    expect(askErrorKind(errorOf(result))).toBe('network');
   });
 
   it(`gives up after ${ASK_TIMEOUT_MS} ms, once, as a timeout`, async () => {
@@ -74,6 +80,6 @@ describe('askResearch', () => {
     const result = await pending;
     expect(spy).toHaveBeenCalledTimes(1);
     expect('error' in result && result.error).toMatchObject({ status: 'TIMEOUT_ERROR' });
-    expect('error' in result && askErrorKind(result.error)).toBe('busy');
+    expect(askErrorKind(errorOf(result))).toBe('busy');
   });
 });

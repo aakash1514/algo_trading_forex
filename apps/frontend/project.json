@@ -60,6 +60,18 @@
     "lint": {
       "executor": "@nx/eslint:lint"
     },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": ["default", "^production"],
+      "options": {
+        "commands": [
+          "tsc --noEmit -p apps/frontend/tsconfig.json",
+          "tsc --noEmit -p apps/frontend/tsconfig.spec.json"
+        ],
+        "parallel": false
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/frontend"],

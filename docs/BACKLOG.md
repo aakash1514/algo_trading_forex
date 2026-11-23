@@ -17,6 +17,10 @@ for 10 bars, ↑/↓ speed, B/S preselect the order side without placing an orde
    trades endpoint on replay-service.
 5. **No stop-out in replay.** As in the backtester, equity can fall below the margin in use. A stop-out rule would
    break the verified equivalence with the backtester, so it needs its own verification.
+13. **Replay ack types (StepResult) are duplicated in frontend replay.types.ts; move to a shared lib so a server-side
+    shape change breaks the build.** Today `StepResult` (replay-service `playback.service.ts`) and `CommandAck`
+    (`replay.gateway.ts`) are copied by hand into `apps/frontend/src/types/replay.types.ts`; the frontend tests type
+    their acks against the copy, so a change on the server side alone compiles and passes.
 
 ## Deployment (step 7)
 
