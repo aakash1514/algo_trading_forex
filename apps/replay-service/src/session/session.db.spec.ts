@@ -54,9 +54,15 @@ run('replay sessions (real DB, real history, replay login)', () => {
       'INSERT INTO ticks SELECT * FROM ticks WHERE false',
       'SELECT 1 FROM candles_1m',
       'SELECT 1 FROM users',
-      'DELETE FROM replay_sessions WHERE false',
+      'DELETE FROM ticks WHERE false',
+      'DELETE FROM candles_1m WHERE false',
+      'DELETE FROM instruments WHERE false',
     ]) {
       await expect(db.replay.query(sql)).rejects.toMatchObject({ code: '42501' });
+    }
+    // an ENDED session is deleted with its positions (migration ReplaySessionsList)
+    for (const sql of ['DELETE FROM replay_positions WHERE false', 'DELETE FROM replay_sessions WHERE false']) {
+      await expect(db.replay.query(sql)).resolves.toBeDefined();
     }
   });
 
