@@ -19,6 +19,17 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
   const lastMigration = async () =>
     (await testDb.dataSource.query('SELECT name FROM migrations ORDER BY id DESC LIMIT 1'))[0]?.name;
 
+  // The newest migration in the repo, and undoing the newer ones one by one down to `name`
+  const stamp = (name: string) => Number(/\d+$/.exec(name)?.[0] ?? 0);
+  const newestMigration = () =>
+    testDb.dataSource.migrations.map((m) => m.name ?? '').sort((a, b) => stamp(a) - stamp(b)).at(-1);
+  const undoDownTo = async (name: string) => {
+    for (let i = 0; i < 50 && (await lastMigration()) !== name; i += 1) {
+      await testDb.dataSource.undoLastMigration({ transaction: 'each' });
+    }
+    expect(await lastMigration()).toBe(name);
+  };
+
   const insertAllDay = async () => testDb.dataSource.query(
     `INSERT INTO economic_events (title, currency, impact, scheduled_at, all_day, source) VALUES
      ('Governing Council of the ECB: monetary policy meeting in Frankfurt (Day 1)', 'EUR', 'LOW', '2026-10-28T00:00:00Z', true, 'ECB'),
@@ -27,15 +38,10 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
 
   it('deletes the all-day rows, logs the counts per source, and replaces all_day with time_source', async () => {
     const ds = testDb.dataSource;
-    // Newer migrations first: ReplayPauseReason (6b-2), ReplayTables (6b-1), then CalendarThirdPartyEvents and CalendarEventTimes
-    expect(await lastMigration()).toBe('ReplayPauseReason1792600000000');
-    await ds.undoLastMigration({ transaction: 'each' });
-    expect(await lastMigration()).toBe('ReplayTables1792500000000');
-    await ds.undoLastMigration({ transaction: 'each' });
-    expect(await lastMigration()).toBe('CalendarThirdPartyEvents1792400000000');
-    await ds.undoLastMigration({ transaction: 'each' });
-    await ds.undoLastMigration({ transaction: 'each' });
-    expect(await lastMigration()).toBe('RemovePreOfficialCalendarEvents1792200000000');
+    // Newer migrations first (replay and later), then CalendarThirdPartyEvents and CalendarEventTimes
+    expect(await lastMigration()).toBe(newestMigration());
+    await undoDownTo('CalendarThirdPartyEvents1792400000000');
+    await undoDownTo('RemovePreOfficialCalendarEvents1792200000000');
     await insertAllDay();
     expect(Number((await ds.query('SELECT count(*)::int AS n FROM economic_events'))[0].n)).toBe(2);
 
@@ -44,7 +50,7 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
     expect(log).toHaveBeenCalledWith('CalendarEventTimes: deleted all-day events per source: ECB 2; rows left 0');
     log.mockRestore();
 
-    expect(await lastMigration()).toBe('ReplayPauseReason1792600000000');
+    expect(await lastMigration()).toBe(newestMigration());
     expect(Number((await ds.query('SELECT count(*)::int AS n FROM economic_events'))[0].n)).toBe(0);
     const columns = (await ds.query(
       `SELECT column_name FROM information_schema.columns WHERE table_name = 'economic_events' ORDER BY column_name`,
@@ -55,10 +61,7 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
 
   it('refuses a timed row whose time source is unknown, and leaves the table as it was', async () => {
     const ds = testDb.dataSource;
-    await ds.undoLastMigration({ transaction: 'each' }); // ReplayPauseReason
-    await ds.undoLastMigration({ transaction: 'each' }); // ReplayTables
-    await ds.undoLastMigration({ transaction: 'each' });
-    await ds.undoLastMigration({ transaction: 'each' });
+    await undoDownTo('RemovePreOfficialCalendarEvents1792200000000');
     await insertAllDay();
     await ds.query(`UPDATE economic_events SET all_day = false WHERE impact = 'HIGH'`);
 
@@ -68,6 +71,6 @@ runDb('CalendarEventTimes migration (RUN_DB_TESTS)', () => {
 
     await ds.query('DELETE FROM economic_events');
     await ds.runMigrations({ transaction: 'each' });
-    expect(await lastMigration()).toBe('ReplayPauseReason1792600000000');
+    expect(await lastMigration()).toBe(newestMigration());
   });
 });

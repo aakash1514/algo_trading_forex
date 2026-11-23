@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { HistoricalTimeframe, ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
 import { currentBar, historyBars } from '../history/replay-bars';
+import { calendarView, CalendarView } from '../history/replay-calendar';
 import { PairContextService } from '../history/pair-context.service';
 import { minuteAt } from '../history/replay-history';
 import { accountView, AccountView } from '../session/account.view';
@@ -20,6 +21,7 @@ export interface ReplayState {
   bars: BarView[];          // completed bars before the current one (up to 500)
   currentBar: BarView;      // the bar holding the clock, from its minutes up to the clock
   positions: PositionView[]; // pending and open, then the latest closed/cancelled
+  calendar: CalendarView;    // calendar events from the first bar to the clock (none after it)
 }
 
 @Injectable()
@@ -47,6 +49,7 @@ export class ReplayStateService {
       bars: history.map((b) => barView(b, ctx.priceDecimals)),
       currentBar: barView(current, ctx.priceDecimals),
       positions: [...live, ...done].map((p) => positionView(p, ctx.priceDecimals)),
+      calendar: await calendarView(this.dataSource, session.pair, timeframe, history[0]?.time ?? current.time, session.clockTime),
     };
   }
 
