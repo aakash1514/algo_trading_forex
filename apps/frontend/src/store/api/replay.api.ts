@@ -1,7 +1,8 @@
 import { baseApi } from './base.api';
 import { API_BASE } from '../../lib/constants';
 import type {
-  CreateSessionRequest, EndedSession, OrderResult, PlaceOrderRequest, ReplaySession, ReplayStats, TradesPage,
+  CreateSessionRequest, EndedSession, OrderResult, PlaceOrderRequest, ReplaySession, ReplayState, ReplayStats,
+  SessionListItem, SessionsPage, TradesPage,
 } from '../../types/replay.types';
 
 const SESSIONS = `${API_BASE.REPLAY}/replay/sessions`;
@@ -43,6 +44,23 @@ export const replayApi = baseApi.injectEndpoints({
         url: `${SESSIONS}/${encodeURIComponent(sessionId)}/trades`, params: cursor ? { cursor } : undefined,
       }),
     }),
+    // "My replays": a page of the user's sessions, last opened first; the next from its nextCursor
+    getReplaySessions: build.query<SessionsPage, { cursor?: string; refreshKey: number }>({
+      query: ({ cursor }) => ({ url: SESSIONS, params: cursor ? { cursor } : undefined }),
+    }),
+    // 1-60 characters (the server checks); '' gives the auto name
+    renameReplaySession: build.mutation<SessionListItem, { sessionId: string; title: string }>({
+      query: ({ sessionId, title }) => ({ url: `${SESSIONS}/${encodeURIComponent(sessionId)}`, method: 'PATCH', body: { title } }),
+    }),
+    // ENDED sessions only (409 otherwise); for good, with its trades
+    deleteReplaySession: build.mutation<void, string>({
+      query: (sessionId) => ({ url: `${SESSIONS}/${encodeURIComponent(sessionId)}`, method: 'DELETE' }),
+    }),
+    // The session's full state; a playing session pauses first. Unended: it becomes the
+    // current one (PAUSED). ENDED: read-only.
+    openReplaySession: build.mutation<ReplayState, string>({
+      query: (sessionId) => ({ url: `${SESSIONS}/${encodeURIComponent(sessionId)}/open`, method: 'POST' }),
+    }),
     // closedKey only changes the cache key: a new close asks again
     getReplayStats: build.query<ReplayStats, { sessionId: string; closedKey: string }>({
       query: ({ sessionId }) => `${SESSIONS}/${encodeURIComponent(sessionId)}/stats`,
@@ -58,4 +76,8 @@ export const {
   useCloseReplayPositionMutation,
   useLazyGetReplayTradesQuery,
   useGetReplayStatsQuery,
+  useLazyGetReplaySessionsQuery,
+  useRenameReplaySessionMutation,
+  useDeleteReplaySessionMutation,
+  useOpenReplaySessionMutation,
 } = replayApi;

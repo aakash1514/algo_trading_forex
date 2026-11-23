@@ -163,11 +163,38 @@ export interface OrderResult {
   account: ReplayAccount;
 }
 
+// 'switched': the user opened or created a session; the sessions that were playing paused
+export interface SwitchedEvent {
+  pausedSessionIds: string[];
+  openedSessionId: string;
+}
+
+// GET /sessions: "My replays", last opened first, 20 a page
+export interface SessionListItem {
+  id: string;
+  title: string;                // plain text: rendered as text only
+  instrument: string;           // 'EUR_USD'
+  timeframe: string;
+  status: 'PLAYING' | 'PAUSED' | 'ENDED';
+  current: boolean;             // the user's current session (latest opened, not ENDED)
+  startTime: string;
+  clockTime: string;            // the replay time it stopped at
+  netPnlUsd: string;            // closed trades only (open positions are not marked)
+  lastOpenedAt: string;
+  endedAt: string | null;
+}
+
+export interface SessionsPage {
+  sessions: SessionListItem[];
+  nextCursor: string | null;
+}
+
 export interface CreateSessionRequest {
   instrument: string;
   startTime: string;            // 'YYYY-MM-DDTHH:MMZ'
   timeframe: string;
   startingBalance: number;
+  title?: string;               // optional; without one the server names it 'EUR/USD · 1m · 2022-03-16'
 }
 
 export interface PlaceOrderRequest {

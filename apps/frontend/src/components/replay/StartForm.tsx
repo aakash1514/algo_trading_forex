@@ -5,7 +5,7 @@ import { useCreateReplaySessionMutation } from '../../store/api/replay.api';
 import { PAIR_DISPLAY } from '../../lib/constants';
 import {
   DEFAULT_REPLAY_TIMEFRAME, DEFAULT_STARTING_BALANCE, REPLAY_PAIRS, REPLAY_TIMEFRAMES, replayErrorMessage,
-  startingBalanceFromInput, startTimeFromInputs,
+  startingBalanceFromInput, startTimeFromInputs, TITLE_MAX_CHARS,
 } from '../../lib/replay';
 
 const FIELD = 'w-full rounded border border-terminal-border bg-terminal-bg px-2.5 py-1.5 text-[12px] text-[#e2e4e9] '
@@ -24,6 +24,7 @@ export function StartForm({ onCreated }: StartFormProps) {
   const [time, setTime] = useState('00:00');
   const [balance, setBalance] = useState(String(DEFAULT_STARTING_BALANCE));
   const [timeframe, setTimeframe] = useState<string>(DEFAULT_REPLAY_TIMEFRAME);
+  const [title, setTitle] = useState('');
   const [problem, setProblem] = useState<string | null>(null);
   const [create, { isLoading }] = useCreateReplaySessionMutation();
 
@@ -34,7 +35,9 @@ export function StartForm({ onCreated }: StartFormProps) {
     const amount = startingBalanceFromInput(balance);
     if (!amount.ok) return setProblem(amount.error);
     setProblem(null);
-    const result = await create({ instrument, startTime: start.value, timeframe, startingBalance: amount.value });
+    const result = await create({
+      instrument, startTime: start.value, timeframe, startingBalance: amount.value, ...(title.trim() ? { title } : {}),
+    });
     if ('data' in result) return onCreated();
     setProblem(replayErrorMessage(result.error));
   }
@@ -77,6 +80,11 @@ export function StartForm({ onCreated }: StartFormProps) {
             {REPLAY_TIMEFRAMES.map((tf) => <option key={tf} value={tf}>{tf}</option>)}
           </select>
         </div>
+      </div>
+      <div>
+        <label htmlFor="replay-title" className={LABEL}>Title (optional, up to {TITLE_MAX_CHARS} characters)</label>
+        <input id="replay-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Pair · timeframe · start date"
+          className={FIELD} />
       </div>
       {problem && <p role="alert" data-testid="replay-start-error" className="text-[12px] text-accent-red">{problem}</p>}
       <button type="submit" disabled={isLoading}

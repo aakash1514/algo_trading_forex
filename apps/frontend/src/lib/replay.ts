@@ -197,7 +197,8 @@ export function replayErrorMessage(error: unknown): string {
     .replace(/\btakeProfit\b/g, 'Take profit')
     .replace(/\bstartingBalance\b/g, 'Starting balance')
     .replace(/\bstartTime\b/g, 'Start time')
-    .replace(/\blots\b/g, 'Lots');
+    .replace(/\blots\b/g, 'Lots')
+    .replace(/^title\b/, 'Title');
 }
 
 // ── After ending ──
@@ -227,4 +228,20 @@ export function endSummary(
     trades: ids.size,
     tradesCapped: stateWasCapped,
   };
+}
+
+// ── My replays ──
+
+// The server checks titles (1-60 characters after trimming); the page only counts, the
+// way the server does: characters (code points), so an emoji is one
+export const TITLE_MAX_CHARS = 60;
+
+export function titleLength(title: string): number {
+  return [...title.trim()].length;
+}
+
+// Active = the user's current session (playing or paused); Paused = another unended one
+export function sessionStatusLabel(s: { status: string; current: boolean }): 'Active' | 'Paused' | 'Ended' {
+  if (s.status === 'ENDED') return 'Ended';
+  return s.current ? 'Active' : 'Paused';
 }
