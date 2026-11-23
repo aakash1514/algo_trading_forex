@@ -127,6 +127,32 @@ export interface EndedSession {
   cancelled: ReplayPosition[];  // pending orders that never filled
 }
 
+// GET /sessions/:id/trades: closed trades newest first (exit time, then id), 20 a page
+export interface TradesPage {
+  trades: ReplayPosition[];
+  nextCursor: string | null;    // null on the last page
+}
+
+// GET /sessions/:id/stats (replay-service session/replay-stats.ts): from every closed
+// trade of the session; null where undefined (no trades, no wins, no losses)
+export interface ReplayStats {
+  trades: number;
+  wins: number;
+  losses: number;
+  breakeven: number;
+  winRatePct: string | null;
+  netPnlUsd: string;
+  grossProfitUsd: string;
+  grossLossUsd: string;
+  profitFactor: string | null;  // null without a loss
+  averageWinUsd: string | null;
+  averageLossUsd: string | null;
+  largestWinUsd: string | null;
+  largestLossUsd: string | null;
+  maxDrawdownUsd: string;       // on the closed-trade balance
+  maxDrawdownPct: string;
+}
+
 export interface OrderResult {
   position: ReplayPosition;
   account: ReplayAccount;

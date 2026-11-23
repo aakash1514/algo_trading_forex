@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
-import { useCancelReplayOrderMutation, useCloseReplayPositionMutation } from '../../store/api/replay.api';
+import {
+  useCancelReplayOrderMutation, useCloseReplayPositionMutation, useLazyGetReplayTradesQuery,
+} from '../../store/api/replay.api';
 import {
   accountReceived, positionsReceived, selectClosedReplayPositions, selectLiveReplayPositions,
 } from '../../store/slices/replay.slice';
 import { cn } from '../../lib/cn';
-import { centsToDecimal, formatReplayTime, formatUsd, replayErrorMessage } from '../../lib/replay';
+import { centsToDecimal, formatReplayTime, formatUsd, mergeClosedTrades, replayErrorMessage } from '../../lib/replay';
 import { openPnlCents } from '../../lib/replay-money';
 import type { OrderResult, ReplayPosition } from '../../types/replay.types';
 
@@ -29,8 +31,49 @@ function Money({ cents }: { cents: string | null }) {
   return <span className={cents.startsWith('-') ? 'text-accent-red' : 'text-accent-green'}>{formatUsd(cents, true)}</span>;
 }
 
+// The closed-trade history beyond what the socket's state carries (its last 50): pages of
+// 20 from replay-service, newest first, loaded on opening the tab and by Load more. They
+// stay in this component (only this tab uses them) and are merged by id with the
+// store's closed trades, so a trade that closes by socket goes to the top and a trade
+// both sources hold is listed once. A new session starts over.
+function useClosedTradePages(sessionId: string | undefined, active: boolean) {
+  const [pages, setPages] = useState<{ sessionId: string; trades: ReplayPosition[]; cursor: string | null } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [fetchPage, { isFetching }] = useLazyGetReplayTradesQuery();
+
+  const load = useCallback(async (cursor?: string) => {
+    if (!sessionId) return;
+    setError(null);
+    const result = await fetchPage({ sessionId, cursor });
+    if (!result.data) {
+      setError(replayErrorMessage(result.error));
+      return;
+    }
+    const page = result.data;
+    setPages((prev) => ({
+      sessionId,
+      trades: cursor && prev?.sessionId === sessionId ? [...prev.trades, ...page.trades] : page.trades,
+      cursor: page.nextCursor,
+    }));
+  }, [fetchPage, sessionId]);
+
+  const current = pages?.sessionId === sessionId ? pages : null;
+  // the first page, once per session, when the tab is opened
+  useEffect(() => {
+    if (active && sessionId && !current) void load();
+  }, [active, sessionId, current, load]);
+
+  return {
+    trades: current?.trades ?? [],
+    hasMore: current?.cursor != null,
+    loadMore: () => { if (current?.cursor) void load(current.cursor); },
+    loading: isFetching,
+    error,
+  };
+}
+
 // Pending orders and open positions (with live P&L at the clock), and the closed
-// trades the state carries (the last 50). A Close is pending until the next minute.
+// trades (the state's latest, then pages on demand). A Close is pending until the next minute.
 export function ReplayPositions() {
   const dispatch = useAppDispatch();
   const session = useAppSelector((s) => s.replay.session);
@@ -43,6 +86,8 @@ export function ReplayPositions() {
   const [error, setError] = useState<string | null>(null);
   const [cancelOrder] = useCancelReplayOrderMutation();
   const [closePosition] = useCloseReplayPositionMutation();
+  const pages = useClosedTradePages(session?.id, tab === 'closed');
+  const allClosed = useMemo(() => mergeClosedTrades(closed, pages.trades), [closed, pages.trades]);
   if (!session || !bar) return null;
 
   async function act(id: string, run: (id: string) => Promise<{ data?: OrderResult; error?: unknown }>) {
@@ -71,7 +116,7 @@ export function ReplayPositions() {
   return (
     <div className="h-full flex flex-col">
       <div className="flex border-b border-terminal-border bg-terminal-surface shrink-0" role="tablist">
-        {([['open', `Open & pending (${live.length})`], ['closed', `Closed trades (${closed.length})`]] as const).map(([key, label]) => (
+        {([['open', `Open & pending (${live.length})`], ['closed', `Closed trades (${allClosed.length}${pages.hasMore ? '+' : ''})`]] as const).map(([key, label]) => (
           <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setTab(key)}
             className={cn('px-4 py-2 text-[10px] font-medium uppercase tracking-wider border-b-2',
               tab === key ? 'text-accent-blue border-accent-blue' : 'text-terminal-muted border-transparent hover:text-[#e2e4e9]')}>
@@ -81,6 +126,9 @@ export function ReplayPositions() {
         {error && <p role="alert" className="ml-auto self-center px-4 text-[11px] text-accent-red">{error}</p>}
       </div>
       <div className="flex-1 overflow-auto text-[11px]">
+        {tab === 'closed' && pages.error && (
+          <p role="alert" data-testid="replay-trades-error" className="px-3 pt-2 text-accent-red">{pages.error}</p>
+        )}
         {tab === 'open' ? (
           live.length === 0 ? <p className="p-4 text-terminal-muted">No open positions or pending orders</p> : (
             <table className="w-full" data-testid="replay-open-positions">
@@ -117,14 +165,15 @@ export function ReplayPositions() {
             </table>
           )
         ) : (
-          closed.length === 0 ? <p className="p-4 text-terminal-muted">No closed trades yet</p> : (
+          allClosed.length === 0 ? <p className="p-4 text-terminal-muted">{pages.loading ? 'Loading…' : 'No closed trades yet'}</p> : (
+            <>
             <table className="w-full" data-testid="replay-closed-trades">
               <thead><tr className="border-b border-terminal-border">
                 {['Closed (UTC)', 'Side', 'Lots', 'Entry → exit', 'Reason', 'Net P&L'].map((h) => <th key={h} className={TH}>{h}</th>)}
               </tr></thead>
               <tbody>
-                {closed.map((p) => (
-                  <tr key={p.id} data-testid="replay-closed-row" className="border-b border-terminal-border/50">
+                {allClosed.map((p) => (
+                  <tr key={p.id} data-testid="replay-closed-row" data-id={p.id} className="border-b border-terminal-border/50">
                     <td className={cn(TD, 'text-terminal-muted')}>{p.exitTime ? formatReplayTime(p.exitTime) : '—'}</td>
                     <td className={TD}><SideTag side={p.side} /></td>
                     <td className={cn(TD, 'text-[#e2e4e9]')}>{p.lots}</td>
@@ -135,6 +184,13 @@ export function ReplayPositions() {
                 ))}
               </tbody>
             </table>
+            {pages.hasMore && (
+              <button type="button" onClick={pages.loadMore} disabled={pages.loading} data-testid="replay-load-more"
+                className="m-3 px-3 py-1.5 rounded border border-terminal-border text-terminal-muted hover:text-[#e2e4e9] disabled:opacity-40">
+                {pages.loading ? 'Loading…' : 'Load more'}
+              </button>
+            )}
+            </>
           )
         )}
       </div>

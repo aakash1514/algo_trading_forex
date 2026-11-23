@@ -47,6 +47,17 @@ export function statusMessage(session: Pick<ReplaySession, 'status' | 'pauseReas
   return session.pauseReason ? PAUSE_MESSAGES[session.pauseReason] : 'Paused';
 }
 
+// Closed trades from the socket (the store) and from loaded pages, one per id (the
+// store's copy wins: it is the newest), in the server's order: exit time, then id, newest first
+export function mergeClosedTrades(fromStore: ReplayPosition[], fromPages: ReplayPosition[]): ReplayPosition[] {
+  const byId = new Map<string, ReplayPosition>();
+  for (const p of fromPages) byId.set(p.id, p);
+  for (const p of fromStore) byId.set(p.id, p);
+  return [...byId.values()]
+    .filter((p) => p.status === 'CLOSED')
+    .sort((a, b) => (b.exitTime ?? '').localeCompare(a.exitTime ?? '') || b.id.localeCompare(a.id));
+}
+
 export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 // Date 'YYYY-MM-DD' and time 'HH:MM', both UTC -> 'YYYY-MM-DDTHH:MMZ' (the API's form),
