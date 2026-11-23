@@ -194,6 +194,10 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   `prepare(side)` on the order panel: side + focus Lots, never submit), ?, Esc (help; End-session cancel). Keys
   call the buttons' own handlers from `useReplayActions` (one instance per screen), so a disabled button's key is a
   no-op; ignored in fields/forms/dialogs, with Ctrl/Meta/Alt, isComposing, repeat, or unless a command can go out.
+  Calendar markers come only from the server's `calendar` (state + socket event, merged by id; the Medium toggle
+  only filters what is drawn). The Closed trades tab merges loaded `/trades` pages with the store's closed trades
+  by id in the server's order (Load more follows `nextCursor`); the Statistics tab refetches when the store's
+  closed trades change (`closedKey` in the query arg).
   Component
   tests use recorded replay-service bodies and socket events (`components/replay/__fixtures__`, written by
   `record-frontend-fixtures.ts`, sha256 in its manifest).
@@ -381,8 +385,19 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   - One non-ENDED session per user (partial unique index). The replay login can't write `historical_*`, `ticks`,
     `candles_*` or `instruments`, and can't read users/orders/live ticks; replay-service refuses to start as `DB_USER`.
   - Tests use real minutes only: `test/replay-test-db.ts` loads the importer's real fixtures into `<DB_NAME>_test`
-    with the real instruments seed (the only cross-project imports, test code) and connects as a temporary login
-    with the replay grants; `test/replay-app.ts` runs the real AppModule in-process.
+    with the real instruments seed and the real FOMC/ECB events (domain-service's parsers over its recorded official
+    pages; these are the only cross-project imports, test code) and connects as a temporary login with the replay
+    grants; `test/replay-app.ts` runs the real AppModule in-process.
+  - **Calendar on the chart** (`history/replay-calendar.ts`): events with `scheduled_at <= clock` only (HIGH and
+    MEDIUM, the pair's currencies, metals dropped), in the `state` (first bar to clock) and in a `calendar` event
+    after a step (previous clock, new clock]; never filtered in the browser, so a future event or its actual never
+    reaches it. `barTime` from `historicalBucketSql`. `covered` = some event exists at or before the clock. The
+    replay writer role reads `economic_events` (migration ReplayCalendarRead).
+  - **Closed trades and statistics** (`session/trades.service.ts`): `GET /sessions/:id/trades` keyset on
+    (exit_time DESC, id DESC), 20 a page, opaque cursor; `GET /sessions/:id/stats` from every CLOSED trade (BigInt
+    cents, ratios half away from zero, drawdown on the closed-trade balance). Both owner-scoped in the query (404).
+    `tools/replay-verify/src/stats-sql.ts` recomputes the statistics in SQL; `replay:verify` and the DB test compare
+    every field to the cent.
 
 ### Terraform rules (`infra/terraform`)
 - No secret in any variable, resource argument or output: state is plain JSON in the S3 state bucket.

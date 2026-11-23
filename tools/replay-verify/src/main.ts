@@ -270,7 +270,7 @@ function report(run: VerifiedRun, results: PairResult[], user: string, commit: s
   for (const f of STATS_FIELDS) {
     lines.push(`| ${f} | ${results.map((r) => `${cell(r.stats.api[f])} | ${cell(r.stats.sql[f])}`).join(' | ')} |`);
   }
-  lines.push(`| **Result** | ${results.map((r) => (r.stats.ok ? '**equal** | ' : `**DIFFERS** (${r.stats.differences.length}) | `)).join('')}`);
+  lines.push(`| **Result** | ${results.map((r) => (r.stats.ok ? '**equal** | **equal** | ' : `**DIFFERS** (${r.stats.differences.length}) | | `)).join('')}`);
   lines.push('');
   for (const r of results) {
     lines.push(`## ${r.pair}`, '');
