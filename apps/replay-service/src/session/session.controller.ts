@@ -1,9 +1,12 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseUUIDPipe, Patch, Post, Query, Req, UseGuards,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PlaybackService } from '../playback/playback.service';
 import { ReplayEmitter } from '../playback/replay-emitter';
 import { CreateSessionDto } from './dto/create-session.dto';
+import { RenameSessionDto } from './dto/rename-session.dto';
 import { ReplaySessionService } from './session.service';
 import { ReplayTradesService } from './trades.service';
 
@@ -26,6 +29,27 @@ export class ReplaySessionController {
   @Post()
   create(@Req() req: AuthenticatedRequest, @Body() dto: CreateSessionDto) {
     return this.playback.createAndOpen(req.user.id, () => this.sessions.create(req.user.id, dto));
+  }
+
+  // GET /api/replay/sessions[?cursor=] — "My replays": every session of the user, last opened
+  // first, 20 a page
+  @Get()
+  list(@Req() req: AuthenticatedRequest, @Query('cursor') cursor?: string) {
+    return this.sessions.list(req.user.id, cursor);
+  }
+
+  // PATCH /api/replay/sessions/:id { title } — rename (any status); '' or null: the auto name
+  @Patch(':id')
+  rename(@Req() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string, @Body() dto: RenameSessionDto) {
+    return this.sessions.rename(req.user.id, id, dto.title);
+  }
+
+  // DELETE /api/replay/sessions/:id — an ENDED session and its positions, for good (204);
+  // 409 while it isn't ENDED
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Req() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string): Promise<void> {
+    await this.sessions.remove(req.user.id, id);
   }
 
   // GET /api/replay/sessions/active — the current session (latest opened, not ENDED); 404 when there is none

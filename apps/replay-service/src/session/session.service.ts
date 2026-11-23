@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException, ConflictException, Injectable, NotFoundException, UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Not, Repository } from 'typeorm';
 import { assertUserId } from '@forexedge/common';
@@ -13,7 +15,12 @@ import { autoTitle, currentSession, NO_SUCH_SESSION } from './current-session';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { positionView, PositionView } from './position.view';
 import { DEFAULT_STARTING_BALANCE, instrumentToPair, parseStartTime } from './replay-window';
+import {
+  CURSOR_TIME_SQL, decodeListCursor, encodeListCursor, REPLAY_SESSION_CHILD_TABLES, SessionListItem, sessionListItem,
+  SESSIONS_PAGE_SIZE, SessionsPage,
+} from './session-list';
 import { sessionView, SessionView } from './session.view';
+import { normalizeTitle } from './title';
 
 export interface EndedSession {
   session: SessionView;
@@ -53,7 +60,7 @@ export class ReplaySessionService {
     const saved = await this.sessions.save(this.sessions.create({
       userId, pair, startTime: start, clockTime: clock, status: 'PAUSED', pauseReason: null, speedMs: 1000,
       timeframe: dto.timeframe, startingBalance: balance, balance, endedAt: null,
-      title: autoTitle(pair, dto.timeframe, start), lastOpenedAt: new Date(),
+      title: this.titleOrAuto(dto.title, pair, dto.timeframe, start), lastOpenedAt: new Date(),
     }));
     return sessionView(await this.sessions.findOneByOrFail({ id: saved.id, userId }), ctx.lastTime);
   }
@@ -65,9 +72,71 @@ export class ReplaySessionService {
     return sessionView(session, (await this.pairs.get(session.pair)).lastTime);
   }
 
-  // Ends the named session (the user's, not ENDED; it needn't be the current one): pending orders are cancelled, open positions close at the
-  // clock minute's close (a long at the bid, a short at the ask; reason SESSION_END),
-  // all in one transaction under the session lock.
+  // "My replays": every session of the user (any status), last opened first, 20 a page.
+  // Keyset on (last_opened_at DESC, id DESC): the id breaks a tie, and opening a session
+  // while the user pages moves it to the top of a fresh first page.
+  async list(userId: string, cursor?: string): Promise<SessionsPage> {
+    assertUserId(userId);
+    const after = cursor ? decodeListCursor(cursor) : null;
+    const { entities, raw } = await this.sessions.createQueryBuilder('s')
+      .addSelect(CURSOR_TIME_SQL, 'cursor_time')
+      .where('s.userId = :userId', { userId })
+      .andWhere(after ? '(s.lastOpenedAt, s.id) < (CAST(:t AS timestamptz), CAST(:id AS uuid))' : 'TRUE', after ?? {})
+      .orderBy('s.lastOpenedAt', 'DESC')
+      .addOrderBy('s.id', 'DESC')
+      .limit(SESSIONS_PAGE_SIZE + 1)
+      .getRawAndEntities<{ s_id: string; cursor_time: string }>();
+    const currentId = (await currentSession(this.sessions, userId))?.id ?? null;
+    const page = entities.slice(0, SESSIONS_PAGE_SIZE);
+    const last = page.at(-1);
+    const lastTime = last && raw.find((r) => r.s_id === last.id)?.cursor_time;
+    return {
+      sessions: page.map((s) => sessionListItem(s, currentId)),
+      nextCursor: entities.length > SESSIONS_PAGE_SIZE && last && lastTime ? encodeListCursor({ t: lastTime, id: last.id }) : null,
+    };
+  }
+
+  // Renames one of the user's sessions (any status). A title by title.ts's rules; empty or
+  // null gives the auto name again.
+  async rename(userId: string, sessionId: string, title: unknown): Promise<SessionListItem> {
+    assertUserId(userId);
+    const session = await this.sessions.findOne({ where: { id: sessionId, userId } });
+    if (!session) throw new NotFoundException('No such replay session');
+    const next = this.titleOrAuto(title, session.pair, session.timeframe, session.startTime);
+    await this.sessions.update({ id: session.id, userId }, { title: next });
+    const currentId = (await currentSession(this.sessions, userId))?.id ?? null;
+    return sessionListItem(await this.sessions.findOneByOrFail({ id: session.id, userId }), currentId);
+  }
+
+  // Deletes one of the user's ENDED sessions for good, with every row that belongs to it
+  // (REPLAY_SESSION_CHILD_TABLES), in one transaction under the session lock. An unended
+  // session is refused (409: end it first); another user's is a 404.
+  async remove(userId: string, sessionId: string): Promise<void> {
+    assertUserId(userId);
+    await this.lock.run(sessionId, () => this.dataSource.transaction(async (manager) => {
+      const session = await manager.findOne(ReplaySessionEntity, {
+        where: { id: sessionId, userId }, lock: { mode: 'pessimistic_write' },
+      });
+      if (!session) throw new NotFoundException('No such replay session');
+      if (session.status !== 'ENDED') throw new ConflictException('End the session before deleting it');
+      for (const table of REPLAY_SESSION_CHILD_TABLES) {
+        await manager.query(`DELETE FROM ${table} WHERE session_id = $1`, [session.id]);
+      }
+      const [, deleted] = await manager.query(
+        `DELETE FROM replay_sessions WHERE id = $1 AND user_id = $2 AND status = 'ENDED'`, [session.id, userId]) as [unknown, number];
+      if (deleted !== 1) throw new Error(`replay session ${session.id} changed while deleting`);
+    }));
+  }
+
+  private titleOrAuto(raw: unknown, pair: string, timeframe: string, start: Date): string {
+    const result = normalizeTitle(raw);
+    if (result.error !== null) throw new BadRequestException(result.error);
+    return result.title ?? autoTitle(pair, timeframe, start);
+  }
+
+  // Ends the named session (the user's, not ENDED; it needn't be the current one): pending
+  // orders are cancelled, open positions close at the clock minute's close (a long at the
+  // bid, a short at the ask; reason SESSION_END), all in one transaction under the session lock.
   async end(userId: string, sessionId: string): Promise<EndedSession> {
     assertUserId(userId);
     return this.lock.run(sessionId, () => this.dataSource.transaction(async (manager) => {

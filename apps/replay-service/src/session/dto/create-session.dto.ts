@@ -1,5 +1,6 @@
 import { buildMessage, IsIn, IsNumber, IsOptional, Max, Min, ValidateBy, ValidationOptions } from 'class-validator';
 import { parseStartTime, REPLAY_INSTRUMENTS, REPLAY_TIMEFRAMES } from '../replay-window';
+import { IsReplayTitle } from './rename-session.dto';
 
 function IsReplayStart(options?: ValidationOptions): PropertyDecorator {
   return ValidateBy({
@@ -37,4 +38,8 @@ export class CreateSessionDto {
 
   @IsIn(REPLAY_TIMEFRAMES)
   timeframe!: string;
+
+  // Optional: 1-60 characters after trimming; without one the session gets the auto name
+  @IsReplayTitle(false)
+  title?: string | null;
 }

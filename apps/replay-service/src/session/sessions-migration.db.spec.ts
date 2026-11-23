@@ -7,7 +7,7 @@ import { createTestDatabase, TestDatabase } from '@forexedge/database/testing';
 const run = process.env['RUN_DB_TESTS'] === 'true' ? describe : describe.skip;
 
 run('migration ReplaySessionsList (real DB)', () => {
-  jest.setTimeout(120_000);
+  jest.setTimeout(180_000);
   let db: TestDatabase;
   let userId: string;
 

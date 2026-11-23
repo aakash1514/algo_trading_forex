@@ -74,6 +74,33 @@ run('replay lifecycle (real app, real DB, real minutes)', () => {
     await endCurrent(two.token);
   });
 
+  it('My replays over HTTP: list, rename, open, delete; another user gets 404 and an unended session 409', async () => {
+    const owner = await user();
+    const other = await user();
+    const { body: s } = await create(owner.token, { title: 'Before the NFP' });
+    type Page = { sessions: { id: string; title: string; current: boolean }[]; nextCursor: string | null };
+    const page = await http<Page>(app.url, owner.token, 'GET', '/sessions');
+    expect(page.status).toBe(200);
+    expect(page.body).toEqual({ sessions: [expect.objectContaining({ id: s.id, title: 'Before the NFP', current: true })], nextCursor: null });
+    expect((await http<Page>(app.url, other.token, 'GET', '/sessions')).body.sessions).toEqual([]);
+
+    const renamed = await http<{ title: string }>(app.url, owner.token, 'PATCH', `/sessions/${s.id}`, { title: '  NFP  ' });
+    expect([renamed.status, renamed.body.title]).toEqual([200, 'NFP']);
+    expect((await http(app.url, owner.token, 'PATCH', `/sessions/${s.id}`, { title: 'x'.repeat(61) })).status).toBe(400);
+    expect((await http(app.url, owner.token, 'PATCH', `/sessions/${s.id}`, {})).status).toBe(400);
+    expect((await http(app.url, other.token, 'PATCH', `/sessions/${s.id}`, { title: 'mine' })).status).toBe(404);
+    expect((await http(app.url, other.token, 'POST', `/sessions/${s.id}/open`)).status).toBe(404);
+
+    expect((await http(app.url, owner.token, 'DELETE', `/sessions/${s.id}`)).status).toBe(409);
+    expect((await http(app.url, owner.token, 'POST', `/sessions/${s.id}/end`)).status).toBe(200);
+    const opened = await http<{ session: { id: string; status: string } }>(app.url, owner.token, 'POST', `/sessions/${s.id}/open`);
+    expect([opened.status, opened.body.session.status]).toEqual([200, 'ENDED']);
+    expect((await http(app.url, other.token, 'DELETE', `/sessions/${s.id}`)).status).toBe(404);
+    expect((await http(app.url, owner.token, 'DELETE', `/sessions/${s.id}`)).status).toBe(204);
+    expect((await http(app.url, owner.token, 'DELETE', `/sessions/${s.id}`)).status).toBe(404);
+    expect((await http<Page>(app.url, owner.token, 'GET', '/sessions')).body.sessions).toEqual([]);
+  });
+
   it('a socket without a valid token is refused', async () => {
     const wrongSecret = new JwtService().sign({ sub: '00000000-0000-4000-8000-000000000000' }, { secret: 'not-the-secret' });
     for (const token of ['', 'not-a-token', wrongSecret]) {
