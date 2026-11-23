@@ -16,6 +16,7 @@ import { ReplayGateway } from '../playback/replay.gateway';
 import { ReplayStateService } from '../playback/replay-state.service';
 import { ReplaySessionController } from '../session/session.controller';
 import { ReplaySessionService } from '../session/session.service';
+import { ReplayTradesService } from '../session/trades.service';
 import { replayDbCredentials } from './replay-db.config';
 
 // Bar replay over the imported history. No Kafka and no Redis: replay prices never
@@ -51,7 +52,7 @@ import { replayDbCredentials } from './replay-db.config';
   controllers: [ReplaySessionController, ReplayOrderController],
   providers: [
     ReplaySessionService, PairContextService, SessionLock,
-    PlaybackService, ReplayStateService, ReplayEmitter, ReplayGateway, ReplayOrderService,
+    PlaybackService, ReplayStateService, ReplayEmitter, ReplayGateway, ReplayOrderService, ReplayTradesService,
   ],
 })
 export class AppModule {}
