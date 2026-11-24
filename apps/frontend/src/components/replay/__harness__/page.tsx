@@ -30,6 +30,8 @@ export const page = {
 };
 
 export function serve(...r: Route[]) { page.routes = r; }
+// The requests that change something (the landing view also reads "My replays" with a GET)
+export const writes = () => page.calls.filter((c) => c.method !== 'GET');
 export const rest = (method: string, path: string, name: string, status: number): Route => ({ method, path, status, body: raw(name) });
 
 class NoResize { observe() { return undefined; } disconnect() { return undefined; } }
@@ -54,7 +56,8 @@ export function setupReplayPage() {
       const route = page.routes.find((r) => r.method === req.method && req.url === `http://localhost/api/replay/sessions${r.path}`);
       return route
         // the recorded bytes as they are (a Uint8Array copy: Node's Buffer type isn't a BodyInit)
-        ? new Response(typeof route.body === 'string' ? route.body : new Uint8Array(route.body),
+        // (a 204 has no body at all: the recorded file is empty)
+        ? new Response(route.status === 204 ? null : typeof route.body === 'string' ? route.body : new Uint8Array(route.body),
           { status: route.status, headers: { 'Content-Type': 'application/json' } })
         : new Response('{}', { status: 404 });
     });

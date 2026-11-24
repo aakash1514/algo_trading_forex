@@ -9,7 +9,9 @@ import { replayErrorMessage } from '../../lib/replay';
 // "End session" with a confirmation on the page (no browser dialog): ending closes the
 // open positions at the replay clock's price and cancels pending orders. Esc cancels the
 // question (the "Keep replaying" handler); nothing but the button confirms.
-export function EndSession({ openPositions, pendingOrders }: { openPositions: number; pendingOrders: number }) {
+export function EndSession({ sessionId, openPositions, pendingOrders }: {
+  sessionId: string; openPositions: number; pendingOrders: number;
+}) {
   const dispatch = useAppDispatch();
   const [confirming, setConfirming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +29,7 @@ export function EndSession({ openPositions, pendingOrders }: { openPositions: nu
 
   async function confirm() {
     setError(null);
-    const result = await end();
+    const result = await end(sessionId);
     if ('data' in result && result.data) dispatch(sessionEnded(result.data));
     else setError(replayErrorMessage(result.error));
   }

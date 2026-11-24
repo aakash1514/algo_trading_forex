@@ -7,8 +7,8 @@ export type ReplayStatus = (typeof REPLAY_STATUSES)[number];
 export const REPLAY_PAUSE_REASONS = ['USER', 'OTHER_TAB', 'DISCONNECT', 'SERVER_RESTART', 'END_OF_DATA'] as const;
 export type ReplayPauseReason = (typeof REPLAY_PAUSE_REASONS)[number];
 
-// One bar replay over the imported history (migration ReplayTables). At most one
-// session per user is not ENDED.
+// One bar replay over the imported history (migration ReplayTables). A user may keep
+// several sessions; at most one per user is PLAYING (migration ReplaySessionsList).
 @Entity('replay_sessions')
 export class ReplaySessionEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -56,4 +56,13 @@ export class ReplaySessionEntity {
 
   @Column({ name: 'ended_at', type: 'timestamptz', nullable: true })
   endedAt!: Date | null;
+
+  // 1-60 characters; the auto name when the user gave none (migration ReplaySessionsList).
+  // Null only for a row the previous release created.
+  @Column({ type: 'varchar', length: 60, nullable: true })
+  title!: string | null;
+
+  // When the user last opened it: the list's order, and the user's current session
+  @Column({ name: 'last_opened_at', type: 'timestamptz', default: () => 'now()' })
+  lastOpenedAt!: Date;
 }

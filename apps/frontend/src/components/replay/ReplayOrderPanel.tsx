@@ -53,6 +53,7 @@ export function ReplayOrderPanel({ ref }: { ref?: Ref<OrderPanelHandle> }) {
 
   const bid = bar.bid.close;
   const ask = bar.ask.close;
+  const sessionId = session.id;
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -60,7 +61,7 @@ export function ReplayOrderPanel({ ref }: { ref?: Ref<OrderPanelHandle> }) {
     const order = validateOrder({ side, lots, stopLoss, takeProfit }, { bid, ask, decimals });
     if (!order.ok) return setProblem(order.error);
     setProblem(null);
-    const result = await place(order.value);
+    const result = await place({ sessionId, order: order.value });
     if ('data' in result && result.data) {
       dispatch(positionsReceived([result.data.position]));
       dispatch(accountReceived(result.data.account));

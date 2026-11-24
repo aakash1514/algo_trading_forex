@@ -33,7 +33,7 @@ export function ResumeCard({ onResume }: { onResume: () => void }) {
           className="px-4 py-1.5 rounded bg-accent-blue text-white text-[12px] font-medium">
           Resume
         </button>
-        <EndSession openPositions={account.openPositions} pendingOrders={account.pendingOrders} />
+        <EndSession sessionId={session.id} openPositions={account.openPositions} pendingOrders={account.pendingOrders} />
       </div>
     </div>
   );

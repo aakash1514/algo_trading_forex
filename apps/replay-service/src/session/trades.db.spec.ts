@@ -27,7 +27,7 @@ run('closed trades and statistics (real DB, real minutes, replay login)', () => 
   const get = <T,>(userId: string, path: string) => http<T>(app.url, as(userId), 'GET', path);
   const step = async (n = 1) => {
     for (let i = 0; i < n; i += 1) {
-      const ack = await client.command('step');
+      const ack = await client.command('step', { sessionId });
       if (!ack.ok) throw new Error(`step: ${ack.error}`);
     }
   };
@@ -63,7 +63,7 @@ run('closed trades and statistics (real DB, real minutes, replay login)', () => 
     // 26 market orders of 0.1 lots, half long and half short, filled at the next minute
     const ids: string[] = [];
     for (let i = 0; i <= BATCH; i += 1) {
-      const res = await http<{ position: PositionView }>(app.url, as(owner), 'POST', '/sessions/active/orders',
+      const res = await http<{ position: PositionView }>(app.url, as(owner), 'POST', `/sessions/${sessionId}/orders`,
         { side: i % 2 === 0 ? 'BUY' : 'SELL', lots: 0.1 });
       expect(res.status).toBe(201);
       ids.push(res.body.position.id);
@@ -71,7 +71,7 @@ run('closed trades and statistics (real DB, real minutes, replay login)', () => 
     await step(30);
     // 25 closes requested at one clock minute: all close at the next minute's open, at one exit_time
     for (const id of ids.slice(0, BATCH)) {
-      expect((await http(app.url, as(owner), 'POST', `/sessions/active/positions/${id}/close`)).status).toBe(200);
+      expect((await http(app.url, as(owner), 'POST', `/sessions/${sessionId}/positions/${id}/close`)).status).toBe(200);
     }
     await step();
   });
@@ -102,7 +102,7 @@ run('closed trades and statistics (real DB, real minutes, replay login)', () => 
 
     const [last] = await db.admin.query(
       `SELECT id FROM replay_positions WHERE session_id = $1 AND status = 'OPEN'`, [sessionId]);
-    expect((await http(app.url, as(owner), 'POST', `/sessions/active/positions/${last.id}/close`)).status).toBe(200);
+    expect((await http(app.url, as(owner), 'POST', `/sessions/${sessionId}/positions/${last.id}/close`)).status).toBe(200);
     await step(3);
 
     expect(await second()).toEqual(before);

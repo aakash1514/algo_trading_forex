@@ -6,13 +6,19 @@ import type {
 
 export type ReplayConnection = 'connecting' | 'connected' | 'reconnecting' | 'failed' | 'closed';
 
-// The latest copy of what replay-service sent. The server owns the clock, fills and
-// money; nothing here is computed except where to put each update:
-//   state      replaces everything (connect, reconnect, timeframe change)
+// The latest copy of what replay-service sent for the session this page shows. The server
+// owns the clock, fills and money; nothing here is computed except where to put each
+// update. Every event names its session, and one for another session is ignored (the
+// user may have opened another session in another tab):
+//   state      replaces everything (connect, reconnect); stateUpdated only for this session
+//              (a timeframe change)
 //   bar        the current bar: same start time -> replaced in place; a later one ->
 //              the previous current bar is complete and joins the history
 //   positions  upserted by id (the same update twice changes nothing)
 //   account, status   replaced
+// An ENDED session opened from "My replays" is shown read-only from the server's answer
+// (readOnly: no socket state replaces it until the user leaves it). switchedAway: another
+// tab opened a different session, so this one was paused and its commands are refused.
 export interface ReplaySliceState {
   connection: ReplayConnection;
   loaded: boolean;               // a 'state' (with or without a session) has arrived
@@ -28,6 +34,8 @@ export interface ReplaySliceState {
   error: string | null;
   summary: EndSummary | null;    // set when the session ends
   calendar: { covered: boolean; events: Record<string, CalendarEvent> };
+  readOnly: boolean;             // an ENDED session being viewed
+  switchedAway: boolean;         // the user opened another session (in another tab)
 }
 
 // The history kept in memory while playing; a reload gets the server's 500 again
@@ -48,6 +56,8 @@ const initialState: ReplaySliceState = {
   error: null,
   summary: null,
   calendar: { covered: false, events: {} },
+  readOnly: false,
+  switchedAway: false,
 };
 
 const replaySlice = createSlice({
@@ -59,11 +69,18 @@ const replaySlice = createSlice({
       // a command can't be acknowledged by a socket that is gone
       if (action.payload !== 'connected') state.pendingCommand = null;
     },
+    // A broadcast state (a timeframe change): only for the session shown
+    stateUpdated(state, action: PayloadAction<ReplayState>) {
+      if (!state.session || state.session.id !== action.payload.session.id) return;
+      replaySlice.caseReducers.stateReceived(state, action);
+    },
     stateReceived(state, action: PayloadAction<ReplayState | null>) {
       const s = action.payload;
       state.loaded = true;
       state.stateVersion += 1;
       state.error = null;
+      state.readOnly = false;
+      state.switchedAway = false;
       if (!s) {
         Object.assign(state, {
           session: null, account: null, bars: [], currentBar: null, positions: {}, stateWasCapped: false,
@@ -82,6 +99,21 @@ const replaySlice = createSlice({
       };
       state.stateWasCapped = s.positions.filter((p) => p.status === 'CLOSED' || p.status === 'CANCELLED').length
         >= RECENT_CLOSED_CAP;
+    },
+    // An ENDED session from "My replays", read-only
+    endedViewOpened(state, action: PayloadAction<ReplayState>) {
+      replaySlice.caseReducers.stateReceived(state, action);
+      state.readOnly = true;
+    },
+    // Back from the ended view: the socket sends the current session's state next
+    endedViewClosed(state) {
+      state.readOnly = false;
+      state.loaded = false;
+    },
+    // The user opened (or created) a session: a page showing another live session says so
+    switchedReceived(state, action: PayloadAction<{ openedSessionId: string }>) {
+      if (state.session && !state.readOnly && state.session.status !== 'ENDED'
+        && state.session.id !== action.payload.openedSessionId) state.switchedAway = true;
     },
     barReceived(state, action: PayloadAction<BarEvent>) {
       const { sessionId, timeframe, clockTime, bar } = action.payload;
@@ -103,11 +135,11 @@ const replaySlice = createSlice({
       if (events.length > 0) state.calendar.covered = true;
     },
     accountReceived(state, action: PayloadAction<ReplayAccount>) {
-      if (state.session) state.account = action.payload;
+      if (state.session && state.session.id === action.payload.sessionId) state.account = action.payload;
     },
     positionsReceived(state, action: PayloadAction<ReplayPosition[]>) {
       if (!state.session) return;
-      for (const p of action.payload) state.positions[p.id] = p;
+      for (const p of action.payload) if (p.sessionId === state.session.id) state.positions[p.id] = p;
     },
     statusReceived(state, action: PayloadAction<ReplaySession>) {
       if (state.session && state.session.id === action.payload.id) state.session = action.payload;
@@ -118,6 +150,7 @@ const replaySlice = createSlice({
     sessionEnded(state, action: PayloadAction<EndedSession>) {
       const { session, closed } = action.payload;
       if (state.summary) return; // the REST answer and the socket's 'ended' both land here
+      if (!state.session || state.session.id !== session.id) return; // another session ended
       const knownClosed = Object.values(state.positions).filter((p) => p.status === 'CLOSED').map((p) => p.id);
       state.summary = endSummary(session, knownClosed, closed, state.stateWasCapped);
       Object.assign(state, {
@@ -146,7 +179,7 @@ const replaySlice = createSlice({
 });
 
 export const {
-  connectionChanged, stateReceived, barReceived, calendarReceived, accountReceived, positionsReceived, statusReceived,
+  connectionChanged, stateReceived, stateUpdated, endedViewOpened, endedViewClosed, switchedReceived, barReceived, calendarReceived, accountReceived, positionsReceived, statusReceived,
   endOfDataReceived, sessionEnded, summaryDismissed, commandStarted, commandFinished, errorReceived, replayReset,
 } = replaySlice.actions;
 export default replaySlice.reducer;

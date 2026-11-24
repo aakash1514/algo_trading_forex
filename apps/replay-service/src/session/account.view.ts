@@ -11,6 +11,7 @@ import { PairContext } from '../history/replay-history';
 //   marginUsed  = margin reserved by the open positions and the pending orders
 //   freeMargin  = equity - marginUsed
 export interface AccountView {
+  sessionId: string;   // every socket event names its session
   clockTime: string;
   balance: string;
   unrealizedPnlUsd: string;
@@ -39,10 +40,11 @@ export function accountCents(
 }
 
 export function accountView(
-  balance: string, positions: ReplayPositionEntity[], clockMinute: EngineMinute, ctx: PairContext,
+  sessionId: string, balance: string, positions: ReplayPositionEntity[], clockMinute: EngineMinute, ctx: PairContext,
 ): AccountView {
   const a = accountCents(balance, positions, clockMinute, ctx);
   return {
+    sessionId,
     clockTime: clockMinute.time.toISOString(),
     balance: centsToDecimal(a.balance),
     unrealizedPnlUsd: centsToDecimal(a.unrealized),

@@ -27,6 +27,9 @@ const ALLOWED = [
   `UPDATE replay_sessions SET updated_at = updated_at WHERE false`,
   `INSERT INTO replay_positions SELECT * FROM replay_positions WHERE false`,
   `UPDATE replay_positions SET updated_at = updated_at WHERE false`,
+  // a user deletes an ENDED session with its positions (migration ReplaySessionsList)
+  `DELETE FROM replay_positions WHERE false`,
+  `DELETE FROM replay_sessions WHERE false`,
 ];
 
 const REPLAY_DENIED = [
@@ -37,14 +40,15 @@ const REPLAY_DENIED = [
   'SELECT 1 FROM backtest_runs LIMIT 1',
   'SELECT 1 FROM ticks LIMIT 1',
   'SELECT 1 FROM candles_1m LIMIT 1',
-  'DELETE FROM replay_sessions WHERE false',
-  'DELETE FROM replay_positions WHERE false',
   'INSERT INTO historical_candles SELECT * FROM historical_candles WHERE false',
   'UPDATE historical_candles SET bid_open = bid_open WHERE false',
   'DELETE FROM historical_candles WHERE false',
   'UPDATE historical_price_scale SET pair = pair WHERE false',
   'INSERT INTO historical_import_log SELECT * FROM historical_import_log WHERE false',
   'INSERT INTO ticks SELECT * FROM ticks WHERE false',
+  'DELETE FROM ticks WHERE false',
+  'DELETE FROM candles_1m WHERE false',
+  'DELETE FROM instruments WHERE false',
   'UPDATE instruments SET pair = pair WHERE false',
 ];
 

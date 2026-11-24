@@ -83,14 +83,16 @@ run('no future data (real app, real minutes, H4 and D1 boundaries)', () => {
 
     const userId = await db.createUser();
     const token = accessToken(userId);
-    expect((await http(app.url, token, 'POST', '/sessions',
-      { instrument: 'EUR_USD', startTime: '2022-01-03T16:10Z', timeframe: '1h' })).status).toBe(201);
+    const created = await http<{ id: string }>(app.url, token, 'POST', '/sessions',
+      { instrument: 'EUR_USD', startTime: '2022-01-03T16:10Z', timeframe: '1h' });
+    expect(created.status).toBe(201);
+    const sessionId = created.body.id;
 
     const a = await connectClient(app.url, token);
-    const ok = async (name: string, body?: unknown) => expect((await a.command(name, body)).ok).toBe(true);
+    const ok = async (name: string, body?: object) => expect((await a.command(name, { sessionId, ...body })).ok).toBe(true);
     await ok('step');                                      // 1h: 16:11-16:59
     await ok('step');                                      // 1h: 17:00-17:59
-    expect((await http(app.url, token, 'POST', '/sessions/active/orders', { side: 'BUY', lots: 0.1 })).status).toBe(201);
+    expect((await http(app.url, token, 'POST', `/sessions/${sessionId}/orders`, { side: 'BUY', lots: 0.1 })).status).toBe(201);
     await ok('setTimeframe', { timeframe: '1d' });         // D1 2022-01-02 22:00, unfinished at 17:59
     await ok('setTimeframe', { timeframe: '4h' });         // H4 14:00, complete at 17:59
     await ok('setTimeframe', { timeframe: '15m' });
@@ -104,12 +106,12 @@ run('no future data (real app, real minutes, H4 and D1 boundaries)', () => {
     await a.close();
 
     const b = await connectClient(app.url, token);         // reconnect: PAUSED, full state
-    const okB = async (name: string, body?: unknown) => expect((await b.command(name, body)).ok).toBe(true);
+    const okB = async (name: string, body?: object) => expect((await b.command(name, { sessionId, ...body })).ok).toBe(true);
     await okB('setTimeframe', { timeframe: '1d' });        // D1 2022-01-02 22:00, now complete
     await okB('step');                                     // D1 2022-01-03 22:00: 22:00-23:59, the end of the data
     await okB('step');                                     // nothing left: endOfData again
     await sleep(200);
-    expect((await http(app.url, token, 'POST', '/sessions/active/end')).status).toBe(200);
+    expect((await http(app.url, token, 'POST', `/sessions/${sessionId}/end`)).status).toBe(200);
     await sleep(300);
     received.push(...b.events);
     await b.close();

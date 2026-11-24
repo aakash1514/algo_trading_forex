@@ -10,6 +10,7 @@ export function pointsToDecimal(points: number, priceDecimals: number): string {
 
 export interface PositionView {
   id: string;
+  sessionId: string;   // every socket event names its session
   side: 'BUY' | 'SELL';
   lots: string;
   units: number;
@@ -33,6 +34,7 @@ export function positionView(p: ReplayPositionEntity, priceDecimals: number): Po
   const iso = (d: Date | null) => (d ? d.toISOString() : null);
   return {
     id: p.id,
+    sessionId: p.sessionId,
     side: p.side,
     lots: p.lots,
     units: p.units,

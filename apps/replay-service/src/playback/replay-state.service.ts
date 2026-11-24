@@ -63,6 +63,6 @@ export class ReplayStateService {
   async account(session: ReplaySessionEntity, live?: ReplayPositionEntity[]): Promise<AccountView> {
     const ctx = await this.pairs.get(session.pair);
     const clockMinute = await minuteAt(this.dataSource, session.pair, session.clockTime);
-    return accountView(session.balance, live ?? await this.livePositions(session.id), clockMinute, ctx);
+    return accountView(session.id, session.balance, live ?? await this.livePositions(session.id), clockMinute, ctx);
   }
 }

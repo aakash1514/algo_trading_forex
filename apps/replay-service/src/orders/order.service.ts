@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Not, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { checkMargin, entryQuotes, exitQuotes, marginRequiredCents, positionUnits, Side } from '@forexedge/trading-sim';
 import { assertUserId } from '@forexedge/common';
 import { ReplayPositionEntity, ReplaySessionEntity } from '@forexedge/database';
@@ -11,6 +11,7 @@ import { Minute, minuteAt, PairContext } from '../history/replay-history';
 import { ReplayEmitter } from '../playback/replay-emitter';
 import { ReplayStateService } from '../playback/replay-state.service';
 import { accountCents, AccountView } from '../session/account.view';
+import { liveSession, NO_SUCH_SESSION, OTHER_SESSION_OPENED } from '../session/current-session';
 import { positionView, PositionView } from '../session/position.view';
 import { PlaceOrderDto } from './dto/place-order.dto';
 
@@ -21,7 +22,8 @@ export interface OrderResult {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// Replay orders, allowed while the session is PLAYING or PAUSED. An order is decided
+// Replay orders on the session the request names, allowed while it is PLAYING or PAUSED
+// and the user's current session. An order is decided
 // at the clock minute's close, so it is saved PENDING and fills at the next processed
 // minute's open (the backtester's next-open rule); a manual close is pending the same
 // way. Validation uses the clock minute's close, the last price the user has seen:
@@ -42,8 +44,8 @@ export class ReplayOrderService {
     private readonly emitter: ReplayEmitter,
   ) {}
 
-  place(userId: string, dto: PlaceOrderDto): Promise<OrderResult> {
-    return this.withSession(userId, async (s, ctx, clock) => {
+  place(userId: string, sessionId: string, dto: PlaceOrderDto): Promise<OrderResult> {
+    return this.withSession(userId, sessionId, async (s, ctx, clock) => {
       this.refuseAtEndOfData(s, ctx, 'no later minute to fill the order at');
       const side: Side = dto.side;
       let units: number;
@@ -78,8 +80,8 @@ export class ReplayOrderService {
     });
   }
 
-  close(userId: string, positionId: string): Promise<OrderResult> {
-    return this.withSession(userId, async (s, ctx) => {
+  close(userId: string, sessionId: string, positionId: string): Promise<OrderResult> {
+    return this.withSession(userId, sessionId, async (s, ctx) => {
       const position = await this.findPosition(s, positionId);
       if (position.status === 'PENDING') throw new ConflictException('The order has not filled yet: cancel it instead');
       if (position.status !== 'OPEN') throw new ConflictException(`The position is already ${position.status}`);
@@ -91,8 +93,8 @@ export class ReplayOrderService {
   }
 
   // A PENDING order only; its reserved margin is released (only open and pending count)
-  cancel(userId: string, orderId: string): Promise<OrderResult> {
-    return this.withSession(userId, async (s, ctx) => {
+  cancel(userId: string, sessionId: string, orderId: string): Promise<OrderResult> {
+    return this.withSession(userId, sessionId, async (s, ctx) => {
       const order = await this.findPosition(s, orderId);
       if (order.status !== 'PENDING') {
         throw new ConflictException(order.status === 'CANCELLED' ? 'The order is already cancelled' : 'The order has already filled');
@@ -104,15 +106,17 @@ export class ReplayOrderService {
 
   // ── Helpers ──
 
+  // The named session under its lock: the user's (another user's is a 404), not ENDED (404),
+  // and the user's current one (409: a stale tab's order never reaches another session)
   private async withSession<T>(
-    userId: string, work: (s: ReplaySessionEntity, ctx: PairContext, clock: Minute) => Promise<T>,
+    userId: string, sessionId: string, work: (s: ReplaySessionEntity, ctx: PairContext, clock: Minute) => Promise<T>,
   ): Promise<T> {
     assertUserId(userId);
-    const found = await this.sessions.findOne({ where: { userId, status: Not('ENDED') } });
-    if (!found) throw new NotFoundException('No active replay session');
-    return this.lock.run(found.id, async () => {
-      const s = await this.sessions.findOne({ where: { id: found.id, userId, status: Not('ENDED') } });
-      if (!s) throw new NotFoundException('No active replay session');
+    return this.lock.run(sessionId, async () => {
+      const { session: s, refused } = await liveSession(this.sessions, userId, sessionId, true);
+      if (refused || !s) {
+        throw refused === 'not-current' ? new ConflictException(OTHER_SESSION_OPENED) : new NotFoundException(NO_SUCH_SESSION);
+      }
       const ctx = await this.pairs.get(s.pair);
       return work(s, ctx, await minuteAt(this.dataSource, s.pair, s.clockTime));
     });

@@ -29,7 +29,7 @@ export function configureApp(app: INestApplication): void {
   app.enableCors({
     origin: CORS_ORIGIN,
     credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
   app.setGlobalPrefix('api', { exclude: HEALTH_ROUTES }); // /health/live and /health/ready

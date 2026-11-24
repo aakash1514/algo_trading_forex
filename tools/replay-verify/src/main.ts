@@ -174,7 +174,7 @@ async function replayPair(db: Client, replayUrl: string, tokens: Tokens, pair: s
   const positions = new Map<string, PositionView>();
   socket.on('positions', (list: PositionView[]) => list.forEach((p) => positions.set(p.id, p)));
   await new Promise((ok, fail) => { socket.once('state', ok); socket.once('connect_error', fail); });
-  const ack = <T>(command: string) => socket.timeout(ACK_TIMEOUT_MS).emitWithAck(command, {}) as
+  const ack = <T>(command: string) => socket.timeout(ACK_TIMEOUT_MS).emitWithAck(command, { sessionId: session.id }) as
     Promise<{ ok: boolean; result: T; error?: string }>;
 
   const lastDay = Date.parse(`${run.to}T00:00Z`) + 86_400_000;
@@ -191,17 +191,17 @@ async function replayPair(db: Client, replayUrl: string, tokens: Tokens, pair: s
       const todo = actions.get(bar);
       if (!todo) continue;
       for (const i of todo.close) {
-        await api.call('POST', `/sessions/active/positions/${positionOf.get(i)}/close`);
+        await api.call('POST', `/sessions/${session.id}/positions/${positionOf.get(i)}/close`);
       }
       for (const i of todo.open) {
-        const placed = await api.call<{ position: { id: string } }>('POST', '/sessions/active/orders',
+        const placed = await api.call<{ position: { id: string } }>('POST', `/sessions/${session.id}/orders`,
           { side: verified[i].side, lots: run.lots });
         positionOf.set(i, placed.position.id);
       }
       actions.delete(bar);
     }
     if (actions.size > 0) throw new Error(`${pair}: ${actions.size} signal bar(s) never reached (${[...actions.keys()][0]} ...)`);
-    const ended = await api.call<{ session: { balance: string }; closed: PositionView[] }>('POST', '/sessions/active/end');
+    const ended = await api.call<{ session: { balance: string }; closed: PositionView[] }>('POST', `/sessions/${session.id}/end`);
     ended.closed.forEach((p) => positions.set(p.id, p));
 
     const replayed: ReplayedTrade[] = verified.map((_, i) => {

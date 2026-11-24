@@ -98,15 +98,15 @@ run('replay calendar (real DB, real FOMC/ECB events, replay login)', () => {
       db.replay.getRepository(ReplaySessionEntity), db.replay, pairs, new SessionLock(), emitter, state);
     const userId = await db.createUser();
     try {
-      await sessions.create(userId, { instrument: 'EUR_USD', startTime: '2022-01-26T18:58Z', timeframe: '1m' } as never);
+      const created = await sessions.create(userId, { instrument: 'EUR_USD', startTime: '2022-01-26T18:58Z', timeframe: '1m' } as never);
       const session = () => db.admin.getRepository(ReplaySessionEntity).findOneByOrFail({ userId });
       const first = await state.state(await session());
       expect(first.session.clockTime).toBe('2022-01-26T18:58:00.000Z');
       expect(first.calendar).toEqual({ covered: true, events: [] }); // FOMC events exist since 2021, none in view yet
 
-      await playback.step(userId); // 18:59
+      await playback.step(userId, created.id); // 18:59
       expect(emitter.events.map((e) => e.event)).not.toContain('calendar');
-      await playback.step(userId); // 19:00
+      await playback.step(userId, created.id); // 19:00
       const sent = emitter.events.filter((e) => e.event === 'calendar');
       expect(sent).toHaveLength(1);
       expect(sent[0].clock.toISOString()).toBe(FOMC_TIME);
@@ -114,16 +114,16 @@ run('replay calendar (real DB, real FOMC/ECB events, replay login)', () => {
         clockTime: FOMC_TIME, timeframe: '1m', events: [{ time: FOMC_TIME, barTime: FOMC_TIME, title: FOMC_TITLE }],
       });
 
-      await playback.setTimeframe(userId, '4h');
+      await playback.setTimeframe(userId, created.id, '4h');
       const reloaded = emitter.events.filter((e) => e.event === 'state').at(-1)?.payload as { calendar: unknown };
       expect(reloaded.calendar).toEqual({
         covered: true, events: [expect.objectContaining({ time: FOMC_TIME, barTime: FOMC_BAR['4h'] })],
       });
-      await playback.step(userId); // 19:01: the event is not sent again
+      await playback.step(userId, created.id); // 19:01: the event is not sent again
       expect(emitter.events.filter((e) => e.event === 'calendar')).toHaveLength(1);
     } finally {
       await playback.onModuleDestroy();
-      await sessions.end(userId);
+      await sessions.end(userId, (await sessions.getActive(userId)).id);
     }
   });
 });
