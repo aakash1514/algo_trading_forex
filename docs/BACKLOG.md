@@ -26,6 +26,12 @@ its trades.
     language evaluated over the replay's bars up to the clock only (never a later bar), with its own parser and
     interpreter: no `eval`, `Function` or dynamic imports, bounded loops and time. Indicator rows would belong to a
     session and be deleted with it (`REPLAY_SESSION_CHILD_TABLES`).
+15. **Flaky under parallel load: `apps/replay-service/src/guarantees/lifecycle.db.spec.ts`, "an expiring token
+    without a reauth: authExpired, disconnected, a playing replay paused as DISCONNECT".** It signs a token that
+    expires in 2-3 s, then creates, connects, sets the speed, plays and waits for one bar. With every DB suite running
+    in parallel on the laptop, the token can expire before the first bar ("no bar within 5000 ms", seen once on
+    2026-11-23; passes alone). Fix: issue the short token after the first bar (reauth with it), or give the step its
+    own deadline, so the expiry is measured from a known point instead of from the start of the test.
 
 ## Deployment (step 7)
 

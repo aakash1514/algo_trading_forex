@@ -191,6 +191,36 @@ run('replay session switching (real DB, real minutes, replay login)', () => {
     for (const s of [a, b]) await svc.sessions.end(userId, s.id);
   });
 
+  it('a restart pauses every playing session (one per user) and leaves the paused ones as they were; nothing conflicts', async () => {
+    const userId = await db.createUser();
+    const other = await db.createUser();
+    const a = await create(userId);
+    const b = await create(userId, { instrument: 'XAU_USD' });
+    const c = await create(other);
+    await svc.playback.pause(userId, b.id);
+    await db.admin.query(`UPDATE replay_sessions SET pause_reason = 'DISCONNECT' WHERE id = $1`, [b.id]);
+    await svc.playback.open(userId, a.id);
+    await svc.playback.setSpeed(userId, a.id, 2000);
+    await svc.playback.play(userId, a.id);
+    await svc.playback.setSpeed(other, c.id, 2000);
+    await svc.playback.play(other, c.id);
+    expect([await playingCount(userId), await playingCount(other)]).toEqual([1, 1]);
+
+    const booted = replayServices(db).playback; // a new process: its boot runs pauseAllPlaying
+    await booted.onModuleInit();
+    expect(await row(a.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'SERVER_RESTART' });
+    expect(await row(c.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'SERVER_RESTART' });
+    expect(await row(b.id)).toMatchObject({ status: 'PAUSED', pauseReason: 'DISCONNECT' });
+    expect([await playingCount(userId), await playingCount(other)]).toEqual([0, 0]);
+    // nothing resumes, and the index doesn't block playing the current session again
+    const clock = (await row(a.id)).clockTime.toISOString();
+    await sleep(2_500);
+    expect((await row(a.id)).clockTime.toISOString()).toBe(clock);
+    expect((await booted.play(userId, a.id)).status).toBe('PLAYING');
+    await booted.onModuleDestroy();
+    for (const [u, s] of [[userId, a], [userId, b], [other, c]] as const) await svc.sessions.end(u, s.id);
+  });
+
   it('every account and position event names its session', async () => {
     const userId = await db.createUser();
     const a = await create(userId);

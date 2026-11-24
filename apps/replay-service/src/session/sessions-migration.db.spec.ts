@@ -79,6 +79,37 @@ run('migration ReplaySessionsList (real DB)', () => {
     await expect(set('')).rejects.toMatchObject({ code: '23514' });
   });
 
+  // A rollback restores the previous release's code but keeps this schema. Its queries, verbatim in SQL:
+  //   findActive / withSession / connected / lastSocketLeft: findOne({ userId, status: Not('ENDED') }) = LIMIT 1,
+  //     then every write re-reads that row by id: nothing needs exactly one unended row
+  //   create: refuseIfActive (that query) -> 409 whenever one exists; only two creates at the same instant could
+  //     both pass it and, without the old index, insert a second unended row (harmless: findOne picks one)
+  //   play: UPDATE ... SET status = 'PLAYING' -> a second PLAYING row of a user is refused by the new index
+  //   boot / clean stop: pauseAllPlaying, unchanged
+  it('the previous release still works on this schema (rollback)', async () => {
+    const unended = (await db.dataSource.query(
+      `SELECT id FROM replay_sessions WHERE user_id = $1 AND status <> 'ENDED' LIMIT 1`, [userId]));
+    expect(unended).toHaveLength(1); // its create answers 409 here, as before
+    // a row inserted the old way (no title, no last_opened_at) gets the defaults
+    const old = await insertSession({ status: 'PAUSED', updatedAt: '2026-11-23T00:00Z' });
+    const [row] = await db.dataSource.query(`SELECT title, last_opened_at FROM replay_sessions WHERE id = $1`, [old]);
+    expect(row.title).toBeNull();
+    expect(row.last_opened_at).not.toBeNull();
+    // its play on one session, then on another of the same user: the second is refused
+    const [first, second] = (await db.dataSource.query(
+      `SELECT id FROM replay_sessions WHERE user_id = $1 AND status <> 'ENDED' ORDER BY id LIMIT 2`, [userId])).map((r: { id: string }) => r.id);
+    await db.dataSource.query(`UPDATE replay_sessions SET status = 'PLAYING' WHERE id = $1`, [first]);
+    await expect(db.dataSource.query(`UPDATE replay_sessions SET status = 'PLAYING' WHERE id = $1`, [second]))
+      .rejects.toMatchObject({ code: '23505' });
+    // its boot pauses it again with no conflict
+    await db.dataSource.query(
+      `UPDATE replay_sessions SET status = 'PAUSED', pause_reason = 'SERVER_RESTART', updated_at = now() WHERE status = 'PLAYING' RETURNING id`);
+    const [{ playing }] = await db.dataSource.query(
+      `SELECT count(*)::int AS playing FROM replay_sessions WHERE user_id = $1 AND status = 'PLAYING'`, [userId]);
+    expect(playing).toBe(0);
+    await db.dataSource.query(`UPDATE replay_sessions SET status = 'ENDED', ended_at = now(), pause_reason = NULL WHERE id = $1`, [old]);
+  });
+
   it('refuses to revert while a user has two unended sessions', async () => {
     await expect(db.dataSource.undoLastMigration({ transaction: 'each' })).rejects.toThrow(/more than one unended replay session/);
     expect(await indexes()).toContain('replay_sessions_one_playing_per_user');
