@@ -7,6 +7,10 @@ says when.
 
 Done on branch `replay-improvements`: keyboard shortcuts (2026-11-20, was item 1); calendar events on the replay
 chart, paged closed-trade history and replay statistics (2026-11-23, were items 2-4; plans in `docs/plans/`).
+Done on branch `replay-sessions` (2026-11-24): "My replays" (several sessions per user, one playing, titles,
+switching, read-only ended sessions; `docs/plans/replay-sessions.md`). **Resolved: ended sessions are kept
+forever** — on purpose (their trades and statistics stay reviewable); the user can now delete an ENDED session with
+its trades.
 
 2. **Calendar history before 2021.** The replay chart marks only the events `economic_events` holds: inside the
    replay history (2010-2022) that is the FOMC decisions of 2021-2022 (the Fed's calendar page starts in 2021; ECB
@@ -18,6 +22,10 @@ chart, paged closed-trade history and replay statistics (2026-11-23, were items 
     shape change breaks the build.** Today `StepResult` (replay-service `playback.service.ts`) and `CommandAck`
     (`replay.gateway.ts`) are copied by hand into `apps/frontend/src/types/replay.types.ts`; the frontend tests type
     their acks against the copy, so a change on the server side alone compiles and passes.
+14. **Custom indicators in a Pine-like scripting language** (own interpreter, no `eval`). A small, sandboxed
+    language evaluated over the replay's bars up to the clock only (never a later bar), with its own parser and
+    interpreter: no `eval`, `Function` or dynamic imports, bounded loops and time. Indicator rows would belong to a
+    session and be deleted with it (`REPLAY_SESSION_CHILD_TABLES`).
 
 ## Deployment (step 7)
 

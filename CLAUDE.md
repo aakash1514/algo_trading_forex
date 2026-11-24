@@ -116,7 +116,7 @@ only). In production everything is one origin behind Caddy (`infra/caddy/Caddyfi
 | order-service | 3004 | Orders, positions, account. Validates orders using live ticks, spread alerts, and session state from Kafka. Publishes `orders.lifecycle`. |
 | ml-service (Python) | 3006 | FastAPI, inference only: LSTM next-H1-direction models trained offline walk-forward (`models/`, manifest + sha256). `GET /api/ml/{health,models,evaluation,predictions/{instrument}}`, JWT on all but health. Reads the history as the read-only login `forexedge_ml` (role `forexedge_readonly`). Results are a **historical walk-forward test, not live signals**. |
 | research-agent (Python) | 3007 | FastAPI + LangGraph agent over a FastMCP stdio server (7 read-only tools: available data, bars, market stats, the caller's backtest runs, ML evaluation/predictions). `POST /api/research/ask` (JWT) returns a structured report whose every number is checked by a deterministic verifier. LLM from env (`RESEARCH_LLM_MODEL`, default `groq:openai/gpt-oss-120b`, free tier). DB login `forexedge_research` (roles `forexedge_readonly` + `forexedge_research_reader`); calls ml-service with the caller's own token. |
-| replay-service | 3008 | Bar replay over the imported 2010-2022 history (step 6b-1). REST `/api/replay/sessions` (create: 409 `{activeSessionId}` while one is active; `active`; `active/end`), `active/orders`, `active/orders/:id/cancel`, `active/positions/:id/close`; Socket.IO namespace `/replay` on path `/api/replay/socket.io` (JWT in `handshake.auth.token`, room `user:<id>`; commands play, pause, step, setSpeed, setTimeframe, reauth, acked `{ok, result or error}`; events state, bar, account, positions, status, endOfData, ended). Trades through `@forexedge/trading-sim`. DB login `forexedge_replay` (roles `forexedge_readonly` + `forexedge_replay_writer`). **No Kafka, no Redis.** |
+| replay-service | 3008 | Bar replay over the imported 2010-2022 history (step 6b-1). REST `/api/replay/sessions` (create, pausing a playing one first; `GET` list "My replays"; `PATCH :id` title; `DELETE :id` ENDED only), `active` (GET, the current session), `:id/open`, `:id/end`, `:id/orders`, `:id/orders/:oid/cancel`, `:id/positions/:pid/close`; Socket.IO namespace `/replay` on path `/api/replay/socket.io` (JWT in `handshake.auth.token`, room `user:<id>`; commands play, pause, step, setSpeed, setTimeframe (each `{ sessionId, ... }`), reauth, acked `{ok, result or error}`; events state, bar, account, positions, status, endOfData, ended, switched, each naming its session). Trades through `@forexedge/trading-sim`. DB login `forexedge_replay` (roles `forexedge_readonly` + `forexedge_replay_writer`). **No Kafka, no Redis.** |
 | ws-gateway | 3005 | Socket.IO gateway (rooms `user:<id>`, events `tick:<instrument>`). Relays `forex.ticks`, `orders.lifecycle`, `positions.updated`, `accounts.updated` to clients. Also hosts the **backtest engine**: a BullMQ queue/worker with strategies in `backtest/strategies/` registered via `strategy.registry.ts`, results stored in MinIO, and Bull Board at `/admin/queues` (HTTP Basic auth from `BULL_BOARD_USER`/`BULL_BOARD_PASS`; not mounted unless both are set). |
 
 order-service's `RealtimePublisher` publishes `positions.updated` (tick-driven P&L throttled to ~1/s per position, plus a full snapshot after a fill/close) and `accounts.updated`, always after the DB commit. Socket event names live in `libs/kafka/src/lib/interfaces/realtime.interface.ts`; the frontend mirrors `SOCKET_EVENTS` in `src/lib/constants.ts`.
@@ -189,6 +189,12 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
   formatted from cents as BigInt). Each open position's P&L is computed with `@forexedge/trading-sim`'s
   `markToMarketCents` at the current bar's close (the server sends only the total; a test checks the rows add up
   to `unrealizedPnlUsd`). On /replay the Topbar hides the live ticker and shows "Historical replay".
+  **My replays** (`ReplaySessionList`): the landing view lists every session (server-paged, Load more), titles as
+  text only, inline rename, Delete on ENDED rows behind a dialog; opening asks the server (`POST /:id/open`). Every
+  socket event and command carries the session id; the slice ignores another session's events, and only the first
+  `state` after a connect may switch sessions (a later one is `stateUpdated`, same session only). An ENDED session
+  is shown read-only (`readOnly`: no controls, orders or shortcuts; a reconnect's state doesn't replace it);
+  `switchedAway` (a `switched` for another session) shows the banner and disables the controls.
   **Shortcuts** (`useReplayShortcuts`, window listener while the replay screen is mounted): Space, → (Shift+→ = 10
   single steps, each after the previous ack; replay-service has no step count), ↑/↓ speed (no wrap), B/S (only
   `prepare(side)` on the order panel: side + focus Lots, never submit), ?, Esc (help; End-session cancel). Keys
@@ -382,8 +388,20 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
     paused session, never END_OF_DATA; the other sockets get a `status`), DISCONNECT (the last socket left while
     playing; a lone reconnect keeps it), SERVER_RESTART (boot or clean stop), END_OF_DATA. A step that fails while
     playing pauses with no reason and sends a `status`.
-  - One non-ENDED session per user (partial unique index). The replay login can't write `historical_*`, `ticks`,
-    `candles_*` or `instruments`, and can't read users/orders/live ticks; replay-service refuses to start as `DB_USER`.
+  - **Several sessions per user, one playing** (branch `replay-sessions`, migration ReplaySessionsList; plan
+    `docs/plans/replay-sessions.md`): the **current** session is the latest `last_opened_at` that isn't ENDED
+    (`session/current-session.ts`); unique index `replay_sessions_one_playing_per_user`. Every command and order
+    **names its session** (`{ sessionId }`, `/:id/...`); the server acts only on that one (owner-scoped, not ENDED,
+    else 404 / "No such replay session"), and play/step/speed/timeframe/orders/cancels/closes also need it to be the
+    current one (else 409 / "This replay was paused because you opened another one"): a stale tab is refused, never
+    redirected. Opening or creating a session runs under the user's lock (`user:<id>` in `SessionLock`), pauses the
+    playing one first (USER) and sends `switched`. Opening an ENDED session is read-only (its state; no socket event).
+    Titles: 1-60 code points after trimming, no `\p{Cc}`/`\p{Cf}`/line or paragraph separators (`session/title.ts`),
+    empty = the stored auto name `EUR/USD · 1m · 2022-03-16`. Delete: ENDED only, the session and every
+    `REPLAY_SESSION_CHILD_TABLES` row in one transaction; a DB test fails when a table with an FK to
+    `replay_sessions` is missing from that list (add future indicators/drawings there). The list's keyset cursor keeps
+    Postgres microseconds. The replay login has DELETE on the two replay tables only; it can't write `historical_*`,
+    `ticks`, `candles_*` or `instruments`, and can't read users/orders/live ticks; replay-service refuses to start as `DB_USER`.
   - Tests use real minutes only: `test/replay-test-db.ts` loads the importer's real fixtures into `<DB_NAME>_test`
     with the real instruments seed and the real FOMC/ECB events (domain-service's parsers over its recorded official
     pages; these are the only cross-project imports, test code) and connects as a temporary login with the replay
@@ -493,6 +511,9 @@ Most services use `@forexedge/kafka`. `KafkaModule` is `@Global`. `KafkaConsumer
 - **Step 6b-2 (Replay page) is done** (2026-11-10) on branch `step-6b-2-replay-frontend` (not merged): `/replay`,
   the pause reason, a Playwright browser run. Write-up: `docs/phase-summaries/step-6b-2-replay-frontend.md`.
   Deferred items: `docs/BACKLOG.md`.
+- **Replay sessions ("My replays") are done** (2026-11-24) on branch `replay-sessions`, stacked on
+  `replay-improvements` (PR #20; neither merged): several sessions per user, one playing, list/rename/delete,
+  read-only ended sessions, every command named by its session. Plan: `docs/plans/replay-sessions.md`.
 - **Step 7 phase 1 (deploy readiness) is done** (2026-11-10) on branch `step-7-deploy-readiness` (not merged):
   health endpoints, token expiry on sockets, pinned JWT claims, live feed dot, closed registration + demo users,
   research quota, same-origin frontend, S3 results with the instance role, images, prod compose, Caddy, history

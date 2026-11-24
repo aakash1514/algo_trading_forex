@@ -131,9 +131,11 @@ Every new query has `user_id` in its WHERE (another user's id is a 404, never a 
 Frontend decisions, in plain words:
 - **The server decides what "current" means; the page only asks.** Two tabs could otherwise disagree about which
   session is open. The page sends "open X" and draws whatever state the server sends back.
-- **An ended replay is a separate read-only view, not the live screen with buttons hidden.** The live screen listens
-  to the socket. An ended session's data comes from one REST answer and lives in that view only, so no socket event can
-  change it, and there is no button that could send a command (the server refuses one anyway).
+- **An ended replay is a separate read-only view, not the live screen with buttons hidden.** It mounts no controls,
+  order panel or shortcuts, so there is no button that could send a command (the server refuses one anyway). As built:
+  its data (one REST answer) goes into the same `replay` slice marked `readOnly`, so the existing chart, closed-trade
+  and statistics components are reused unchanged; no socket event can change it (every event names its session and
+  an ENDED session gets none, and a reconnect's state is ignored while `readOnly`), and leaving it re-syncs the socket.
 - **The list is refetched, not patched by hand,** after open, rename, delete, create and end. It is one small request,
   and it avoids keeping two copies of the order in sync.
 - **Paging the list like the closed trades** ("Load more", cursor from the server) keeps one pattern for long lists.
